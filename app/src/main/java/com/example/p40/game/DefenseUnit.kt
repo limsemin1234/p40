@@ -2,51 +2,86 @@ package com.example.p40.game
 
 import android.graphics.Canvas
 import android.graphics.PointF
-import kotlin.math.sqrt
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
 
 class DefenseUnit(
     private val position: PointF,
-    private val attackRange: Float = GameConfig.DEFENSE_UNIT_ATTACK_RANGE,
-    private val attackCooldown: Long = GameConfig.DEFENSE_UNIT_ATTACK_COOLDOWN
+    var attackRange: Float,
+    private val attackCooldown: Long
 ) {
-    private var lastAttackTime = 0L
+    private var lastAttackTime: Long = 0
     
     // 가장 가까운 적을 찾아 공격
-    fun attack(enemies: List<Enemy>, currentTime: Long): Missile? {
+    fun attack(
+        enemies: List<Enemy>, 
+        currentTime: Long,
+        adjustedCooldown: Long = attackCooldown,
+        damageMultiplier: Float = 1.0f,
+        angleOffset: Double = 0.0
+    ): Missile? {
         if (enemies.isEmpty()) return null
         
         // 쿨다운 체크
-        if (currentTime - lastAttackTime < attackCooldown) {
+        if (currentTime - lastAttackTime < adjustedCooldown) {
             return null
         }
         
         // 가장 가까운 적 찾기
-        var closestEnemy: Enemy? = null
-        var closestDistance = Float.MAX_VALUE
+        val target = findNearestEnemy(enemies)
+        if (target != null) {
+            lastAttackTime = currentTime
+            
+            val dx = target.getPosition().x - position.x
+            val dy = target.getPosition().y - position.y
+            val angle = atan2(dy.toDouble(), dx.toDouble()) + angleOffset
+            
+            val missileSpeed = 5.0f
+            val damage = (GameConfig.MISSILE_DAMAGE * damageMultiplier).toInt()
+            val missileSize = 5.0f
+            
+            val startX = position.x + cos(angle).toFloat() * 20
+            val startY = position.y + sin(angle).toFloat() * 20
+            
+            return Missile(
+                position = PointF(startX, startY),
+                angle = angle,
+                speed = missileSpeed,
+                size = missileSize,
+                damage = damage,
+                target = target
+            )
+        }
+        
+        return null
+    }
+    
+    // 가장 가까운 적 찾기
+    private fun findNearestEnemy(enemies: List<Enemy>): Enemy? {
+        var nearest: Enemy? = null
+        var minDistance = Float.MAX_VALUE
         
         for (enemy in enemies) {
-            if (enemy.isDead()) continue
+            val dx = enemy.getPosition().x - position.x
+            val dy = enemy.getPosition().y - position.y
+            val distance = dx * dx + dy * dy
             
-            val enemyPos = enemy.getPosition()
-            val dx = enemyPos.x - position.x
-            val dy = enemyPos.y - position.y
-            val distance = sqrt(dx * dx + dy * dy)
-            
-            if (distance < attackRange && distance < closestDistance) {
-                closestDistance = distance
-                closestEnemy = enemy
+            if (distance < attackRange * attackRange && distance < minDistance) {
+                minDistance = distance
+                nearest = enemy
             }
         }
         
-        // 공격 가능한 적이 있으면 미사일 발사
-        return if (closestEnemy != null) {
-            lastAttackTime = currentTime
-            Missile(
-                position = PointF(position.x, position.y),
-                target = closestEnemy
-            )
-        } else {
-            null
+        return nearest
+    }
+    
+    // 적들까지의 거리 계산 (디버깅용)
+    fun getEnemyDistances(enemies: List<Enemy>): List<Float> {
+        return enemies.map { enemy ->
+            val dx = enemy.getPosition().x - position.x
+            val dy = enemy.getPosition().y - position.y
+            kotlin.math.sqrt(dx * dx + dy * dy)
         }
     }
     

@@ -14,22 +14,34 @@ object GameConfig {
     const val WAVE_MESSAGE_DURATION = 2000L  // 웨이브 메시지 표시 시간 (밀리초)
     
     // 디펜스 유닛 설정
-    const val DEFENSE_UNIT_SIZE = 40f  // 디펜스 유닛 크기
+    const val DEFENSE_UNIT_SIZE = 30f  // 디펜스 유닛 크기
     const val DEFENSE_UNIT_COLOR = Color.BLUE  // 디펜스 유닛 색상
     const val DEFENSE_UNIT_ATTACK_RANGE = 500f  // 공격 범위
-    const val DEFENSE_UNIT_ATTACK_COOLDOWN = 500L  // 공격 쿨다운 (밀리초)
+    const val DEFENSE_UNIT_ATTACK_COOLDOWN = 1000L  // 공격속도 1초
     
     // 미사일 설정
-    const val MISSILE_SIZE = 15f  // 미사일 크기
-    const val MISSILE_SPEED = 8f  // 미사일 속도
+    const val MISSILE_SIZE = 5f  // 미사일 크기
+    const val MISSILE_SPEED = 5f  // 미사일 속도
     const val MISSILE_DAMAGE = 50  // 미사일 기본 데미지
     const val MISSILE_COLOR = Color.YELLOW  // 미사일 색상
     const val MISSILE_MAX_DISTANCE = 2000f  // 미사일 최대 이동 거리
     
     // 일반 적 설정
-    const val ENEMY_BASE_SIZE = 20f  // 기본 크기
-    const val ENEMY_BASE_HEALTH = 100  // 기본 체력
+    const val ENEMY_BASE_SIZE = 10f  // 기본 크기
+    const val ENEMY_BASE_HEALTH = 50  // 기본 체력
     const val ENEMY_COLOR = Color.RED  // 적 색상
+    
+    // 웨이브별 적 체력 배율 (ENEMY_BASE_HEALTH에 곱해짐)
+    const val WAVE_1_HEALTH_MULTIPLIER = 1.0f
+    const val WAVE_2_HEALTH_MULTIPLIER = 1.2f
+    const val WAVE_3_HEALTH_MULTIPLIER = 1.4f
+    const val WAVE_4_HEALTH_MULTIPLIER = 1.6f
+    const val WAVE_5_HEALTH_MULTIPLIER = 1.8f
+    const val WAVE_6_HEALTH_MULTIPLIER = 2.0f
+    const val WAVE_7_HEALTH_MULTIPLIER = 2.2f
+    const val WAVE_8_HEALTH_MULTIPLIER = 2.4f
+    const val WAVE_9_HEALTH_MULTIPLIER = 2.6f
+    const val WAVE_10_HEALTH_MULTIPLIER = 2.8f
     
     // 보스 설정
     const val BOSS_SIZE_MULTIPLIER = 2.0f  // 보스 크기 배율
@@ -72,19 +84,23 @@ object GameConfig {
         10 to 2.8f
     )
     
-    // 웨이브별 적 체력
-    val WAVE_ENEMY_HEALTHS = mapOf(
-        1 to 100,
-        2 to 120,
-        3 to 140,
-        4 to 160,
-        5 to 180,
-        6 to 200,
-        7 to 220,
-        8 to 240,
-        9 to 260,
-        10 to 280
-    )
+    // 웨이브별 적 체력 계산 (ENEMY_BASE_HEALTH에 배율을 곱함)
+    fun getEnemyHealthForWave(wave: Int): Int {
+        val multiplier = when(wave) {
+            1 -> WAVE_1_HEALTH_MULTIPLIER
+            2 -> WAVE_2_HEALTH_MULTIPLIER
+            3 -> WAVE_3_HEALTH_MULTIPLIER
+            4 -> WAVE_4_HEALTH_MULTIPLIER
+            5 -> WAVE_5_HEALTH_MULTIPLIER
+            6 -> WAVE_6_HEALTH_MULTIPLIER
+            7 -> WAVE_7_HEALTH_MULTIPLIER
+            8 -> WAVE_8_HEALTH_MULTIPLIER
+            9 -> WAVE_9_HEALTH_MULTIPLIER
+            10 -> WAVE_10_HEALTH_MULTIPLIER
+            else -> WAVE_1_HEALTH_MULTIPLIER
+        }
+        return (ENEMY_BASE_HEALTH * multiplier).toInt()
+    }
     
     // 점수 설정
     const val SCORE_PER_NORMAL_ENEMY = 10  // 일반 적 처치 시 얻는 점수

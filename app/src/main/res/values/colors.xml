@@ -2,4 +2,6 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="main_bottom_color">#202020</color>
+    <color name="button_color">#212675</color>
 </resources>

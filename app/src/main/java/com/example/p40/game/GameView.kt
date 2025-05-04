@@ -16,6 +16,13 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.random.Random
 
+/**
+ * 게임 오버 콜백 인터페이스
+ */
+interface GameOverListener {
+    fun onGameOver(resource: Int, waveCount: Int)
+}
+
 class GameView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -25,65 +32,45 @@ class GameView @JvmOverloads constructor(
     private var gameThread: GameThread? = null
     private var isRunning = false
     private var isPaused = false
+    private var isGameOver = false // 게임 오버 상태 추가
+    
+    // 게임 오버 콜백
+    private var gameOverListener: GameOverListener? = null
     
     // 게임 요소
     private lateinit var defenseUnit: DefenseUnit
     private val enemies = CopyOnWriteArrayList<Enemy>()
     private val missiles = CopyOnWriteArrayList<Missile>()
     
+    // 버프 관리자
+    private val buffManager = BuffManager()
+    
     // 게임 상태
     private var screenWidth = 0f
     private var screenHeight = 0f
-    private var score = 0
+    private var resource = 0  // 점수를 자원으로 변경
     private var waveCount = 1
     private var killCount = 0
     private var spawnedCount = 0  // 생성된 적의 수를 추적
-    private var totalEnemiesInWave = 50
+    private var totalEnemiesInWave = GameConfig.ENEMIES_PER_WAVE
     private var bossSpawned = false
     private var showWaveMessage = false
     private var waveMessageStartTime = 0L
-    private var waveMessageDuration = 2000L // 2초 동안 웨이브 메시지 표시
+    private var waveMessageDuration = GameConfig.WAVE_MESSAGE_DURATION
     
     // 디펜스 유닛 설정
-    private val DEFENSE_UNIT_SIZE = 40f  // 디펜스 유닛의 크기
+    private val DEFENSE_UNIT_SIZE = GameConfig.DEFENSE_UNIT_SIZE
+    
+    // 디펜스 유닛 스탯
+    private var unitHealth = 100
+    private var unitMaxHealth = 100
+    private var unitAttackPower = GameConfig.MISSILE_DAMAGE
+    private var unitAttackSpeed = GameConfig.DEFENSE_UNIT_ATTACK_COOLDOWN
+    private var unitAttackRange = GameConfig.DEFENSE_UNIT_ATTACK_RANGE
     
     // 웨이브별 설정
-    private val waveEnemySpawnCooldowns = mapOf(
-        1 to 3000L,
-        2 to 2500L,
-        3 to 2000L,
-        4 to 1800L,
-        5 to 1600L,
-        6 to 1400L,
-        7 to 1200L,
-        8 to 1000L,
-        9 to 800L,
-        10 to 600L
-    )
-    private val waveEnemySpeeds = mapOf(
-        1 to 1.0f,
-        2 to 1.2f,
-        3 to 1.4f,
-        4 to 1.6f,
-        5 to 1.8f,
-        6 to 2.0f,
-        7 to 2.2f,
-        8 to 2.4f,
-        9 to 2.6f,
-        10 to 2.8f
-    )
-    private val waveEnemyHealths = mapOf(
-        1 to 100,
-        2 to 120,
-        3 to 140,
-        4 to 160,
-        5 to 180,
-        6 to 200,
-        7 to 220,
-        8 to 240,
-        9 to 260,
-        10 to 280
-    )
+    private val waveEnemySpawnCooldowns = GameConfig.WAVE_ENEMY_SPAWN_COOLDOWNS
+    private val waveEnemySpeeds = GameConfig.WAVE_ENEMY_SPEEDS
     
     private var enemySpawnCooldown = waveEnemySpawnCooldowns[1] ?: 3000L
     private var lastEnemySpawnTime = 0L
@@ -91,28 +78,31 @@ class GameView @JvmOverloads constructor(
     
     // 그리기 도구
     private val textPaint = Paint().apply {
-        color = Color.WHITE
-        textSize = 48f
+        color = GameConfig.TEXT_COLOR
+        textSize = GameConfig.TEXT_SIZE_NORMAL
         textAlign = Paint.Align.LEFT
     }
     
     private val waveMessagePaint = Paint().apply {
-        color = Color.YELLOW
-        textSize = 100f
+        color = GameConfig.WAVE_TEXT_COLOR
+        textSize = GameConfig.TEXT_SIZE_WAVE
         textAlign = Paint.Align.CENTER
     }
     
     private val unitPaint = Paint().apply {
-        color = Color.BLUE
+        color = GameConfig.DEFENSE_UNIT_COLOR
         style = Paint.Style.FILL
     }
     
     // 일시정지 관련
     private val pauseTextPaint = Paint().apply {
-        color = Color.WHITE
-        textSize = 72f
+        color = GameConfig.TEXT_COLOR
+        textSize = GameConfig.TEXT_SIZE_PAUSE
         textAlign = Paint.Align.CENTER
     }
+    
+    // 현재 활성화된 포커 족보 효과
+    private var activePokerHand: PokerHand? = null
     
     init {
         holder.addCallback(this)
@@ -125,7 +115,11 @@ class GameView @JvmOverloads constructor(
         // 중앙에 방어 유닛 배치
         val centerX = screenWidth / 2
         val centerY = screenHeight / 2
-        defenseUnit = DefenseUnit(PointF(centerX, centerY))
+        defenseUnit = DefenseUnit(
+            position = PointF(centerX, centerY),
+            attackRange = unitAttackRange,
+            attackCooldown = unitAttackSpeed
+        )
         
         gameStartTime = System.currentTimeMillis()
         lastEnemySpawnTime = gameStartTime
@@ -153,7 +147,7 @@ class GameView @JvmOverloads constructor(
     }
     
     private fun update() {
-        if (isPaused) return
+        if (isPaused || isGameOver) return
         
         val currentTime = System.currentTimeMillis()
         
@@ -174,7 +168,9 @@ class GameView @JvmOverloads constructor(
         val centerY = screenHeight / 2
         
         enemies.forEach { enemy ->
-            enemy.update()
+            // 버프에 의한 적 이동 속도 조정 적용
+            val speedMultiplier = buffManager.getEnemySpeedMultiplier()
+            enemy.update(speedMultiplier)
             
             // 중앙에 도달했는지 확인
             val enemyPos = enemy.getPosition()
@@ -184,25 +180,105 @@ class GameView @JvmOverloads constructor(
             
             if (distanceToCenter < DEFENSE_UNIT_SIZE) {  // 디펜스 유닛 크기 적용
                 enemy.takeDamage(1000) // 중앙에 도달하면 죽음
+                // 디펜스 유닛 체력 감소
+                unitHealth = (unitHealth - 10).coerceAtLeast(0)
+                
+                // 체력이 0이 되면 게임 오버
+                if (unitHealth <= 0 && !isGameOver) {
+                    isGameOver = true
+                    // 게임 오버 처리 - UI 스레드에서 실행
+                    Handler(Looper.getMainLooper()).post {
+                        gameOverListener?.onGameOver(resource, waveCount)
+                    }
+                }
             }
         }
         
         // 미사일 업데이트
-        missiles.forEach { it.update() }
+        missiles.forEach { missile ->
+            // 버프에 의한 미사일 속도 조정 적용
+            val speedMultiplier = buffManager.getMissileSpeedMultiplier()
+            missile.update(speedMultiplier)
+            
+            // 미사일이 모든 적과 충돌 체크
+            if (!missile.isDead()) {
+                val pierceCount = buffManager.getMissilePierceCount()
+                var hitCount = 0
+                
+                for (enemy in enemies) {
+                    // 충돌 체크 (원래 타겟이 아닌 다른 적과의 충돌 확인)
+                    if (missile.checkCollision(enemy)) {
+                        hitCount++
+                        // 관통 횟수를 초과하면 미사일 제거
+                        if (hitCount > pierceCount) {
+                            break
+                        }
+                    }
+                }
+            }
+        }
         
         // 방어 유닛이 적을 공격
-        val newMissile = defenseUnit.attack(enemies, currentTime)
-        if (newMissile != null) {
-            missiles.add(newMissile)
+        // 버프에 의한 공격 속도 조정 적용
+        val attackSpeedMultiplier = buffManager.getAttackSpeedMultiplier()
+        val adjustedAttackCooldown = (unitAttackSpeed * attackSpeedMultiplier).toLong()
+        
+        // 다방향 발사 지원
+        val multiDirCount = buffManager.getMultiDirectionCount()
+        if (multiDirCount > 1 && !enemies.isEmpty()) {
+            // 다방향 발사 (기본 1방향 + 추가 방향)
+            val angleStep = (2 * Math.PI) / multiDirCount
+            
+            for (i in 0 until multiDirCount) {
+                val newMissile = defenseUnit.attack(
+                    enemies, 
+                    currentTime, 
+                    adjustedAttackCooldown, 
+                    buffManager.getMissileDamageMultiplier(),
+                    i * angleStep
+                )
+                
+                if (newMissile != null) {
+                    missiles.add(newMissile)
+                }
+            }
+        } else {
+            // 기본 1방향 발사
+            val newMissile = defenseUnit.attack(
+                enemies, 
+                currentTime, 
+                adjustedAttackCooldown,
+                buffManager.getMissileDamageMultiplier()
+            )
+            
+            if (newMissile != null) {
+                missiles.add(newMissile)
+            }
+        }
+        
+        // 지속 데미지 효과 (Full House)
+        val dotLevel = buffManager.getBuffLevel(BuffType.DOT_DAMAGE)
+        if (dotLevel > 0 && currentTime % 1000 < 20) { // 약 1초마다
+            enemies.forEach { enemy ->
+                enemy.takeDamage(dotLevel)
+            }
+        }
+        
+        // 주기적 대량 데미지 효과 (Royal Flush)
+        val massLevel = buffManager.getBuffLevel(BuffType.MASS_DAMAGE)
+        if (massLevel > 0 && currentTime % 5000 < 20) { // 약 5초마다
+            enemies.forEach { enemy ->
+                enemy.takeDamage(massLevel * 100)
+            }
         }
         
         // 죽은 적과 미사일 제거
         val deadEnemies = enemies.filter { it.isDead() }
         enemies.removeAll(deadEnemies)
         
-        // 킬 카운트 및 점수 갱신
+        // 킬 카운트 및 점수(자원) 갱신
         deadEnemies.forEach { enemy ->
-            score += if (enemy.isBoss) 100 else 10
+            resource += if (enemy.isBoss) 100 else 10  // 자원 획득
             if (!enemy.isBoss) {
                 killCount++
             } else {
@@ -248,7 +324,7 @@ class GameView @JvmOverloads constructor(
         
         // 현재 웨이브에 맞는 적 능력치 설정
         val speed = waveEnemySpeeds[waveCount] ?: 1.0f
-        val health = waveEnemyHealths[waveCount] ?: 100
+        val health = GameConfig.getEnemyHealthForWave(waveCount)
         
         val enemy = Enemy(
             position = PointF(spawnX, spawnY),
@@ -274,7 +350,7 @@ class GameView @JvmOverloads constructor(
         
         // 현재 웨이브에 맞는 보스 능력치 설정 (일반 적보다 느리지만 크고 강함)
         val speed = (waveEnemySpeeds[waveCount] ?: 1.0f) * 0.7f
-        val health = (waveEnemyHealths[waveCount] ?: 100) * 5
+        val health = GameConfig.getEnemyHealthForWave(waveCount) * GameConfig.BOSS_HEALTH_MULTIPLIER
         
         val boss = Enemy(
             position = PointF(spawnX, spawnY),
@@ -311,6 +387,64 @@ class GameView @JvmOverloads constructor(
         }
     }
     
+    // 공격력 업그레이드 - 미사일 데미지 증가
+    private var damageLevel = 1
+    private var damageCost = 10  // 초기 비용
+    fun upgradeDamage(): Boolean {
+        if (resource >= damageCost) {
+            resource -= damageCost  // 자원 사용
+            unitAttackPower += 1    // 데미지 1 증가
+            damageCost += 5         // 다음 업그레이드 비용 5 증가
+            damageLevel++
+            return true
+        }
+        return false  // 자원 부족
+    }
+    
+    // 공격 속도 업그레이드 - 발사 속도 증가
+    private var attackSpeedLevel = 1
+    private var attackSpeedCost = 10  // 초기 비용
+    fun upgradeAttackSpeed(): Boolean {
+        if (resource >= attackSpeedCost) {
+            resource -= attackSpeedCost  // 자원 사용
+            unitAttackSpeed = (unitAttackSpeed * 0.99f).toLong()  // 공격속도 1% 향상, toLong()으로 수정
+            attackSpeedCost += 5          // 다음 업그레이드 비용 5 증가
+            attackSpeedLevel++
+            return true
+        }
+        return false  // 자원 부족
+    }
+    
+    // 공격 범위 업그레이드 - 공격 범위 증가
+    private var attackRangeLevel = 1
+    private var attackRangeCost = 10  // 초기 비용
+    fun upgradeAttackRange(): Boolean {
+        if (resource >= attackRangeCost) {
+            resource -= attackRangeCost  // 자원 사용
+            unitAttackRange += 5f        // 공격 범위 5 증가
+            defenseUnit.attackRange = unitAttackRange  // 디펜스 유닛에 적용
+            attackRangeCost += 5         // 다음 업그레이드 비용 5 증가
+            attackRangeLevel++
+            return true
+        }
+        return false  // 자원 부족
+    }
+    
+    // 방어력 업그레이드 - 디펜스 유닛 크기와 내구도 증가
+    private var defenseLevel = 1
+    private var defenseCost = 10  // 초기 비용
+    fun upgradeDefense(): Boolean {
+        if (resource >= defenseCost) {
+            resource -= defenseCost  // 자원 사용
+            unitMaxHealth += 20      // 20씩 최대 체력 증가
+            unitHealth += 20         // 현재 체력도 회복
+            defenseCost += 5         // 다음 업그레이드 비용 5 증가
+            defenseLevel++
+            return true
+        }
+        return false  // 자원 부족
+    }
+    
     // 일시정지 처리
     fun pause() {
         isPaused = true
@@ -337,9 +471,6 @@ class GameView @JvmOverloads constructor(
         // 미사일 그리기
         missiles.forEach { it.draw(canvas) }
         
-        // 점수 및 웨이브 정보 표시
-        canvas.drawText("점수: $score  웨이브: $waveCount  처치: $killCount/$totalEnemiesInWave  생성: $spawnedCount/$totalEnemiesInWave", 20f, 70f, textPaint)
-        
         // 웨이브 시작 메시지 표시
         if (showWaveMessage) {
             canvas.drawText("$waveCount WAVE", centerX, centerY - 100, waveMessagePaint)
@@ -349,6 +480,112 @@ class GameView @JvmOverloads constructor(
         if (isPaused) {
             canvas.drawText("일시 정지", centerX, centerY - 100, pauseTextPaint)
         }
+        
+        // 게임 오버 상태 표시
+        if (isGameOver) {
+            val textPaint = Paint().apply {
+                color = Color.RED
+                textSize = 100f
+                textAlign = Paint.Align.CENTER
+            }
+            canvas.drawText("GAME OVER", centerX, centerY, textPaint)
+        }
+    }
+    
+    // 포커 족보 효과 적용
+    fun applyPokerHandEffect(pokerHand: PokerHand) {
+        activePokerHand = pokerHand
+        buffManager.addPokerHandBuff(pokerHand)
+    }
+    
+    // 현재 적용된 포커 족보 효과 정보 반환
+    fun getActivePokerHandInfo(): String {
+        return activePokerHand?.let {
+            "${it.handName}: ${it.getDescription()}"
+        } ?: "없음"
+    }
+    
+    // 유닛 상태 정보 접근자 메서드들
+    fun getUnitHealth(): Int = unitHealth
+    
+    fun getUnitMaxHealth(): Int = unitMaxHealth
+    
+    fun getUnitAttack(): Int {
+        val baseDamage = unitAttackPower
+        val multiplier = buffManager.getMissileDamageMultiplier()
+        return (baseDamage * multiplier).toInt()
+    }
+    
+    fun getUnitAttackSpeed(): Float {
+        val baseSpeed = unitAttackSpeed
+        val multiplier = buffManager.getAttackSpeedMultiplier()
+        return baseSpeed * multiplier
+    }
+    
+    fun getActiveBuffs(): List<Buff> {
+        return buffManager.getAllBuffs()
+    }
+    
+    // 디펜스 유닛 버프 목록 가져오기
+    fun getDefenseBuffs(): List<Buff> {
+        return buffManager.getDefenseBuffs()
+    }
+    
+    // 적 너프 목록 가져오기
+    fun getEnemyNerfs(): List<Buff> {
+        return buffManager.getEnemyNerfs()
+    }
+    
+    // 게임 상태 접근자 메서드들
+    fun getResource(): Int = resource
+    
+    fun getWaveCount(): Int = waveCount
+    
+    fun getKillCount(): Int = killCount
+    
+    fun getTotalEnemiesInWave(): Int = totalEnemiesInWave
+    
+    // 현재 유닛 스탯 정보 가져오기
+    fun getUnitAttackRange(): Float = unitAttackRange
+    
+    // 현재 업그레이드 비용 정보 반환
+    fun getDamageCost(): Int = damageCost
+    fun getAttackSpeedCost(): Int = attackSpeedCost
+    fun getAttackRangeCost(): Int = attackRangeCost
+    fun getDefenseCost(): Int = defenseCost
+    
+    // 게임 오버 콜백 설정
+    fun setGameOverListener(listener: GameOverListener) {
+        gameOverListener = listener
+    }
+    
+    // 게임 재시작
+    fun restartGame() {
+        // 게임 초기화
+        resource = 0
+        waveCount = 1
+        killCount = 0
+        spawnedCount = 0
+        unitHealth = 100
+        unitMaxHealth = 100
+        unitAttackPower = GameConfig.MISSILE_DAMAGE
+        unitAttackSpeed = GameConfig.DEFENSE_UNIT_ATTACK_COOLDOWN
+        unitAttackRange = GameConfig.DEFENSE_UNIT_ATTACK_RANGE
+        
+        // 게임 요소 초기화
+        enemies.clear()
+        missiles.clear()
+        
+        // 게임 상태 초기화
+        isGameOver = false
+        isPaused = false
+        
+        // 버프 초기화
+        // buffManager 초기화 로직이 필요할 수 있음
+        
+        // 게임 시작 시간 재설정
+        gameStartTime = System.currentTimeMillis()
+        lastEnemySpawnTime = gameStartTime
     }
     
     inner class GameThread : Thread() {

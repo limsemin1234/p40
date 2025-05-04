@@ -45,10 +45,11 @@ class Enemy(
         // size는 생성자에서 더 큰 값으로 전달
     }
     
-    fun update() {
-        // 목표 방향으로 이동
-        position.x += directionX * speed
-        position.y += directionY * speed
+    // 스피드 배율을 적용할 수 있는 업데이트 메서드
+    fun update(speedMultiplier: Float = 1.0f) {
+        // 목표 방향으로 이동 (버프로 인한 속도 배율 적용)
+        position.x += directionX * speed * speedMultiplier
+        position.y += directionY * speed * speedMultiplier
     }
     
     fun draw(canvas: Canvas) {

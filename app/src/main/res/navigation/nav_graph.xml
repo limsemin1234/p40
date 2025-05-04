@@ -23,6 +23,14 @@
         android:id="@+id/gameFragment"
         android:name="com.example.p40.GameFragment"
         android:label="게임 화면"
-        tools:layout="@layout/fragment_game" />
+        tools:layout="@layout/fragment_game">
+        
+        <!-- 게임 종료 시 메인 메뉴로 돌아가기 -->
+        <action
+            android:id="@+id/action_gameFragment_to_mainMenuFragment"
+            app:destination="@id/mainMenuFragment"
+            app:popUpTo="@id/mainMenuFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
 
 </navigation>
