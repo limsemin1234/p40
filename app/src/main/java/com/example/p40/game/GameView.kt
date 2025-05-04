@@ -62,8 +62,8 @@ class GameView @JvmOverloads constructor(
     private val DEFENSE_UNIT_SIZE = GameConfig.DEFENSE_UNIT_SIZE
     
     // 디펜스 유닛 스탯
-    private var unitHealth = 100
-    private var unitMaxHealth = 100
+    private var unitHealth = GameConfig.DEFENSE_UNIT_INITIAL_HEALTH
+    private var unitMaxHealth = GameConfig.DEFENSE_UNIT_INITIAL_MAX_HEALTH
     private var unitAttackPower = GameConfig.MISSILE_DAMAGE
     private var unitAttackSpeed = GameConfig.DEFENSE_UNIT_ATTACK_COOLDOWN
     private var unitAttackRange = GameConfig.DEFENSE_UNIT_ATTACK_RANGE
@@ -389,12 +389,16 @@ class GameView @JvmOverloads constructor(
     
     // 공격력 업그레이드 - 미사일 데미지 증가
     private var damageLevel = 1
-    private var damageCost = 10  // 초기 비용
+    private var damageCost = GameConfig.DAMAGE_UPGRADE_INITIAL_COST  // 초기 비용
     fun upgradeDamage(): Boolean {
+        if (damageLevel >= GameConfig.DAMAGE_UPGRADE_MAX_LEVEL) {
+            return false // 최대 레벨 도달
+        }
+        
         if (resource >= damageCost) {
             resource -= damageCost  // 자원 사용
-            unitAttackPower += 1    // 데미지 1 증가
-            damageCost += 5         // 다음 업그레이드 비용 5 증가
+            unitAttackPower += GameConfig.DAMAGE_UPGRADE_VALUE  // 데미지 증가
+            damageCost += GameConfig.DAMAGE_UPGRADE_COST_INCREASE  // 다음 업그레이드 비용 증가
             damageLevel++
             return true
         }
@@ -403,12 +407,17 @@ class GameView @JvmOverloads constructor(
     
     // 공격 속도 업그레이드 - 발사 속도 증가
     private var attackSpeedLevel = 1
-    private var attackSpeedCost = 10  // 초기 비용
+    private var attackSpeedCost = GameConfig.ATTACK_SPEED_UPGRADE_INITIAL_COST  // 초기 비용
     fun upgradeAttackSpeed(): Boolean {
+        if (attackSpeedLevel >= GameConfig.ATTACK_SPEED_UPGRADE_MAX_LEVEL) {
+            return false // 최대 레벨 도달
+        }
+        
         if (resource >= attackSpeedCost) {
             resource -= attackSpeedCost  // 자원 사용
-            unitAttackSpeed = (unitAttackSpeed * 0.99f).toLong()  // 공격속도 1% 향상, toLong()으로 수정
-            attackSpeedCost += 5          // 다음 업그레이드 비용 5 증가
+            // 공격속도 1% 향상 (쿨다운 시간을 0.99배로 줄임)
+            unitAttackSpeed = (unitAttackSpeed * (1f - GameConfig.ATTACK_SPEED_UPGRADE_PERCENT)).toLong()
+            attackSpeedCost += GameConfig.ATTACK_SPEED_UPGRADE_COST_INCREASE  // 다음 업그레이드 비용 증가
             attackSpeedLevel++
             return true
         }
@@ -417,13 +426,17 @@ class GameView @JvmOverloads constructor(
     
     // 공격 범위 업그레이드 - 공격 범위 증가
     private var attackRangeLevel = 1
-    private var attackRangeCost = 10  // 초기 비용
+    private var attackRangeCost = GameConfig.ATTACK_RANGE_UPGRADE_INITIAL_COST  // 초기 비용
     fun upgradeAttackRange(): Boolean {
+        if (attackRangeLevel >= GameConfig.ATTACK_RANGE_UPGRADE_MAX_LEVEL) {
+            return false // 최대 레벨 도달
+        }
+        
         if (resource >= attackRangeCost) {
             resource -= attackRangeCost  // 자원 사용
-            unitAttackRange += 5f        // 공격 범위 5 증가
+            unitAttackRange += GameConfig.ATTACK_RANGE_UPGRADE_VALUE  // 공격 범위 증가
             defenseUnit.attackRange = unitAttackRange  // 디펜스 유닛에 적용
-            attackRangeCost += 5         // 다음 업그레이드 비용 5 증가
+            attackRangeCost += GameConfig.ATTACK_RANGE_UPGRADE_COST_INCREASE  // 다음 업그레이드 비용 증가
             attackRangeLevel++
             return true
         }
@@ -432,13 +445,17 @@ class GameView @JvmOverloads constructor(
     
     // 방어력 업그레이드 - 디펜스 유닛 크기와 내구도 증가
     private var defenseLevel = 1
-    private var defenseCost = 10  // 초기 비용
+    private var defenseCost = GameConfig.DEFENSE_UPGRADE_INITIAL_COST  // 초기 비용
     fun upgradeDefense(): Boolean {
+        if (defenseLevel >= GameConfig.DEFENSE_UPGRADE_MAX_LEVEL) {
+            return false // 최대 레벨 도달
+        }
+        
         if (resource >= defenseCost) {
             resource -= defenseCost  // 자원 사용
-            unitMaxHealth += 20      // 20씩 최대 체력 증가
-            unitHealth += 20         // 현재 체력도 회복
-            defenseCost += 5         // 다음 업그레이드 비용 5 증가
+            unitMaxHealth += GameConfig.DEFENSE_UPGRADE_VALUE  // 최대 체력 증가
+            unitHealth += GameConfig.DEFENSE_UPGRADE_VALUE  // 현재 체력도 증가
+            defenseCost += GameConfig.DEFENSE_UPGRADE_COST_INCREASE  // 다음 업그레이드 비용 증가
             defenseLevel++
             return true
         }
@@ -554,6 +571,12 @@ class GameView @JvmOverloads constructor(
     fun getAttackRangeCost(): Int = attackRangeCost
     fun getDefenseCost(): Int = defenseCost
     
+    // 현재 업그레이드 레벨 정보 반환
+    fun getDamageLevel(): Int = damageLevel
+    fun getAttackSpeedLevel(): Int = attackSpeedLevel
+    fun getAttackRangeLevel(): Int = attackRangeLevel
+    fun getDefenseLevel(): Int = defenseLevel
+    
     // 게임 오버 콜백 설정
     fun setGameOverListener(listener: GameOverListener) {
         gameOverListener = listener
@@ -561,16 +584,26 @@ class GameView @JvmOverloads constructor(
     
     // 게임 재시작
     fun restartGame() {
-        // 게임 초기화
+        // 게임 상태 초기화
         resource = 0
         waveCount = 1
         killCount = 0
         spawnedCount = 0
-        unitHealth = 100
-        unitMaxHealth = 100
+        unitHealth = GameConfig.DEFENSE_UNIT_INITIAL_HEALTH
+        unitMaxHealth = GameConfig.DEFENSE_UNIT_INITIAL_MAX_HEALTH
         unitAttackPower = GameConfig.MISSILE_DAMAGE
         unitAttackSpeed = GameConfig.DEFENSE_UNIT_ATTACK_COOLDOWN
         unitAttackRange = GameConfig.DEFENSE_UNIT_ATTACK_RANGE
+        
+        // 업그레이드 레벨 및 비용 초기화
+        damageLevel = 1
+        attackSpeedLevel = 1
+        attackRangeLevel = 1
+        defenseLevel = 1
+        damageCost = GameConfig.DAMAGE_UPGRADE_INITIAL_COST
+        attackSpeedCost = GameConfig.ATTACK_SPEED_UPGRADE_INITIAL_COST
+        attackRangeCost = GameConfig.ATTACK_RANGE_UPGRADE_INITIAL_COST
+        defenseCost = GameConfig.DEFENSE_UPGRADE_INITIAL_COST
         
         // 게임 요소 초기화
         enemies.clear()
@@ -581,7 +614,7 @@ class GameView @JvmOverloads constructor(
         isPaused = false
         
         // 버프 초기화
-        // buffManager 초기화 로직이 필요할 수 있음
+        buffManager.clearAllBuffs()
         
         // 게임 시작 시간 재설정
         gameStartTime = System.currentTimeMillis()

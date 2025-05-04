@@ -2,6 +2,8 @@ package com.example.p40
 
 import android.animation.ObjectAnimator
 import android.app.Dialog
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -207,11 +209,22 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
         // 버프 텍스트 설정
         buffView.text = buff.getShortDisplayText()
         
-        // 배경 리소스 설정 (디펜스 버프와 적 너프 구분)
-        buffView.setBackgroundResource(
-            if (isDefenseBuff) R.drawable.buff_background
-            else R.drawable.nerf_background
-        )
+        // 배경 설정
+        val drawable = if (isDefenseBuff) {
+            GradientDrawable().apply {
+                cornerRadius = resources.getDimension(R.dimen.buff_corner_radius)
+                setColor(GameConfig.BUFF_DEFENSE_COLOR)
+                setStroke(1, GameConfig.BUFF_DEFENSE_STROKE_COLOR)
+            }
+        } else {
+            GradientDrawable().apply {
+                cornerRadius = resources.getDimension(R.dimen.buff_corner_radius)
+                setColor(GameConfig.BUFF_ENEMY_NERF_COLOR)
+                setStroke(1, GameConfig.BUFF_ENEMY_NERF_STROKE_COLOR)
+            }
+        }
+        
+        buffView.background = drawable
         
         // 컨테이너에 추가
         container.addView(buffView)
@@ -460,17 +473,57 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
     private fun updateUpgradeButtonsText() {
         if (!::gameView.isInitialized || !isAdded) return
         
-        view?.findViewById<Button>(R.id.btnUpgradeDamage)?.text = 
-            "데미지 +1\n💰 ${gameView.getDamageCost()} 자원"
+        // 데미지 업그레이드 버튼
+        val btnUpgradeDamage = view?.findViewById<Button>(R.id.btnUpgradeDamage)
+        if (btnUpgradeDamage != null) {
+            val damageLevel = gameView.getDamageLevel()
+            if (damageLevel >= GameConfig.DAMAGE_UPGRADE_MAX_LEVEL) {
+                btnUpgradeDamage.text = "데미지\n최대 레벨"
+                btnUpgradeDamage.isEnabled = false
+            } else {
+                btnUpgradeDamage.text = "데미지 +${GameConfig.DAMAGE_UPGRADE_VALUE}\n💰 ${gameView.getDamageCost()} 자원"
+                btnUpgradeDamage.isEnabled = true
+            }
+        }
         
-        view?.findViewById<Button>(R.id.btnUpgradeAttackSpeed)?.text = 
-            "공격속도 +1%\n💰 ${gameView.getAttackSpeedCost()} 자원"
+        // 공격속도 업그레이드 버튼
+        val btnUpgradeAttackSpeed = view?.findViewById<Button>(R.id.btnUpgradeAttackSpeed)
+        if (btnUpgradeAttackSpeed != null) {
+            val attackSpeedLevel = gameView.getAttackSpeedLevel()
+            if (attackSpeedLevel >= GameConfig.ATTACK_SPEED_UPGRADE_MAX_LEVEL) {
+                btnUpgradeAttackSpeed.text = "공격속도\n최대 레벨"
+                btnUpgradeAttackSpeed.isEnabled = false
+            } else {
+                btnUpgradeAttackSpeed.text = "공격속도 +${(GameConfig.ATTACK_SPEED_UPGRADE_PERCENT * 100).toInt()}%\n💰 ${gameView.getAttackSpeedCost()} 자원"
+                btnUpgradeAttackSpeed.isEnabled = true
+            }
+        }
         
-        view?.findViewById<Button>(R.id.btnUpgradeAttackRange)?.text = 
-            "공격범위 +5\n💰 ${gameView.getAttackRangeCost()} 자원"
+        // 공격범위 업그레이드 버튼
+        val btnUpgradeAttackRange = view?.findViewById<Button>(R.id.btnUpgradeAttackRange)
+        if (btnUpgradeAttackRange != null) {
+            val attackRangeLevel = gameView.getAttackRangeLevel()
+            if (attackRangeLevel >= GameConfig.ATTACK_RANGE_UPGRADE_MAX_LEVEL) {
+                btnUpgradeAttackRange.text = "공격범위\n최대 레벨"
+                btnUpgradeAttackRange.isEnabled = false
+            } else {
+                btnUpgradeAttackRange.text = "공격범위 +${GameConfig.ATTACK_RANGE_UPGRADE_VALUE.toInt()}\n💰 ${gameView.getAttackRangeCost()} 자원"
+                btnUpgradeAttackRange.isEnabled = true
+            }
+        }
         
-        view?.findViewById<Button>(R.id.defenseUpgrade1)?.text = 
-            "체력 +20\n💰 ${gameView.getDefenseCost()} 자원"
+        // 방어력 업그레이드 버튼
+        val defenseUpgrade1 = view?.findViewById<Button>(R.id.defenseUpgrade1)
+        if (defenseUpgrade1 != null) {
+            val defenseLevel = gameView.getDefenseLevel()
+            if (defenseLevel >= GameConfig.DEFENSE_UPGRADE_MAX_LEVEL) {
+                defenseUpgrade1.text = "체력\n최대 레벨"
+                defenseUpgrade1.isEnabled = false
+            } else {
+                defenseUpgrade1.text = "체력 +${GameConfig.DEFENSE_UPGRADE_VALUE}\n💰 ${gameView.getDefenseCost()} 자원"
+                defenseUpgrade1.isEnabled = true
+            }
+        }
     }
     
     // 게임 오버 다이얼로그 표시

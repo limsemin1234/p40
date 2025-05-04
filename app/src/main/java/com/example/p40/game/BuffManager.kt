@@ -206,4 +206,9 @@ class BuffManager {
         val level = getBuffLevel(BuffType.MULTI_DIRECTION)
         return if (level > 0) level + 1 else 1
     }
+    
+    // 모든 버프 초기화
+    fun clearAllBuffs() {
+        buffs.clear()
+    }
 } 
