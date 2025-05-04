@@ -319,25 +319,19 @@ class PokerCardsDialog(
                 cardViews[i]?.setOnLongClickListener(null)
                 cardViews[i]?.contentDescription = null
                 
-                // 별 모양 조커 처리
-                if (CardUtils.isStarJoker(card)) {
+                // 모든 조커는 같은 방식으로 처리 (별 조커와 문양 조커 모두 동일한 조커 선택 다이얼로그 표시)
+                if (CardUtils.isJokerCard(card)) {
                     cardViews[i]?.setOnLongClickListener {
                         showJokerSelectionDialog(i)
                         true
                     }
                     
                     // 조커 카드는 "변환 가능" 힌트 텍스트 추가
-                    cardViews[i]?.contentDescription = "조커 카드 - 길게 누르면 원하는 카드로 변환할 수 있습니다"
-                }
-                // 문양 조커 처리 (하트, 스페이드, 다이아, 클로버 조커)
-                else if (CardUtils.isSuitedJoker(card)) {
-                    cardViews[i]?.setOnLongClickListener {
-                        showJokerNumberPickerDialog(card, i)
-                        true
+                    if (CardUtils.isStarJoker(card)) {
+                        cardViews[i]?.contentDescription = "별 조커 - 길게 누르면 원하는 카드로 변환할 수 있습니다"
+                    } else if (CardUtils.isSuitedJoker(card)) {
+                        cardViews[i]?.contentDescription = "${card.suit.getName()} 조커 - 길게 누르면 원하는 카드로 변환할 수 있습니다"
                     }
-                    
-                    // 문양 조커 카드도 힌트 텍스트 추가
-                    cardViews[i]?.contentDescription = "${card.suit.getName()} 조커 - 길게 누르면 숫자를 선택할 수 있습니다"
                 }
             }
         }
@@ -354,24 +348,15 @@ class PokerCardsDialog(
             
             // 조커 카드와 문양 조커는 선택할 수 없도록 설정
             if (CardUtils.isJokerCard(card)) {
+                // 항상 선택 상태를 false로 유지
                 card.isSelected = false
                 
                 if (waveNumber > 0) {
-                    // 웨이브 보상 모드에서의 처리
-                    if (CardUtils.isStarJoker(card)) {
-                        // 별 조커 변환 힌트 토스트 표시
-                        Toast.makeText(context, "조커 카드를 길게 누르면 원하는 카드로 변환할 수 있습니다.", Toast.LENGTH_SHORT).show()
-                    } else if (CardUtils.isSuitedJoker(card)) {
-                        // 문양 조커 안내 메시지 표시
-                        Toast.makeText(context, "${card.suit.getName()} 조커를 길게 누르면 숫자를 선택할 수 있습니다.", Toast.LENGTH_SHORT).show()
-                    }
+                    // 웨이브 보상 모드에서의 처리 - 모든 조커는 변환 힌트 토스트 표시
+                    Toast.makeText(context, "조커 카드를 길게 누르면 원하는 카드로 변환할 수 있습니다.", Toast.LENGTH_SHORT).show()
                 } else {
                     // 덱 구성 모드에서의 처리
-                    if (CardUtils.isStarJoker(card)) {
-                        Toast.makeText(context, "조커 카드는 선택이 불가능합니다.", Toast.LENGTH_SHORT).show()
-                    } else if (CardUtils.isSuitedJoker(card)) {
-                        Toast.makeText(context, "${card.suit.getName()} 조커는 선택이 불가능합니다.", Toast.LENGTH_SHORT).show()
-                    }
+                    Toast.makeText(context, "조커 카드는 선택이 불가능합니다.", Toast.LENGTH_SHORT).show()
                 }
             } else {
                 // 덱 구성 모드에서는 카드 선택을 토글
@@ -534,7 +519,7 @@ class PokerCardsDialog(
     // 조커 선택 다이얼로그 표시 메서드 추가
     private fun showJokerSelectionDialog(jokerIndex: Int) {
         // 조커 카드가 맞는지 확인
-        if (jokerIndex >= currentCards.size || !CardUtils.isStarJoker(currentCards[jokerIndex])) {
+        if (jokerIndex >= currentCards.size || !CardUtils.isJokerCard(currentCards[jokerIndex])) {
             return
         }
         
@@ -561,9 +546,10 @@ class PokerCardsDialog(
             updateHandDisplay()
             
             // 토스트 메시지
+            val originalCard = if (CardUtils.isStarJoker(currentCards[jokerIndex])) "별 조커" else "${currentCards[jokerIndex].suit.getName()} 조커"
             Toast.makeText(
                 context,
-                "조커 카드가 ${selectedCard.suit.getName()} ${selectedCard.rank.getName()}(으)로 변환되었습니다.",
+                "$originalCard 카드가 ${selectedCard.suit.getName()} ${selectedCard.rank.getName()}(으)로 변환되었습니다.",
                 Toast.LENGTH_SHORT
             ).show()
         }
@@ -575,6 +561,11 @@ class PokerCardsDialog(
      * 조커 카드의 숫자를 선택하는 다이얼로그 표시
      */
     private fun showJokerNumberPickerDialog(card: Card, cardIndex: Int) {
+        // 문양 조커가 아니면 처리하지 않음
+        if (!CardUtils.isSuitedJoker(card)) {
+            return
+        }
+        
         val dialog = Dialog(context)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setCancelable(true)
@@ -700,7 +691,9 @@ class PokerCardsDialog(
             currentCards[cardIndex] = newCard
             
             // PokerDeck의 playerHand도 직접 업데이트
-            pokerDeck.playerHand[cardIndex] = newCard
+            if (cardIndex < pokerDeck.playerHand.size) {
+                pokerDeck.playerHand[cardIndex] = newCard
+            }
             
             // UI 업데이트
             updateCardView(cardIndex, newCard)
@@ -717,7 +710,7 @@ class PokerCardsDialog(
         
         // 카드 숫자 설정
         if (card.isJoker) {
-            if (card.suit == CardSuit.JOKER || card.rank == CardRank.JOKER) {
+            if (CardUtils.isStarJoker(card)) {
                 cardRankViews[index]?.text = "조커"
             } else {
                 cardRankViews[index]?.text = card.rank.getName()
@@ -737,6 +730,21 @@ class PokerCardsDialog(
         // 카드 선택 여부 표시 유지
         if (card.isSelected) {
             cardViews[index]?.setCardBackgroundColor(Color.YELLOW)
+        }
+        
+        // 웨이브 보상 모드에서 조커 롱클릭 리스너 다시 설정
+        if (waveNumber > 0 && CardUtils.isJokerCard(card)) {
+            cardViews[index]?.setOnLongClickListener {
+                showJokerSelectionDialog(index)
+                true
+            }
+            
+            // 조커 카드 힌트 텍스트 설정
+            if (CardUtils.isStarJoker(card)) {
+                cardViews[index]?.contentDescription = "별 조커 - 길게 누르면 원하는 카드로 변환할 수 있습니다"
+            } else {
+                cardViews[index]?.contentDescription = "${card.suit.getName()} 조커 - 길게 누르면 원하는 카드로 변환할 수 있습니다"
+            }
         }
     }
     
