@@ -3,7 +3,33 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/mainMenuFragment">
+    app:startDestination="@id/splashFragment">
+
+    <!-- 스플래시 화면 -->
+    <fragment
+        android:id="@+id/splashFragment"
+        android:name="com.example.p40.SplashFragment"
+        android:label="스플래시"
+        tools:layout="@layout/fragment_splash">
+        
+        <action
+            android:id="@+id/action_splashFragment_to_mainMenuFragment"
+            app:destination="@id/mainMenuFragment"
+            app:popUpTo="@id/splashFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <!-- 로비 화면 -->
+    <fragment
+        android:id="@+id/lobbyFragment"
+        android:name="com.example.p40.LobbyFragment"
+        android:label="로비"
+        tools:layout="@layout/fragment_lobby">
+        
+        <action
+            android:id="@+id/action_lobbyFragment_to_gameFragment"
+            app:destination="@id/gameFragment" />
+    </fragment>
 
     <!-- 메인 메뉴 화면 -->
     <fragment
@@ -12,22 +38,40 @@
         android:label="메인 메뉴"
         tools:layout="@layout/fragment_main_menu">
 
-        <!-- 게임 시작 버튼 클릭 시 게임 화면으로 이동 -->
+        <!-- 게임 로비 버튼 클릭 시 로비 화면으로 이동 -->
         <action
             android:id="@+id/action_mainMenu_to_game"
-            app:destination="@id/gameFragment" />
+            app:destination="@id/lobbyFragment" />
+            
+        <!-- 덱 구성 버튼 클릭 시 덱 구성 화면으로 이동 -->
+        <action
+            android:id="@+id/action_mainMenu_to_deckBuilder"
+            app:destination="@id/deckBuilderFragment" />
     </fragment>
 
     <!-- 게임 화면 -->
     <fragment
         android:id="@+id/gameFragment"
         android:name="com.example.p40.GameFragment"
-        android:label="게임 화면"
+        android:label="게임"
         tools:layout="@layout/fragment_game">
         
-        <!-- 게임 종료 시 메인 메뉴로 돌아가기 -->
         <action
             android:id="@+id/action_gameFragment_to_mainMenuFragment"
+            app:destination="@id/mainMenuFragment"
+            app:popUpTo="@id/lobbyFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+    
+    <!-- 덱 구성 화면 -->
+    <fragment
+        android:id="@+id/deckBuilderFragment"
+        android:name="com.example.p40.DeckBuilderFragment"
+        android:label="덱 구성"
+        tools:layout="@layout/fragment_deck_builder">
+        
+        <action
+            android:id="@+id/action_deckBuilder_to_mainMenu"
             app:destination="@id/mainMenuFragment"
             app:popUpTo="@id/mainMenuFragment"
             app:popUpToInclusive="true" />

@@ -2,11 +2,15 @@ package com.example.p40
 
 import android.animation.ObjectAnimator
 import android.app.Dialog
+import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.view.LayoutInflater
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
@@ -52,6 +56,16 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // 게임 레벨 정보 가져오기
+        arguments?.let { args ->
+            val levelId = args.getInt("levelId", 1)
+            val totalWaves = args.getInt("totalWaves", 10)
+            val difficulty = args.getFloat("difficulty", 1.0f)
+            
+            // GameConfig에 게임 레벨 설정 적용
+            GameConfig.setGameLevel(difficulty, totalWaves)
+        }
+        
         // 게임 뷰 초기화
         gameView = view.findViewById(R.id.gameView)
         
@@ -60,6 +74,26 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
         
         // 버프 UI 초기화
         initBuffUI(view)
+        
+        // 저장된 덱 확인
+        val savedDeck = DeckBuilderFragment.loadDeckFromPrefs(requireContext())
+        if (savedDeck != null && savedDeck.isNotEmpty()) {
+            Toast.makeText(
+                requireContext(),
+                "저장된 덱이 게임에 적용되었습니다 (${savedDeck.size}장)",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+        
+        // 게임 메뉴 초기화
+        setupGameMenu(view)
+        
+        // 업그레이드 버튼 설정
+        setupAttackUpgradeButtons(view)
+        setupDefenseUpgradeButtons(view)
+        
+        // 카드 패널 버튼 설정
+        setupCardButtons(view)
         
         // 웨이브 완료 리스너 설정
         setupWaveCompletionListener()
@@ -87,41 +121,16 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
             togglePanel(cardPanel)
         }
         
-        // 일시정지 버튼
-        val pauseButton = view.findViewById<Button>(R.id.pauseButton)
-        pauseButton.setOnClickListener {
-            isPaused = !isPaused
-            if (isPaused) {
-                pauseButton.text = "재개"
-                gameView.pause()
-                handler.removeCallbacks(uiUpdateRunnable)
-            } else {
-                pauseButton.text = "일시정지"
-                gameView.resume()
-                handler.post(uiUpdateRunnable)
-            }
-        }
-        
-        // 종료 버튼
-        val exitButton = view.findViewById<Button>(R.id.exitButton)
-        exitButton.setOnClickListener {
-            // 게임 종료 및 메인 메뉴로 돌아가기
-            gameView.pause() // 먼저 게임 일시정지
-            handler.removeCallbacks(uiUpdateRunnable)
-            findNavController().navigate(R.id.action_gameFragment_to_mainMenuFragment)
-        }
-        
-        // 공격 업그레이드 패널 버튼 설정
-        setupAttackUpgradeButtons(view)
-        
-        // 방어 업그레이드 패널 버튼 설정
-        setupDefenseUpgradeButtons(view)
-        
-        // 카드 패널 버튼 설정
-        setupCardButtons(view)
-        
         // UI 업데이트 시작
-        handler.post(uiUpdateRunnable)
+        startUiUpdates()
+        
+        // 게임 시작 진동 효과
+        val vibrator = context?.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
+        if (vibrator != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE))
+        } else {
+            vibrator?.vibrate(200)
+        }
         
         // 업그레이드 버튼 텍스트 초기화 (UI 업데이트 후에 실행)
         handler.post {
@@ -143,6 +152,7 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
         val waveCount = gameView.getWaveCount()
         val killCount = gameView.getKillCount()
         val totalEnemies = gameView.getTotalEnemiesInWave()
+        val difficulty = GameConfig.getDifficulty()
         
         // 현재 웨이브의 적 데미지 계산
         val normalEnemyDamage = GameConfig.getEnemyDamageForWave(waveCount, false)
@@ -150,7 +160,7 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
         
         // 게임 정보 업데이트
         view?.findViewById<TextView>(R.id.tvGameInfo)?.text = 
-            "자원: $resource  웨이브: $waveCount  처치: $killCount/$totalEnemies  적 데미지: $normalEnemyDamage/보스: $bossDamage"
+            "자원: $resource  웨이브: $waveCount/${GameConfig.getTotalWaves()}  처치: $killCount/$totalEnemies  난이도: ${difficulty}x"
     }
     
     // 유닛 스탯 UI 업데이트
@@ -583,5 +593,37 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
     override fun onDestroyView() {
         super.onDestroyView()
         handler.removeCallbacks(uiUpdateRunnable)
+    }
+
+    // setupGameMenu 함수 추가 (pauseButton과 exitButton 설정 코드를 여기로 이동)
+    private fun setupGameMenu(view: View) {
+        // 일시정지 버튼
+        val pauseButton = view.findViewById<Button>(R.id.pauseButton)
+        pauseButton.setOnClickListener {
+            isPaused = !isPaused
+            if (isPaused) {
+                pauseButton.text = "재개"
+                gameView.pause()
+                handler.removeCallbacks(uiUpdateRunnable)
+            } else {
+                pauseButton.text = "일시정지"
+                gameView.resume()
+                handler.post(uiUpdateRunnable)
+            }
+        }
+        
+        // 종료 버튼
+        val exitButton = view.findViewById<Button>(R.id.exitButton)
+        exitButton.setOnClickListener {
+            // 게임 종료 및 메인 메뉴로 돌아가기
+            gameView.pause() // 먼저 게임 일시정지
+            handler.removeCallbacks(uiUpdateRunnable)
+            findNavController().navigate(R.id.action_gameFragment_to_mainMenuFragment)
+        }
+    }
+
+    // UI 업데이트 시작하는 함수
+    private fun startUiUpdates() {
+        handler.post(uiUpdateRunnable)
     }
 }

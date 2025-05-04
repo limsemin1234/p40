@@ -13,6 +13,7 @@ class PokerDeck {
     // 덱 초기화
     fun initializeDeck() {
         cards.clear()
+        hasJoker = false
         
         // 52장의 카드 생성
         for (suit in CardSuit.values()) {
@@ -23,6 +24,28 @@ class PokerDeck {
                 
                 cards.add(Card(suit, rank))
             }
+        }
+        
+        // 덱 섞기
+        cards.shuffle()
+    }
+    
+    /**
+     * 사용자 정의 카드로 덱 초기화
+     */
+    fun initializeWithCards(userCards: List<Card>) {
+        cards.clear()
+        hasJoker = false
+        
+        // 사용자 정의 카드 추가
+        userCards.forEach { card ->
+            // 조커 카드 확인
+            if (card.suit == CardSuit.JOKER && card.rank == CardRank.JOKER) {
+                hasJoker = true
+            }
+            
+            // 복사본 생성하여 추가 (원본 카드의 선택 상태 초기화)
+            cards.add(Card(card.suit, card.rank, isSelected = false))
         }
         
         // 덱 섞기

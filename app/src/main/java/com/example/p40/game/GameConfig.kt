@@ -197,4 +197,52 @@ object GameConfig {
     const val DIFFICULTY_MULTIPLIER_EASY = 0.8f  // 쉬움 난이도 배율 (데미지, 체력)
     const val DIFFICULTY_MULTIPLIER_NORMAL = 1.0f  // 보통 난이도 배율
     const val DIFFICULTY_MULTIPLIER_HARD = 1.3f  // 어려움 난이도 배율
+
+    // 게임 레벨 설정
+    private var currentDifficulty: Float = 1.0f   // 기본 난이도
+    private var currentTotalWaves: Int = 10       // 기본 총 웨이브 수
+
+    /**
+     * 게임 난이도 설정
+     * @param difficulty 난이도 배율 (1.0 = 기본)
+     * @param totalWaves 총 웨이브 수
+     */
+    fun setGameLevel(difficulty: Float, totalWaves: Int) {
+        currentDifficulty = difficulty
+        currentTotalWaves = totalWaves
+    }
+
+    /**
+     * 현재 설정된 난이도 배율 반환
+     */
+    fun getDifficulty(): Float = currentDifficulty
+
+    /**
+     * 현재 설정된 총 웨이브 수 반환
+     */
+    fun getTotalWaves(): Int = currentTotalWaves
+
+    /**
+     * 난이도가 적용된 적 체력 계산
+     * @param baseHealth 기본 체력
+     * @param waveCount 현재 웨이브
+     * @param isBoss 보스 여부
+     */
+    fun getScaledEnemyHealth(baseHealth: Int, waveCount: Int, isBoss: Boolean): Int {
+        // 웨이브가 증가할수록 체력 증가, 난이도 배율 적용
+        val waveMultiplier = 1.0f + ((waveCount - 1) * 0.1f)
+        return (baseHealth * waveMultiplier * currentDifficulty).toInt()
+    }
+
+    /**
+     * 난이도가 적용된 적 공격력 계산
+     * @param baseDamage 기본 공격력
+     * @param waveCount 현재 웨이브
+     * @param isBoss 보스 여부
+     */
+    fun getScaledEnemyDamage(baseDamage: Int, waveCount: Int, isBoss: Boolean): Int {
+        // 웨이브가 증가할수록 공격력 증가, 난이도 배율 적용
+        val waveMultiplier = 1.0f + ((waveCount - 1) * 0.1f)
+        return (baseDamage * waveMultiplier * currentDifficulty).toInt()
+    }
 } 

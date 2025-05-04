@@ -9,26 +9,31 @@
     android:padding="24dp"
     android:background="#111111">
 
-    <TextView
-        android:id="@+id/titleText"
+    <ImageView
+        android:id="@+id/imageViewLogo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="방치형 카드 디펜스"
-        android:textSize="32sp"
-        android:textColor="#FFFFFF"
-        android:layout_marginBottom="40dp" />
+        android:src="@mipmap/ic_launcher"
+        android:layout_marginBottom="50dp" />
 
     <Button
-        android:id="@+id/btnStartGame"
+        android:id="@+id/btnLobby"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="게임 시작" />
+        android:text="게임 로비" />
 
     <Button
-        android:id="@+id/btnSettings"
+        android:id="@+id/btnBuyCards"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="설정"
+        android:text="카드 구매"
+        android:layout_marginTop="16dp" />
+
+    <Button
+        android:id="@+id/btnDeckBuilder"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="덱 구성"
         android:layout_marginTop="16dp" />
 
     <Button

@@ -5,6 +5,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.PointF
+import android.graphics.Typeface
 import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
@@ -510,12 +511,7 @@ class GameView @JvmOverloads constructor(
         
         // 게임 오버 상태 표시
         if (isGameOver) {
-            val textPaint = Paint().apply {
-                color = Color.RED
-                textSize = 100f
-                textAlign = Paint.Align.CENTER
-            }
-            canvas.drawText("GAME OVER", centerX, centerY, textPaint)
+            drawGameOver(canvas)
         }
     }
     
@@ -629,6 +625,73 @@ class GameView @JvmOverloads constructor(
         // 게임 시작 시간 재설정
         gameStartTime = System.currentTimeMillis()
         lastEnemySpawnTime = gameStartTime
+    }
+    
+    // 디펜스 유닛 그리기
+    private fun drawDefenseUnit(canvas: Canvas) {
+        val centerX = width / 2f
+        val centerY = height / 2f
+        
+        // 디펜스 유닛 그리기
+        val unitPaint = Paint().apply {
+            color = GameConfig.DEFENSE_UNIT_COLOR
+            style = Paint.Style.FILL
+        }
+        canvas.drawCircle(centerX, centerY, GameConfig.DEFENSE_UNIT_SIZE, unitPaint)
+        
+        // 디펜스 유닛 체력바 그리기
+        val healthBarWidth = GameConfig.DEFENSE_UNIT_SIZE * 3
+        val healthBarHeight = 10f
+        val healthRatio = unitHealth.toFloat() / unitMaxHealth
+        
+        // 체력바 배경
+        val bgPaint = Paint().apply { 
+            color = Color.DKGRAY 
+            style = Paint.Style.FILL
+        }
+        
+        // 체력바
+        val healthPaint = Paint().apply {
+            color = if (healthRatio > 0.5f) Color.GREEN else if (healthRatio > 0.25f) Color.YELLOW else Color.RED
+            style = Paint.Style.FILL
+        }
+        
+        // 체력바 위치
+        val healthBarTop = centerY + GameConfig.DEFENSE_UNIT_SIZE + 10f
+        val healthBarLeft = centerX - healthBarWidth / 2
+        
+        // 체력바 배경 그리기
+        canvas.drawRect(
+            healthBarLeft, 
+            healthBarTop, 
+            healthBarLeft + healthBarWidth, 
+            healthBarTop + healthBarHeight, 
+            bgPaint
+        )
+        
+        // 체력바 그리기
+        canvas.drawRect(
+            healthBarLeft, 
+            healthBarTop, 
+            healthBarLeft + healthBarWidth * healthRatio, 
+            healthBarTop + healthBarHeight, 
+            healthPaint
+        )
+    }
+    
+    // 게임 오버 화면 그리기
+    private fun drawGameOver(canvas: Canvas) {
+        val paint = Paint().apply {
+            color = Color.RED
+            textSize = 100f
+            textAlign = Paint.Align.CENTER
+            typeface = Typeface.DEFAULT_BOLD
+        }
+        
+        val centerX = width / 2f
+        val centerY = height / 2f
+        
+        canvas.drawText("GAME OVER", centerX, centerY, paint)
     }
     
     inner class GameThread : Thread() {

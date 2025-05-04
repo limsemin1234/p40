@@ -30,30 +30,41 @@ class Enemy(
     
     // 이동 방향 계산
     init {
-        val angle = atan2(target.y - position.y, target.x - position.x)
-        val dirX = cos(angle)
-        val dirY = sin(angle)
+        // 이동 방향 계산
+        val dx = target.x - position.x
+        val dy = target.y - position.y
+        val distance = kotlin.math.sqrt(dx * dx + dy * dy)
         
-        // 방향 벡터 정규화
-        val length = kotlin.math.sqrt(dirX * dirX + dirY * dirY)
-        val normalizedDirX = dirX / length
-        val normalizedDirY = dirY / length
+        directionX = dx / distance
+        directionY = dy / distance
         
-        this.directionX = normalizedDirX
-        this.directionY = normalizedDirY
-        
-        // 보스는 이미 GameView에서 체력이 5배로 설정되어 있으므로 여기서는 중복 적용하지 않음
-        // size는 생성자에서 더 큰 값으로 전달
+        // 보스일 경우 체력 보정
+        if (isBoss) {
+            health = GameConfig.getScaledEnemyHealth(health * 5, wave, isBoss)
+        } else {
+            health = GameConfig.getScaledEnemyHealth(health, wave, isBoss)
+        }
     }
     
-    // 적의 공격력 계산 - 웨이브와 보스 여부에 따라 달라짐
+    /**
+     * 현재 웨이브 설정
+     */
+    fun setWave(waveNumber: Int) {
+        this.wave = waveNumber
+        // 웨이브 변경 시 체력 재계산
+        if (isBoss) {
+            health = GameConfig.getScaledEnemyHealth(GameConfig.ENEMY_BASE_HEALTH * 5, wave, isBoss)
+        } else {
+            health = GameConfig.getScaledEnemyHealth(GameConfig.ENEMY_BASE_HEALTH, wave, isBoss)
+        }
+    }
+
+    /**
+     * 적 공격력 반환
+     */
     fun getDamage(): Int {
-        return GameConfig.getEnemyDamageForWave(wave, isBoss)
-    }
-    
-    // 웨이브 설정 메서드
-    fun setWave(newWave: Int) {
-        wave = newWave
+        val baseDamage = if (isBoss) GameConfig.BOSS_DAMAGE else GameConfig.NORMAL_ENEMY_DAMAGE
+        return GameConfig.getScaledEnemyDamage(baseDamage, wave, isBoss)
     }
     
     // 현재 웨이브 반환
