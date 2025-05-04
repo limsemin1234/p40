@@ -45,13 +45,14 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
         // 어댑터 생성 및 설정
         setupAdapters()
         
-        // 저장된 덱 불러오기 시도 또는 기본 덱 로드
+        // 저장된 덱과 컬렉션 불러오기 시도 또는 기본 덱 로드
         if (!loadSavedDeck()) {
             loadDefaultDeck()
+            // 컬렉션이 비어있으면 조커 카드 추가
+            if (collectionCards.isEmpty()) {
+                addJokerToCollection()
+            }
         }
-        
-        // 카드 컬렉션 로드
-        loadCardCollection()
         
         // 버튼 설정
         setupButtons()
@@ -94,7 +95,35 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
     }
     
     private fun navigateBack() {
+        // 뒤로 가기 전에 현재 덱과 컬렉션 상태 저장
+        autoSaveDeckAndCollection()
         findNavController().popBackStack()
+    }
+    
+    /**
+     * 덱과 컬렉션을 자동 저장하는 함수
+     */
+    private fun autoSaveDeckAndCollection() {
+        // 덱 데이터 준비
+        val cardDataList = deckCards.map { card ->
+            CardData(card.suit.name, card.rank.name)
+        }
+        
+        // 컬렉션 카드 준비
+        val collectionDataList = collectionCards.map { card ->
+            CardData(card.suit.name, card.rank.name)
+        }
+        
+        val gson = Gson()
+        val deckJson = gson.toJson(cardDataList)
+        val collectionJson = gson.toJson(collectionDataList)
+        
+        // SharedPreferences에 저장
+        val sharedPrefs = requireActivity().getSharedPreferences(DECK_PREFS_NAME, Context.MODE_PRIVATE)
+        sharedPrefs.edit()
+            .putString(DECK_KEY, deckJson)
+            .putString(COLLECTION_KEY, collectionJson)
+            .apply()
     }
     
     private fun setupAdapters() {
@@ -142,21 +171,14 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
     }
     
     /**
-     * 모든 카드 컬렉션 로드 (사용자가 소유한 모든 카드)
+     * 컬렉션에 조커 카드 추가
      */
-    private fun loadCardCollection() {
-        collectionCards.clear()
-        
-        // 초기 컬렉션은 비어있음 - 덱에서 카드를 제거하면 여기에 추가됨
-        
-        // 조커 카드 추가 (기본 컬렉션으로 조커만 제공)
+    private fun addJokerToCollection() {
         val jokerCard = Card.createJoker()
         if (!isCardInDeck(jokerCard)) {
             collectionCards.add(jokerCard)
+            collectionAdapter.notifyDataSetChanged()
         }
-        
-        // UI 갱신
-        collectionAdapter.notifyDataSetChanged()
     }
     
     /**
@@ -195,6 +217,9 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
         
         // 카드 수량 업데이트
         updateDeckCount()
+        
+        // 변경사항 자동 저장
+        autoSaveDeckAndCollection()
     }
     
     /**
@@ -213,6 +238,9 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
             
             // 카드 수량 업데이트
             updateDeckCount()
+            
+            // 변경사항 자동 저장
+            autoSaveDeckAndCollection()
         }
     }
     
@@ -244,15 +272,21 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
             
             // 저장된 컬렉션 카드도 불러오기
             val collectionJson = sharedPrefs.getString(COLLECTION_KEY, null)
+            collectionCards.clear() // 컬렉션 초기화
+            
             if (collectionJson != null) {
                 val savedCollection = gson.fromJson<List<CardData>>(collectionJson, type)
                 
-                collectionCards.clear()
                 savedCollection.forEach { cardData ->
                     val suit = CardSuit.valueOf(cardData.suit)
                     val rank = CardRank.valueOf(cardData.rank)
                     collectionCards.add(Card(suit, rank))
                 }
+            }
+            
+            // 컬렉션이 비어있으면 조커 카드 추가
+            if (collectionCards.isEmpty()) {
+                addJokerToCollection()
             }
             
             // UI 갱신
@@ -276,30 +310,10 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
             return
         }
         
-        // 덱 저장 처리
-        val cardDataList = deckCards.map { card ->
-            CardData(card.suit.name, card.rank.name)
-        }
-        
-        // 컬렉션 카드 저장
-        val collectionDataList = collectionCards.map { card ->
-            CardData(card.suit.name, card.rank.name)
-        }
-        
-        val gson = Gson()
-        val deckJson = gson.toJson(cardDataList)
-        val collectionJson = gson.toJson(collectionDataList)
-        
-        // SharedPreferences에 저장
-        val sharedPrefs = requireActivity().getSharedPreferences(DECK_PREFS_NAME, Context.MODE_PRIVATE)
-        sharedPrefs.edit()
-            .putString(DECK_KEY, deckJson)
-            .putString(COLLECTION_KEY, collectionJson)
-            .apply()
+        // 덱 저장 처리 (기존 autoSaveDeckAndCollection() 함수 활용)
+        autoSaveDeckAndCollection()
         
         Toast.makeText(requireContext(), "덱이 저장되었습니다. (${deckCards.size}장)", Toast.LENGTH_SHORT).show()
-        
-        // 저장 후 화면에 그대로 남아있도록 navigateBack() 호출 삭제
     }
     
     // 카드 데이터 직렬화를 위한 클래스

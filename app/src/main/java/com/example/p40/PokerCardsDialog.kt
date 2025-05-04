@@ -26,7 +26,7 @@ class PokerCardsDialog(
 ) : Dialog(context) {
 
     private val pokerDeck = PokerDeck()
-    private var currentCards = listOf<Card>()
+    private var currentCards = mutableListOf<Card>()
     private var cardViews = arrayOfNulls<CardView>(5)
     private var cardSuitViews = arrayOfNulls<TextView>(5)
     private var cardRankViews = arrayOfNulls<TextView>(5)
@@ -199,14 +199,26 @@ class PokerCardsDialog(
     }
     
     private fun drawCards() {
-        // 5장 카드 뽑기
-        currentCards = pokerDeck.draw5Cards()
+        // 카드 5장 뽑기
+        pokerDeck.drawCards(5)
         
-        // 카드 표시
+        // 플레이어 핸드 가져오기
+        currentCards = pokerDeck.playerHand.toMutableList()
+        
+        // 카드 표시 업데이트
         updateCardDisplay()
         
-        // 현재 족보 평가
+        // 족보 업데이트
         updateHandDisplay()
+        
+        // 조커 카드 포함 여부 확인 및 안내
+        if (waveNumber > 0 && currentCards.any { it.suit == CardSuit.JOKER && it.rank == CardRank.JOKER }) {
+            Toast.makeText(
+                context,
+                "조커 카드를 길게 누르면 원하는 카드로 변환할 수 있습니다.",
+                Toast.LENGTH_LONG
+            ).show()
+        }
     }
     
     private fun updateCardDisplay() {
@@ -252,6 +264,20 @@ class PokerCardsDialog(
             
             // 선택 상태 업데이트
             updateCardSelectionDisplay(i)
+            
+            // 조커 카드에 롱클릭 리스너 추가 (웨이브 보상 모드에서만)
+            if (waveNumber > 0 && card.suit == CardSuit.JOKER && card.rank == CardRank.JOKER) {
+                cardViews[i]?.setOnLongClickListener {
+                    showJokerSelectionDialog(i)
+                    true
+                }
+                
+                // 조커 카드는 "변환 가능" 힌트 텍스트 추가
+                cardViews[i]?.contentDescription = "조커 카드 - 길게 누르면 변환할 수 있습니다"
+            } else {
+                cardViews[i]?.setOnLongClickListener(null)
+                cardViews[i]?.contentDescription = null
+            }
         }
     }
     
@@ -281,10 +307,17 @@ class PokerCardsDialog(
                 
                 updateDeckInfo()
             } else {
-                // 웨이브 보상 모드에서는 교체할 카드 선택
-                card.isSelected = !card.isSelected
+                // 웨이브 보상 모드에서 조커 카드는 롱클릭으로 처리
+                if (card.suit == CardSuit.JOKER && card.rank == CardRank.JOKER) {
+                    // 조커 변환 힌트 토스트 표시
+                    Toast.makeText(context, "조커 카드를 길게 누르면 원하는 카드로 변환할 수 있습니다.", Toast.LENGTH_SHORT).show()
+                } else {
+                    // 일반 카드는 교체를 위한 선택 상태 토글
+                    card.isSelected = !card.isSelected
+                }
             }
             
+            // 선택 상태 UI 업데이트
             updateCardSelectionDisplay(index)
         }
     }
@@ -375,7 +408,7 @@ class PokerCardsDialog(
             btnReplaceCards.setOnClickListener {
                 // 선택된 카드 교체
                 pokerDeck.replaceSelectedCards()
-                currentCards = pokerDeck.playerHand
+                currentCards = pokerDeck.playerHand.toMutableList()
                 
                 // 카드 표시 업데이트
                 updateCardDisplay()
@@ -398,5 +431,37 @@ class PokerCardsDialog(
                 dismiss()
             }
         }
+    }
+    
+    // 조커 선택 다이얼로그 표시 메서드 추가
+    private fun showJokerSelectionDialog(jokerIndex: Int) {
+        // 조커 카드가 맞는지 확인
+        if (jokerIndex >= currentCards.size || currentCards[jokerIndex].suit != CardSuit.JOKER) {
+            return
+        }
+        
+        // 조커 선택 다이얼로그 생성 및 표시
+        val jokerDialog = com.example.p40.game.JokerSelectionDialog(context) { selectedCard ->
+            // 선택된 카드로 조커 카드 대체
+            currentCards[jokerIndex] = selectedCard
+            
+            // 플레이어 핸드 업데이트 (PokerDeck 클래스의 playerHand 변수)
+            pokerDeck.playerHand = currentCards.toMutableList()
+            
+            // 카드 표시 업데이트
+            updateCardDisplay()
+            
+            // 족보 업데이트
+            updateHandDisplay()
+            
+            // 토스트 메시지
+            Toast.makeText(
+                context,
+                "조커 카드가 ${selectedCard.suit.getName()} ${selectedCard.rank.getName()}(으)로 변환되었습니다.",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+        
+        jokerDialog.show()
     }
 } 

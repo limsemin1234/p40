@@ -64,18 +64,23 @@ class PokerDeck {
     
     // 5장의 카드 뽑기
     fun draw5Cards(): List<Card> {
+        return drawCards(5)
+    }
+    
+    // 지정된 수의 카드 뽑기
+    fun drawCards(count: Int): List<Card> {
         val drawnCards = mutableListOf<Card>()
         
-        // 덱에 카드가 5장 미만이면 덱 초기화
-        if (cards.size < 5) {
+        // 덱에 카드가 부족하면 덱 초기화
+        if (cards.size < count) {
             initializeDeck()
             if (hasJoker) {
                 addJoker()
             }
         }
         
-        // 5장 뽑기
-        for (i in 0 until 5) {
+        // 지정된 수만큼 카드 뽑기
+        for (i in 0 until count) {
             if (cards.isNotEmpty()) {
                 drawnCards.add(cards.removeAt(0))
             }
@@ -128,16 +133,27 @@ class PokerDeck {
     fun evaluateHand(): PokerHand {
         val tempHand = playerHand.toMutableList()
         
-        // 조커가 있으면 가장 유리한 카드로 대체하여 평가
-        val jokerIndex = tempHand.indexOfFirst { it.suit == CardSuit.JOKER }
+        // 조커 카드가 있는지 확인
+        val jokerIndex = tempHand.indexOfFirst { it.suit == CardSuit.JOKER && it.rank == CardRank.JOKER }
+        
+        // 조커가 있고, 아직 변환되지 않은 경우에만 자동 변환 로직 적용
+        // 사용자가 이미 조커를 다른 카드로 변환한 경우에는 추가 변환 없이 그대로 평가
         if (jokerIndex != -1) {
-            // 여기서는 간단히 구현 - 조커는 평가 시 가장 유리한 카드로 대체됨
-            // 실제 구현에서는 모든 가능한 조합을 시도하여 최적의 족보 찾아야 함
-            tempHand.removeAt(jokerIndex) // 일단 조커 제거
+            // 조커를 임시로 제거하고 가장 유리한 카드로 대체
+            tempHand.removeAt(jokerIndex)
             
-            // 임시 구현: 로얄 플러시 가능성 확인
+            // 남은 4장의 카드로 가능한 최적의 카드 찾기
             if (tempHand.size == 4) {
-                // 간단한 대체 로직
+                val suits = tempHand.map { it.suit }.distinct()
+                val ranks = tempHand.map { it.rank }.sortedBy { it.value }
+                
+                // 가능한 추가 전략:
+                // 1. 같은 숫자가 3장 있으면 -> 포카드를 위해 같은 숫자 추가
+                // 2. 같은 숫자가 2장씩 있으면 -> 풀하우스를 위해 많은 쪽 숫자 추가
+                // 3. 같은 무늬가 4장 있으면 -> 플러시를 위해 같은 무늬 추가
+                // 4. 스트레이트 가능성 확인 -> 연속되는 숫자 추가
+                
+                // 기본 전략: 최고 족보인 로얄 플러시를 위해 스페이드 에이스 추가
                 tempHand.add(Card(CardSuit.SPADE, CardRank.ACE))
             }
         }

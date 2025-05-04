@@ -5,12 +5,9 @@ import android.app.Dialog
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.os.VibrationEffect
-import android.os.Vibrator
 import android.view.LayoutInflater
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
@@ -123,14 +120,6 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
         
         // UI 업데이트 시작
         startUiUpdates()
-        
-        // 게임 시작 진동 효과
-        val vibrator = context?.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
-        if (vibrator != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE))
-        } else {
-            vibrator?.vibrate(200)
-        }
         
         // 업그레이드 버튼 텍스트 초기화 (UI 업데이트 후에 실행)
         handler.post {
