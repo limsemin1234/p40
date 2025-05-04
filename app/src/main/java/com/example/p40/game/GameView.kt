@@ -16,6 +16,7 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.random.Random
+import com.example.p40.game.BossKillListener
 
 /**
  * 게임 오버 콜백 인터페이스
@@ -37,6 +38,9 @@ class GameView @JvmOverloads constructor(
     
     // 게임 오버 콜백
     private var gameOverListener: GameOverListener? = null
+    
+    // 보스 처치 콜백
+    private var bossKillListener: BossKillListener? = null
     
     // 게임 요소
     private lateinit var defenseUnit: DefenseUnit
@@ -159,7 +163,7 @@ class GameView @JvmOverloads constructor(
         
         // 보스를 처치하고 다음 웨이브로 넘어가거나 웨이브 내 적 생성
         if (!showWaveMessage) {
-            if (waveCount <= 10) {
+            if (waveCount <= GameConfig.getTotalWaves()) {
                 handleEnemySpawning(currentTime)
             }
         }
@@ -167,57 +171,77 @@ class GameView @JvmOverloads constructor(
         // 적 업데이트
         val centerX = screenWidth / 2
         val centerY = screenHeight / 2
+        val visibleMargin = 100f // 화면 밖 여유 공간
+        
+        // 화면 범위 계산 (화면 밖 일정 거리까지 포함)
+        val minX = -visibleMargin
+        val minY = -visibleMargin
+        val maxX = screenWidth + visibleMargin
+        val maxY = screenHeight + visibleMargin
         
         enemies.forEach { enemy ->
-            // 버프에 의한 적 이동 속도 조정 적용
-            val speedMultiplier = buffManager.getEnemySpeedMultiplier()
-            enemy.update(speedMultiplier)
-            
-            // 중앙에 도달했는지 확인
+            // 화면 안쪽 또는 가장자리 근처에 있는 적만 업데이트
             val enemyPos = enemy.getPosition()
-            val dx = enemyPos.x - centerX
-            val dy = enemyPos.y - centerY
-            val distanceToCenter = kotlin.math.sqrt(dx * dx + dy * dy)
-            
-            if (distanceToCenter < DEFENSE_UNIT_SIZE) {  // 디펜스 유닛 크기 적용
-                enemy.takeDamage(GameConfig.CENTER_REACHED_DAMAGE) // 중앙에 도달하면 죽음
+            if (enemyPos.x > minX && enemyPos.x < maxX && 
+                enemyPos.y > minY && enemyPos.y < maxY) {
                 
-                // 적의 공격력에 따라 디펜스 유닛 체력 감소
-                val enemyDamage = enemy.getDamage()
-                unitHealth = (unitHealth - enemyDamage).coerceAtLeast(0)
+                // 버프에 의한 적 이동 속도 조정 적용
+                val speedMultiplier = buffManager.getEnemySpeedMultiplier()
+                enemy.update(speedMultiplier)
                 
-                // 체력이 0이 되면 게임 오버
-                if (unitHealth <= 0 && !isGameOver) {
-                    isGameOver = true
-                    // 게임 오버 처리 - UI 스레드에서 실행
-                    Handler(Looper.getMainLooper()).post {
-                        gameOverListener?.onGameOver(resource, waveCount)
+                // 중앙에 도달했는지 확인
+                val dx = enemyPos.x - centerX
+                val dy = enemyPos.y - centerY
+                val distanceToCenter = kotlin.math.sqrt(dx * dx + dy * dy)
+                
+                if (distanceToCenter < DEFENSE_UNIT_SIZE) {  // 디펜스 유닛 크기 적용
+                    enemy.takeDamage(GameConfig.CENTER_REACHED_DAMAGE) // 중앙에 도달하면 죽음
+                    
+                    // 적의 공격력에 따라 디펜스 유닛 체력 감소
+                    val enemyDamage = enemy.getDamage()
+                    unitHealth = (unitHealth - enemyDamage).coerceAtLeast(0)
+                    
+                    // 체력이 0이 되면 게임 오버
+                    if (unitHealth <= 0 && !isGameOver) {
+                        isGameOver = true
+                        // 게임 오버 처리 - UI 스레드에서 실행
+                        Handler(Looper.getMainLooper()).post {
+                            gameOverListener?.onGameOver(resource, waveCount)
+                        }
                     }
                 }
             }
         }
         
-        // 미사일 업데이트
+        // 미사일 업데이트 - 화면 내부 또는 근처의 미사일만 처리
         missiles.forEach { missile ->
-            // 버프에 의한 미사일 속도 조정 적용
-            val speedMultiplier = buffManager.getMissileSpeedMultiplier()
-            missile.update(speedMultiplier)
-            
-            // 미사일이 모든 적과 충돌 체크
-            if (!missile.isDead()) {
-                val pierceCount = buffManager.getMissilePierceCount()
-                var hitCount = 0
+            val missilePos = missile.getPosition()
+            if (missilePos.x > minX && missilePos.x < maxX && 
+                missilePos.y > minY && missilePos.y < maxY) {
                 
-                for (enemy in enemies) {
-                    // 충돌 체크 (원래 타겟이 아닌 다른 적과의 충돌 확인)
-                    if (missile.checkCollision(enemy)) {
-                        hitCount++
-                        // 관통 횟수를 초과하면 미사일 제거
-                        if (hitCount > pierceCount) {
-                            break
+                // 버프에 의한 미사일 속도 조정 적용
+                val speedMultiplier = buffManager.getMissileSpeedMultiplier()
+                missile.update(speedMultiplier)
+                
+                // 미사일이 모든 적과 충돌 체크
+                if (!missile.isDead()) {
+                    val pierceCount = buffManager.getMissilePierceCount()
+                    var hitCount = 0
+                    
+                    for (enemy in enemies) {
+                        // 충돌 체크 (원래 타겟이 아닌 다른 적과의 충돌 확인)
+                        if (missile.checkCollision(enemy)) {
+                            hitCount++
+                            // 관통 횟수를 초과하면 미사일 제거
+                            if (hitCount > pierceCount) {
+                                break
+                            }
                         }
                     }
                 }
+            } else {
+                // 화면에서 벗어난 미사일은 제거 표시
+                missile.setOutOfBounds()
             }
         }
         
@@ -226,36 +250,39 @@ class GameView @JvmOverloads constructor(
         val attackSpeedMultiplier = buffManager.getAttackSpeedMultiplier()
         val adjustedAttackCooldown = (unitAttackSpeed * attackSpeedMultiplier).toLong()
         
-        // 다방향 발사 지원
-        val multiDirCount = buffManager.getMultiDirectionCount()
-        if (multiDirCount > 1 && !enemies.isEmpty()) {
-            // 다방향 발사 (기본 1방향 + 추가 방향)
-            val angleStep = (2 * Math.PI) / multiDirCount
-            
-            for (i in 0 until multiDirCount) {
+        // 적이 있는 경우에만 미사일 발사
+        if (enemies.isNotEmpty()) {
+            // 다방향 발사 지원
+            val multiDirCount = buffManager.getMultiDirectionCount()
+            if (multiDirCount > 1) {
+                // 다방향 발사 (기본 1방향 + 추가 방향)
+                val angleStep = (2 * Math.PI) / multiDirCount
+                
+                for (i in 0 until multiDirCount) {
+                    val newMissile = defenseUnit.attack(
+                        enemies, 
+                        currentTime, 
+                        adjustedAttackCooldown, 
+                        buffManager.getMissileDamageMultiplier(),
+                        i * angleStep
+                    )
+                    
+                    if (newMissile != null) {
+                        missiles.add(newMissile)
+                    }
+                }
+            } else {
+                // 기본 1방향 발사
                 val newMissile = defenseUnit.attack(
                     enemies, 
                     currentTime, 
-                    adjustedAttackCooldown, 
-                    buffManager.getMissileDamageMultiplier(),
-                    i * angleStep
+                    adjustedAttackCooldown,
+                    buffManager.getMissileDamageMultiplier()
                 )
                 
                 if (newMissile != null) {
                     missiles.add(newMissile)
                 }
-            }
-        } else {
-            // 기본 1방향 발사
-            val newMissile = defenseUnit.attack(
-                enemies, 
-                currentTime, 
-                adjustedAttackCooldown,
-                buffManager.getMissileDamageMultiplier()
-            )
-            
-            if (newMissile != null) {
-                missiles.add(newMissile)
             }
         }
         
@@ -285,8 +312,11 @@ class GameView @JvmOverloads constructor(
             if (!enemy.isBoss) {
                 killCount++
             } else {
+                // 보스 처치 이벤트 발생
+                bossKillListener?.onBossKilled()
+                
                 // 보스 처치 시 다음 웨이브로 이동
-                if (waveCount < 10) {
+                if (waveCount < GameConfig.getTotalWaves()) {
                     startNextWave()
                 }
             }
@@ -298,19 +328,33 @@ class GameView @JvmOverloads constructor(
             bossSpawned = true
         }
         
+        // 화면 밖으로 완전히 벗어난 적 제거 (최적화)
+        val farOffScreenMargin = 500f
+        enemies.removeAll { enemy ->
+            val pos = enemy.getPosition()
+            pos.x < -farOffScreenMargin || pos.x > screenWidth + farOffScreenMargin ||
+            pos.y < -farOffScreenMargin || pos.y > screenHeight + farOffScreenMargin
+        }
+        
+        // 죽거나 범위를 벗어난 미사일 제거
         missiles.removeAll { it.isDead() }
     }
     
     private fun handleEnemySpawning(currentTime: Long) {
-        // 웨이브당 정확히 50마리만 생성되도록 수정
-        if (spawnedCount < totalEnemiesInWave && !bossSpawned) {
-            // 웨이브에 맞는 적 생성 간격으로 적 생성
-            val spawnCooldown = waveEnemySpawnCooldowns[waveCount] ?: 3000L
-            
-            if (currentTime - lastEnemySpawnTime > spawnCooldown) {
-                spawnEnemy()
-                lastEnemySpawnTime = currentTime
+        try {
+            // 웨이브당 정확히 적 수만큼만 생성되도록 수정
+            if (spawnedCount < totalEnemiesInWave && !bossSpawned && !isGameOver) {
+                // 웨이브에 맞는 적 생성 간격으로 적 생성
+                val spawnCooldown = waveEnemySpawnCooldowns[waveCount] ?: 3000L
+                
+                if (currentTime - lastEnemySpawnTime > spawnCooldown) {
+                    spawnEnemy()
+                    lastEnemySpawnTime = currentTime
+                }
             }
+        } catch (e: Exception) {
+            // 예외 발생 시 로그 출력 (실제 앱에서는 logger 사용)
+            e.printStackTrace()
         }
     }
     
@@ -371,22 +415,47 @@ class GameView @JvmOverloads constructor(
     }
     
     private fun startNextWave() {
-        waveCount++
-        killCount = 0
-        spawnedCount = 0  // 생성된 적 카운트 초기화
-        bossSpawned = false
-        
-        // 현재 남아있는 적들의 웨이브 번호 업데이트
-        enemies.forEach { enemy ->
-            enemy.setWave(waveCount)
+        try {
+            // 다음 웨이브가 최대 웨이브를 초과하면 종료
+            if (waveCount >= GameConfig.getTotalWaves()) return
+            
+            waveCount++
+            killCount = 0
+            spawnedCount = 0  // 생성된 적 카운트 초기화
+            bossSpawned = false
+            
+            // 화면 바깥에 있는 적이나 일정 거리 이상 떨어진 적은 새 웨이브에서 제거
+            val visibleMargin = 200f
+            val enemiesInView = enemies.filter { enemy ->
+                val pos = enemy.getPosition()
+                pos.x >= -visibleMargin && pos.x <= screenWidth + visibleMargin &&
+                pos.y >= -visibleMargin && pos.y <= screenHeight + visibleMargin
+            }
+            
+            enemies.clear()
+            enemies.addAll(enemiesInView)
+            
+            // 남아있는 적들의 웨이브 번호 업데이트
+            enemies.forEach { enemy ->
+                enemy.setWave(waveCount)
+            }
+            
+            // 웨이브 시작 메시지 표시
+            showWaveMessage = true
+            waveMessageStartTime = System.currentTimeMillis()
+            
+            // 새 웨이브에 맞는 적 생성 간격 설정
+            enemySpawnCooldown = waveEnemySpawnCooldowns[waveCount] ?: 1000L
+            
+            // 미사일 초기화
+            missiles.clear()
+            
+            // 웨이브 시작 준비 시간 설정
+            lastEnemySpawnTime = System.currentTimeMillis() + GameConfig.WAVE_MESSAGE_DURATION
+        } catch (e: Exception) {
+            // 예외 발생 시 로그 출력 (실제 앱에서는 logger 사용)
+            e.printStackTrace()
         }
-        
-        // 웨이브 시작 메시지 표시
-        showWaveMessage = true
-        waveMessageStartTime = System.currentTimeMillis()
-        
-        // 새 웨이브에 맞는 적 생성 간격 설정
-        enemySpawnCooldown = waveEnemySpawnCooldowns[waveCount] ?: 1000L
     }
     
     // 모든 적에게 데미지를 주는 카드 사용 효과
@@ -583,9 +652,14 @@ class GameView @JvmOverloads constructor(
     fun getAttackRangeLevel(): Int = attackRangeLevel
     fun getDefenseLevel(): Int = defenseLevel
     
-    // 게임 오버 콜백 설정
+    // 게임 오버 리스너 설정
     fun setGameOverListener(listener: GameOverListener) {
-        gameOverListener = listener
+        this.gameOverListener = listener
+    }
+    
+    // 보스 처치 리스너 설정
+    fun setBossKillListener(listener: BossKillListener) {
+        this.bossKillListener = listener
     }
     
     // 게임 재시작

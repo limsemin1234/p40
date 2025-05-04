@@ -20,17 +20,75 @@
         android:elevation="4dp"
         app:layout_constraintTop_toTopOf="parent">
 
-        <!-- 점수 및 웨이브 정보 -->
-        <TextView
-            android:id="@+id/tvGameInfo"
-            android:layout_width="wrap_content"
+        <!-- 상단바 그리드 레이아웃 -->
+        <GridLayout
+            android:id="@+id/topBarGrid"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="자원: 0  웨이브: 1  처치: 0/50"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp"
-            android:textStyle="bold"
+            android:columnCount="2"
+            android:rowCount="2"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <!-- 자원 정보 -->
+            <TextView
+                android:id="@+id/tvResourceInfo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:text="자원: 0"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginEnd="4dp"
+                android:layout_row="0"
+                android:layout_column="0" />
+            
+            <!-- 코인 정보 -->
+            <TextView
+                android:id="@+id/tvCoinInfo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:text="코인: 0"
+                android:textColor="#FFD700"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:drawableStart="@drawable/ic_coin"
+                android:drawablePadding="4dp"
+                android:gravity="end"
+                android:layout_row="0"
+                android:layout_column="1" />
+                
+            <!-- 웨이브 정보 -->
+            <TextView
+                android:id="@+id/tvWaveInfo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:text="웨이브: 1/10"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginEnd="4dp"
+                android:layout_row="1"
+                android:layout_column="0" />
+                
+            <!-- 적 처치 정보 -->
+            <TextView
+                android:id="@+id/tvKillInfo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:text="처치: 0/50"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:gravity="end"
+                android:layout_row="1"
+                android:layout_column="1" />
+        </GridLayout>
 
         <!-- 버프 정보 표시 - 가로 배치로 수정 -->
         <LinearLayout
@@ -40,7 +98,7 @@
             android:orientation="horizontal"
             android:layout_marginTop="8dp"
             android:gravity="start|center_vertical"
-            app:layout_constraintTop_toBottomOf="@id/tvGameInfo"
+            app:layout_constraintTop_toBottomOf="@id/topBarGrid"
             app:layout_constraintStart_toStartOf="parent">
 
             <TextView
@@ -141,8 +199,8 @@
                 android:layout_weight="1"
                 android:text="내 유닛 정보"
                 android:textStyle="bold"
-                android:textSize="14sp"
-                android:paddingVertical="8dp"
+                android:textSize="12sp"
+                android:paddingVertical="6dp"
                 android:textColor="#FFFFFF"
                 android:gravity="center"
                 android:background="@android:color/transparent" />
@@ -159,8 +217,8 @@
                 android:layout_weight="1"
                 android:text="적 유닛 정보"
                 android:textStyle="bold"
-                android:textSize="14sp"
-                android:paddingVertical="8dp"
+                android:textSize="12sp"
+                android:paddingVertical="6dp"
                 android:textColor="#808080"
                 android:gravity="center"
                 android:background="@android:color/transparent" />
@@ -192,7 +250,7 @@
                     android:layout_weight="1"
                     android:text="체력: 100/100"
                     android:textColor="#FFFFFF"
-                    android:textSize="14sp"
+                    android:textSize="12sp"
                     android:gravity="center" />
 
                 <TextView
@@ -202,7 +260,7 @@
                     android:layout_weight="1"
                     android:text="공격력: 50"
                     android:textColor="#FFFFFF"
-                    android:textSize="14sp"
+                    android:textSize="12sp"
                     android:gravity="center" />
 
                 <TextView
@@ -212,7 +270,7 @@
                     android:layout_weight="1"
                     android:text="공격속도: 1.0"
                     android:textColor="#FFFFFF"
-                    android:textSize="14sp"
+                    android:textSize="12sp"
                     android:gravity="center" />
 
                 <TextView
@@ -222,7 +280,7 @@
                     android:layout_weight="1"
                     android:text="사거리: 500"
                     android:textColor="#FFFFFF"
-                    android:textSize="14sp"
+                    android:textSize="12sp"
                     android:gravity="center" />
             </LinearLayout>
 
@@ -242,7 +300,7 @@
                     android:layout_weight="1"
                     android:text="체력: 50"
                     android:textColor="#FFFFFF"
-                    android:textSize="14sp"
+                    android:textSize="12sp"
                     android:gravity="center" />
 
                 <TextView
@@ -252,7 +310,7 @@
                     android:layout_weight="1"
                     android:text="공격력: 5"
                     android:textColor="#FFFFFF"
-                    android:textSize="14sp"
+                    android:textSize="12sp"
                     android:gravity="center" />
 
                 <TextView
@@ -262,7 +320,7 @@
                     android:layout_weight="1"
                     android:text="이동속도: 1.0"
                     android:textColor="#FFFFFF"
-                    android:textSize="14sp"
+                    android:textSize="12sp"
                     android:gravity="center" />
             </LinearLayout>
         </FrameLayout>

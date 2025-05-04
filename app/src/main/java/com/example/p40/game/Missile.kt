@@ -77,4 +77,16 @@ class Missile(
      * 미사일이 죽었는지 확인
      */
     fun isDead(): Boolean = isDead
+    
+    /**
+     * 현재 위치 반환
+     */
+    fun getPosition(): PointF = position
+    
+    /**
+     * 화면 밖으로 나간 미사일 처리
+     */
+    fun setOutOfBounds() {
+        isDead = true
+    }
 } 

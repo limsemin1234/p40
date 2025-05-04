@@ -22,6 +22,7 @@ import com.example.p40.game.GameConfig
 import com.example.p40.game.GameOverListener
 import com.example.p40.game.GameView
 import com.example.p40.game.PokerHand
+import com.example.p40.game.BossKillListener
 
 class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
 
@@ -36,6 +37,9 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
     // 현재 웨이브 정보
     private var currentWave = 1
     
+    // 코인 정보
+    private var coins = 0
+    
     // 버프 정보 UI
     private lateinit var tvBuffList: TextView
     
@@ -47,6 +51,7 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
             updateBuffUI()
             updateUnitStatsUI()
             updateEnemyStatsUI()
+            updateCoinUI()
             handler.postDelayed(this, 500) // 500ms마다 업데이트
         }
     }
@@ -69,6 +74,16 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
         
         // 게임 오버 리스너 설정
         gameView.setGameOverListener(this)
+        
+        // 보스 처치 리스너 설정
+        gameView.setBossKillListener(object : BossKillListener {
+            override fun onBossKilled() {
+                // 보스 처치 시 100코인 획득
+                coins += 100
+                updateCoinUI()
+                Toast.makeText(context, "보스 처치! +100 코인", Toast.LENGTH_SHORT).show()
+            }
+        })
         
         // 버프 UI 초기화
         initBuffUI(view)
@@ -129,6 +144,9 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
         handler.post {
             updateUpgradeButtonsText()
         }
+
+        // 저장된 코인 불러오기
+        coins = MainMenuFragment.loadCoins(requireContext())
     }
     
     // 버프 UI 초기화
@@ -144,25 +162,53 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
         val enemyStatsContainer = view.findViewById<LinearLayout>(R.id.enemyStatsContainer)
         
         // 초기 상태 설정 (내 유닛 정보 탭이 활성화)
-        myUnitTabButton.setTextColor(resources.getColor(android.R.color.white, null))
-        enemyUnitTabButton.setTextColor(resources.getColor(android.R.color.darker_gray, null))
-        myUnitStatsContainer.visibility = View.VISIBLE
-        enemyStatsContainer.visibility = View.GONE
+        updateTabState(true, myUnitTabButton, enemyUnitTabButton, myUnitStatsContainer, enemyStatsContainer)
         
         // 내 유닛 정보 탭 클릭 시
         myUnitTabButton.setOnClickListener {
-            myUnitTabButton.setTextColor(resources.getColor(android.R.color.white, null))
-            enemyUnitTabButton.setTextColor(resources.getColor(android.R.color.darker_gray, null))
-            myUnitStatsContainer.visibility = View.VISIBLE
-            enemyStatsContainer.visibility = View.GONE
+            updateTabState(true, myUnitTabButton, enemyUnitTabButton, myUnitStatsContainer, enemyStatsContainer)
         }
         
         // 적 유닛 정보 탭 클릭 시
         enemyUnitTabButton.setOnClickListener {
+            updateTabState(false, myUnitTabButton, enemyUnitTabButton, myUnitStatsContainer, enemyStatsContainer)
+        }
+    }
+    
+    // 탭 상태 업데이트 (코드 중복 제거 및 일관성 유지)
+    private fun updateTabState(
+        isMyUnitTab: Boolean, 
+        myUnitTabButton: TextView, 
+        enemyUnitTabButton: TextView,
+        myUnitStatsContainer: LinearLayout,
+        enemyStatsContainer: LinearLayout
+    ) {
+        if (isMyUnitTab) {
+            // 내 유닛 탭 활성화
+            myUnitTabButton.setTextColor(resources.getColor(android.R.color.white, null))
+            myUnitTabButton.setBackgroundResource(R.drawable.tab_selected_background)
+            enemyUnitTabButton.setTextColor(resources.getColor(android.R.color.darker_gray, null))
+            enemyUnitTabButton.setBackgroundResource(R.drawable.tab_unselected_background)
+            
+            // 내 유닛 정보 표시, 적 정보 숨김
+            myUnitStatsContainer.visibility = View.VISIBLE
+            enemyStatsContainer.visibility = View.GONE
+            
+            // 최신 유닛 스탯 업데이트
+            updateUnitStatsUI()
+        } else {
+            // 적 유닛 탭 활성화
             myUnitTabButton.setTextColor(resources.getColor(android.R.color.darker_gray, null))
+            myUnitTabButton.setBackgroundResource(R.drawable.tab_unselected_background)
             enemyUnitTabButton.setTextColor(resources.getColor(android.R.color.white, null))
+            enemyUnitTabButton.setBackgroundResource(R.drawable.tab_selected_background)
+            
+            // 적 정보 표시, 내 유닛 정보 숨김
             myUnitStatsContainer.visibility = View.GONE
             enemyStatsContainer.visibility = View.VISIBLE
+            
+            // 최신 적 스탯 업데이트
+            updateEnemyStatsUI()
         }
     }
     
@@ -175,15 +221,15 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
         val waveCount = gameView.getWaveCount()
         val killCount = gameView.getKillCount()
         val totalEnemies = gameView.getTotalEnemiesInWave()
+        val totalWaves = GameConfig.getTotalWaves()
         val difficulty = GameConfig.getDifficulty()
         
-        // 현재 웨이브의 적 데미지 계산
-        val normalEnemyDamage = GameConfig.getEnemyDamageForWave(waveCount, false)
-        val bossDamage = GameConfig.getEnemyDamageForWave(waveCount, true)
-        
-        // 게임 정보 업데이트
-        view?.findViewById<TextView>(R.id.tvGameInfo)?.text = 
-            "자원: $resource  웨이브: $waveCount/${GameConfig.getTotalWaves()}  처치: $killCount/$totalEnemies  난이도: ${difficulty}x"
+        // 각 정보를 개별 TextView에 업데이트
+        view?.apply {
+            findViewById<TextView>(R.id.tvResourceInfo)?.text = "자원: $resource"
+            findViewById<TextView>(R.id.tvWaveInfo)?.text = "웨이브: $waveCount/$totalWaves"
+            findViewById<TextView>(R.id.tvKillInfo)?.text = "처치: $killCount/$totalEnemies"
+        }
     }
     
     // 유닛 스탯 UI 업데이트
@@ -592,6 +638,9 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
     
     // 게임 오버 다이얼로그 표시
     override fun onGameOver(resource: Int, waveCount: Int) {
+        // 코인 저장
+        saveCoins()
+        
         // 게임 오버 다이얼로그 생성
         val dialog = Dialog(requireContext())
         
@@ -604,9 +653,11 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
         // 다이얼로그 내용 설정
         val tvGameOverScore = dialogView.findViewById<TextView>(R.id.tvGameOverScore)
         val tvGameOverWave = dialogView.findViewById<TextView>(R.id.tvGameOverWave)
+        val tvGameOverCoins = dialogView.findViewById<TextView>(R.id.tvGameOverCoins)
         
         tvGameOverScore.text = "최종 자원: $resource"
         tvGameOverWave.text = "도달한 웨이브: $waveCount"
+        tvGameOverCoins?.text = "보유 코인: $coins"
         
         // 메인 메뉴 버튼 설정
         val btnMainMenu = dialogView.findViewById<Button>(R.id.btnMainMenu)
@@ -643,6 +694,9 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
     override fun onDestroyView() {
         super.onDestroyView()
         handler.removeCallbacks(uiUpdateRunnable)
+        
+        // 코인 저장
+        saveCoins()
     }
 
     // setupGameMenu 함수 추가 (pauseButton과 exitButton 설정 코드를 여기로 이동)
@@ -707,5 +761,36 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
     // UI 업데이트 시작하는 함수
     private fun startUiUpdates() {
         handler.post(uiUpdateRunnable)
+    }
+
+    // 코인 UI 업데이트
+    private fun updateCoinUI() {
+        if (!isAdded) return
+        view?.findViewById<TextView>(R.id.tvCoinInfo)?.text = "코인: $coins"
+    }
+
+    // 코인 획득
+    private fun addCoins(amount: Int) {
+        coins += amount
+        updateCoinUI()
+        saveCoins() // 코인이 변경될 때마다 저장
+    }
+
+    // 코인 사용
+    private fun useCoins(amount: Int): Boolean {
+        return if (coins >= amount) {
+            coins -= amount
+            updateCoinUI()
+            saveCoins() // 코인이 변경될 때마다 저장
+            true
+        } else {
+            Toast.makeText(context, "코인이 부족합니다!", Toast.LENGTH_SHORT).show()
+            false
+        }
+    }
+
+    // 코인 저장
+    private fun saveCoins() {
+        MainMenuFragment.saveCoins(requireContext(), coins)
     }
 }
