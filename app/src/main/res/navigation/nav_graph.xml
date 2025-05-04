@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/mainMenuFragment">
+
+    <!-- 메인 메뉴 화면 -->
+    <fragment
+        android:id="@+id/mainMenuFragment"
+        android:name="com.example.p40.MainMenuFragment"
+        android:label="메인 메뉴"
+        tools:layout="@layout/fragment_main_menu">
+
+        <!-- 게임 시작 버튼 클릭 시 게임 화면으로 이동 -->
+        <action
+            android:id="@+id/action_mainMenu_to_game"
+            app:destination="@id/gameFragment" />
+    </fragment>
+
+    <!-- 게임 화면 -->
+    <fragment
+        android:id="@+id/gameFragment"
+        android:name="com.example.p40.GameFragment"
+        android:label="게임 화면"
+        tools:layout="@layout/fragment_game" />
+
+</navigation>
