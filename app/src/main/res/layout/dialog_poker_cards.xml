@@ -8,8 +8,8 @@
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="24dp"
-        app:cardCornerRadius="16dp"
+        android:layout_margin="8dp"
+        app:cardCornerRadius="12dp"
         app:cardBackgroundColor="#212121"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -20,7 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="8dp">
 
             <TextView
                 android:id="@+id/tvWaveCompleted"
@@ -29,34 +29,45 @@
                 android:gravity="center"
                 android:text="웨이브 완료!"
                 android:textColor="#FFFFFF"
-                android:textSize="24sp"
+                android:textSize="22sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tvSelectCards"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="4dp"
                 android:gravity="center"
                 android:text="교체할 카드를 선택하세요"
                 android:textColor="#CCCCCC"
-                android:textSize="16sp" />
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tvReplaceCount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:gravity="center"
+                android:text="교체 가능 횟수: 1"
+                android:textColor="#4CAF50"
+                android:textSize="14sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tvCurrentHand"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="4dp"
                 android:gravity="center"
                 android:text="현재 족보: 하이카드"
                 android:textColor="#FFD700"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="12dp"
                 android:gravity="center"
                 android:orientation="horizontal">
 
@@ -64,10 +75,10 @@
                 <androidx.cardview.widget.CardView
                     android:id="@+id/cardView1"
                     android:layout_width="0dp"
-                    android:layout_height="120dp"
-                    android:layout_margin="4dp"
+                    android:layout_height="130dp"
+                    android:layout_margin="1dp"
                     android:layout_weight="1"
-                    app:cardCornerRadius="8dp"
+                    app:cardCornerRadius="6dp"
                     app:cardBackgroundColor="#FFFFFF">
 
                     <LinearLayout
@@ -82,7 +93,7 @@
                             android:layout_height="wrap_content"
                             android:text="♥"
                             android:textColor="#FF0000"
-                            android:textSize="28sp"
+                            android:textSize="32sp"
                             android:textStyle="bold" />
 
                         <TextView
@@ -91,7 +102,7 @@
                             android:layout_height="wrap_content"
                             android:text="A"
                             android:textColor="#FF0000"
-                            android:textSize="28sp"
+                            android:textSize="32sp"
                             android:textStyle="bold" />
 
                     </LinearLayout>
@@ -100,10 +111,10 @@
                 <androidx.cardview.widget.CardView
                     android:id="@+id/cardView2"
                     android:layout_width="0dp"
-                    android:layout_height="120dp"
-                    android:layout_margin="4dp"
+                    android:layout_height="130dp"
+                    android:layout_margin="1dp"
                     android:layout_weight="1"
-                    app:cardCornerRadius="8dp"
+                    app:cardCornerRadius="6dp"
                     app:cardBackgroundColor="#FFFFFF">
 
                     <LinearLayout
@@ -118,7 +129,7 @@
                             android:layout_height="wrap_content"
                             android:text="♦"
                             android:textColor="#FF0000"
-                            android:textSize="28sp"
+                            android:textSize="32sp"
                             android:textStyle="bold" />
 
                         <TextView
@@ -127,7 +138,7 @@
                             android:layout_height="wrap_content"
                             android:text="K"
                             android:textColor="#FF0000"
-                            android:textSize="28sp"
+                            android:textSize="32sp"
                             android:textStyle="bold" />
 
                     </LinearLayout>
@@ -136,10 +147,10 @@
                 <androidx.cardview.widget.CardView
                     android:id="@+id/cardView3"
                     android:layout_width="0dp"
-                    android:layout_height="120dp"
-                    android:layout_margin="4dp"
+                    android:layout_height="130dp"
+                    android:layout_margin="1dp"
                     android:layout_weight="1"
-                    app:cardCornerRadius="8dp"
+                    app:cardCornerRadius="6dp"
                     app:cardBackgroundColor="#FFFFFF">
 
                     <LinearLayout
@@ -154,7 +165,7 @@
                             android:layout_height="wrap_content"
                             android:text="♣"
                             android:textColor="#000000"
-                            android:textSize="28sp"
+                            android:textSize="32sp"
                             android:textStyle="bold" />
 
                         <TextView
@@ -163,7 +174,7 @@
                             android:layout_height="wrap_content"
                             android:text="Q"
                             android:textColor="#000000"
-                            android:textSize="28sp"
+                            android:textSize="32sp"
                             android:textStyle="bold" />
 
                     </LinearLayout>
@@ -172,10 +183,10 @@
                 <androidx.cardview.widget.CardView
                     android:id="@+id/cardView4"
                     android:layout_width="0dp"
-                    android:layout_height="120dp"
-                    android:layout_margin="4dp"
+                    android:layout_height="130dp"
+                    android:layout_margin="1dp"
                     android:layout_weight="1"
-                    app:cardCornerRadius="8dp"
+                    app:cardCornerRadius="6dp"
                     app:cardBackgroundColor="#FFFFFF">
 
                     <LinearLayout
@@ -190,7 +201,7 @@
                             android:layout_height="wrap_content"
                             android:text="♠"
                             android:textColor="#000000"
-                            android:textSize="28sp"
+                            android:textSize="32sp"
                             android:textStyle="bold" />
 
                         <TextView
@@ -199,7 +210,7 @@
                             android:layout_height="wrap_content"
                             android:text="J"
                             android:textColor="#000000"
-                            android:textSize="28sp"
+                            android:textSize="32sp"
                             android:textStyle="bold" />
 
                     </LinearLayout>
@@ -208,10 +219,10 @@
                 <androidx.cardview.widget.CardView
                     android:id="@+id/cardView5"
                     android:layout_width="0dp"
-                    android:layout_height="120dp"
-                    android:layout_margin="4dp"
+                    android:layout_height="130dp"
+                    android:layout_margin="1dp"
                     android:layout_weight="1"
-                    app:cardCornerRadius="8dp"
+                    app:cardCornerRadius="6dp"
                     app:cardBackgroundColor="#FFFFFF">
 
                     <LinearLayout
@@ -226,7 +237,7 @@
                             android:layout_height="wrap_content"
                             android:text="♥"
                             android:textColor="#FF0000"
-                            android:textSize="28sp"
+                            android:textSize="32sp"
                             android:textStyle="bold" />
 
                         <TextView
@@ -235,7 +246,7 @@
                             android:layout_height="wrap_content"
                             android:text="10"
                             android:textColor="#FF0000"
-                            android:textSize="28sp"
+                            android:textSize="32sp"
                             android:textStyle="bold" />
 
                     </LinearLayout>
@@ -247,7 +258,7 @@
                 android:id="@+id/navButtonsLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="6dp"
                 android:gravity="center"
                 android:orientation="horizontal">
 
@@ -272,7 +283,7 @@
                 android:id="@+id/tvHandDescription"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="12dp"
                 android:gravity="center"
                 android:text="효과: 가장 높은 카드의 랭크 기준"
                 android:textColor="#BBBBBB"
@@ -281,14 +292,14 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="16dp"
                 android:orientation="horizontal">
 
                 <Button
                     android:id="@+id/btnReplaceCards"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
+                    android:layout_marginEnd="4dp"
                     android:layout_weight="1"
                     android:background="@drawable/main_button_selector"
                     android:backgroundTint="@null"
@@ -299,7 +310,7 @@
                     android:id="@+id/btnConfirmHand"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
+                    android:layout_marginStart="4dp"
                     android:layout_weight="1"
                     android:background="@drawable/main_button_selector"
                     android:backgroundTint="@null"

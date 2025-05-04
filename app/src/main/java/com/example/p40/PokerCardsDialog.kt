@@ -13,6 +13,7 @@ import androidx.cardview.widget.CardView
 import com.example.p40.game.Card
 import com.example.p40.game.CardRank
 import com.example.p40.game.CardSuit
+import com.example.p40.game.GameConfig
 import com.example.p40.game.PokerDeck
 import com.example.p40.game.PokerHand
 
@@ -38,12 +39,16 @@ class PokerCardsDialog(
     private lateinit var btnConfirmHand: Button
     private lateinit var btnPrevCards: Button
     private lateinit var btnNextCards: Button
+    private lateinit var tvReplaceCount: TextView
     
     // 덱 구성 모드에서 사용할 변수
     private var allCards = mutableListOf<Card>()
     private var currentPage = 0
     private val cardsPerPage = 5
     private var selectedDeckCards = mutableListOf<Card>()
+    
+    // 포커 카드 교체 횟수
+    private var remainingReplaceCount = GameConfig.POKER_CARD_REPLACE_COUNT
     
     init {
         if (waveNumber == 0) {
@@ -91,6 +96,16 @@ class PokerCardsDialog(
         // 레이아웃 설정
         setContentView(R.layout.dialog_poker_cards)
         
+        // 다이얼로그 크기 설정 (화면 너비의 95% 사용)
+        val window = window
+        if (window != null) {
+            val displayMetrics = context.resources.displayMetrics
+            val width = (displayMetrics.widthPixels * 0.95).toInt()
+            
+            window.setLayout(width, android.view.WindowManager.LayoutParams.WRAP_CONTENT)
+            window.setGravity(android.view.Gravity.CENTER)
+        }
+        
         // 뷰 초기화
         initViews()
         
@@ -110,12 +125,16 @@ class PokerCardsDialog(
         tvTitle = findViewById(R.id.tvWaveCompleted)
         tvCurrentHand = findViewById(R.id.tvCurrentHand)
         tvHandDescription = findViewById(R.id.tvHandDescription)
+        tvReplaceCount = findViewById(R.id.tvReplaceCount)
         
         // 타이틀 설정
         if (waveNumber == 0) {
             tvTitle.text = "덱 구성"
+            tvReplaceCount.visibility = View.GONE
         } else {
             tvTitle.text = "웨이브 ${waveNumber} 완료!"
+            tvReplaceCount.visibility = View.VISIBLE
+            tvReplaceCount.text = "교체 가능 횟수: ${remainingReplaceCount}"
         }
         
         // 카드 뷰 초기화
@@ -406,9 +425,26 @@ class PokerCardsDialog(
             
             // 교체 버튼
             btnReplaceCards.setOnClickListener {
+                // 교체 횟수가 남아있는지 확인
+                if (remainingReplaceCount <= 0) {
+                    Toast.makeText(context, "더 이상 교체할 수 없습니다.", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+                
+                // 선택된 카드가 있는지 확인
+                val hasSelectedCards = currentCards.any { it.isSelected }
+                if (!hasSelectedCards) {
+                    Toast.makeText(context, "교체할 카드를 선택해주세요.", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+                
                 // 선택된 카드 교체
                 pokerDeck.replaceSelectedCards()
                 currentCards = pokerDeck.playerHand.toMutableList()
+                
+                // 교체 횟수 감소
+                remainingReplaceCount--
+                tvReplaceCount.text = "교체 가능 횟수: ${remainingReplaceCount}"
                 
                 // 카드 표시 업데이트
                 updateCardDisplay()
@@ -416,9 +452,11 @@ class PokerCardsDialog(
                 // 족보 업데이트
                 updateHandDisplay()
                 
-                // 교체 후 버튼 비활성화
-                btnReplaceCards.isEnabled = false
-                btnReplaceCards.text = "교체 완료"
+                // 교체 후 버튼 상태 업데이트
+                if (remainingReplaceCount <= 0) {
+                    btnReplaceCards.isEnabled = false
+                    btnReplaceCards.text = "교체 완료"
+                }
             }
             
             // 확정 버튼

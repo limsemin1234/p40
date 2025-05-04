@@ -38,6 +38,16 @@ class JokerSelectionDialog(
         // 레이아웃 설정
         setContentView(R.layout.dialog_joker_selection)
         
+        // 다이얼로그 크기 설정 (화면 너비의 90% 사용)
+        val window = window
+        if (window != null) {
+            val displayMetrics = context.resources.displayMetrics
+            val width = (displayMetrics.widthPixels * 0.9).toInt()
+            
+            window.setLayout(width, android.view.WindowManager.LayoutParams.WRAP_CONTENT)
+            window.setGravity(android.view.Gravity.CENTER)
+        }
+        
         // 뷰 초기화
         initViews()
         

@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp"
+    android:padding="12dp"
     android:background="@android:color/white">
 
     <TextView
@@ -13,70 +13,85 @@
         android:textSize="20sp"
         android:textStyle="bold"
         android:gravity="center"
-        android:layout_marginBottom="16dp" />
+        android:layout_marginBottom="12dp" />
 
     <TextView
         android:id="@+id/tvSelectedCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="조커를 변환할 카드를 선택하세요"
-        android:textSize="16sp"
+        android:textSize="14sp"
         android:gravity="center"
-        android:layout_marginBottom="16dp" />
+        android:layout_marginBottom="12dp" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="카드 모양 선택"
-        android:textSize="16sp"
+        android:textSize="14sp"
         android:textStyle="bold"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp" />
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp" />
 
-    <GridLayout
-        android:id="@+id/suitLayout"
+    <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:columnCount="4"
-        android:useDefaultMargins="true"
-        android:layout_marginBottom="16dp" />
+        android:scrollbars="none">
+        
+        <GridLayout
+            android:id="@+id/suitLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:columnCount="4"
+            android:useDefaultMargins="true"
+            android:layout_marginBottom="8dp" />
+    </HorizontalScrollView>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="카드 숫자 선택"
-        android:textSize="16sp"
+        android:textSize="14sp"
         android:textStyle="bold"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp" />
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp" />
 
-    <GridLayout
-        android:id="@+id/rankLayout"
+    <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:columnCount="4"
-        android:useDefaultMargins="true"
-        android:layout_marginBottom="16dp" />
+        android:scrollbars="none">
+        
+        <GridLayout
+            android:id="@+id/rankLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:columnCount="5"
+            android:useDefaultMargins="true"
+            android:layout_marginBottom="8dp" />
+    </HorizontalScrollView>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center"
-        android:layout_marginTop="16dp">
+        android:layout_marginTop="12dp">
 
         <Button
             android:id="@+id/btnCancel"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:text="취소"
-            android:layout_marginEnd="16dp" />
+            android:layout_marginEnd="8dp" />
 
         <Button
             android:id="@+id/btnConfirm"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="확인" />
+            android:text="확인"
+            android:layout_marginStart="8dp" />
     </LinearLayout>
 
 </LinearLayout> 
