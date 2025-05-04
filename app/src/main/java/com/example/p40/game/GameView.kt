@@ -168,10 +168,11 @@ class GameView @JvmOverloads constructor(
             }
         }
         
-        // 적 업데이트
+        // 화면 범위 계산 (성능 최적화를 위한 값)
         val centerX = screenWidth / 2
         val centerY = screenHeight / 2
         val visibleMargin = 100f // 화면 밖 여유 공간
+        val farOffScreenMargin = 300f // 더 먼 화면 밖 거리
         
         // 화면 범위 계산 (화면 밖 일정 거리까지 포함)
         val minX = -visibleMargin
@@ -179,15 +180,28 @@ class GameView @JvmOverloads constructor(
         val maxX = screenWidth + visibleMargin
         val maxY = screenHeight + visibleMargin
         
-        enemies.forEach { enemy ->
-            // 화면 안쪽 또는 가장자리 근처에 있는 적만 업데이트
+        // 버프에 의한 적 이동 속도 계산 (한 번만 계산하여 재사용)
+        val enemySpeedMultiplier = buffManager.getEnemySpeedMultiplier()
+        val missileSpeedMultiplier = buffManager.getMissileSpeedMultiplier()
+        
+        // 1. 화면 내부 또는 가장자리에 있는 적만 업데이트 (최적화)
+        val screenRect = ScreenRect(minX, minY, maxX, maxY)
+        val deadEnemies = mutableListOf<Enemy>()
+        
+        for (enemy in enemies) {
             val enemyPos = enemy.getPosition()
-            if (enemyPos.x > minX && enemyPos.x < maxX && 
-                enemyPos.y > minY && enemyPos.y < maxY) {
-                
+            
+            // 화면 범위에서 멀리 벗어난 적은 자동 제거 (최적화)
+            if (enemyPos.x < -farOffScreenMargin || enemyPos.x > screenWidth + farOffScreenMargin ||
+                enemyPos.y < -farOffScreenMargin || enemyPos.y > screenHeight + farOffScreenMargin) {
+                deadEnemies.add(enemy)
+                continue
+            }
+            
+            // 화면 안쪽이나 가장자리에 있는 적만 업데이트
+            if (screenRect.contains(enemyPos.x, enemyPos.y)) {
                 // 버프에 의한 적 이동 속도 조정 적용
-                val speedMultiplier = buffManager.getEnemySpeedMultiplier()
-                enemy.update(speedMultiplier)
+                enemy.update(enemySpeedMultiplier)
                 
                 // 중앙에 도달했는지 확인
                 val dx = enemyPos.x - centerX
@@ -211,113 +225,158 @@ class GameView @JvmOverloads constructor(
                     }
                 }
             }
+            
+            // 죽은 적 확인
+            if (enemy.isDead()) {
+                deadEnemies.add(enemy)
+            }
         }
         
-        // 미사일 업데이트 - 화면 내부 또는 근처의 미사일만 처리
-        missiles.forEach { missile ->
+        // 2. 미사일 업데이트 최적화 - 객체 재사용 및 화면 밖 미사일 처리
+        val deadMissiles = mutableListOf<Missile>()
+        
+        for (missile in missiles) {
             val missilePos = missile.getPosition()
-            if (missilePos.x > minX && missilePos.x < maxX && 
-                missilePos.y > minY && missilePos.y < maxY) {
+            
+            // 화면 밖으로 완전히 벗어난 미사일은 즉시 제거 표시
+            if (missilePos.x < -farOffScreenMargin || missilePos.x > screenWidth + farOffScreenMargin ||
+                missilePos.y < -farOffScreenMargin || missilePos.y > screenHeight + farOffScreenMargin) {
+                missile.setOutOfBounds()
+                deadMissiles.add(missile)
+                continue
+            }
+            
+            // 화면 내부 또는 가까운 범위의 미사일만 업데이트
+            if (screenRect.contains(missilePos.x, missilePos.y)) {
+                missile.update(missileSpeedMultiplier)
                 
-                // 버프에 의한 미사일 속도 조정 적용
-                val speedMultiplier = buffManager.getMissileSpeedMultiplier()
-                missile.update(speedMultiplier)
-                
-                // 미사일이 모든 적과 충돌 체크
+                // 미사일이 죽지 않았고 화면 내부에 있는 경우에만 충돌 체크
                 if (!missile.isDead()) {
                     val pierceCount = buffManager.getMissilePierceCount()
                     var hitCount = 0
                     
+                    // 화면 내부의 적들과만 충돌 체크 (최적화)
                     for (enemy in enemies) {
-                        // 충돌 체크 (원래 타겟이 아닌 다른 적과의 충돌 확인)
-                        if (missile.checkCollision(enemy)) {
-                            hitCount++
-                            // 관통 횟수를 초과하면 미사일 제거
-                            if (hitCount > pierceCount) {
-                                break
+                        val enemyPos = enemy.getPosition()
+                        if (screenRect.contains(enemyPos.x, enemyPos.y) && !enemy.isDead()) {
+                            if (missile.checkCollision(enemy)) {
+                                hitCount++
+                                // 관통 횟수를 초과하면 미사일 제거
+                                if (hitCount > pierceCount) {
+                                    deadMissiles.add(missile)
+                                    break
+                                }
                             }
                         }
                     }
                 }
-            } else {
-                // 화면에서 벗어난 미사일은 제거 표시
-                missile.setOutOfBounds()
+            }
+            
+            // 죽은 미사일 확인
+            if (missile.isDead()) {
+                deadMissiles.add(missile)
             }
         }
         
-        // 방어 유닛이 적을 공격
-        // 버프에 의한 공격 속도 조정 적용
-        val attackSpeedMultiplier = buffManager.getAttackSpeedMultiplier()
-        val adjustedAttackCooldown = (unitAttackSpeed * attackSpeedMultiplier).toLong()
-        
-        // 적이 있는 경우에만 미사일 발사
-        if (enemies.isNotEmpty()) {
-            // 다방향 발사 지원
-            val multiDirCount = buffManager.getMultiDirectionCount()
-            if (multiDirCount > 1) {
-                // 다방향 발사 (기본 1방향 + 추가 방향)
-                val angleStep = (2 * Math.PI) / multiDirCount
-                
-                for (i in 0 until multiDirCount) {
+        // 3. 방어 유닛 공격 로직 최적화
+        if (!enemies.isEmpty()) {
+            // 공격 쿨다운 계산 (한 번만 계산)
+            val attackSpeedMultiplier = buffManager.getAttackSpeedMultiplier()
+            val adjustedAttackCooldown = (unitAttackSpeed * attackSpeedMultiplier).toLong()
+            val missileDamageMultiplier = buffManager.getMissileDamageMultiplier()
+            
+            // 화면 내 적이 있는 경우에만 공격 처리
+            val screenEnemies = enemies.filter { 
+                val pos = it.getPosition()
+                screenRect.contains(pos.x, pos.y) && !it.isDead()
+            }
+            
+            if (screenEnemies.isNotEmpty()) {
+                // 다방향 발사 지원
+                val multiDirCount = buffManager.getMultiDirectionCount()
+                if (multiDirCount > 1) {
+                    // 다방향 발사 (기본 1방향 + 추가 방향)
+                    val angleStep = (2 * Math.PI) / multiDirCount
+                    
+                    for (i in 0 until multiDirCount) {
+                        val newMissile = defenseUnit.attack(
+                            screenEnemies, 
+                            currentTime, 
+                            adjustedAttackCooldown, 
+                            missileDamageMultiplier,
+                            i * angleStep
+                        )
+                        
+                        if (newMissile != null) {
+                            missiles.add(newMissile)
+                        }
+                    }
+                } else {
+                    // 기본 1방향 발사
                     val newMissile = defenseUnit.attack(
-                        enemies, 
+                        screenEnemies, 
                         currentTime, 
-                        adjustedAttackCooldown, 
-                        buffManager.getMissileDamageMultiplier(),
-                        i * angleStep
+                        adjustedAttackCooldown,
+                        missileDamageMultiplier
                     )
                     
                     if (newMissile != null) {
                         missiles.add(newMissile)
                     }
                 }
-            } else {
-                // 기본 1방향 발사
-                val newMissile = defenseUnit.attack(
-                    enemies, 
-                    currentTime, 
-                    adjustedAttackCooldown,
-                    buffManager.getMissileDamageMultiplier()
-                )
-                
-                if (newMissile != null) {
-                    missiles.add(newMissile)
+            }
+        }
+        
+        // 4. 버프 효과 처리 최적화
+        val dotLevel = buffManager.getBuffLevel(BuffType.DOT_DAMAGE)
+        val massLevel = buffManager.getBuffLevel(BuffType.MASS_DAMAGE)
+        
+        // DoT 효과 (1초마다)
+        if (dotLevel > 0 && currentTime % 1000 < 20) {
+            val dotDamage = dotLevel * 2 // 레벨당 2 데미지
+            for (enemy in enemies) {
+                if (!enemy.isDead() && screenRect.contains(enemy.getPosition().x, enemy.getPosition().y)) {
+                    enemy.takeDamage(dotDamage)
+                    if (enemy.isDead()) {
+                        deadEnemies.add(enemy)
+                    }
                 }
             }
         }
         
-        // 지속 데미지 효과 (Full House)
-        val dotLevel = buffManager.getBuffLevel(BuffType.DOT_DAMAGE)
-        if (dotLevel > 0 && currentTime % 1000 < 20) { // 약 1초마다
-            enemies.forEach { enemy ->
-                enemy.takeDamage(dotLevel)
+        // 대량 데미지 효과 (5초마다)
+        if (massLevel > 0 && currentTime % 5000 < 20) {
+            val massDamage = massLevel * 100 // 레벨당 100 데미지
+            for (enemy in enemies) {
+                if (!enemy.isDead() && screenRect.contains(enemy.getPosition().x, enemy.getPosition().y)) {
+                    enemy.takeDamage(massDamage)
+                    if (enemy.isDead()) {
+                        deadEnemies.add(enemy)
+                    }
+                }
             }
         }
         
-        // 주기적 대량 데미지 효과 (Royal Flush)
-        val massLevel = buffManager.getBuffLevel(BuffType.MASS_DAMAGE)
-        if (massLevel > 0 && currentTime % 5000 < 20) { // 약 5초마다
-            enemies.forEach { enemy ->
-                enemy.takeDamage(massLevel * 100)
-            }
-        }
-        
-        // 죽은 적과 미사일 제거
-        val deadEnemies = enemies.filter { it.isDead() }
-        enemies.removeAll(deadEnemies)
-        
-        // 킬 카운트 및 점수(자원) 갱신
-        deadEnemies.forEach { enemy ->
-            resource += if (enemy.isBoss) GameConfig.SCORE_PER_BOSS else GameConfig.SCORE_PER_NORMAL_ENEMY  // 자원 획득
-            if (!enemy.isBoss) {
-                killCount++
-            } else {
-                // 보스 처치 이벤트 발생
-                bossKillListener?.onBossKilled()
+        // 5. 적 처리 및 점수 계산
+        if (deadEnemies.isNotEmpty()) {
+            // 킬 카운트 및 점수(자원) 갱신
+            for (enemy in deadEnemies) {
+                if (!enemies.remove(enemy)) continue // 이미 제거된 경우 스킵
                 
-                // 보스 처치 시 다음 웨이브로 이동
-                if (waveCount < GameConfig.getTotalWaves()) {
-                    startNextWave()
+                if (enemy.isDead()) { // 실제로 죽은 경우만 점수 처리
+                    resource += if (enemy.isBoss) GameConfig.SCORE_PER_BOSS else GameConfig.SCORE_PER_NORMAL_ENEMY
+                    
+                    if (!enemy.isBoss) {
+                        killCount++
+                    } else {
+                        // 보스 처치 이벤트 발생
+                        bossKillListener?.onBossKilled()
+                        
+                        // 보스 처치 시 다음 웨이브로 이동
+                        if (waveCount < GameConfig.getTotalWaves()) {
+                            startNextWave()
+                        }
+                    }
                 }
             }
         }
@@ -328,16 +387,10 @@ class GameView @JvmOverloads constructor(
             bossSpawned = true
         }
         
-        // 화면 밖으로 완전히 벗어난 적 제거 (최적화)
-        val farOffScreenMargin = 500f
-        enemies.removeAll { enemy ->
-            val pos = enemy.getPosition()
-            pos.x < -farOffScreenMargin || pos.x > screenWidth + farOffScreenMargin ||
-            pos.y < -farOffScreenMargin || pos.y > screenHeight + farOffScreenMargin
+        // 6. 미사일 처리 (한번에 처리)
+        if (deadMissiles.isNotEmpty()) {
+            missiles.removeAll(deadMissiles)
         }
-        
-        // 죽거나 범위를 벗어난 미사일 제거
-        missiles.removeAll { it.isDead() }
     }
     
     private fun handleEnemySpawning(currentTime: Long) {
@@ -359,6 +412,12 @@ class GameView @JvmOverloads constructor(
     }
     
     private fun spawnEnemy() {
+        // 적 수 제한 확인
+        if (enemies.size >= GameConfig.MAX_ENEMIES) {
+            // 가장 멀리 있는 적 제거 후 새로운 적 생성
+            removeDistantEnemy()
+        }
+        
         val centerX = screenWidth / 2
         val centerY = screenHeight / 2
         
@@ -515,7 +574,7 @@ class GameView @JvmOverloads constructor(
         if (resource >= attackRangeCost) {
             resource -= attackRangeCost  // 자원 사용
             unitAttackRange += GameConfig.ATTACK_RANGE_UPGRADE_VALUE  // 공격 범위 증가
-            defenseUnit.attackRange = unitAttackRange  // 디펜스 유닛에 적용
+            defenseUnit.setAttackRange(unitAttackRange)  // 디펜스 유닛에 적용
             attackRangeCost += GameConfig.ATTACK_RANGE_UPGRADE_COST_INCREASE  // 다음 업그레이드 비용 증가
             attackRangeLevel++
             return true
@@ -562,11 +621,23 @@ class GameView @JvmOverloads constructor(
         val centerY = screenHeight / 2
         canvas.drawCircle(centerX, centerY, DEFENSE_UNIT_SIZE, unitPaint)  // 디펜스 유닛 크기 적용
         
-        // 적 그리기
-        enemies.forEach { it.draw(canvas) }
+        // 적 그리기 - 화면 내 적만 그리기
+        for (enemy in enemies) {
+            val pos = enemy.getPosition()
+            if (pos.x >= -50 && pos.x <= screenWidth + 50 && 
+                pos.y >= -50 && pos.y <= screenHeight + 50) {
+                enemy.draw(canvas)
+            }
+        }
         
-        // 미사일 그리기
-        missiles.forEach { it.draw(canvas) }
+        // 미사일 그리기 - 화면 내 미사일만 그리기
+        for (missile in missiles) {
+            val pos = missile.getPosition()
+            if (pos.x >= -20 && pos.x <= screenWidth + 20 && 
+                pos.y >= -20 && pos.y <= screenHeight + 20) {
+                missile.draw(canvas)
+            }
+        }
         
         // 웨이브 시작 메시지 표시
         if (showWaveMessage) {
@@ -582,6 +653,9 @@ class GameView @JvmOverloads constructor(
         if (isGameOver) {
             drawGameOver(canvas)
         }
+        
+        // 디버그 정보 표시
+        drawDebugInfo(canvas)
     }
     
     // 포커 족보 효과 적용
@@ -768,24 +842,109 @@ class GameView @JvmOverloads constructor(
         canvas.drawText("GAME OVER", centerX, centerY, paint)
     }
     
+    // 화면 영역 체크를 위한 헬퍼 클래스 (객체 할당 최소화)
+    private class ScreenRect(val left: Float, val top: Float, val right: Float, val bottom: Float) {
+        fun contains(x: Float, y: Float): Boolean {
+            return x >= left && x <= right && y >= top && y <= bottom
+        }
+    }
+    
     inner class GameThread : Thread() {
+        // 프레임 제한을 위한 설정
+        private val targetFPS = GameConfig.FRAME_LIMIT
+        private val targetFrameTime = 1000 / targetFPS
+        
         override fun run() {
+            var lastFrameTime = System.currentTimeMillis()
+            
             while (isRunning) {
-                val canvas = holder.lockCanvas() ?: continue
-                try {
-                    update()
-                    renderGame(canvas)
-                } finally {
-                    holder.unlockCanvasAndPost(canvas)
+                val startTime = System.currentTimeMillis()
+                
+                val canvas = holder.lockCanvas()
+                if (canvas != null) {
+                    try {
+                        update()
+                        renderGame(canvas)
+                    } finally {
+                        holder.unlockCanvasAndPost(canvas)
+                    }
                 }
                 
-                // 60 FPS 유지
-                try {
-                    sleep(16)
-                } catch (e: InterruptedException) {
-                    // 무시
+                // FPS 제한 및 CPU 사용량 최적화
+                val frameTime = System.currentTimeMillis() - startTime
+                if (frameTime < targetFrameTime) {
+                    try {
+                        sleep(targetFrameTime - frameTime)
+                    } catch (e: InterruptedException) {
+                        // 무시
+                    }
+                }
+                
+                // 디버그 모드에서 FPS 계산
+                val currentTime = System.currentTimeMillis()
+                val elapsedFrameTime = currentTime - lastFrameTime
+                lastFrameTime = currentTime
+                
+                // 디버그 모드에서 FPS 저장
+                if (GameConfig.DEBUG_MODE && elapsedFrameTime > 0) {
+                    currentFPS = 1000 / elapsedFrameTime
                 }
             }
         }
+    }
+    
+    // 렌더링 최적화를 위한 FPS 추적
+    private var currentFPS: Long = 0
+    
+    // 중앙에서 가장 멀리 있는 적 제거
+    private fun removeDistantEnemy() {
+        val centerX = screenWidth / 2
+        val centerY = screenHeight / 2
+        
+        var farthestEnemy: Enemy? = null
+        var maxDistanceSquared = 0f
+        
+        for (enemy in enemies) {
+            val pos = enemy.getPosition()
+            val dx = pos.x - centerX
+            val dy = pos.y - centerY
+            val distanceSquared = dx * dx + dy * dy
+            
+            if (distanceSquared > maxDistanceSquared) {
+                maxDistanceSquared = distanceSquared
+                farthestEnemy = enemy
+            }
+        }
+        
+        // 가장 멀리 있는 적 제거
+        farthestEnemy?.let { enemies.remove(it) }
+    }
+    
+    // 미사일 수 제한 기능 추가
+    private fun addMissile(missile: Missile) {
+        // 미사일 수 제한 확인
+        if (missiles.size >= GameConfig.MAX_MISSILES) {
+            // 가장 오래된 미사일 제거
+            missiles.removeAt(0)
+        }
+        
+        missiles.add(missile)
+    }
+    
+    // 디버그 정보 표시
+    private fun drawDebugInfo(canvas: Canvas) {
+        if (!GameConfig.DEBUG_MODE) return
+        
+        val debugPaint = Paint().apply {
+            color = Color.GREEN
+            textSize = 30f
+            textAlign = Paint.Align.LEFT
+        }
+        
+        // 디버그 정보 표시
+        canvas.drawText("FPS: $currentFPS", 10f, 30f, debugPaint)
+        canvas.drawText("적: ${enemies.size}/${GameConfig.MAX_ENEMIES}", 10f, 60f, debugPaint)
+        canvas.drawText("미사일: ${missiles.size}/${GameConfig.MAX_MISSILES}", 10f, 90f, debugPaint)
+        canvas.drawText("Wave: $waveCount", 10f, 120f, debugPaint)
     }
 } 

@@ -210,6 +210,14 @@ object GameConfig {
     // 게임 레벨 설정
     private var currentDifficulty: Float = 1.0f   // 기본 난이도
     private var currentTotalWaves: Int = 10       // 기본 총 웨이브 수
+    
+    // 성능 관련 설정
+    const val DEBUG_MODE = false // 디버그 정보 표시 여부
+    const val MAX_MISSILES = 100 // 최대 미사일 수 제한
+    const val MAX_ENEMIES = 50  // 최대 적 수 제한
+    const val OFFSCREEN_MARGIN = 300f // 화면 외부 마진 (오브젝트 제거 범위)
+    const val OBJECT_POOL_SIZE = 100 // 오브젝트 풀 크기
+    const val FRAME_LIMIT = 60 // 최대 FPS
 
     /**
      * 게임 난이도 설정
