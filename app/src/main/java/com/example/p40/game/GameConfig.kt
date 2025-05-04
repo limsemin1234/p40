@@ -168,7 +168,7 @@ object GameConfig {
     const val BUFF_MAX_LEVEL = 5  // 각 버프의 최대 레벨
     
     // 포커 카드 관련 설정
-    const val POKER_CARD_REPLACE_COUNT = 1  // 포커 카드 교체 가능 횟수
+    const val POKER_CARD_REPLACE_COUNT = 3  // 포커 카드 교체 가능 횟수
     
     // 디펜스 유닛 버프 효과 설정
     const val MISSILE_DAMAGE_BUFF_PER_LEVEL = 0.1f  // 레벨당 데미지 증가율(10%)
