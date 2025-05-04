@@ -98,24 +98,39 @@ class PokerDeck {
         for (i in playerHand.indices) {
             val card = playerHand[i]
             // 조커 카드는 교체에서 제외 (별 조커 또는 문양 조커)
-            if (card.isSelected && !(card.isJoker || (card.suit == CardSuit.JOKER && card.rank == CardRank.JOKER))) {
+            if (card.isSelected && !CardUtils.isJokerCard(card)) {
                 indexesToReplace.add(i)
-            } else if (card.isJoker || (card.suit == CardSuit.JOKER && card.rank == CardRank.JOKER)) {
+            } else if (CardUtils.isJokerCard(card)) {
                 // 조커 카드의 선택 상태는 항상 false로 리셋
                 card.isSelected = false
             }
         }
         
+        // 교체할 카드가 없으면 현재 핸드 반환
+        if (indexesToReplace.isEmpty()) {
+            return playerHand
+        }
+        
         // 덱에 카드가 부족하면 덱 리셋 (교체할 카드 수보다 덱에 카드가 적을 경우)
         if (cards.size < indexesToReplace.size) {
-            val remainingCards = cards.toList() // 현재 남은 카드 저장
+            val remainingCards = cards.toHashSet() // 현재 남은 카드 저장 (HashSet으로 변환)
+            
+            // 현재 핸드의 카드를 HashSet으로 변환 (빠른 검색을 위해)
+            val handCardKeys = playerHand.map { CardUtils.getCardKey(it) }.toHashSet()
+            
+            // 덱 초기화
             initializeDeck()
             if (hasJoker) {
                 addJoker()
             }
-            // 사용했던 카드와 플레이어 핸드의 카드는 제외
-            cards.removeAll(remainingCards)
-            cards.removeAll(playerHand)
+            
+            // 사용했던 카드 제거 (HashSet 검색으로 최적화)
+            cards.removeAll { card -> 
+                CardUtils.getCardKey(card) in handCardKeys || 
+                remainingCards.any { CardUtils.isSameCard(it, card) }
+            }
+            
+            // 덱 다시 섞기
             cards.shuffle()
         }
         
@@ -138,11 +153,13 @@ class PokerDeck {
     fun evaluateHand(): PokerHand {
         val tempHand = playerHand.toMutableList()
         
-        // 조커 카드가 있는지 확인
-        val jokerIndex = tempHand.indexOfFirst { it.suit == CardSuit.JOKER && it.rank == CardRank.JOKER }
+        // 일반 조커 카드가 있는지 확인 (별 모양 조커)
+        val jokerIndex = tempHand.indexOfFirst { CardUtils.isStarJoker(it) }
         
-        // 조커가 있고, 아직 변환되지 않은 경우에만 자동 변환 로직 적용
-        // 사용자가 이미 조커를 다른 카드로 변환한 경우에는 추가 변환 없이 그대로 평가
+        // 문양 조커 카드가 있는지 확인
+        val suitedJokerIndex = tempHand.indexOfFirst { CardUtils.isSuitedJoker(it) }
+        
+        // 일반 조커가 있고, 아직 변환되지 않은 경우에만 자동 변환 로직 적용
         if (jokerIndex != -1) {
             // 조커를 임시로 제거하고 가장 유리한 카드로 대체
             tempHand.removeAt(jokerIndex)
@@ -154,44 +171,105 @@ class PokerDeck {
                 
                 // 가능한 추가 전략:
                 // 1. 같은 숫자가 3장 있으면 -> 포카드를 위해 같은 숫자 추가
-                // 2. 같은 숫자가 2장씩 있으면 -> 풀하우스를 위해 많은 쪽 숫자 추가
-                // 3. 같은 무늬가 4장 있으면 -> 플러시를 위해 같은 무늬 추가
-                // 4. 스트레이트 가능성 확인 -> 연속되는 숫자 추가
+                val rankGroups = tempHand.groupBy { it.rank }
+                val maxRankGroup = rankGroups.maxByOrNull { it.value.size }
                 
-                // 기본 전략: 최고 족보인 로얄 플러시를 위해 스페이드 에이스 추가
-                tempHand.add(Card(CardSuit.SPADE, CardRank.ACE))
+                if (maxRankGroup != null && maxRankGroup.value.size >= 3) {
+                    // 같은 숫자 3장 이상 -> 포카드 만들기
+                    tempHand.add(Card(CardSuit.SPADE, maxRankGroup.key))
+                } else if (suits.size == 1) {
+                    // 같은 무늬 4장 -> 플러시 만들기
+                    tempHand.add(Card(suits.first(), CardRank.ACE))
+                } else if (isNearStraight(tempHand)) {
+                    // 연속된 숫자에 가까움 -> 스트레이트 만들기
+                    val missingRank = findMissingRankForStraight(tempHand)
+                    if (missingRank != null) {
+                        tempHand.add(Card(CardSuit.SPADE, missingRank))
+                    } else {
+                        // 미싱 랭크를 찾지 못했을 경우 기본 전략
+                        tempHand.add(Card(CardSuit.SPADE, CardRank.ACE))
+                    }
+                } else {
+                    // 기본 전략: 최고 족보인 로얄 플러시를 위해 스페이드 에이스 추가
+                    tempHand.add(Card(CardSuit.SPADE, CardRank.ACE))
+                }
             }
         }
         
+        // 효율성을 위해 필요한 카드 정보를 한 번만 계산
+        val suits = tempHand.groupBy { it.suit }
+        val ranks = tempHand.groupBy { it.rank }
+        val rankValues = tempHand.map { it.rank.value }.sorted()
+        val isAllSameSuit = suits.size == 1
+        
         // 로얄 플러시 체크
-        if (isRoyalFlush(tempHand)) return PokerHand.ROYAL_FLUSH
+        if (isAllSameSuit && 
+            ranks.containsKey(CardRank.TEN) && 
+            ranks.containsKey(CardRank.JACK) && 
+            ranks.containsKey(CardRank.QUEEN) && 
+            ranks.containsKey(CardRank.KING) && 
+            ranks.containsKey(CardRank.ACE)) {
+            return PokerHand.ROYAL_FLUSH
+        }
         
         // 스트레이트 플러시 체크
-        if (isStraightFlush(tempHand)) return PokerHand.STRAIGHT_FLUSH
+        val isStraight = checkStraight(rankValues)
+        if (isAllSameSuit && isStraight) {
+            return PokerHand.STRAIGHT_FLUSH
+        }
         
         // 포카드 체크
-        if (isFourOfAKind(tempHand)) return PokerHand.FOUR_OF_A_KIND
+        if (ranks.any { it.value.size >= 4 }) {
+            return PokerHand.FOUR_OF_A_KIND
+        }
         
         // 풀하우스 체크
-        if (isFullHouse(tempHand)) return PokerHand.FULL_HOUSE
+        if (ranks.size == 2 && ranks.any { it.value.size == 3 }) {
+            return PokerHand.FULL_HOUSE
+        }
         
         // 플러시 체크
-        if (isFlush(tempHand)) return PokerHand.FLUSH
+        if (isAllSameSuit) {
+            return PokerHand.FLUSH
+        }
         
         // 스트레이트 체크
-        if (isStraight(tempHand)) return PokerHand.STRAIGHT
+        if (isStraight) {
+            return PokerHand.STRAIGHT
+        }
         
         // 트리플 체크
-        if (isThreeOfAKind(tempHand)) return PokerHand.THREE_OF_A_KIND
+        if (ranks.any { it.value.size >= 3 }) {
+            return PokerHand.THREE_OF_A_KIND
+        }
         
         // 투페어 체크
-        if (isTwoPair(tempHand)) return PokerHand.TWO_PAIR
+        val pairs = ranks.filter { it.value.size >= 2 }
+        if (pairs.size >= 2) {
+            return PokerHand.TWO_PAIR
+        }
         
         // 원페어 체크
-        if (isOnePair(tempHand)) return PokerHand.ONE_PAIR
+        if (pairs.size == 1) {
+            return PokerHand.ONE_PAIR
+        }
         
         // 하이카드
         return PokerHand.HIGH_CARD
+    }
+    
+    // 스트레이트 확인 (최적화된 버전)
+    private fun checkStraight(sortedValues: List<Int>): Boolean {
+        // A,2,3,4,5 스트레이트 특수 처리
+        if (sortedValues == listOf(1, 2, 3, 4, 5)) return true
+        
+        // 일반적인 스트레이트 확인
+        for (i in 1 until sortedValues.size) {
+            if (sortedValues[i] != sortedValues[i-1] + 1) {
+                return false
+            }
+        }
+        return true
     }
     
     // 족보 판정 메서드들
@@ -229,7 +307,7 @@ class PokerDeck {
         val sortedValues = hand.map { it.rank.value }.sorted()
         
         // A,2,3,4,5 스트레이트 특수 처리
-        if (sortedValues == listOf(1, 2, 3, 4, 13)) return true
+        if (sortedValues == listOf(1, 2, 3, 4, 5)) return true
         
         // 일반적인 스트레이트 확인
         for (i in 1 until sortedValues.size) {
@@ -254,5 +332,92 @@ class PokerDeck {
     private fun isOnePair(hand: List<Card>): Boolean {
         val rankGroups = hand.groupBy { it.rank }
         return rankGroups.any { it.value.size >= 2 }
+    }
+    
+    // 스트레이트에 가까운지 확인 (연속된 4장의 카드가 있는지)
+    private fun isNearStraight(hand: List<Card>): Boolean {
+        val sortedValues = hand.map { it.rank.value }.sorted()
+        val uniqueValues = sortedValues.distinct()
+        
+        if (uniqueValues.size < 4) return false
+        
+        // 연속된 숫자 4개 확인
+        for (i in 0 until uniqueValues.size - 3) {
+            if (uniqueValues[i + 3] - uniqueValues[i] == 3) {
+                return true
+            }
+        }
+        
+        // A, 2, 3, 4 or 10, J, Q, K 특수 케이스 확인
+        if (uniqueValues.contains(1) && uniqueValues.contains(2) && 
+            uniqueValues.contains(3) && uniqueValues.contains(4)) {
+            return true
+        }
+        
+        if (uniqueValues.contains(10) && uniqueValues.contains(11) && 
+            uniqueValues.contains(12) && uniqueValues.contains(13)) {
+            return true
+        }
+        
+        return false
+    }
+    
+    // 스트레이트를 만들기 위한 누락된 랭크 찾기
+    private fun findMissingRankForStraight(hand: List<Card>): CardRank? {
+        val values = hand.map { it.rank.value }.sorted().distinct()
+        
+        // 이미 4장이 연속된 경우, 마지막 카드를 찾음
+        for (i in 0 until values.size - 3) {
+            if (values[i + 3] - values[i] == 3 && values[i] >= 1) {
+                // 앞쪽에 카드가 누락된 경우
+                if (i == 0 && values[i] > 1) {
+                    return getCardRankByValue(values[i] - 1)
+                }
+                // 뒤쪽에 카드가 누락된 경우
+                else if (values[i + 3] < 13) {
+                    return getCardRankByValue(values[i + 3] + 1)
+                }
+                // 중간에 카드가 누락된 경우
+                else {
+                    for (j in i until i + 3) {
+                        if (values[j + 1] - values[j] > 1) {
+                            return getCardRankByValue(values[j] + 1)
+                        }
+                    }
+                }
+            }
+        }
+        
+        // A, 2, 3, 4를 가지고 있다면 5를 추가
+        if (values.containsAll(listOf(1, 2, 3, 4))) {
+            return CardRank.FIVE
+        }
+        
+        // 10, J, Q, K를 가지고 있다면 A를 추가
+        if (values.containsAll(listOf(10, 11, 12, 13))) {
+            return CardRank.ACE
+        }
+        
+        return null
+    }
+    
+    // 값으로 CardRank 반환
+    private fun getCardRankByValue(value: Int): CardRank? {
+        return when (value) {
+            1 -> CardRank.ACE
+            2 -> CardRank.TWO
+            3 -> CardRank.THREE
+            4 -> CardRank.FOUR
+            5 -> CardRank.FIVE
+            6 -> CardRank.SIX
+            7 -> CardRank.SEVEN
+            8 -> CardRank.EIGHT
+            9 -> CardRank.NINE
+            10 -> CardRank.TEN
+            11 -> CardRank.JACK
+            12 -> CardRank.QUEEN
+            13 -> CardRank.KING
+            else -> null
+        }
     }
 } 

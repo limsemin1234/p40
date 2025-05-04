@@ -60,7 +60,7 @@ class JokerSelectionDialog(
     private val suitDisplayValues = arrayOf("♥", "♦", "♣", "♠")
     
     // 카드 숫자 표시 문자열
-    private val rankDisplayValues = arrayOf("A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K")
+    private val rankDisplayValues = CardUtils.getRankDisplayValues()
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -136,34 +136,13 @@ class JokerSelectionDialog(
     }
     
     private fun updateCardPreview() {
-        // 카드 모양 및 색상 설정
-        tvPreviewSuit.text = getSuitSymbol(selectedSuit)
-        tvPreviewSuit.setTextColor(getSuitColor(selectedSuit))
+        // 카드 모양 및 색상 설정 - CardUtils 활용
+        tvPreviewSuit.text = CardUtils.getSuitSymbol(selectedSuit)
+        tvPreviewSuit.setTextColor(CardUtils.getSuitColor(selectedSuit))
         
-        // 카드 숫자 및 색상 설정
-        tvPreviewRank.text = getRankSymbol(selectedRank)
-        tvPreviewRank.setTextColor(getSuitColor(selectedSuit))
-    }
-    
-    private fun getSuitSymbol(suit: CardSuit): String {
-        return when (suit) {
-            CardSuit.HEART -> "♥"
-            CardSuit.DIAMOND -> "♦"
-            CardSuit.CLUB -> "♣"
-            CardSuit.SPADE -> "♠"
-            else -> "?"
-        }
-    }
-    
-    private fun getRankSymbol(rank: CardRank): String {
-        return rank.getName()
-    }
-    
-    private fun getSuitColor(suit: CardSuit): Int {
-        return when (suit) {
-            CardSuit.HEART, CardSuit.DIAMOND -> Color.RED
-            else -> Color.BLACK
-        }
+        // 카드 숫자 및 색상 설정 - CardUtils 활용
+        tvPreviewRank.text = CardUtils.getRankDisplayValue(selectedRank)
+        tvPreviewRank.setTextColor(CardUtils.getSuitColor(selectedSuit))
     }
     
     private fun updateSelectedCardDisplay() {
@@ -173,8 +152,8 @@ class JokerSelectionDialog(
     private fun setupButtons() {
         // 확인 버튼
         btnConfirm.setOnClickListener {
-            // 선택된 카드 생성
-            val selectedCard = Card(selectedSuit, selectedRank)
+            // 선택된 카드 생성 - isJoker 속성을 true로 설정
+            val selectedCard = Card(selectedSuit, selectedRank, isSelected = false, isJoker = true)
             
             // 콜백 호출
             onCardSelected(selectedCard)
@@ -187,5 +166,15 @@ class JokerSelectionDialog(
         findViewById<Button>(R.id.btnCancel).setOnClickListener {
             dismiss()
         }
+    }
+    
+    override fun dismiss() {
+        // 리소스 정리
+        suitPicker.setOnValueChangedListener(null)
+        rankPicker.setOnValueChangedListener(null)
+        btnConfirm.setOnClickListener(null)
+        findViewById<Button>(R.id.btnCancel).setOnClickListener(null)
+        
+        super.dismiss()
     }
 } 

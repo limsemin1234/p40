@@ -12,28 +12,25 @@ data class ShopCard(
     val isNew: Boolean = true, // 신규 카드 여부
     var isPurchased: Boolean = false // 구매 여부
 ) {
-    // 카드 문양 심볼 반환
+    // 카드 문양 심볼 반환 - CardUtils 활용
     fun getSuitSymbol(): String {
-        return when(suit) {
-            CardSuit.HEART -> "♥"
-            CardSuit.DIAMOND -> "♦"
-            CardSuit.CLUB -> "♣"
-            CardSuit.SPADE -> "♠"
-            CardSuit.JOKER -> "⭐"
+        // 조커의 경우 별 모양 사용
+        return if (suit == CardSuit.JOKER) {
+            "⭐"
+        } else {
+            CardUtils.getSuitSymbol(suit)
         }
     }
     
-    // 카드 문양 색상 반환
+    // 카드 문양 색상 반환 - CardUtils 활용
     fun getSuitColor(): Int {
-        return when(suit) {
-            CardSuit.HEART, CardSuit.DIAMOND -> android.graphics.Color.RED
-            CardSuit.CLUB, CardSuit.SPADE -> android.graphics.Color.BLACK
-            CardSuit.JOKER -> android.graphics.Color.MAGENTA
-        }
+        return CardUtils.getSuitColor(suit)
     }
     
     // 실제 카드 객체로 변환 (구매 시 덱에 추가될 카드)
     fun toCard(): Card {
+        // 각 문양에 맞는 조커 카드 생성
+        // 모든 문양 조커는 isJoker = true로 설정됨
         return when (id) {
             1 -> Card.createHeartJoker(CardRank.JOKER)
             2 -> Card.createSpadeJoker(CardRank.JOKER)
