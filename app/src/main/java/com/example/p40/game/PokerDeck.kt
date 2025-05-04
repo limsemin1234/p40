@@ -156,9 +156,6 @@ class PokerDeck {
         // 일반 조커 카드가 있는지 확인 (별 모양 조커)
         val jokerIndex = tempHand.indexOfFirst { CardUtils.isStarJoker(it) }
         
-        // 문양 조커 카드가 있는지 확인
-        val suitedJokerIndex = tempHand.indexOfFirst { CardUtils.isSuitedJoker(it) }
-        
         // 일반 조커가 있고, 아직 변환되지 않은 경우에만 자동 변환 로직 적용
         if (jokerIndex != -1) {
             // 조커를 임시로 제거하고 가장 유리한 카드로 대체
@@ -270,68 +267,6 @@ class PokerDeck {
             }
         }
         return true
-    }
-    
-    // 족보 판정 메서드들
-    private fun isRoyalFlush(hand: List<Card>): Boolean {
-        if (!isFlush(hand)) return false
-        
-        val ranks = hand.map { it.rank }
-        return ranks.contains(CardRank.TEN) &&
-                ranks.contains(CardRank.JACK) &&
-                ranks.contains(CardRank.QUEEN) &&
-                ranks.contains(CardRank.KING) &&
-                ranks.contains(CardRank.ACE)
-    }
-    
-    private fun isStraightFlush(hand: List<Card>): Boolean {
-        return isFlush(hand) && isStraight(hand)
-    }
-    
-    private fun isFourOfAKind(hand: List<Card>): Boolean {
-        val rankGroups = hand.groupBy { it.rank }
-        return rankGroups.any { it.value.size >= 4 }
-    }
-    
-    private fun isFullHouse(hand: List<Card>): Boolean {
-        val rankGroups = hand.groupBy { it.rank }
-        return rankGroups.size == 2 && rankGroups.any { it.value.size == 3 }
-    }
-    
-    private fun isFlush(hand: List<Card>): Boolean {
-        val suits = hand.map { it.suit }.toSet()
-        return suits.size == 1
-    }
-    
-    private fun isStraight(hand: List<Card>): Boolean {
-        val sortedValues = hand.map { it.rank.value }.sorted()
-        
-        // A,2,3,4,5 스트레이트 특수 처리
-        if (sortedValues == listOf(1, 2, 3, 4, 5)) return true
-        
-        // 일반적인 스트레이트 확인
-        for (i in 1 until sortedValues.size) {
-            if (sortedValues[i] != sortedValues[i-1] + 1) {
-                return false
-            }
-        }
-        return true
-    }
-    
-    private fun isThreeOfAKind(hand: List<Card>): Boolean {
-        val rankGroups = hand.groupBy { it.rank }
-        return rankGroups.any { it.value.size >= 3 }
-    }
-    
-    private fun isTwoPair(hand: List<Card>): Boolean {
-        val rankGroups = hand.groupBy { it.rank }
-        val pairs = rankGroups.filter { it.value.size >= 2 }
-        return pairs.size >= 2
-    }
-    
-    private fun isOnePair(hand: List<Card>): Boolean {
-        val rankGroups = hand.groupBy { it.rank }
-        return rankGroups.any { it.value.size >= 2 }
     }
     
     // 스트레이트에 가까운지 확인 (연속된 4장의 카드가 있는지)

@@ -93,18 +93,10 @@ object CardUtils {
     }
     
     /**
-     * 카드가 조커인지 확인 (별 조커 또는 문양 조커)
+     * 카드가 조커인지 확인 (별 조커)
      */
     fun isJokerCard(card: Card): Boolean {
-        return card.isJoker || (card.suit == CardSuit.JOKER && card.rank == CardRank.JOKER)
-    }
-    
-    /**
-     * 카드가 문양 조커인지 확인
-     */
-    fun isSuitedJoker(card: Card): Boolean {
-        // 문양 조커는 isJoker=true이고 suit가 JOKER가 아닌 카드
-        return card.isJoker && card.suit != CardSuit.JOKER
+        return card.isJoker || CardUtils.isStarJoker(card)
     }
     
     /**

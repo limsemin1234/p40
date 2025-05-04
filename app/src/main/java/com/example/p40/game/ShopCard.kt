@@ -29,15 +29,8 @@ data class ShopCard(
     
     // 실제 카드 객체로 변환 (구매 시 덱에 추가될 카드)
     fun toCard(): Card {
-        // 각 문양에 맞는 조커 카드 생성
-        // 모든 문양 조커는 isJoker = true로 설정됨
-        return when (id) {
-            1 -> Card.createHeartJoker(CardRank.JOKER)
-            2 -> Card.createSpadeJoker(CardRank.JOKER)
-            3 -> Card.createDiamondJoker(CardRank.JOKER)
-            4 -> Card.createClubJoker(CardRank.JOKER)
-            else -> Card.createJoker()
-        }
+        // 문양 조커 대신 별 조커만 사용
+        return Card.createJoker()
     }
     
     companion object {
@@ -46,30 +39,9 @@ data class ShopCard(
             return listOf(
                 ShopCard(
                     id = 1,
-                    suit = CardSuit.HEART,
-                    name = "하트 조커",
-                    description = "모든 하트 숫자로 변환 가능한 특수 카드",
-                    price = 500
-                ),
-                ShopCard(
-                    id = 2,
-                    suit = CardSuit.SPADE,
-                    name = "스페이드 조커",
-                    description = "모든 스페이드 숫자로 변환 가능한 특수 카드",
-                    price = 500
-                ),
-                ShopCard(
-                    id = 3,
-                    suit = CardSuit.DIAMOND,
-                    name = "다이아 조커",
-                    description = "모든 다이아 숫자로 변환 가능한 특수 카드",
-                    price = 500
-                ),
-                ShopCard(
-                    id = 4,
-                    suit = CardSuit.CLUB,
-                    name = "클로버 조커",
-                    description = "모든 클로버 숫자로 변환 가능한 특수 카드",
+                    suit = CardSuit.JOKER,
+                    name = "별 조커",
+                    description = "모든 카드로 변환 가능한 특수 카드",
                     price = 500
                 )
             )

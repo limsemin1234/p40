@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.p40.game.Card
 import com.example.p40.game.CardRank
 import com.example.p40.game.CardSuit
+import com.example.p40.game.CardUtils
 import com.example.p40.game.PokerDeck
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -60,10 +61,7 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
         // 저장된 덱과 컬렉션 불러오기 시도 또는 기본 덱 로드
         if (!loadSavedDeck()) {
             loadDefaultDeck()
-            // 컬렉션이 비어있으면 조커 카드 추가
-            if (collectionCards.isEmpty()) {
-                addJokerToCollection()
-            }
+            // 기본 게임 시작 시 조커 카드는 더 이상 자동 추가되지 않음
         }
         
         // 구매한 카드 로드 및 적용
@@ -160,9 +158,9 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
                 removeCardFromDeck(card)
             },
             onCardLongClick = { card ->
-                // 덱에서 카드 롱클릭 - 조커인 경우 숫자 선택 다이얼로그 표시
-                if (card.isJoker && card.suit != CardSuit.JOKER) {
-                    showJokerNumberPickerDialog(card, true)
+                // 덱에서 카드 롱클릭 - 별 조커인 경우만 처리
+                if (CardUtils.isStarJoker(card)) {
+                    showJokerSelectionDialog(card, true)
                     true
                 } else {
                     false
@@ -180,9 +178,9 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
             showNewLabel = true,
             deckBuilderFragment = this,
             onCardLongClick = { card ->
-                // 컬렉션에서 카드 롱클릭 - 조커인 경우 숫자 선택 다이얼로그 표시
-                if (card.isJoker && card.suit != CardSuit.JOKER) {
-                    showJokerNumberPickerDialog(card, false)
+                // 컬렉션에서 카드 롱클릭 - 별 조커인 경우만 처리
+                if (CardUtils.isStarJoker(card)) {
+                    showJokerSelectionDialog(card, false)
                     true
                 } else {
                     false
@@ -219,24 +217,6 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
         // UI 갱신
         deckAdapter.notifyDataSetChanged()
         updateDeckCount()
-    }
-    
-    /**
-     * 컬렉션에 조커 카드 추가
-     */
-    private fun addJokerToCollection() {
-        val jokerCard = Card.createJoker()
-        if (!isCardInDeck(jokerCard)) {
-            collectionCards.add(jokerCard)
-            collectionAdapter.notifyDataSetChanged()
-        }
-    }
-    
-    /**
-     * 카드가 이미 덱에 있는지 확인
-     */
-    private fun isCardInDeck(card: Card): Boolean {
-        return deckCards.any { it.suit == card.suit && it.rank == card.rank }
     }
     
     /**
@@ -335,10 +315,7 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
                 }
             }
             
-            // 컬렉션이 비어있으면 조커 카드 추가
-            if (collectionCards.isEmpty()) {
-                addJokerToCollection()
-            }
+            // 기본 게임 시작 시 조커 카드는 더 이상 자동 추가되지 않음
             
             // UI 갱신
             deckAdapter.notifyDataSetChanged()
@@ -390,6 +367,13 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
     }
     
     /**
+     * 카드가 이미 덱에 있는지 확인
+     */
+    private fun isCardInDeck(card: Card): Boolean {
+        return deckCards.any { it.suit == card.suit && it.rank == card.rank }
+    }
+    
+    /**
      * 카드가 이미 컬렉션에 있는지 확인
      */
     private fun isCardInCollection(card: Card): Boolean {
@@ -412,148 +396,47 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
     }
     
     /**
-     * 조커 카드의 숫자를 선택하는 다이얼로그 표시
+     * 별 조커 카드 선택 다이얼로그 표시
      */
-    private fun showJokerNumberPickerDialog(card: Card, isInDeck: Boolean) {
-        val dialog = Dialog(requireContext())
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setCancelable(true)
-        dialog.setContentView(R.layout.dialog_joker_number_picker)
-        
-        // 윈도우 크기 조정
-        val window = dialog.window
-        if (window != null) {
-            val displayMetrics = requireContext().resources.displayMetrics
-            val width = (displayMetrics.widthPixels * 0.85).toInt()
-            window.setLayout(width, android.view.WindowManager.LayoutParams.WRAP_CONTENT)
-            window.setGravity(android.view.Gravity.CENTER)
-        }
-        
-        // 뷰 초기화
-        val tvTitle = dialog.findViewById<TextView>(R.id.tvTitle)
-        val tvDescription = dialog.findViewById<TextView>(R.id.tvDescription)
-        val tvPreviewSuit = dialog.findViewById<TextView>(R.id.tvPreviewSuit)
-        val tvPreviewRank = dialog.findViewById<TextView>(R.id.tvPreviewRank)
-        val numberPicker = dialog.findViewById<NumberPicker>(R.id.numberPicker)
-        val btnCancel = dialog.findViewById<Button>(R.id.btnCancel)
-        val btnConfirm = dialog.findViewById<Button>(R.id.btnConfirm)
-        
-        // 타이틀 설정
-        tvTitle.text = "${card.suit.getName()} 조커 변환"
-        tvDescription.text = "조커를 변환할 숫자를 선택하세요"
-        
-        // 카드 미리보기 초기화
-        val suitSymbol = when (card.suit) {
-            CardSuit.HEART -> "♥"
-            CardSuit.DIAMOND -> "♦"
-            CardSuit.CLUB -> "♣"
-            CardSuit.SPADE -> "♠"
-            CardSuit.JOKER -> "★"
-        }
-        tvPreviewSuit.text = suitSymbol
-        
-        // 카드 색상 설정
-        val cardColor = if (card.suit == CardSuit.HEART || card.suit == CardSuit.DIAMOND) {
-            android.graphics.Color.RED
-        } else {
-            android.graphics.Color.BLACK
-        }
-        tvPreviewSuit.setTextColor(cardColor)
-        tvPreviewRank.setTextColor(cardColor)
-        
-        // 숫자 선택기 설정
-        numberPicker.minValue = 1
-        numberPicker.maxValue = 13
-        val rankValues = arrayOf("A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K")
-        numberPicker.displayedValues = rankValues
-        
-        // 현재 값이 JOKER가 아니면 그 값을 기본값으로 설정
-        if (card.rank != CardRank.JOKER) {
-            numberPicker.value = card.rank.value
-        } else {
-            numberPicker.value = 1 // 기본값 A
-        }
-        
-        // 미리보기 업데이트
-        updatePreview(tvPreviewRank, numberPicker.value - 1, rankValues)
-        
-        // 값 변경 리스너
-        numberPicker.setOnValueChangedListener { _, _, newVal ->
-            updatePreview(tvPreviewRank, newVal - 1, rankValues)
-        }
-        
-        // 취소 버튼
-        btnCancel.setOnClickListener {
-            dialog.dismiss()
-        }
-        
-        // 확인 버튼
-        btnConfirm.setOnClickListener {
-            // 선택된 카드 랭크로 변환
-            val selectedRank = getCardRankByValue(numberPicker.value)
-            replaceJokerCard(card, selectedRank, isInDeck)
-            dialog.dismiss()
+    private fun showJokerSelectionDialog(card: Card, isInDeck: Boolean) {
+        // 조커 선택 다이얼로그 생성 및 표시
+        val jokerDialog = com.example.p40.game.JokerSelectionDialog(requireContext()) { selectedCard ->
+            // 선택된 카드로 조커 카드 대체
+            replaceJokerCard(card, selectedCard.suit, selectedCard.rank, isInDeck)
             
-            // 변경 알림
+            // 토스트 메시지
             Toast.makeText(
                 requireContext(),
-                "${card.suit.getName()} 조커를 ${selectedRank.getName()}으로 변환했습니다", 
+                "조커 카드가 ${selectedCard.suit.getName()} ${selectedCard.rank.getName()}(으)로 변환되었습니다.",
                 Toast.LENGTH_SHORT
             ).show()
         }
         
-        dialog.show()
+        jokerDialog.show()
     }
     
-    // 미리보기 업데이트
-    private fun updatePreview(tvPreviewRank: TextView, index: Int, rankValues: Array<String>) {
-        tvPreviewRank.text = rankValues[index]
-    }
-    
-    // 카드 랭크 값으로 CardRank 반환
-    private fun getCardRankByValue(value: Int): CardRank {
-        return when (value) {
-            1 -> CardRank.ACE
-            2 -> CardRank.TWO
-            3 -> CardRank.THREE
-            4 -> CardRank.FOUR
-            5 -> CardRank.FIVE
-            6 -> CardRank.SIX
-            7 -> CardRank.SEVEN
-            8 -> CardRank.EIGHT
-            9 -> CardRank.NINE
-            10 -> CardRank.TEN
-            11 -> CardRank.JACK
-            12 -> CardRank.QUEEN
-            13 -> CardRank.KING
-            else -> CardRank.ACE // 기본값
-        }
-    }
-    
-    // 조커 카드 변환
-    private fun replaceJokerCard(card: Card, newRank: CardRank, isInDeck: Boolean) {
+    /**
+     * 조커 카드 변환 처리
+     */
+    private fun replaceJokerCard(card: Card, newSuit: CardSuit, newRank: CardRank, isInDeck: Boolean) {
+        // 새 카드 생성
         val newCard = Card(
-            suit = card.suit,
+            suit = newSuit,
             rank = newRank,
+            isSelected = false,
             isJoker = true
         )
         
         if (isInDeck) {
             // 덱에서 카드 교체
-            val index = deckCards.indexOfFirst { 
-                it.suit == card.suit && it.isJoker && 
-                (it.rank == CardRank.JOKER || it.rank == card.rank) 
-            }
+            val index = deckCards.indexOf(card)
             if (index != -1) {
                 deckCards[index] = newCard
                 deckAdapter.notifyItemChanged(index)
             }
         } else {
             // 컬렉션에서 카드 교체
-            val index = collectionCards.indexOfFirst { 
-                it.suit == card.suit && it.isJoker && 
-                (it.rank == CardRank.JOKER || it.rank == card.rank) 
-            }
+            val index = collectionCards.indexOf(card)
             if (index != -1) {
                 collectionCards[index] = newCard
                 collectionAdapter.notifyItemChanged(index)

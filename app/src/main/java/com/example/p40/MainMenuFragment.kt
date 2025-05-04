@@ -147,7 +147,7 @@ class MainMenuFragment : Fragment(R.layout.fragment_main_menu) {
     }
     
     private fun createJokerCard(suit: CardSuit, rank: CardRank): Card {
-        // 문양과 랭크를 가진 "조커" 카드 생성
-        return Card.createSuitedJoker(suit, rank)
+        // 문양과 랭크를 가진 카드 생성 (별 조커로 대체)
+        return Card(suit, rank, isJoker = true)
     }
 }
