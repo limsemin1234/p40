@@ -92,7 +92,7 @@ object GameConfig {
     )
     
     // 웨이브별 적 체력 계산 (ENEMY_BASE_HEALTH에 배율을 곱함)
-    fun getEnemyHealthForWave(wave: Int): Int {
+    fun getEnemyHealthForWave(wave: Int, isBoss: Boolean = false): Int {
         val multiplier = when(wave) {
             1 -> WAVE_1_HEALTH_MULTIPLIER
             2 -> WAVE_2_HEALTH_MULTIPLIER
@@ -106,7 +106,13 @@ object GameConfig {
             10 -> WAVE_10_HEALTH_MULTIPLIER
             else -> WAVE_1_HEALTH_MULTIPLIER
         }
-        return (ENEMY_BASE_HEALTH * multiplier).toInt()
+        val baseHealth = ENEMY_BASE_HEALTH
+        
+        return if (isBoss) {
+            (baseHealth * multiplier * BOSS_HEALTH_MULTIPLIER).toInt()
+        } else {
+            (baseHealth * multiplier).toInt()
+        }
     }
     
     // 웨이브별 적 데미지 계산
@@ -247,5 +253,34 @@ object GameConfig {
         // 웨이브가 증가할수록 공격력 증가, 난이도 배율 적용
         val waveMultiplier = 1.0f + ((waveCount - 1) * 0.1f)
         return (baseDamage * waveMultiplier * currentDifficulty).toInt()
+    }
+
+    /**
+     * 적 이동 속도 반환
+     * @param isBoss 보스 여부
+     * @return 적 이동 속도
+     */
+    fun getEnemySpeed(isBoss: Boolean): Float {
+        val baseSpeed = WAVE_ENEMY_SPEEDS[1] ?: 1.0f
+        return if (isBoss) {
+            baseSpeed * BOSS_SPEED_MULTIPLIER
+        } else {
+            baseSpeed
+        }
+    }
+
+    /**
+     * 웨이브에 따른 적 이동 속도 반환
+     * @param wave 웨이브 번호
+     * @param isBoss 보스 여부
+     * @return 적 이동 속도
+     */
+    fun getEnemySpeedForWave(wave: Int, isBoss: Boolean): Float {
+        val baseSpeed = WAVE_ENEMY_SPEEDS[wave] ?: WAVE_ENEMY_SPEEDS[1] ?: 1.0f
+        return if (isBoss) {
+            baseSpeed * BOSS_SPEED_MULTIPLIER
+        } else {
+            baseSpeed
+        }
     }
 } 

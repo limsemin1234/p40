@@ -46,6 +46,7 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
             updateGameInfoUI()
             updateBuffUI()
             updateUnitStatsUI()
+            updateEnemyStatsUI()
             handler.postDelayed(this, 500) // 500ms마다 업데이트
         }
     }
@@ -71,6 +72,9 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
         
         // 버프 UI 초기화
         initBuffUI(view)
+        
+        // 탭 버튼 초기화
+        setupStatTabs(view)
         
         // 저장된 덱 확인
         val savedDeck = DeckBuilderFragment.loadDeckFromPrefs(requireContext())
@@ -132,6 +136,36 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
         tvBuffList = view.findViewById(R.id.tvBuffList)
     }
     
+    // 스탯 탭 설정
+    private fun setupStatTabs(view: View) {
+        val myUnitTabButton = view.findViewById<TextView>(R.id.myUnitTabButton)
+        val enemyUnitTabButton = view.findViewById<TextView>(R.id.enemyUnitTabButton)
+        val myUnitStatsContainer = view.findViewById<LinearLayout>(R.id.myUnitStatsContainer)
+        val enemyStatsContainer = view.findViewById<LinearLayout>(R.id.enemyStatsContainer)
+        
+        // 초기 상태 설정 (내 유닛 정보 탭이 활성화)
+        myUnitTabButton.setTextColor(resources.getColor(android.R.color.white, null))
+        enemyUnitTabButton.setTextColor(resources.getColor(android.R.color.darker_gray, null))
+        myUnitStatsContainer.visibility = View.VISIBLE
+        enemyStatsContainer.visibility = View.GONE
+        
+        // 내 유닛 정보 탭 클릭 시
+        myUnitTabButton.setOnClickListener {
+            myUnitTabButton.setTextColor(resources.getColor(android.R.color.white, null))
+            enemyUnitTabButton.setTextColor(resources.getColor(android.R.color.darker_gray, null))
+            myUnitStatsContainer.visibility = View.VISIBLE
+            enemyStatsContainer.visibility = View.GONE
+        }
+        
+        // 적 유닛 정보 탭 클릭 시
+        enemyUnitTabButton.setOnClickListener {
+            myUnitTabButton.setTextColor(resources.getColor(android.R.color.darker_gray, null))
+            enemyUnitTabButton.setTextColor(resources.getColor(android.R.color.white, null))
+            myUnitStatsContainer.visibility = View.GONE
+            enemyStatsContainer.visibility = View.VISIBLE
+        }
+    }
+    
     // 게임 정보 UI 업데이트
     private fun updateGameInfoUI() {
         if (!::gameView.isInitialized || !isAdded) return
@@ -164,9 +198,33 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
         val attacksPerSecond = 1000f / attackSpeed
         val attackRange = gameView.getUnitAttackRange()
         
-        // 유닛 스탯 정보 업데이트
+        // UI 요소 찾기
+        view?.findViewById<TextView>(R.id.unitHealthText)?.text = "체력: $health/$maxHealth"
+        view?.findViewById<TextView>(R.id.unitAttackText)?.text = "공격력: $attack"
+        view?.findViewById<TextView>(R.id.unitAttackSpeedText)?.text = "공격속도: ${String.format("%.2f", attacksPerSecond)}/초"
+        view?.findViewById<TextView>(R.id.unitRangeText)?.text = "사거리: ${attackRange.toInt()}"
+        
+        // 이전 코드 유지 (이전 레이아웃과의 호환성을 위해)
         view?.findViewById<TextView>(R.id.tvUnitStats)?.text = 
             "체력: $health/$maxHealth  |  공격력: $attack  |  공격속도: ${String.format("%.2f", attacksPerSecond)}/초  |  범위: ${attackRange.toInt()}"
+    }
+    
+    // 적 스탯 UI 업데이트 (새 메서드)
+    private fun updateEnemyStatsUI() {
+        if (!::gameView.isInitialized || !isAdded) return
+        
+        // 현재 웨이브 정보 가져오기
+        val waveCount = gameView.getWaveCount()
+        
+        // 현재 웨이브의 적 스탯 계산
+        val normalEnemyHealth = GameConfig.getEnemyHealthForWave(waveCount, false)
+        val normalEnemyDamage = GameConfig.getEnemyDamageForWave(waveCount, false)
+        val normalEnemySpeed = GameConfig.getEnemySpeedForWave(waveCount, false)
+        
+        // UI 요소 찾기
+        view?.findViewById<TextView>(R.id.enemyHealthText)?.text = "체력: $normalEnemyHealth"
+        view?.findViewById<TextView>(R.id.enemyAttackText)?.text = "공격력: $normalEnemyDamage"
+        view?.findViewById<TextView>(R.id.enemySpeedText)?.text = "이동속도: ${String.format("%.1f", normalEnemySpeed)}"
     }
     
     // 버프 정보 업데이트
