@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="12dp"
+    android:padding="16dp"
     android:background="@android:color/white">
 
     <TextView
@@ -13,69 +13,86 @@
         android:textSize="20sp"
         android:textStyle="bold"
         android:gravity="center"
-        android:layout_marginBottom="12dp" />
+        android:layout_marginBottom="16dp" />
 
     <TextView
         android:id="@+id/tvSelectedCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="조커를 변환할 카드를 선택하세요"
-        android:textSize="14sp"
+        android:textSize="16sp"
         android:gravity="center"
-        android:layout_marginBottom="12dp" />
+        android:layout_marginBottom="16dp" />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="카드 모양 선택"
-        android:textSize="14sp"
-        android:textStyle="bold"
-        android:layout_marginTop="4dp"
-        android:layout_marginBottom="4dp" />
+    <!-- 카드 미리보기 -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardPreview"
+        android:layout_width="120dp"
+        android:layout_height="160dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="16dp"
+        android:layout_marginTop="8dp"
+        android:background="@android:color/white">
 
-    <HorizontalScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scrollbars="none">
-        
-        <GridLayout
-            android:id="@+id/suitLayout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:columnCount="4"
-            android:useDefaultMargins="true"
-            android:layout_marginBottom="8dp" />
-    </HorizontalScrollView>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="카드 숫자 선택"
-        android:textSize="14sp"
-        android:textStyle="bold"
-        android:layout_marginTop="4dp"
-        android:layout_marginBottom="4dp" />
+            <TextView
+                android:id="@+id/tvPreviewSuit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="♥"
+                android:textSize="40sp"
+                android:textStyle="bold"
+                android:textColor="#FF0000"/>
 
-    <HorizontalScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scrollbars="none">
-        
-        <GridLayout
-            android:id="@+id/rankLayout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:columnCount="5"
-            android:useDefaultMargins="true"
-            android:layout_marginBottom="8dp" />
-    </HorizontalScrollView>
+            <TextView
+                android:id="@+id/tvPreviewRank"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="A"
+                android:textSize="40sp"
+                android:textStyle="bold"
+                android:textColor="#FF0000"/>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
 
+    <!-- 선택기 컨테이너 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center"
-        android:layout_marginTop="12dp">
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp">
+
+        <!-- 카드 모양 선택기 -->
+        <NumberPicker
+            android:id="@+id/suitPicker"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="16dp" />
+
+        <!-- 카드 숫자 선택기 -->
+        <NumberPicker
+            android:id="@+id/rankPicker"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="16dp" />
+    </LinearLayout>
+
+    <!-- 버튼 레이아웃 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="16dp">
 
         <Button
             android:id="@+id/btnCancel"

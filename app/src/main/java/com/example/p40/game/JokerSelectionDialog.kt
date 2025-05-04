@@ -7,9 +7,10 @@ import android.os.Bundle
 import android.view.View
 import android.view.Window
 import android.widget.Button
-import android.widget.GridLayout
+import android.widget.NumberPicker
 import android.widget.TextView
 import android.widget.Toast
+import androidx.cardview.widget.CardView
 import com.example.p40.R
 
 /**
@@ -20,14 +21,46 @@ class JokerSelectionDialog(
     private val onCardSelected: (Card) -> Unit
 ) : Dialog(context) {
 
-    private var selectedSuit: CardSuit? = null
-    private var selectedRank: CardRank? = null
+    private var selectedSuit: CardSuit = CardSuit.HEART
+    private var selectedRank: CardRank = CardRank.ACE
     
     private lateinit var btnConfirm: Button
     private lateinit var tvSelectedCard: TextView
+    private lateinit var tvPreviewSuit: TextView
+    private lateinit var tvPreviewRank: TextView
+    private lateinit var suitPicker: NumberPicker
+    private lateinit var rankPicker: NumberPicker
     
-    private val suitButtons = mutableListOf<Button>()
-    private val rankButtons = mutableListOf<Button>()
+    // 카드 모양 배열
+    private val suits = arrayOf(
+        CardSuit.HEART,
+        CardSuit.DIAMOND,
+        CardSuit.CLUB,
+        CardSuit.SPADE
+    )
+    
+    // 카드 숫자 배열
+    private val ranks = arrayOf(
+        CardRank.ACE,
+        CardRank.TWO,
+        CardRank.THREE,
+        CardRank.FOUR,
+        CardRank.FIVE,
+        CardRank.SIX,
+        CardRank.SEVEN,
+        CardRank.EIGHT,
+        CardRank.NINE,
+        CardRank.TEN,
+        CardRank.JACK,
+        CardRank.QUEEN,
+        CardRank.KING
+    )
+    
+    // 카드 모양 표시 문자열
+    private val suitDisplayValues = arrayOf("♥", "♦", "♣", "♠")
+    
+    // 카드 숫자 표시 문자열
+    private val rankDisplayValues = arrayOf("A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K")
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,6 +84,9 @@ class JokerSelectionDialog(
         // 뷰 초기화
         initViews()
         
+        // 선택기 설정
+        setupPickers()
+        
         // 버튼 이벤트 설정
         setupButtons()
         
@@ -62,144 +98,89 @@ class JokerSelectionDialog(
         // 선택된 카드 텍스트뷰
         tvSelectedCard = findViewById(R.id.tvSelectedCard)
         
+        // 카드 미리보기
+        tvPreviewSuit = findViewById(R.id.tvPreviewSuit)
+        tvPreviewRank = findViewById(R.id.tvPreviewRank)
+        
         // 확인 버튼
         btnConfirm = findViewById(R.id.btnConfirm)
-        btnConfirm.isEnabled = false // 초기에는 비활성화
         
-        // 슈트(모양) 버튼 설정
-        val suitLayout = findViewById<GridLayout>(R.id.suitLayout)
-        setupSuitButtons(suitLayout)
-        
-        // 랭크(숫자) 버튼 설정
-        val rankLayout = findViewById<GridLayout>(R.id.rankLayout)
-        setupRankButtons(rankLayout)
+        // 선택기
+        suitPicker = findViewById(R.id.suitPicker)
+        rankPicker = findViewById(R.id.rankPicker)
     }
     
-    private fun setupSuitButtons(suitLayout: GridLayout) {
-        // 슈트(모양) 버튼 동적 생성 - JOKER 제외
-        val suits = CardSuit.values().filter { it != CardSuit.JOKER }
+    private fun setupPickers() {
+        // 카드 모양 선택기 설정
+        suitPicker.minValue = 0
+        suitPicker.maxValue = suitDisplayValues.size - 1
+        suitPicker.displayedValues = suitDisplayValues
         
-        for (suit in suits) {
-            val button = Button(context).apply {
-                text = when (suit) {
-                    CardSuit.HEART -> "♥"
-                    CardSuit.DIAMOND -> "♦"
-                    CardSuit.CLUB -> "♣"
-                    CardSuit.SPADE -> "♠"
-                    else -> ""
-                }
-                
-                // 텍스트 색상 설정
-                setTextColor(
-                    when (suit) {
-                        CardSuit.HEART, CardSuit.DIAMOND -> Color.RED
-                        else -> Color.BLACK
-                    }
-                )
-                
-                // 크기 및 마진 설정
-                val params = GridLayout.LayoutParams()
-                params.width = GridLayout.LayoutParams.WRAP_CONTENT
-                params.height = GridLayout.LayoutParams.WRAP_CONTENT
-                params.setMargins(10, 10, 10, 10)
-                layoutParams = params
-                
-                // 클릭 이벤트
-                setOnClickListener {
-                    selectSuit(suit)
-                }
-            }
-            
-            suitButtons.add(button)
-            suitLayout.addView(button)
+        // 카드 숫자 선택기 설정
+        rankPicker.minValue = 0
+        rankPicker.maxValue = rankDisplayValues.size - 1
+        rankPicker.displayedValues = rankDisplayValues
+        
+        // 선택기 변경 리스너 설정
+        suitPicker.setOnValueChangedListener { _, _, newVal ->
+            selectedSuit = suits[newVal]
+            updateCardPreview()
+            updateSelectedCardDisplay()
+        }
+        
+        rankPicker.setOnValueChangedListener { _, _, newVal ->
+            selectedRank = ranks[newVal]
+            updateCardPreview()
+            updateSelectedCardDisplay()
         }
     }
     
-    private fun setupRankButtons(rankLayout: GridLayout) {
-        // 랭크(숫자) 버튼 동적 생성 - JOKER 제외
-        val ranks = CardRank.values().filter { it != CardRank.JOKER }
+    private fun updateCardPreview() {
+        // 카드 모양 및 색상 설정
+        tvPreviewSuit.text = getSuitSymbol(selectedSuit)
+        tvPreviewSuit.setTextColor(getSuitColor(selectedSuit))
         
-        for (rank in ranks) {
-            val button = Button(context).apply {
-                text = rank.getName()
-                
-                // 크기 및 마진 설정
-                val params = GridLayout.LayoutParams()
-                params.width = GridLayout.LayoutParams.WRAP_CONTENT
-                params.height = GridLayout.LayoutParams.WRAP_CONTENT
-                params.setMargins(8, 8, 8, 8)
-                layoutParams = params
-                
-                // 클릭 이벤트
-                setOnClickListener {
-                    selectRank(rank)
-                }
-            }
-            
-            rankButtons.add(button)
-            rankLayout.addView(button)
+        // 카드 숫자 및 색상 설정
+        tvPreviewRank.text = getRankSymbol(selectedRank)
+        tvPreviewRank.setTextColor(getSuitColor(selectedSuit))
+    }
+    
+    private fun getSuitSymbol(suit: CardSuit): String {
+        return when (suit) {
+            CardSuit.HEART -> "♥"
+            CardSuit.DIAMOND -> "♦"
+            CardSuit.CLUB -> "♣"
+            CardSuit.SPADE -> "♠"
+            else -> "?"
         }
     }
     
-    private fun selectSuit(suit: CardSuit) {
-        selectedSuit = suit
-        
-        // 선택된 슈트 버튼 강조
-        suitButtons.forEachIndexed { index, button ->
-            val currentSuit = CardSuit.values().filter { it != CardSuit.JOKER }[index]
-            button.isSelected = (currentSuit == suit)
-            button.setBackgroundResource(if (button.isSelected) android.R.color.holo_blue_light else android.R.color.background_light)
-        }
-        
-        updateSelectedCardDisplay()
-        updateConfirmButton()
+    private fun getRankSymbol(rank: CardRank): String {
+        return rank.getName()
     }
     
-    private fun selectRank(rank: CardRank) {
-        selectedRank = rank
-        
-        // 선택된 랭크 버튼 강조
-        rankButtons.forEachIndexed { index, button ->
-            val currentRank = CardRank.values().filter { it != CardRank.JOKER }[index]
-            button.isSelected = (currentRank == rank)
-            button.setBackgroundResource(if (button.isSelected) android.R.color.holo_blue_light else android.R.color.background_light)
+    private fun getSuitColor(suit: CardSuit): Int {
+        return when (suit) {
+            CardSuit.HEART, CardSuit.DIAMOND -> Color.RED
+            else -> Color.BLACK
         }
-        
-        updateSelectedCardDisplay()
-        updateConfirmButton()
     }
     
     private fun updateSelectedCardDisplay() {
-        tvSelectedCard.text = if (selectedSuit != null && selectedRank != null) {
-            "선택된 카드: ${selectedSuit!!.getName()} ${selectedRank!!.getName()}"
-        } else if (selectedSuit != null) {
-            "선택된 모양: ${selectedSuit!!.getName()}"
-        } else if (selectedRank != null) {
-            "선택된 숫자: ${selectedRank!!.getName()}"
-        } else {
-            "조커를 변환할 카드를 선택하세요"
-        }
-    }
-    
-    private fun updateConfirmButton() {
-        btnConfirm.isEnabled = (selectedSuit != null && selectedRank != null)
+        tvSelectedCard.text = "선택된 카드: ${selectedSuit.getName()} ${selectedRank.getName()}"
     }
     
     private fun setupButtons() {
         // 확인 버튼
         btnConfirm.setOnClickListener {
-            if (selectedSuit != null && selectedRank != null) {
-                // 선택된 카드 생성
-                val selectedCard = Card(selectedSuit!!, selectedRank!!)
-                
-                // 콜백 호출
-                onCardSelected(selectedCard)
-                
-                // 다이얼로그 닫기
-                dismiss()
-            } else {
-                Toast.makeText(context, "카드 모양과 숫자를 모두 선택해주세요", Toast.LENGTH_SHORT).show()
-            }
+            // 선택된 카드 생성
+            val selectedCard = Card(selectedSuit, selectedRank)
+            
+            // 콜백 호출
+            onCardSelected(selectedCard)
+            
+            // 다이얼로그 닫기
+            dismiss()
         }
         
         // 취소 버튼
