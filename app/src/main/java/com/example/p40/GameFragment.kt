@@ -144,9 +144,13 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
         val killCount = gameView.getKillCount()
         val totalEnemies = gameView.getTotalEnemiesInWave()
         
+        // 현재 웨이브의 적 데미지 계산
+        val normalEnemyDamage = GameConfig.getEnemyDamageForWave(waveCount, false)
+        val bossDamage = GameConfig.getEnemyDamageForWave(waveCount, true)
+        
         // 게임 정보 업데이트
         view?.findViewById<TextView>(R.id.tvGameInfo)?.text = 
-            "자원: $resource  웨이브: $waveCount  처치: $killCount/$totalEnemies"
+            "자원: $resource  웨이브: $waveCount  처치: $killCount/$totalEnemies  적 데미지: $normalEnemyDamage/보스: $bossDamage"
     }
     
     // 유닛 스탯 UI 업데이트
@@ -529,12 +533,13 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
     // 게임 오버 다이얼로그 표시
     override fun onGameOver(resource: Int, waveCount: Int) {
         // 게임 오버 다이얼로그 생성
-        val dialog = Dialog(requireContext(), android.R.style.Theme_Black_NoTitleBar_Fullscreen)
+        val dialog = Dialog(requireContext())
         
         // 게임 오버 다이얼로그 레이아웃 설정
         val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_game_over, null)
         dialog.setContentView(dialogView)
         dialog.setCancelable(false)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         
         // 다이얼로그 내용 설정
         val tvGameOverScore = dialogView.findViewById<TextView>(R.id.tvGameOverScore)

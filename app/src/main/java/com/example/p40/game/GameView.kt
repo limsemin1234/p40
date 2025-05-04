@@ -179,9 +179,11 @@ class GameView @JvmOverloads constructor(
             val distanceToCenter = kotlin.math.sqrt(dx * dx + dy * dy)
             
             if (distanceToCenter < DEFENSE_UNIT_SIZE) {  // 디펜스 유닛 크기 적용
-                enemy.takeDamage(1000) // 중앙에 도달하면 죽음
-                // 디펜스 유닛 체력 감소
-                unitHealth = (unitHealth - 10).coerceAtLeast(0)
+                enemy.takeDamage(GameConfig.CENTER_REACHED_DAMAGE) // 중앙에 도달하면 죽음
+                
+                // 적의 공격력에 따라 디펜스 유닛 체력 감소
+                val enemyDamage = enemy.getDamage()
+                unitHealth = (unitHealth - enemyDamage).coerceAtLeast(0)
                 
                 // 체력이 0이 되면 게임 오버
                 if (unitHealth <= 0 && !isGameOver) {
@@ -278,7 +280,7 @@ class GameView @JvmOverloads constructor(
         
         // 킬 카운트 및 점수(자원) 갱신
         deadEnemies.forEach { enemy ->
-            resource += if (enemy.isBoss) 100 else 10  // 자원 획득
+            resource += if (enemy.isBoss) GameConfig.SCORE_PER_BOSS else GameConfig.SCORE_PER_NORMAL_ENEMY  // 자원 획득
             if (!enemy.isBoss) {
                 killCount++
             } else {
@@ -330,7 +332,8 @@ class GameView @JvmOverloads constructor(
             position = PointF(spawnX, spawnY),
             target = PointF(centerX, centerY),
             speed = speed,
-            health = health
+            health = health,
+            wave = waveCount
         )
         
         enemies.add(enemy)
@@ -349,16 +352,18 @@ class GameView @JvmOverloads constructor(
         val spawnY = centerY + sin(angle).toFloat() * spawnDistance
         
         // 현재 웨이브에 맞는 보스 능력치 설정 (일반 적보다 느리지만 크고 강함)
-        val speed = (waveEnemySpeeds[waveCount] ?: 1.0f) * 0.7f
+        val speed = (waveEnemySpeeds[waveCount] ?: 1.0f) * GameConfig.BOSS_SPEED_MULTIPLIER
         val health = GameConfig.getEnemyHealthForWave(waveCount) * GameConfig.BOSS_HEALTH_MULTIPLIER
+        val bossSize = GameConfig.ENEMY_BASE_SIZE * GameConfig.BOSS_SIZE_MULTIPLIER
         
         val boss = Enemy(
             position = PointF(spawnX, spawnY),
             target = PointF(centerX, centerY),
             speed = speed,
-            size = 60f,  // 보스는 크기가 2배
+            size = bossSize,
             health = health,
-            isBoss = true
+            isBoss = true,
+            wave = waveCount
         )
         
         enemies.add(boss)
@@ -369,6 +374,11 @@ class GameView @JvmOverloads constructor(
         killCount = 0
         spawnedCount = 0  // 생성된 적 카운트 초기화
         bossSpawned = false
+        
+        // 현재 남아있는 적들의 웨이브 번호 업데이트
+        enemies.forEach { enemy ->
+            enemy.setWave(waveCount)
+        }
         
         // 웨이브 시작 메시지 표시
         showWaveMessage = true
@@ -382,7 +392,7 @@ class GameView @JvmOverloads constructor(
     fun useCard() {
         enemies.forEach { enemy ->
             // 보스는 카드 효과가 약하게
-            val damage = if (enemy.isBoss) 50 else 100
+            val damage = if (enemy.isBoss) GameConfig.CARD_DAMAGE_BOSS else GameConfig.CARD_DAMAGE_NORMAL
             enemy.takeDamage(damage)
         }
     }

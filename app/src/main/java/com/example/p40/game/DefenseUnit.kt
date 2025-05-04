@@ -37,9 +37,9 @@ class DefenseUnit(
             val dy = target.getPosition().y - position.y
             val angle = atan2(dy.toDouble(), dx.toDouble()) + angleOffset
             
-            val missileSpeed = 5.0f
+            val missileSpeed = GameConfig.MISSILE_SPEED
             val damage = (GameConfig.MISSILE_DAMAGE * damageMultiplier).toInt()
-            val missileSize = 5.0f
+            val missileSize = GameConfig.MISSILE_SIZE
             
             val startX = position.x + cos(angle).toFloat() * 20
             val startY = position.y + sin(angle).toFloat() * 20

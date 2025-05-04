@@ -32,6 +32,7 @@ object GameConfig {
     const val ENEMY_BASE_SIZE = 10f  // 기본 크기
     const val ENEMY_BASE_HEALTH = 50  // 기본 체력
     const val ENEMY_COLOR = Color.RED  // 적 색상
+    const val NORMAL_ENEMY_DAMAGE = 5  // 일반 적의 공격력
     
     // 웨이브별 적 체력 배율 (ENEMY_BASE_HEALTH에 곱해짐)
     const val WAVE_1_HEALTH_MULTIPLIER = 1.0f
@@ -52,6 +53,10 @@ object GameConfig {
     const val BOSS_COLOR = Color.MAGENTA  // 보스 색상
     const val BOSS_BORDER_COLOR = Color.YELLOW  // 보스 테두리 색상
     const val BOSS_BORDER_WIDTH = 5f  // 보스 테두리 두께
+    const val BOSS_DAMAGE = 15  // 보스 적의 공격력
+    
+    // 웨이브별 적 데미지 증가량 (웨이브 당 기본 데미지에 더해짐)
+    const val ENEMY_DAMAGE_PER_WAVE = 1  // 웨이브당 적 데미지 증가량
     
     // 카드 스킬 설정
     const val CARD_DAMAGE_NORMAL = 100  // 일반 적에게 주는 데미지
@@ -102,6 +107,13 @@ object GameConfig {
             else -> WAVE_1_HEALTH_MULTIPLIER
         }
         return (ENEMY_BASE_HEALTH * multiplier).toInt()
+    }
+    
+    // 웨이브별 적 데미지 계산
+    fun getEnemyDamageForWave(wave: Int, isBoss: Boolean): Int {
+        val baseDamage = if (isBoss) BOSS_DAMAGE else NORMAL_ENEMY_DAMAGE
+        val additionalDamage = (wave - 1) * ENEMY_DAMAGE_PER_WAVE
+        return baseDamage + additionalDamage
     }
     
     // 점수 설정
@@ -168,7 +180,7 @@ object GameConfig {
     
     // --------- 기타 게임 밸런스 설정 ----------
     
-    // 적이 중앙에 도달할 때 플레이어 체력 감소량
+    // 적이 중앙에 도달할 때 플레이어 체력 감소량 (이것은 제거될 예정)
     const val ENEMY_CENTER_DAMAGE = 10  // 적이 중앙에 도달했을 때 입히는 데미지
     
     // 보스 처치 보상 설정

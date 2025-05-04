@@ -1,7 +1,6 @@
 package com.example.p40.game
 
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.PointF
 import kotlin.math.cos
@@ -20,7 +19,7 @@ class Missile(
 ) {
     private var isDead = false
     private val paint = Paint().apply {
-        color = Color.RED
+        color = GameConfig.MISSILE_COLOR
         style = Paint.Style.FILL
     }
     
@@ -37,7 +36,8 @@ class Missile(
         position.y += sin(angle).toFloat() * adjustedSpeed
         
         // 화면 밖으로 나가면 제거
-        if (position.x < -50 || position.x > 2000 || position.y < -50 || position.y > 2000) {
+        if (position.x < -50 || position.x > GameConfig.MISSILE_MAX_DISTANCE || 
+            position.y < -50 || position.y > GameConfig.MISSILE_MAX_DISTANCE) {
             isDead = true
         }
     }

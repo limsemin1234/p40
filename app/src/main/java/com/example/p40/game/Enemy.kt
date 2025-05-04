@@ -14,7 +14,8 @@ class Enemy(
     private val speed: Float = GameConfig.ENEMY_BASE_SIZE,
     private val size: Float = GameConfig.ENEMY_BASE_SIZE,
     var health: Int = GameConfig.ENEMY_BASE_HEALTH,
-    val isBoss: Boolean = false
+    val isBoss: Boolean = false,
+    private var wave: Int = 1
 ) {
     private val paint = Paint().apply {
         color = if (isBoss) GameConfig.BOSS_COLOR else GameConfig.ENEMY_COLOR
@@ -44,6 +45,19 @@ class Enemy(
         // 보스는 이미 GameView에서 체력이 5배로 설정되어 있으므로 여기서는 중복 적용하지 않음
         // size는 생성자에서 더 큰 값으로 전달
     }
+    
+    // 적의 공격력 계산 - 웨이브와 보스 여부에 따라 달라짐
+    fun getDamage(): Int {
+        return GameConfig.getEnemyDamageForWave(wave, isBoss)
+    }
+    
+    // 웨이브 설정 메서드
+    fun setWave(newWave: Int) {
+        wave = newWave
+    }
+    
+    // 현재 웨이브 반환
+    fun getWave(): Int = wave
     
     // 스피드 배율을 적용할 수 있는 업데이트 메서드
     fun update(speedMultiplier: Float = 1.0f) {
