@@ -47,6 +47,11 @@
         <action
             android:id="@+id/action_mainMenu_to_deckBuilder"
             app:destination="@id/deckBuilderFragment" />
+            
+        <!-- 카드 구매 버튼 클릭 시 카드 상점 화면으로 이동 -->
+        <action
+            android:id="@+id/action_mainMenu_to_cardShop"
+            app:destination="@id/cardShopFragment" />
     </fragment>
 
     <!-- 게임 화면 -->
@@ -72,6 +77,20 @@
         
         <action
             android:id="@+id/action_deckBuilder_to_mainMenu"
+            app:destination="@id/mainMenuFragment"
+            app:popUpTo="@id/mainMenuFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+    
+    <!-- 카드 상점 화면 -->
+    <fragment
+        android:id="@+id/cardShopFragment"
+        android:name="com.example.p40.CardShopFragment"
+        android:label="카드 상점"
+        tools:layout="@layout/fragment_card_shop">
+        
+        <action
+            android:id="@+id/action_cardShop_to_mainMenu"
             app:destination="@id/mainMenuFragment"
             app:popUpTo="@id/mainMenuFragment"
             app:popUpToInclusive="true" />

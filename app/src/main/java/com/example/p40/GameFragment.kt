@@ -183,20 +183,23 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
         val defenseBuffs = gameView.getDefenseBuffs()
         val enemyNerfs = gameView.getEnemyNerfs()
         
-        // 디펜스 유닛 버프 먼저 추가
-        for (buff in defenseBuffs) {
-            addBuffItem(buffContainer, buff, true)
-        }
+        // 버프가 있는지 확인
+        val hasBuffs = defenseBuffs.isNotEmpty() || enemyNerfs.isNotEmpty()
         
-        // 적 너프 추가
-        for (buff in enemyNerfs) {
-            addBuffItem(buffContainer, buff, false)
-        }
-        
-        // 버프가 없으면 "버프 없음" 텍스트뷰 표시
-        if (defenseBuffs.isEmpty() && enemyNerfs.isEmpty()) {
+        if (hasBuffs) {
+            // 디펜스 유닛 버프 먼저 추가
+            for (buff in defenseBuffs) {
+                addBuffItem(buffContainer, buff, true)
+            }
+            
+            // 적 너프 추가
+            for (buff in enemyNerfs) {
+                addBuffItem(buffContainer, buff, false)
+            }
+        } else {
+            // 버프가 없으면 "없음" 텍스트뷰 표시
             val noBuff = TextView(context)
-            noBuff.text = "버프 없음"
+            noBuff.text = "없음"
             noBuff.textSize = 14f
             noBuff.setTextColor(resources.getColor(android.R.color.white, null))
             buffContainer.addView(noBuff)
@@ -586,25 +589,7 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
 
     // setupGameMenu 함수 추가 (pauseButton과 exitButton 설정 코드를 여기로 이동)
     private fun setupGameMenu(view: View) {
-        // 일시정지 버튼
-        val pauseButton = view.findViewById<Button>(R.id.pauseButton)
-        pauseButton.setOnClickListener {
-            isPaused = !isPaused
-            if (isPaused) {
-                pauseButton.text = "재개"
-                gameView.pause()
-                handler.removeCallbacks(uiUpdateRunnable)
-                
-                // 일시정지 메뉴 보여주기
-                showPauseDialog()
-            } else {
-                pauseButton.text = "일시정지"
-                gameView.resume()
-                handler.post(uiUpdateRunnable)
-            }
-        }
-        
-        // 종료 버튼
+        // 종료(일시정지) 버튼
         val exitButton = view.findViewById<Button>(R.id.exitButton)
         exitButton.setOnClickListener {
             // 게임 일시정지
@@ -635,8 +620,6 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
             
             // 게임 재개
             isPaused = false
-            val pauseButton = view?.findViewById<Button>(R.id.pauseButton)
-            pauseButton?.text = "일시정지"
             gameView.resume()
             handler.post(uiUpdateRunnable)
         }

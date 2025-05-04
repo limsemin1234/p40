@@ -30,48 +30,53 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- 버프 정보 표시 -->
-        <TextView
-            android:id="@+id/tvBuffTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="버프:"
-            android:textColor="#FFFF00"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:layout_marginTop="8dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvGameInfo" />
-
-        <HorizontalScrollView
-            android:id="@+id/buffScrollView"
+        <!-- 버프 정보 표시 - 가로 배치로 수정 -->
+        <LinearLayout
+            android:id="@+id/buffLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="2dp"
-            android:scrollbars="none"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvBuffTitle">
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp"
+            android:gravity="start|center_vertical"
+            app:layout_constraintTop_toBottomOf="@id/tvGameInfo"
+            app:layout_constraintStart_toStartOf="parent">
 
-            <LinearLayout
-                android:id="@+id/buffContainer"
+            <TextView
+                android:id="@+id/tvBuffTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="4dp">
+                android:text="버프:"
+                android:textColor="#FFFF00"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:layout_marginEnd="8dp" />
 
-                <!-- 버프가 여기에 동적으로 추가됩니다 -->
-                <TextView
-                    android:id="@+id/tvBuffList"
+            <HorizontalScrollView
+                android:id="@+id/buffScrollView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:id="@+id/buffContainer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="버프 없음"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp"
-                    android:visibility="gone" />
+                    android:orientation="horizontal"
+                    android:padding="2dp">
 
-            </LinearLayout>
-        </HorizontalScrollView>
+                    <!-- 버프가 여기에 동적으로 추가됩니다 -->
+                    <TextView
+                        android:id="@+id/tvBuffList"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="버프 없음"
+                        android:textColor="#FFFFFF"
+                        android:textSize="14sp"
+                        android:visibility="gone" />
+
+                </LinearLayout>
+            </HorizontalScrollView>
+        </LinearLayout>
 
         <!-- 상단바 구분선 -->
         <View
@@ -82,7 +87,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/buffScrollView" />
+            app:layout_constraintTop_toBottomOf="@id/buffLayout" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -178,24 +183,11 @@
                 android:textColor="@android:color/white" />
 
             <Button
-                android:id="@+id/pauseButton"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:text="일시정지"
-                android:gravity="center"
-                android:textStyle="bold"
-                android:layout_margin="3dp"
-                android:background="@drawable/main_button_selector"
-                android:backgroundTint="@null"
-                android:textColor="@android:color/white" />
-
-            <Button
                 android:id="@+id/exitButton"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text="종료"
+                android:text="일시정지"
                 android:textStyle="bold"
                 android:layout_margin="3dp"
                 android:background="@drawable/main_button_selector"

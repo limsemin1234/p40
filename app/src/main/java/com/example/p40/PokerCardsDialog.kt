@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.Window
 import android.widget.Button
+import android.widget.NumberPicker
 import android.widget.TextView
 import android.widget.Toast
 import androidx.cardview.widget.CardView
@@ -65,6 +66,12 @@ class PokerCardsDialog(
             }
             // 조커 카드도 추가
             allCards.add(Card.createJoker())
+            
+            // 문양 조커 카드도 추가 (하트, 스페이드, 다이아몬드, 클럽)
+            allCards.add(Card.createHeartJoker(CardRank.JOKER))
+            allCards.add(Card.createSpadeJoker(CardRank.JOKER))
+            allCards.add(Card.createDiamondJoker(CardRank.JOKER))
+            allCards.add(Card.createClubJoker(CardRank.JOKER))
         } else {
             // 웨이브 보상 모드일 때 - 저장된 덱 로드 또는 기본 덱 사용
             val savedDeck = DeckBuilderFragment.loadDeckFromPrefs(context)
@@ -178,6 +185,22 @@ class PokerCardsDialog(
             cardViews[i]?.setOnClickListener {
                 toggleCardSelection(i)
             }
+            
+            // 카드 롱클릭 이벤트 설정 - 문양 조커 카드 변환용
+            cardViews[i]?.setOnLongClickListener {
+                if (i < currentCards.size) {
+                    val card = currentCards[i]
+                    // 문양 조커인 경우에만 숫자 선택 다이얼로그 표시
+                    if (card.isJoker && card.suit != CardSuit.JOKER) {
+                        showJokerNumberPickerDialog(card, i)
+                        true
+                    } else {
+                        false
+                    }
+                } else {
+                    false
+                }
+            }
         }
     }
     
@@ -263,7 +286,15 @@ class PokerCardsDialog(
             cardSuitViews[i]?.text = suitSymbol
             
             // 카드 숫자 표시
-            cardRankViews[i]?.text = card.rank.getName()
+            if (card.isJoker) {
+                if (card.suit == CardSuit.JOKER || card.rank == CardRank.JOKER) {
+                    cardRankViews[i]?.text = "조커"
+                } else {
+                    cardRankViews[i]?.text = card.rank.getName()
+                }
+            } else {
+                cardRankViews[i]?.text = card.rank.getName()
+            }
             
             // 카드 색상 설정
             val cardColor = if (card.suit == CardSuit.HEART || card.suit == CardSuit.DIAMOND || card.suit == CardSuit.JOKER) {
@@ -284,18 +315,31 @@ class PokerCardsDialog(
             // 선택 상태 업데이트
             updateCardSelectionDisplay(i)
             
-            // 조커 카드에 롱클릭 리스너 추가 (웨이브 보상 모드에서만)
-            if (waveNumber > 0 && card.suit == CardSuit.JOKER && card.rank == CardRank.JOKER) {
-                cardViews[i]?.setOnLongClickListener {
-                    showJokerSelectionDialog(i)
-                    true
+            // 조커 카드에 롱클릭 리스너 추가
+            if (waveNumber > 0) {
+                // 별 모양 조커 처리
+                if (card.suit == CardSuit.JOKER && card.rank == CardRank.JOKER) {
+                    cardViews[i]?.setOnLongClickListener {
+                        showJokerSelectionDialog(i)
+                        true
+                    }
+                    
+                    // 조커 카드는 "변환 가능" 힌트 텍스트 추가
+                    cardViews[i]?.contentDescription = "조커 카드 - 길게 누르면 변환할 수 있습니다"
                 }
-                
-                // 조커 카드는 "변환 가능" 힌트 텍스트 추가
-                cardViews[i]?.contentDescription = "조커 카드 - 길게 누르면 변환할 수 있습니다"
-            } else {
-                cardViews[i]?.setOnLongClickListener(null)
-                cardViews[i]?.contentDescription = null
+                // 문양 조커 처리 (하트, 스페이드, 다이아, 클로버 조커)
+                else if (card.isJoker && card.suit != CardSuit.JOKER) {
+                    cardViews[i]?.setOnLongClickListener {
+                        showJokerNumberPickerDialog(card, i)
+                        true
+                    }
+                    
+                    // 문양 조커 카드도 힌트 텍스트 추가
+                    cardViews[i]?.contentDescription = "${card.suit.getName()} 조커 - 길게 누르면 숫자를 선택할 수 있습니다"
+                } else {
+                    cardViews[i]?.setOnLongClickListener(null)
+                    cardViews[i]?.contentDescription = null
+                }
             }
         }
     }
@@ -328,8 +372,13 @@ class PokerCardsDialog(
             } else {
                 // 웨이브 보상 모드에서 조커 카드는 롱클릭으로 처리
                 if (card.suit == CardSuit.JOKER && card.rank == CardRank.JOKER) {
-                    // 조커 변환 힌트 토스트 표시
+                    // 별 조커 변환 힌트 토스트 표시
                     Toast.makeText(context, "조커 카드를 길게 누르면 원하는 카드로 변환할 수 있습니다.", Toast.LENGTH_SHORT).show()
+                }
+                // 문양 조커도 안내 메시지 표시
+                else if (card.isJoker && card.suit != CardSuit.JOKER) {
+                    // 문양 조커 안내 메시지 표시
+                    Toast.makeText(context, "${card.suit.getName()} 조커를 길게 누르면 숫자를 선택할 수 있습니다.", Toast.LENGTH_SHORT).show()
                 } else {
                     // 일반 카드는 교체를 위한 선택 상태 토글
                     card.isSelected = !card.isSelected
@@ -501,5 +550,214 @@ class PokerCardsDialog(
         }
         
         jokerDialog.show()
+    }
+    
+    /**
+     * 조커 카드의 숫자를 선택하는 다이얼로그 표시
+     */
+    private fun showJokerNumberPickerDialog(card: Card, cardIndex: Int) {
+        val dialog = Dialog(context)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setCancelable(true)
+        dialog.setContentView(R.layout.dialog_joker_number_picker)
+        
+        // 윈도우 크기 조정
+        val window = dialog.window
+        if (window != null) {
+            val displayMetrics = context.resources.displayMetrics
+            val width = (displayMetrics.widthPixels * 0.85).toInt()
+            window.setLayout(width, android.view.WindowManager.LayoutParams.WRAP_CONTENT)
+            window.setGravity(android.view.Gravity.CENTER)
+        }
+        
+        // 뷰 초기화
+        val tvTitle = dialog.findViewById<TextView>(R.id.tvTitle)
+        val tvDescription = dialog.findViewById<TextView>(R.id.tvDescription)
+        val tvPreviewSuit = dialog.findViewById<TextView>(R.id.tvPreviewSuit)
+        val tvPreviewRank = dialog.findViewById<TextView>(R.id.tvPreviewRank)
+        val numberPicker = dialog.findViewById<NumberPicker>(R.id.numberPicker)
+        val btnCancel = dialog.findViewById<Button>(R.id.btnCancel)
+        val btnConfirm = dialog.findViewById<Button>(R.id.btnConfirm)
+        
+        // 타이틀 설정
+        tvTitle.text = "${card.suit.getName()} 조커 변환"
+        tvDescription.text = "조커를 변환할 숫자를 선택하세요"
+        
+        // 카드 미리보기 초기화
+        val suitSymbol = when (card.suit) {
+            CardSuit.HEART -> "♥"
+            CardSuit.DIAMOND -> "♦"
+            CardSuit.CLUB -> "♣"
+            CardSuit.SPADE -> "♠"
+            CardSuit.JOKER -> "★"
+        }
+        tvPreviewSuit.text = suitSymbol
+        
+        // 카드 색상 설정
+        val cardColor = if (card.suit == CardSuit.HEART || card.suit == CardSuit.DIAMOND) {
+            Color.RED
+        } else {
+            Color.BLACK
+        }
+        tvPreviewSuit.setTextColor(cardColor)
+        tvPreviewRank.setTextColor(cardColor)
+        
+        // 숫자 선택기 설정
+        numberPicker.minValue = 1
+        numberPicker.maxValue = 13
+        val rankValues = arrayOf("A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K")
+        numberPicker.displayedValues = rankValues
+        
+        // 현재 값이 JOKER가 아니면 그 값을 기본값으로 설정
+        if (card.rank != CardRank.JOKER) {
+            val value = card.rank.value
+            if (value in 1..13) {
+                numberPicker.value = value
+            } else {
+                numberPicker.value = 1 // 기본값 A
+            }
+        } else {
+            numberPicker.value = 1 // 기본값 A
+        }
+        
+        // 미리보기 업데이트
+        updatePreview(tvPreviewRank, numberPicker.value - 1, rankValues)
+        
+        // 값 변경 리스너
+        numberPicker.setOnValueChangedListener { _, _, newVal ->
+            updatePreview(tvPreviewRank, newVal - 1, rankValues)
+        }
+        
+        // 취소 버튼
+        btnCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+        
+        // 확인 버튼
+        btnConfirm.setOnClickListener {
+            // 선택된 카드 랭크로 변환
+            val selectedRank = getCardRankByValue(numberPicker.value)
+            replaceJokerCard(card, selectedRank, cardIndex)
+            dialog.dismiss()
+            
+            // 변경 알림
+            Toast.makeText(
+                context,
+                "${card.suit.getName()} 조커를 ${selectedRank.getName()}으로 변환했습니다", 
+                Toast.LENGTH_SHORT
+            ).show()
+            
+            // 카드 조합 업데이트
+            updatePokerHand()
+        }
+        
+        dialog.show()
+    }
+    
+    // 미리보기 업데이트
+    private fun updatePreview(tvPreviewRank: TextView, index: Int, rankValues: Array<String>) {
+        tvPreviewRank.text = rankValues[index]
+    }
+    
+    // 카드 랭크 값으로 CardRank 반환
+    private fun getCardRankByValue(value: Int): CardRank {
+        return when (value) {
+            1 -> CardRank.ACE
+            2 -> CardRank.TWO
+            3 -> CardRank.THREE
+            4 -> CardRank.FOUR
+            5 -> CardRank.FIVE
+            6 -> CardRank.SIX
+            7 -> CardRank.SEVEN
+            8 -> CardRank.EIGHT
+            9 -> CardRank.NINE
+            10 -> CardRank.TEN
+            11 -> CardRank.JACK
+            12 -> CardRank.QUEEN
+            13 -> CardRank.KING
+            else -> CardRank.ACE // 기본값
+        }
+    }
+    
+    // 조커 카드 변환
+    private fun replaceJokerCard(card: Card, newRank: CardRank, cardIndex: Int) {
+        if (cardIndex >= 0 && cardIndex < currentCards.size) {
+            // 새 카드 생성
+            val newCard = Card(
+                suit = card.suit,
+                rank = newRank,
+                isJoker = true  // isJoker 속성 유지
+            )
+            
+            // 카드 교체
+            currentCards[cardIndex] = newCard
+            
+            // UI 업데이트
+            updateCardView(cardIndex, newCard)
+            
+            // 토스트 메시지 표시
+            Toast.makeText(
+                context,
+                "${card.suit.getName()} 조커를 ${newRank.getName()}(으)로 변환했습니다",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+    
+    // 카드 모양과 숫자 업데이트 (추가 메서드)
+    private fun updateCardView(index: Int, card: Card) {
+        if (index < 0 || index >= cardViews.size) return
+        
+        // 카드 무늬 설정
+        val suitSymbol = when (card.suit) {
+            CardSuit.HEART -> "♥"
+            CardSuit.DIAMOND -> "♦"
+            CardSuit.CLUB -> "♣"
+            CardSuit.SPADE -> "♠"
+            CardSuit.JOKER -> "★"
+        }
+        cardSuitViews[index]?.text = suitSymbol
+        
+        // 카드 숫자 설정
+        if (card.isJoker) {
+            if (card.suit == CardSuit.JOKER || card.rank == CardRank.JOKER) {
+                cardRankViews[index]?.text = "조커"
+            } else {
+                cardRankViews[index]?.text = card.rank.getName()
+            }
+        } else {
+            cardRankViews[index]?.text = card.rank.getName()
+        }
+        
+        // 카드 색상 설정
+        val textColor = if (card.suit == CardSuit.HEART || card.suit == CardSuit.DIAMOND || card.suit == CardSuit.JOKER) {
+            Color.RED
+        } else {
+            Color.BLACK
+        }
+        cardSuitViews[index]?.setTextColor(textColor)
+        cardRankViews[index]?.setTextColor(textColor)
+        
+        // 카드 배경색 설정 (일반적으로 흰색)
+        cardViews[index]?.setCardBackgroundColor(Color.WHITE)
+        
+        // 카드 선택 여부 표시 유지
+        if (card.isSelected) {
+            cardViews[index]?.setCardBackgroundColor(Color.YELLOW)
+        }
+    }
+    
+    /**
+     * 조커 카드 변경 후 포커 핸드 업데이트
+     */
+    private fun updatePokerHand() {
+        // 웨이브 보상 모드에서만 족보 업데이트
+        if (waveNumber > 0) {
+            // 플레이어 핸드 업데이트 (PokerDeck 클래스의 playerHand 변수)
+            pokerDeck.playerHand = currentCards.toMutableList()
+            
+            // 족보 평가 및 UI 업데이트
+            updateHandDisplay()
+        }
     }
 } 

@@ -2,33 +2,56 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/cardView"
-    android:layout_width="48dp"
-    android:layout_height="68dp"
+    android:layout_width="40dp"
+    android:layout_height="50dp"
     android:layout_margin="2dp"
-    app:cardCornerRadius="6dp"
+    app:cardCornerRadius="4dp"
     app:cardBackgroundColor="#FFFFFF"
     app:cardElevation="2dp">
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:padding="2dp">
+        android:layout_height="match_parent">
+        
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center">
 
+            <TextView
+                android:id="@+id/tvCardSuit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="♥"
+                android:textSize="20sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/tvCardRank"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="A"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:gravity="center"/>
+        </LinearLayout>
+        
+        <!-- 신규 카드 표시 -->
         <TextView
-            android:id="@+id/tvCardRank"
+            android:id="@+id/tvNewLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="A"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/tvCardSuit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="♠"
-            android:textSize="22sp" />
-    </LinearLayout>
+            android:text="NEW"
+            android:textSize="8sp"
+            android:textColor="#FFFFFF"
+            android:background="#F44336"
+            android:paddingHorizontal="2dp"
+            android:paddingVertical="1dp"
+            android:rotation="-45"
+            android:layout_gravity="top|end"
+            android:visibility="gone" />
+    </FrameLayout>
 </androidx.cardview.widget.CardView> 

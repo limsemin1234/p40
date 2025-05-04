@@ -95,11 +95,12 @@ enum class PokerHand(val value: Int, val handName: String) {
 data class Card(
     val suit: CardSuit,
     val rank: CardRank,
-    var isSelected: Boolean = false // 카드 교체 선택 여부
+    var isSelected: Boolean = false, // 카드 교체 선택 여부
+    var isJoker: Boolean = false // 조커 카드 여부
 ) {
     fun getDisplayName(): String {
-        return if (suit == CardSuit.JOKER) {
-            "조커"
+        return if (isJoker) {
+            "${suit.getName()} 조커(${rank.getName()})"
         } else {
             "${suit.getName()} ${rank.getName()}"
         }
@@ -115,8 +116,34 @@ data class Card(
     
     // 조커 카드 생성 팩토리 메서드
     companion object {
+        // 기존 별 조커 카드 생성
         fun createJoker(): Card {
-            return Card(CardSuit.JOKER, CardRank.JOKER)
+            return Card(CardSuit.JOKER, CardRank.JOKER, isJoker = true)
+        }
+        
+        // 문양과 숫자를 가진 조커 카드 생성
+        fun createSuitedJoker(suit: CardSuit, rank: CardRank): Card {
+            return Card(suit, rank, isJoker = true)
+        }
+        
+        // 하트 조커
+        fun createHeartJoker(rank: CardRank): Card {
+            return createSuitedJoker(CardSuit.HEART, rank)
+        }
+        
+        // 스페이드 조커
+        fun createSpadeJoker(rank: CardRank): Card {
+            return createSuitedJoker(CardSuit.SPADE, rank)
+        }
+        
+        // 다이아 조커
+        fun createDiamondJoker(rank: CardRank): Card {
+            return createSuitedJoker(CardSuit.DIAMOND, rank)
+        }
+        
+        // 클로버 조커
+        fun createClubJoker(rank: CardRank): Card {
+            return createSuitedJoker(CardSuit.CLUB, rank)
         }
     }
 } 
