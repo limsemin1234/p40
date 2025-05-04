@@ -267,6 +267,11 @@ class PokerCardsDialog(
         for (i in currentCards.indices) {
             val card = currentCards[i]
             
+            // 조커 카드 및 문양 조커는 항상 선택 불가능하도록 설정
+            if (waveNumber > 0 && (card.suit == CardSuit.JOKER || card.isJoker)) {
+                card.isSelected = false
+            }
+            
             // 빈 카드 처리
             if (card.suit == CardSuit.JOKER && card.rank == CardRank.JOKER && waveNumber == 0 && !card.isSelected) {
                 cardViews[i]?.visibility = View.INVISIBLE
@@ -317,6 +322,10 @@ class PokerCardsDialog(
             
             // 조커 카드에 롱클릭 리스너 추가
             if (waveNumber > 0) {
+                // 롱클릭 리스너 초기화 (기본)
+                cardViews[i]?.setOnLongClickListener(null)
+                cardViews[i]?.contentDescription = null
+                
                 // 별 모양 조커 처리
                 if (card.suit == CardSuit.JOKER && card.rank == CardRank.JOKER) {
                     cardViews[i]?.setOnLongClickListener {
@@ -325,7 +334,7 @@ class PokerCardsDialog(
                     }
                     
                     // 조커 카드는 "변환 가능" 힌트 텍스트 추가
-                    cardViews[i]?.contentDescription = "조커 카드 - 길게 누르면 변환할 수 있습니다"
+                    cardViews[i]?.contentDescription = "조커 카드 - 길게 누르면 원하는 카드로 변환할 수 있습니다"
                 }
                 // 문양 조커 처리 (하트, 스페이드, 다이아, 클로버 조커)
                 else if (card.isJoker && card.suit != CardSuit.JOKER) {
@@ -336,9 +345,6 @@ class PokerCardsDialog(
                     
                     // 문양 조커 카드도 힌트 텍스트 추가
                     cardViews[i]?.contentDescription = "${card.suit.getName()} 조커 - 길게 누르면 숫자를 선택할 수 있습니다"
-                } else {
-                    cardViews[i]?.setOnLongClickListener(null)
-                    cardViews[i]?.contentDescription = null
                 }
             }
         }
@@ -374,11 +380,15 @@ class PokerCardsDialog(
                 if (card.suit == CardSuit.JOKER && card.rank == CardRank.JOKER) {
                     // 별 조커 변환 힌트 토스트 표시
                     Toast.makeText(context, "조커 카드를 길게 누르면 원하는 카드로 변환할 수 있습니다.", Toast.LENGTH_SHORT).show()
+                    // 선택 상태는 false로 유지
+                    card.isSelected = false
                 }
                 // 문양 조커도 안내 메시지 표시
                 else if (card.isJoker && card.suit != CardSuit.JOKER) {
                     // 문양 조커 안내 메시지 표시
                     Toast.makeText(context, "${card.suit.getName()} 조커를 길게 누르면 숫자를 선택할 수 있습니다.", Toast.LENGTH_SHORT).show()
+                    // 선택 상태는 false로 유지
+                    card.isSelected = false
                 } else {
                     // 일반 카드는 교체를 위한 선택 상태 토글
                     card.isSelected = !card.isSelected
@@ -682,25 +692,22 @@ class PokerCardsDialog(
     // 조커 카드 변환
     private fun replaceJokerCard(card: Card, newRank: CardRank, cardIndex: Int) {
         if (cardIndex >= 0 && cardIndex < currentCards.size) {
-            // 새 카드 생성
+            // 새 카드 생성 - 문양은 유지하고 숫자만 변경, isJoker 속성은 true로 유지
             val newCard = Card(
                 suit = card.suit,
                 rank = newRank,
-                isJoker = true  // isJoker 속성 유지
+                isSelected = false,  // 선택 상태는 항상 false로 설정
+                isJoker = true       // isJoker 속성 유지
             )
             
             // 카드 교체
             currentCards[cardIndex] = newCard
             
+            // PokerDeck의 playerHand도 직접 업데이트
+            pokerDeck.playerHand[cardIndex] = newCard
+            
             // UI 업데이트
             updateCardView(cardIndex, newCard)
-            
-            // 토스트 메시지 표시
-            Toast.makeText(
-                context,
-                "${card.suit.getName()} 조커를 ${newRank.getName()}(으)로 변환했습니다",
-                Toast.LENGTH_SHORT
-            ).show()
         }
     }
     

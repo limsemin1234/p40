@@ -107,6 +107,16 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
         btnBack.setOnClickListener {
             navigateBack()
         }
+        
+        // 선택한 카드 추가 버튼 설정
+        view?.findViewById<Button>(R.id.btnAddSelected)?.setOnClickListener {
+            addSelectedCards()
+        }
+        
+        // 선택한 카드 제거 버튼 설정
+        view?.findViewById<Button>(R.id.btnRemoveSelected)?.setOnClickListener {
+            removeSelectedCards()
+        }
     }
     
     private fun navigateBack() {
@@ -552,6 +562,123 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
         
         // 변경사항 저장
         autoSaveDeckAndCollection()
+    }
+    
+    /**
+     * 선택한 카드들을 덱에 추가
+     */
+    private fun addSelectedCards() {
+        val selectedCards = collectionAdapter.getSelectedCards()
+        
+        if (selectedCards.isEmpty()) {
+            Toast.makeText(requireContext(), "추가할 카드를 선택해주세요", Toast.LENGTH_SHORT).show()
+            return
+        }
+        
+        var addedCount = 0
+        
+        // 덱 최대 크기 체크
+        if (deckCards.size + selectedCards.size > 53) {
+            Toast.makeText(requireContext(), "덱에 최대 53장까지만 넣을 수 있습니다.", Toast.LENGTH_SHORT).show()
+            return
+        }
+        
+        // 선택한 카드들 처리
+        for (card in selectedCards) {
+            // 이미 덱에 있는 카드인지 확인
+            if (isCardInDeck(card)) {
+                continue
+            }
+            
+            // 덱에 카드 추가
+            deckCards.add(Card(card.suit, card.rank, isJoker = card.isJoker))
+            
+            // 컬렉션에서 해당 카드 찾기
+            val index = collectionCards.indexOfFirst { 
+                it.suit == card.suit && it.rank == card.rank && it.isJoker == card.isJoker
+            }
+            
+            // 컬렉션에서 카드 제거
+            if (index != -1) {
+                collectionCards.removeAt(index)
+                addedCount++
+            }
+        }
+        
+        // UI 갱신
+        deckAdapter.notifyDataSetChanged()
+        collectionAdapter.notifyDataSetChanged()
+        collectionAdapter.clearSelections()
+        
+        // 카드 수량 업데이트
+        updateDeckCount()
+        
+        // 결과 안내 메시지
+        if (addedCount > 0) {
+            Toast.makeText(requireContext(), "${addedCount}장의 카드를 덱에 추가했습니다.", Toast.LENGTH_SHORT).show()
+            
+            // 변경사항 자동 저장
+            autoSaveDeckAndCollection()
+        } else {
+            Toast.makeText(requireContext(), "추가할 수 있는 카드가 없습니다.", Toast.LENGTH_SHORT).show()
+        }
+    }
+    
+    /**
+     * 선택한 카드들을 덱에서 제거
+     */
+    private fun removeSelectedCards() {
+        val selectedCards = deckAdapter.getSelectedCards()
+        
+        if (selectedCards.isEmpty()) {
+            Toast.makeText(requireContext(), "제거할 카드를 선택해주세요", Toast.LENGTH_SHORT).show()
+            return
+        }
+        
+        var removedCount = 0
+        
+        // 선택된 카드들을 임시 리스트에 복사 (인덱스 변경 방지)
+        val cardsToRemove = selectedCards.toList()
+        
+        // 선택한 카드들 처리
+        for (card in cardsToRemove) {
+            // 덱에서 카드 찾기
+            val index = deckCards.indexOfFirst { 
+                it.suit == card.suit && it.rank == card.rank && it.isJoker == card.isJoker
+            }
+            
+            // 덱에서 카드 제거
+            if (index != -1) {
+                val removedCard = deckCards.removeAt(index)
+                
+                // 컬렉션에 카드 추가
+                collectionCards.add(Card(
+                    removedCard.suit, 
+                    removedCard.rank, 
+                    isJoker = removedCard.isJoker
+                ))
+                
+                removedCount++
+            }
+        }
+        
+        // UI 갱신
+        deckAdapter.notifyDataSetChanged()
+        collectionAdapter.notifyDataSetChanged()
+        deckAdapter.clearSelections()
+        
+        // 카드 수량 업데이트
+        updateDeckCount()
+        
+        // 결과 안내 메시지
+        if (removedCount > 0) {
+            Toast.makeText(requireContext(), "${removedCount}장의 카드를 덱에서 제거했습니다.", Toast.LENGTH_SHORT).show()
+            
+            // 변경사항 자동 저장
+            autoSaveDeckAndCollection()
+        } else {
+            Toast.makeText(requireContext(), "제거할 수 있는 카드가 없습니다.", Toast.LENGTH_SHORT).show()
+        }
     }
     
     // 카드 데이터 직렬화를 위한 클래스

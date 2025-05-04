@@ -96,8 +96,13 @@ class PokerDeck {
         
         // 교체할 카드 인덱스 찾기
         for (i in playerHand.indices) {
-            if (playerHand[i].isSelected) {
+            val card = playerHand[i]
+            // 조커 카드는 교체에서 제외 (별 조커 또는 문양 조커)
+            if (card.isSelected && !(card.isJoker || (card.suit == CardSuit.JOKER && card.rank == CardRank.JOKER))) {
                 indexesToReplace.add(i)
+            } else if (card.isJoker || (card.suit == CardSuit.JOKER && card.rank == CardRank.JOKER)) {
+                // 조커 카드의 선택 상태는 항상 false로 리셋
+                card.isSelected = false
             }
         }
         

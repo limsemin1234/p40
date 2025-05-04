@@ -34,7 +34,7 @@
         android:id="@+id/tvCurrentDeckTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="현재 덱 (클릭하여 카드 제거)"
+        android:text="현재 덱 (선택하여 카드 제거)"
         android:textColor="#FFFFFF"
         android:textSize="18sp"
         android:layout_marginTop="16dp"
@@ -60,20 +60,31 @@
         android:padding="4dp"
         android:clipToPadding="false"
         app:layout_constraintTop_toBottomOf="@id/divider1"
-        app:layout_constraintBottom_toTopOf="@id/tvCollectionTitle"
-        app:layout_constraintHeight_percent="0.35" />
+        app:layout_constraintBottom_toTopOf="@id/btnRemoveSelected"
+        app:layout_constraintHeight_percent="0.30" />
+        
+    <!-- 선택한 카드 제거 버튼 -->
+    <Button
+        android:id="@+id/btnRemoveSelected"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="선택한 카드 제거"
+        android:textSize="16sp"
+        android:layout_marginTop="4dp"
+        app:layout_constraintTop_toBottomOf="@id/rvDeck"
+        app:layout_constraintBottom_toTopOf="@id/tvCollectionTitle" />
 
     <!-- 하단 섹션 타이틀: 보유한 카드 -->
     <TextView
         android:id="@+id/tvCollectionTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="보유한 카드 (클릭하여 덱에 추가)"
+        android:text="보유한 카드 (선택하여 덱에 추가)"
         android:textColor="#FFFFFF"
         android:textSize="18sp"
         android:layout_marginTop="8dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/rvDeck" />
+        app:layout_constraintTop_toBottomOf="@id/btnRemoveSelected" />
 
     <!-- 경계선 -->
     <View
@@ -93,8 +104,19 @@
         android:background="#222222"
         android:padding="4dp"
         android:clipToPadding="false"
-        app:layout_constraintBottom_toTopOf="@id/buttonContainer"
+        app:layout_constraintBottom_toTopOf="@id/btnAddSelected"
         app:layout_constraintTop_toBottomOf="@id/divider2" />
+        
+    <!-- 선택한 카드 추가 버튼 -->
+    <Button
+        android:id="@+id/btnAddSelected"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="선택한 카드 추가"
+        android:textSize="16sp"
+        android:layout_marginTop="4dp"
+        app:layout_constraintTop_toBottomOf="@id/rvCollection"
+        app:layout_constraintBottom_toTopOf="@id/buttonContainer" />
 
     <!-- 버튼 컨테이너 -->
     <LinearLayout
