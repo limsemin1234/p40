@@ -12,17 +12,17 @@ import kotlin.math.sqrt
 class Missile(
     private var position: PointF,
     private val target: Enemy,
-    private val speed: Float = 8f,
-    private val damage: Int = 50,
-    private val maxDistance: Float = 2000f // 최대 이동 거리
+    private val speed: Float = GameConfig.MISSILE_SPEED,
+    private val damage: Int = GameConfig.MISSILE_DAMAGE,
+    private val maxDistance: Float = GameConfig.MISSILE_MAX_DISTANCE
 ) {
     private val paint = Paint().apply {
-        color = Color.YELLOW
+        color = GameConfig.MISSILE_COLOR
         style = Paint.Style.FILL
     }
     
     private var isDead = false
-    private val size = 15f
+    private val size = GameConfig.MISSILE_SIZE
     
     private var directionX: Float
     private var directionY: Float

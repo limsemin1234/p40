@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.example.p40.game.GameConfig
 import com.example.p40.game.GameView
 
 class GameFragment : Fragment(R.layout.fragment_game) {
@@ -12,7 +13,7 @@ class GameFragment : Fragment(R.layout.fragment_game) {
     private lateinit var gameView: GameView
     private var isPaused = false
     private var cardCooldown = false
-    private val cardCooldownTime = 10000L // 10초 쿨다운
+    private val cardCooldownTime = GameConfig.CARD_COOLDOWN
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

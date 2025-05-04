@@ -11,13 +11,13 @@ import kotlin.math.sin
 class Enemy(
     private var position: PointF,
     private val target: PointF,
-    private val speed: Float = 2f,
-    private val size: Float = 20f,
-    var health: Int = 100,
+    private val speed: Float = GameConfig.ENEMY_BASE_SIZE,
+    private val size: Float = GameConfig.ENEMY_BASE_SIZE,
+    var health: Int = GameConfig.ENEMY_BASE_HEALTH,
     val isBoss: Boolean = false
 ) {
     private val paint = Paint().apply {
-        color = if (isBoss) Color.MAGENTA else Color.RED
+        color = if (isBoss) GameConfig.BOSS_COLOR else GameConfig.ENEMY_COLOR
         style = Paint.Style.FILL
     }
     
@@ -57,9 +57,9 @@ class Enemy(
         // 보스는 테두리 추가
         if (isBoss) {
             val bossBorderPaint = Paint().apply {
-                color = Color.YELLOW
+                color = GameConfig.BOSS_BORDER_COLOR
                 style = Paint.Style.STROKE
-                strokeWidth = 5f
+                strokeWidth = GameConfig.BOSS_BORDER_WIDTH
             }
             canvas.drawCircle(position.x, position.y, size, bossBorderPaint)
             

@@ -6,8 +6,8 @@ import kotlin.math.sqrt
 
 class DefenseUnit(
     private val position: PointF,
-    private val attackRange: Float = 500f, // 공격범위
-    private val attackCooldown: Long = 1000 // 공격속도 1초에 1번
+    private val attackRange: Float = GameConfig.DEFENSE_UNIT_ATTACK_RANGE,
+    private val attackCooldown: Long = GameConfig.DEFENSE_UNIT_ATTACK_COOLDOWN
 ) {
     private var lastAttackTime = 0L
     
