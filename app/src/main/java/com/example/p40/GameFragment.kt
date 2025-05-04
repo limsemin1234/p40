@@ -594,6 +594,9 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
                 pauseButton.text = "재개"
                 gameView.pause()
                 handler.removeCallbacks(uiUpdateRunnable)
+                
+                // 일시정지 메뉴 보여주기
+                showPauseDialog()
             } else {
                 pauseButton.text = "일시정지"
                 gameView.resume()
@@ -604,11 +607,60 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
         // 종료 버튼
         val exitButton = view.findViewById<Button>(R.id.exitButton)
         exitButton.setOnClickListener {
-            // 게임 종료 및 메인 메뉴로 돌아가기
-            gameView.pause() // 먼저 게임 일시정지
+            // 게임 일시정지
+            isPaused = true
+            gameView.pause()
             handler.removeCallbacks(uiUpdateRunnable)
+            
+            // 일시정지 메뉴 보여주기
+            showPauseDialog()
+        }
+    }
+
+    // 일시정지 다이얼로그 표시
+    private fun showPauseDialog() {
+        // 다이얼로그 생성
+        val dialog = Dialog(requireContext())
+        
+        // 레이아웃 설정
+        dialog.setContentView(R.layout.dialog_pause_menu)
+        dialog.setCancelable(false)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        
+        // 버튼 설정
+        // 1. 게임 계속하기 버튼
+        val btnResume = dialog.findViewById<Button>(R.id.btnResume)
+        btnResume.setOnClickListener {
+            dialog.dismiss()
+            
+            // 게임 재개
+            isPaused = false
+            val pauseButton = view?.findViewById<Button>(R.id.pauseButton)
+            pauseButton?.text = "일시정지"
+            gameView.resume()
+            handler.post(uiUpdateRunnable)
+        }
+        
+        // 2. 메인화면으로 버튼
+        val btnMainMenu = dialog.findViewById<Button>(R.id.btnMainMenu)
+        btnMainMenu.setOnClickListener {
+            dialog.dismiss()
+            
+            // 메인화면으로 이동
             findNavController().navigate(R.id.action_gameFragment_to_mainMenuFragment)
         }
+        
+        // 3. 게임 종료 버튼
+        val btnExitGame = dialog.findViewById<Button>(R.id.btnExitGame)
+        btnExitGame.setOnClickListener {
+            dialog.dismiss()
+            
+            // 앱 종료
+            requireActivity().finish()
+        }
+        
+        // 다이얼로그 표시
+        dialog.show()
     }
 
     // UI 업데이트 시작하는 함수
