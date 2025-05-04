@@ -206,53 +206,53 @@ class PokerDeck {
             ranks.containsKey(CardRank.QUEEN) && 
             ranks.containsKey(CardRank.KING) && 
             ranks.containsKey(CardRank.ACE)) {
-            return PokerHand.ROYAL_FLUSH
+            return RoyalFlush()
         }
         
         // 스트레이트 플러시 체크
         val isStraight = checkStraight(rankValues)
         if (isAllSameSuit && isStraight) {
-            return PokerHand.STRAIGHT_FLUSH
+            return StraightFlush()
         }
         
         // 포카드 체크
         if (ranks.any { it.value.size >= 4 }) {
-            return PokerHand.FOUR_OF_A_KIND
+            return FourOfAKind()
         }
         
         // 풀하우스 체크
         if (ranks.size == 2 && ranks.any { it.value.size == 3 }) {
-            return PokerHand.FULL_HOUSE
+            return FullHouse()
         }
         
         // 플러시 체크
         if (isAllSameSuit) {
-            return PokerHand.FLUSH
+            return Flush()
         }
         
         // 스트레이트 체크
         if (isStraight) {
-            return PokerHand.STRAIGHT
+            return Straight()
         }
         
         // 트리플 체크
         if (ranks.any { it.value.size >= 3 }) {
-            return PokerHand.THREE_OF_A_KIND
+            return ThreeOfAKind()
         }
         
         // 투페어 체크
         val pairs = ranks.filter { it.value.size >= 2 }
         if (pairs.size >= 2) {
-            return PokerHand.TWO_PAIR
+            return TwoPair()
         }
         
         // 원페어 체크
         if (pairs.size == 1) {
-            return PokerHand.ONE_PAIR
+            return OnePair()
         }
         
         // 하이카드
-        return PokerHand.HIGH_CARD
+        return HighCard()
     }
     
     // 스트레이트 확인 (최적화된 버전)

@@ -1,20 +1,21 @@
 package com.example.p40.game
 
+import android.graphics.Color
 import java.util.concurrent.ConcurrentHashMap
 
 /**
  * 버프 종류 정의
  */
 enum class BuffType {
-    MISSILE_DAMAGE, // 미사일 데미지 증가
-    ENEMY_SLOW,     // 적 이동 속도 감소
-    ATTACK_SPEED,   // 공격 속도 증가
-    MISSILE_SPEED,  // 미사일 속도 증가
-    MISSILE_RANGE,  // 미사일 사거리 증가
-    MISSILE_PIERCE, // 미사일 관통
-    DOT_DAMAGE,     // 지속적 데미지
-    MULTI_DIRECTION,// 다방향 발사
-    MASS_DAMAGE     // 주기적 대량 데미지
+    MISSILE_DAMAGE,   // 미사일 데미지 증가
+    ATTACK_SPEED,     // 공격 속도 증가
+    MISSILE_SPEED,    // 미사일 속도 증가
+    MULTI_DIRECTION,  // 다방향 발사
+    MISSILE_PIERCE,   // 미사일 관통
+    ENEMY_SLOW,       // 적 이동속도 감소
+    DOT_DAMAGE,       // 지속 데미지
+    MASS_DAMAGE,      // 주기적 대량 데미지
+    RESOURCE_GAIN     // 자원 획득량 증가
 }
 
 /**
@@ -31,42 +32,52 @@ enum class BuffCategory {
 data class Buff(
     val type: BuffType,
     var level: Int = 1,
-    val displayName: String,
-    val shortName: String, // 축약된 이름
-    val category: BuffCategory, // 버프 카테고리
-    val increasePerLevel: Float // 레벨당 효과 증가량
+    val maxLevel: Int = GameConfig.BUFF_MAX_LEVEL,
+    var duration: Long = -1L,  // -1은 무제한
+    val name: String,
+    val description: String
 ) {
-    fun getEffectValue(): Float {
-        return increasePerLevel * level
+    // 버프 레벨 증가
+    fun upgrade(): Boolean {
+        if (level < maxLevel) {
+            level++
+            return true
+        }
+        return false
     }
     
+    // 버프 레벨 및 효과 정보 생성
     fun getDisplayText(): String {
-        return when (type) {
-            BuffType.MISSILE_DAMAGE -> "$displayName Lv.$level (${(increasePerLevel * level * 100).toInt()}%)"
-            BuffType.ENEMY_SLOW -> "$displayName Lv.$level (${(increasePerLevel * level * 100).toInt()}%)"
-            BuffType.ATTACK_SPEED -> "$displayName Lv.$level (${(increasePerLevel * level * 100).toInt()}%)"
-            BuffType.MISSILE_SPEED -> "$displayName Lv.$level (${(increasePerLevel * level * 100).toInt()}%)"
-            BuffType.MISSILE_RANGE -> "$displayName Lv.$level (${(increasePerLevel * level * 100).toInt()}%)"
-            BuffType.MISSILE_PIERCE -> "$displayName Lv.$level (${level + 1}개 관통)"
-            BuffType.DOT_DAMAGE -> "$displayName Lv.$level (초당 ${level}데미지)"
-            BuffType.MULTI_DIRECTION -> "$displayName Lv.$level (${level + 1}방향)"
-            BuffType.MASS_DAMAGE -> "$displayName Lv.$level (${level * 100}데미지)"
+        val effectText = when (type) {
+            BuffType.MISSILE_DAMAGE -> "데미지 +${level * 15}%"
+            BuffType.ATTACK_SPEED -> "공격속도 +${level * 12}%"
+            BuffType.MISSILE_SPEED -> "미사일 속도 +${level * 20}%"
+            BuffType.MULTI_DIRECTION -> "${level + 1}방향 발사"
+            BuffType.MISSILE_PIERCE -> "관통 ${level}회"
+            BuffType.ENEMY_SLOW -> "적 이동속도 -${level * 15}%"
+            BuffType.DOT_DAMAGE -> "초당 ${level * 2}데미지"
+            BuffType.MASS_DAMAGE -> "5초마다 ${level * 100}데미지"
+            BuffType.RESOURCE_GAIN -> "자원 획득 +${level * 15}%"
         }
+        
+        return "$name Lv.$level: $effectText"
     }
     
-    // 축약된 버프 표시 텍스트 (예: 공격+20%)
+    // 간단한 표시용 텍스트
     fun getShortDisplayText(): String {
-        return when (type) {
-            BuffType.MISSILE_DAMAGE -> "${shortName}+${(increasePerLevel * level * 100).toInt()}%"
-            BuffType.ENEMY_SLOW -> "${shortName}-${(increasePerLevel * level * 100).toInt()}%"
-            BuffType.ATTACK_SPEED -> "${shortName}+${(increasePerLevel * level * 100).toInt()}%"
-            BuffType.MISSILE_SPEED -> "${shortName}+${(increasePerLevel * level * 100).toInt()}%"
-            BuffType.MISSILE_RANGE -> "${shortName}+${(increasePerLevel * level * 100).toInt()}%"
-            BuffType.MISSILE_PIERCE -> "${shortName}×${level + 1}"
-            BuffType.DOT_DAMAGE -> "${shortName}${level}/초"
-            BuffType.MULTI_DIRECTION -> "${shortName}×${level + 1}"
-            BuffType.MASS_DAMAGE -> "${shortName}${level * 100}"
+        val effectText = when (type) {
+            BuffType.MISSILE_DAMAGE -> "데미지 +${level * 15}%"
+            BuffType.ATTACK_SPEED -> "공격속도 +${level * 12}%"
+            BuffType.MISSILE_SPEED -> "미사일 속도 +${level * 20}%"
+            BuffType.MULTI_DIRECTION -> "${level + 1}방향 발사"
+            BuffType.MISSILE_PIERCE -> "관통 ${level}회"
+            BuffType.ENEMY_SLOW -> "이동속도 -${level * 15}%"
+            BuffType.DOT_DAMAGE -> "DoT ${level * 2}/초"
+            BuffType.MASS_DAMAGE -> "5초마다 ${level * 100}"
+            BuffType.RESOURCE_GAIN -> "자원 +${level * 15}%"
         }
+        
+        return effectText
     }
 }
 
@@ -76,138 +87,302 @@ data class Buff(
 class BuffManager {
     private val buffs = ConcurrentHashMap<BuffType, Buff>()
     
-    // 포커 족보에 따른 버프 추가/업그레이드
-    fun addPokerHandBuff(pokerHand: PokerHand) {
-        when (pokerHand) {
-            PokerHand.HIGH_CARD -> {
-                // 미사일 데미지 10% 증가
-                addOrUpgradeBuff(BuffType.MISSILE_DAMAGE, "미사일 데미지", "공격", BuffCategory.DEFENSE_BUFF, 0.1f)
-            }
-            PokerHand.ONE_PAIR -> {
-                // 미사일 데미지 20% 증가
-                addOrUpgradeBuff(BuffType.MISSILE_DAMAGE, "미사일 데미지", "공격", BuffCategory.DEFENSE_BUFF, 0.2f)
-            }
-            PokerHand.TWO_PAIR -> {
-                // 적 이동 속도 20% 감소
-                addOrUpgradeBuff(BuffType.ENEMY_SLOW, "적 이동속도 감소", "적속도", BuffCategory.ENEMY_NERF, 0.2f)
-            }
-            PokerHand.THREE_OF_A_KIND -> {
-                // 미사일 발사 속도 30% 증가
-                addOrUpgradeBuff(BuffType.ATTACK_SPEED, "공격속도", "속도", BuffCategory.DEFENSE_BUFF, 0.3f)
-            }
-            PokerHand.STRAIGHT -> {
-                // 미사일 속도와 사거리 50% 증가
-                addOrUpgradeBuff(BuffType.MISSILE_SPEED, "미사일 속도", "투사체", BuffCategory.DEFENSE_BUFF, 0.5f)
-                addOrUpgradeBuff(BuffType.MISSILE_RANGE, "미사일 사거리", "범위", BuffCategory.DEFENSE_BUFF, 0.5f)
-            }
-            PokerHand.FLUSH -> {
-                // 미사일이 적을 관통하여 2마리까지 공격 가능
-                addOrUpgradeBuff(BuffType.MISSILE_PIERCE, "미사일 관통", "관통", BuffCategory.DEFENSE_BUFF, 1f)
-            }
-            PokerHand.FULL_HOUSE -> {
-                // 모든 적에게 지속적 데미지
-                addOrUpgradeBuff(BuffType.DOT_DAMAGE, "지속 데미지", "DOT", BuffCategory.ENEMY_NERF, 1f)
-            }
-            PokerHand.FOUR_OF_A_KIND -> {
-                // 미사일이 4방향으로 발사됨
-                addOrUpgradeBuff(BuffType.MULTI_DIRECTION, "다방향 발사", "방향", BuffCategory.DEFENSE_BUFF, 1f)
-            }
-            PokerHand.STRAIGHT_FLUSH -> {
-                // 모든 적의 이동 속도 50% 감소 및 데미지 2배
-                addOrUpgradeBuff(BuffType.ENEMY_SLOW, "적 이동속도 감소", "적속도", BuffCategory.ENEMY_NERF, 0.5f)
-                addOrUpgradeBuff(BuffType.MISSILE_DAMAGE, "미사일 데미지", "공격", BuffCategory.DEFENSE_BUFF, 1.0f)
-            }
-            PokerHand.ROYAL_FLUSH -> {
-                // 일정 시간마다 화면의 모든 적에게 강력한 데미지
-                addOrUpgradeBuff(BuffType.MASS_DAMAGE, "대량 데미지", "대폭발", BuffCategory.ENEMY_NERF, 1.0f)
-            }
-        }
+    init {
+        // 버프 초기화
+        // (실제 게임에서는 아무 버프도 없는 상태로 시작)
     }
     
-    // 버프 추가 또는 레벨 업
-    private fun addOrUpgradeBuff(type: BuffType, displayName: String, shortName: String, category: BuffCategory, increasePerLevel: Float) {
-        if (buffs.containsKey(type)) {
+    // 버프 추가
+    fun addBuff(buff: Buff) {
+        val existingBuff = buffs[buff.type]
+        if (existingBuff != null) {
             // 이미 존재하는 버프면 레벨 업
-            val existingBuff = buffs[type]!!
-            existingBuff.level++
+            existingBuff.upgrade()
         } else {
             // 새 버프 추가
-            buffs[type] = Buff(type, 1, displayName, shortName, category, increasePerLevel)
+            buffs[buff.type] = buff
         }
     }
     
-    // 특정 타입의 버프 레벨 반환
+    // 포커 족보에 따른 버프 추가
+    fun addPokerHandBuff(pokerHand: PokerHand) {
+        when (pokerHand) {
+            is HighCard -> {
+                // 하이 카드는 약한 버프 제공 (데미지 증가)
+                addBuff(Buff(
+                    type = BuffType.MISSILE_DAMAGE,
+                    level = 1,
+                    name = "하이 카드",
+                    description = "약한 데미지 증가"
+                ))
+            }
+            
+            is OnePair -> {
+                // 원 페어 (데미지 증가)
+                addBuff(Buff(
+                    type = BuffType.MISSILE_DAMAGE,
+                    level = 2,
+                    name = "원 페어",
+                    description = "데미지 증가"
+                ))
+            }
+            
+            is TwoPair -> {
+                // 투 페어 (데미지 & 공격 속도 증가)
+                addBuff(Buff(
+                    type = BuffType.MISSILE_DAMAGE,
+                    level = 1,
+                    name = "투 페어 - 데미지",
+                    description = "데미지 증가"
+                ))
+                
+                addBuff(Buff(
+                    type = BuffType.ATTACK_SPEED,
+                    level = 1,
+                    name = "투 페어 - 공격속도",
+                    description = "공격 속도 증가"
+                ))
+            }
+            
+            is ThreeOfAKind -> {
+                // 트리플 (데미지 & 적 이동속도 감소)
+                addBuff(Buff(
+                    type = BuffType.MISSILE_DAMAGE,
+                    level = 2,
+                    name = "트리플 - 데미지",
+                    description = "데미지 대폭 증가"
+                ))
+                
+                addBuff(Buff(
+                    type = BuffType.ENEMY_SLOW,
+                    level = 1,
+                    name = "트리플 - 슬로우",
+                    description = "적 이동속도 감소"
+                ))
+            }
+            
+            is Straight -> {
+                // 스트레이트 (다방향 발사)
+                addBuff(Buff(
+                    type = BuffType.MULTI_DIRECTION,
+                    level = 2,
+                    name = "스트레이트",
+                    description = "3방향 발사"
+                ))
+            }
+            
+            is Flush -> {
+                // 플러시 (미사일 속도 & 관통)
+                addBuff(Buff(
+                    type = BuffType.MISSILE_SPEED,
+                    level = 2,
+                    name = "플러시 - 속도",
+                    description = "미사일 속도 증가"
+                ))
+                
+                addBuff(Buff(
+                    type = BuffType.MISSILE_PIERCE,
+                    level = 1,
+                    name = "플러시 - 관통",
+                    description = "미사일 관통"
+                ))
+            }
+            
+            is FullHouse -> {
+                // 풀 하우스 (지속 데미지 & 공격속도)
+                addBuff(Buff(
+                    type = BuffType.DOT_DAMAGE,
+                    level = 3,
+                    name = "풀 하우스 - DoT",
+                    description = "적에게 지속 데미지"
+                ))
+                
+                addBuff(Buff(
+                    type = BuffType.ATTACK_SPEED,
+                    level = 2,
+                    name = "풀 하우스 - 공격속도",
+                    description = "공격 속도 대폭 증가"
+                ))
+            }
+            
+            is FourOfAKind -> {
+                // 포카드 (데미지 & 관통 & 다방향)
+                addBuff(Buff(
+                    type = BuffType.MISSILE_DAMAGE,
+                    level = 3,
+                    name = "포카드 - 데미지",
+                    description = "데미지 대폭 증가"
+                ))
+                
+                addBuff(Buff(
+                    type = BuffType.MISSILE_PIERCE,
+                    level = 2,
+                    name = "포카드 - 관통",
+                    description = "미사일 관통 강화"
+                ))
+                
+                addBuff(Buff(
+                    type = BuffType.MULTI_DIRECTION,
+                    level = 1,
+                    name = "포카드 - 다방향",
+                    description = "2방향 발사"
+                ))
+            }
+            
+            is StraightFlush -> {
+                // 스트레이트 플러시 (모든 능력치 증가)
+                addBuff(Buff(
+                    type = BuffType.MISSILE_DAMAGE,
+                    level = 2,
+                    name = "스트레이트 플러시 - 데미지",
+                    description = "데미지 증가"
+                ))
+                
+                addBuff(Buff(
+                    type = BuffType.ATTACK_SPEED,
+                    level = 2,
+                    name = "스트레이트 플러시 - 속도",
+                    description = "공격 속도 증가"
+                ))
+                
+                addBuff(Buff(
+                    type = BuffType.MULTI_DIRECTION,
+                    level = 2,
+                    name = "스트레이트 플러시 - 다방향",
+                    description = "3방향 발사"
+                ))
+                
+                addBuff(Buff(
+                    type = BuffType.ENEMY_SLOW,
+                    level = 2,
+                    name = "스트레이트 플러시 - 슬로우",
+                    description = "적 이동속도 크게 감소"
+                ))
+            }
+            
+            is RoyalFlush -> {
+                // 로얄 플러시 (초강력 효과)
+                addBuff(Buff(
+                    type = BuffType.MISSILE_DAMAGE,
+                    level = 3,
+                    name = "로얄 플러시 - 데미지",
+                    description = "데미지 대폭 증가"
+                ))
+                
+                addBuff(Buff(
+                    type = BuffType.ATTACK_SPEED,
+                    level = 3,
+                    name = "로얄 플러시 - 속도",
+                    description = "공격 속도 대폭 증가"
+                ))
+                
+                addBuff(Buff(
+                    type = BuffType.MULTI_DIRECTION,
+                    level = 3,
+                    name = "로얄 플러시 - 다방향",
+                    description = "4방향 발사"
+                ))
+                
+                addBuff(Buff(
+                    type = BuffType.MASS_DAMAGE,
+                    level = 3,
+                    name = "로얄 플러시 - 대량 데미지",
+                    description = "정기적인 대량 데미지"
+                ))
+                
+                addBuff(Buff(
+                    type = BuffType.MISSILE_PIERCE,
+                    level = 2,
+                    name = "로얄 플러시 - 관통",
+                    description = "미사일 관통 강화"
+                ))
+            }
+        }
+    }
+    
+    // 특정 버프 타입의 레벨 가져오기
     fun getBuffLevel(type: BuffType): Int {
         return buffs[type]?.level ?: 0
     }
     
-    // 특정 타입의 버프 효과 값 반환
-    fun getBuffEffect(type: BuffType): Float {
-        return buffs[type]?.getEffectValue() ?: 0f
-    }
-    
-    // 모든 버프 목록 가져오기
+    // 모든 버프 가져오기
     fun getAllBuffs(): List<Buff> {
         return buffs.values.toList()
     }
     
-    // 디펜스 유닛 버프만 가져오기
+    // 디펜스 유닛에 적용되는 버프만 가져오기
     fun getDefenseBuffs(): List<Buff> {
-        return buffs.values.filter { it.category == BuffCategory.DEFENSE_BUFF }
+        return buffs.values.filter { buff ->
+            buff.type in listOf(
+                BuffType.MISSILE_DAMAGE,
+                BuffType.ATTACK_SPEED,
+                BuffType.MISSILE_SPEED,
+                BuffType.MULTI_DIRECTION,
+                BuffType.MISSILE_PIERCE,
+                BuffType.RESOURCE_GAIN
+            )
+        }
     }
     
-    // 적 너프만 가져오기
+    // 적에게 적용되는 너프만 가져오기
     fun getEnemyNerfs(): List<Buff> {
-        return buffs.values.filter { it.category == BuffCategory.ENEMY_NERF }
+        return buffs.values.filter { buff ->
+            buff.type in listOf(
+                BuffType.ENEMY_SLOW,
+                BuffType.DOT_DAMAGE,
+                BuffType.MASS_DAMAGE
+            )
+        }
     }
     
-    // 버프 효과를 계산하여 미사일 데미지 배율 반환
+    // 미사일 데미지 배율 계산
     fun getMissileDamageMultiplier(): Float {
-        val baseDamage = 1.0f
-        val additionalDamage = getBuffEffect(BuffType.MISSILE_DAMAGE)
-        return baseDamage + additionalDamage
+        val level = getBuffLevel(BuffType.MISSILE_DAMAGE)
+        // 레벨당 15% 데미지 증가
+        return 1f + (level * 0.15f)
     }
     
-    // 버프 효과를 계산하여 적 이동 속도 배율 반환
-    fun getEnemySpeedMultiplier(): Float {
-        val baseSpeed = 1.0f
-        val slowAmount = getBuffEffect(BuffType.ENEMY_SLOW)
-        return baseSpeed - slowAmount
-    }
-    
-    // 버프 효과를 계산하여 공격 속도 배율 반환
+    // 공격 속도 배율 계산
     fun getAttackSpeedMultiplier(): Float {
-        val baseSpeed = 1.0f
-        val speedBoost = getBuffEffect(BuffType.ATTACK_SPEED)
-        return baseSpeed - speedBoost // 값이 낮을수록 공격속도가 빨라짐
+        val level = getBuffLevel(BuffType.ATTACK_SPEED)
+        // 레벨당 12% 공격속도 증가 (쿨다운 감소)
+        return 1f - (level * 0.12f)
     }
     
-    // 버프 효과를 계산하여 미사일 속도 배율 반환
+    // 미사일 속도 배율 계산
     fun getMissileSpeedMultiplier(): Float {
-        val baseSpeed = 1.0f
-        val speedBoost = getBuffEffect(BuffType.MISSILE_SPEED)
-        return baseSpeed + speedBoost
+        val level = getBuffLevel(BuffType.MISSILE_SPEED)
+        // 레벨당 20% 미사일 속도 증가
+        return 1f + (level * 0.2f)
     }
     
-    // 버프 효과를 계산하여 미사일 사거리 배율 반환
-    fun getMissileRangeMultiplier(): Float {
-        val baseRange = 1.0f
-        val rangeBoost = getBuffEffect(BuffType.MISSILE_RANGE)
-        return baseRange + rangeBoost
+    // 다방향 발사 횟수 계산
+    fun getMultiDirectionCount(): Int {
+        val level = getBuffLevel(BuffType.MULTI_DIRECTION)
+        // 레벨이 0이면 기본 1방향, 그 이상이면 레벨+1 방향
+        return if (level > 0) level + 1 else 1
     }
     
-    // 미사일 관통 횟수 반환
+    // 미사일 관통 횟수 계산
     fun getMissilePierceCount(): Int {
         return getBuffLevel(BuffType.MISSILE_PIERCE)
     }
     
-    // 다방향 발사 개수 반환
-    fun getMultiDirectionCount(): Int {
-        val level = getBuffLevel(BuffType.MULTI_DIRECTION)
-        return if (level > 0) level + 1 else 1
+    // 적 이동속도 배율 계산
+    fun getEnemySpeedMultiplier(): Float {
+        val level = getBuffLevel(BuffType.ENEMY_SLOW)
+        // 레벨당 15% 적 이동속도 감소
+        return maxOf(0.3f, 1f - (level * 0.15f))  // 최소 30%까지만 감소
     }
     
-    // 모든 버프 초기화
+    // 자원 획득 배율 계산
+    fun getResourceGainMultiplier(): Float {
+        val level = getBuffLevel(BuffType.RESOURCE_GAIN)
+        // 레벨당 15% 자원 획득량 증가
+        return 1f + (level * 0.15f)
+    }
+    
+    // 모든 버프 제거
     fun clearAllBuffs() {
         buffs.clear()
     }

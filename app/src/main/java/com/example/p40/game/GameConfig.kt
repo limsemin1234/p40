@@ -36,59 +36,59 @@ object GameConfig {
     
     // 웨이브별 적 체력 배율 (ENEMY_BASE_HEALTH에 곱해짐)
     const val WAVE_1_HEALTH_MULTIPLIER = 1.0f
-    const val WAVE_2_HEALTH_MULTIPLIER = 1.2f
-    const val WAVE_3_HEALTH_MULTIPLIER = 1.4f
-    const val WAVE_4_HEALTH_MULTIPLIER = 1.6f
-    const val WAVE_5_HEALTH_MULTIPLIER = 1.8f
-    const val WAVE_6_HEALTH_MULTIPLIER = 2.0f
-    const val WAVE_7_HEALTH_MULTIPLIER = 2.2f
-    const val WAVE_8_HEALTH_MULTIPLIER = 2.4f
-    const val WAVE_9_HEALTH_MULTIPLIER = 2.6f
-    const val WAVE_10_HEALTH_MULTIPLIER = 2.8f
+    const val WAVE_2_HEALTH_MULTIPLIER = 1.15f
+    const val WAVE_3_HEALTH_MULTIPLIER = 1.3f
+    const val WAVE_4_HEALTH_MULTIPLIER = 1.45f
+    const val WAVE_5_HEALTH_MULTIPLIER = 1.6f
+    const val WAVE_6_HEALTH_MULTIPLIER = 1.75f
+    const val WAVE_7_HEALTH_MULTIPLIER = 1.9f
+    const val WAVE_8_HEALTH_MULTIPLIER = 2.05f
+    const val WAVE_9_HEALTH_MULTIPLIER = 2.2f
+    const val WAVE_10_HEALTH_MULTIPLIER = 2.4f
     
     // 보스 설정
     const val BOSS_SIZE_MULTIPLIER = 2.0f  // 보스 크기 배율
-    const val BOSS_HEALTH_MULTIPLIER = 5  // 보스 체력 배율
-    const val BOSS_SPEED_MULTIPLIER = 0.7f  // 보스 속도 배율 (일반 적보다 느림)
+    const val BOSS_HEALTH_MULTIPLIER = 4  // 보스 체력 배율 (5에서 4로 감소)
+    const val BOSS_SPEED_MULTIPLIER = 0.8f  // 보스 속도 배율 (0.7에서 0.8로 조정)
     const val BOSS_COLOR = Color.MAGENTA  // 보스 색상
     const val BOSS_BORDER_COLOR = Color.YELLOW  // 보스 테두리 색상
     const val BOSS_BORDER_WIDTH = 5f  // 보스 테두리 두께
-    const val BOSS_DAMAGE = 15  // 보스 적의 공격력
+    const val BOSS_DAMAGE = 12  // 보스 적의 공격력 (15에서 12로 감소)
     
     // 웨이브별 적 데미지 증가량 (웨이브 당 기본 데미지에 더해짐)
     const val ENEMY_DAMAGE_PER_WAVE = 1  // 웨이브당 적 데미지 증가량
     
     // 카드 스킬 설정
-    const val CARD_DAMAGE_NORMAL = 100  // 일반 적에게 주는 데미지
-    const val CARD_DAMAGE_BOSS = 50  // 보스에게 주는 데미지
-    const val CARD_COOLDOWN = 10000L  // 카드 사용 쿨다운 (밀리초)
+    const val CARD_DAMAGE_NORMAL = 120  // 일반 적에게 주는 데미지 (100에서 120으로 증가)
+    const val CARD_DAMAGE_BOSS = 80  // 보스에게 주는 데미지 (50에서 80으로 증가)
+    const val CARD_COOLDOWN = 8000L  // 카드 사용 쿨다운 (10000에서 8000으로 감소)
     
     // 웨이브별 적 생성 간격 (밀리초)
     val WAVE_ENEMY_SPAWN_COOLDOWNS = mapOf(
         1 to 3000L,
-        2 to 2500L,
-        3 to 2000L,
-        4 to 1800L,
-        5 to 1600L,
-        6 to 1400L,
-        7 to 1200L,
-        8 to 1000L,
-        9 to 800L,
-        10 to 600L
+        2 to 2700L,
+        3 to 2400L,
+        4 to 2200L,
+        5 to 2000L,
+        6 to 1800L,
+        7 to 1600L,
+        8 to 1400L,
+        9 to 1200L,
+        10 to 1000L
     )
     
     // 웨이브별 적 이동 속도
     val WAVE_ENEMY_SPEEDS = mapOf(
         1 to 1.0f,
-        2 to 1.2f,
-        3 to 1.4f,
-        4 to 1.6f,
-        5 to 1.8f,
-        6 to 2.0f,
-        7 to 2.2f,
-        8 to 2.4f,
-        9 to 2.6f,
-        10 to 2.8f
+        2 to 1.15f,
+        3 to 1.3f,
+        4 to 1.45f,
+        5 to 1.6f,
+        6 to 1.75f,
+        7 to 1.9f,
+        8 to 2.05f,
+        9 to 2.2f,
+        10 to 2.4f
     )
     
     // 웨이브별 적 체력 계산 (ENEMY_BASE_HEALTH에 배율을 곱함)
@@ -123,8 +123,8 @@ object GameConfig {
     }
     
     // 점수 설정
-    const val SCORE_PER_NORMAL_ENEMY = 10  // 일반 적 처치 시 얻는 점수(자원)
-    const val SCORE_PER_BOSS = 100  // 보스 처치 시 얻는 점수(자원)
+    const val SCORE_PER_NORMAL_ENEMY = 15  // 일반 적 처치 시 얻는 점수(자원) (10에서 15로 증가)
+    const val SCORE_PER_BOSS = 120  // 보스 처치 시 얻는 점수(자원) (100에서 120으로 증가)
     
     // 게임 오버 조건
     const val CENTER_REACHED_DAMAGE = 1000  // 중앙 도달 시 입히는 데미지
@@ -140,27 +140,27 @@ object GameConfig {
     
     // 데미지 업그레이드 설정
     const val DAMAGE_UPGRADE_INITIAL_COST = 10  // 초기 비용
-    const val DAMAGE_UPGRADE_COST_INCREASE = 5  // 레벨당 비용 증가량
-    const val DAMAGE_UPGRADE_VALUE = 1  // 업그레이드당 데미지 증가량
-    const val DAMAGE_UPGRADE_MAX_LEVEL = 50  // 최대 업그레이드 레벨
+    const val DAMAGE_UPGRADE_COST_INCREASE = 4  // 레벨당 비용 증가량 (5에서 4로 감소)
+    const val DAMAGE_UPGRADE_VALUE = 2  // 업그레이드당 데미지 증가량 (1에서 2로 증가)
+    const val DAMAGE_UPGRADE_MAX_LEVEL = 40  // 최대 업그레이드 레벨 (50에서 40으로 감소)
     
     // 공격속도 업그레이드 설정
     const val ATTACK_SPEED_UPGRADE_INITIAL_COST = 10  // 초기 비용
-    const val ATTACK_SPEED_UPGRADE_COST_INCREASE = 5  // 레벨당 비용 증가량
-    const val ATTACK_SPEED_UPGRADE_PERCENT = 0.01f  // 업그레이드당 속도 증가율(1%)
-    const val ATTACK_SPEED_UPGRADE_MAX_LEVEL = 30  // 최대 업그레이드 레벨 (30% 속도 증가까지)
+    const val ATTACK_SPEED_UPGRADE_COST_INCREASE = 6  // 레벨당 비용 증가량 (5에서 6으로 증가)
+    const val ATTACK_SPEED_UPGRADE_PERCENT = 0.015f  // 업그레이드당 속도 증가율 (1%에서 1.5%로 증가)
+    const val ATTACK_SPEED_UPGRADE_MAX_LEVEL = 25  // 최대 업그레이드 레벨 (30에서 25로 감소)
     
     // 공격범위 업그레이드 설정
     const val ATTACK_RANGE_UPGRADE_INITIAL_COST = 10  // 초기 비용
     const val ATTACK_RANGE_UPGRADE_COST_INCREASE = 5  // 레벨당 비용 증가량
-    const val ATTACK_RANGE_UPGRADE_VALUE = 5f  // 업그레이드당 범위 증가량
-    const val ATTACK_RANGE_UPGRADE_MAX_LEVEL = 40  // 최대 업그레이드 레벨
+    const val ATTACK_RANGE_UPGRADE_VALUE = 8f  // 업그레이드당 범위 증가량 (5에서 8로 증가)
+    const val ATTACK_RANGE_UPGRADE_MAX_LEVEL = 30  // 최대 업그레이드 레벨 (40에서 30으로 감소)
     
     // 체력 업그레이드 설정
     const val DEFENSE_UPGRADE_INITIAL_COST = 10  // 초기 비용
-    const val DEFENSE_UPGRADE_COST_INCREASE = 5  // 레벨당 비용 증가량
-    const val DEFENSE_UPGRADE_VALUE = 20  // 업그레이드당 최대 체력 증가량
-    const val DEFENSE_UPGRADE_MAX_LEVEL = 50  // 최대 업그레이드 레벨
+    const val DEFENSE_UPGRADE_COST_INCREASE = 4  // 레벨당 비용 증가량 (5에서 4로 감소)
+    const val DEFENSE_UPGRADE_VALUE = 25  // 업그레이드당 최대 체력 증가량 (20에서 25로 증가)
+    const val DEFENSE_UPGRADE_MAX_LEVEL = 40  // 최대 업그레이드 레벨 (50에서 40으로 감소)
     
     // --------- 버프 관련 설정 ----------
     
