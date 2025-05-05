@@ -582,6 +582,7 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
         private val btnDrawPokerCards: Button = rootView.findViewById(R.id.btnDrawPokerCards)
         private val btnAddCard: Button = rootView.findViewById(R.id.btnAddCard)
         private val replaceButton: Button = rootView.findViewById(R.id.btnReplaceCards)
+        private val replaceAllButton: Button = rootView.findViewById(R.id.btnReplaceAllCards)
         private val confirmButton: Button = rootView.findViewById(R.id.btnConfirmHand)
         private val replaceCountText: TextView = rootView.findViewById(R.id.tvReplaceCount)
         private val currentHandText: TextView = rootView.findViewById(R.id.tvCurrentHand)
@@ -627,6 +628,11 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
             // 교체 버튼 이벤트
             replaceButton.setOnClickListener {
                 replaceSelectedCards()
+            }
+            
+            // 전체교체 버튼 이벤트
+            replaceAllButton.setOnClickListener {
+                replaceAllNonJokerCards()
             }
             
             // 확인 버튼 이벤트
@@ -1011,6 +1017,7 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
             
             // 교체 버튼 활성화/비활성화
             replaceButton.isEnabled = replacesLeft > 0 && selectedCardIndexes.isNotEmpty()
+            replaceAllButton.isEnabled = replacesLeft > 0
             
             // 교체 횟수 텍스트 업데이트
             replaceCountText.text = "교체 가능 횟수: $replacesLeft"
@@ -1242,6 +1249,65 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
             updateUI()
         }
         
+        // 전체 카드 교체 (조커 카드 제외)
+        private fun replaceAllNonJokerCards() {
+            if (replacesLeft <= 0) {
+                Toast.makeText(context, "교체 횟수를 모두 사용했습니다.", Toast.LENGTH_SHORT).show()
+                return
+            }
+            
+            // 조커가 아닌 카드의 인덱스 찾기
+            val nonJokerCardIndices = cards.indices.filter { index ->
+                !CardUtils.isJokerCard(cards[index])
+            }.toMutableSet()
+            
+            // 선택된 카드가 없는 경우 (조커 카드만 있는 경우) 메시지 표시
+            if (nonJokerCardIndices.isEmpty()) {
+                Toast.makeText(context, "교체할 일반 카드가 없습니다.", Toast.LENGTH_SHORT).show()
+                return
+            }
+            
+            // 모든 일반 카드 교체
+            val suits = CardSuit.values().filter { it != CardSuit.JOKER }
+            val ranks = CardRank.values().filter { it != CardRank.JOKER }
+            
+            // 현재 사용 중인 카드 확인 (중복 방지)
+            val usedCards = cards
+                .filterIndexed { index, _ -> index !in nonJokerCardIndices }
+                .map { Pair(it.suit, it.rank) }
+                .toMutableSet()
+            
+            // 선택된 카드 교체
+            for (index in nonJokerCardIndices) {
+                var newCard: Card
+                do {
+                    val suit = suits.random()
+                    val rank = ranks.random()
+                    val cardPair = Pair(suit, rank)
+                    
+                    if (cardPair !in usedCards) {
+                        newCard = Card(suit, rank)
+                        usedCards.add(cardPair)
+                        break
+                    }
+                } while (true)
+                
+                cards[index] = newCard
+            }
+            
+            // 교체 횟수 감소
+            replacesLeft--
+            
+            // 선택 초기화
+            selectedCardIndexes.clear()
+            
+            // UI 업데이트
+            updateUI()
+            
+            // 토스트 메시지 표시
+            Toast.makeText(context, "${nonJokerCardIndices.size}장의 카드가 교체되었습니다.", Toast.LENGTH_SHORT).show()
+        }
+        
         // 카드 선택 확정
         private fun confirmSelection() {
             // 카드가 5장 이상인 경우 최적의 5장 조합 찾기
@@ -1362,10 +1428,6 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
             rankPicker.maxValue = ranks.size - 1
             rankPicker.displayedValues = rankValues
             
-            // NumberPicker 텍스트 색상을 흰색으로 변경
-            setNumberPickerTextColor(suitPicker, Color.WHITE)
-            setNumberPickerTextColor(rankPicker, Color.WHITE)
-            
             // 확인 버튼 설정
             val confirmButton = dialog.findViewById<Button>(R.id.btnConfirm)
             confirmButton.setOnClickListener {
@@ -1391,45 +1453,8 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
                 dialog.dismiss()
             }
             
-            // 다이얼로그 크기 조정
-            dialog.setOnShowListener {
-                val window = dialog.window
-                if (window != null) {
-                    val displayMetrics = resources.displayMetrics
-                    val width = (displayMetrics.widthPixels * 0.45).toInt() // 화면 너비의 45%로 줄임
-                    val height = android.view.WindowManager.LayoutParams.WRAP_CONTENT
-                    
-                    window.setLayout(width, height)
-                    window.setGravity(android.view.Gravity.CENTER)
-                }
-            }
-            
             // 다이얼로그 표시
             dialog.show()
-        }
-
-        // NumberPicker의 텍스트 색상을 변경하는 헬퍼 메서드
-        private fun setNumberPickerTextColor(numberPicker: NumberPicker, color: Int) {
-            try {
-                // NumberPicker 내부의 TextView 필드 가져오기 시도
-                val selectorWheelPaintField = NumberPicker::class.java.getDeclaredField("mSelectorWheelPaint")
-                selectorWheelPaintField.isAccessible = true
-                
-                // Paint 객체에 색상 설정
-                val paint = selectorWheelPaintField.get(numberPicker) as Paint
-                paint.color = color
-                
-                // 편집 모드의 EditText 색상 변경
-                val inputTextField = NumberPicker::class.java.getDeclaredField("mInputText")
-                inputTextField.isAccessible = true
-                val inputText = inputTextField.get(numberPicker) as EditText
-                inputText.setTextColor(color)
-                
-                // 변경 내용 적용을 위해 NumberPicker 갱신
-                numberPicker.invalidate()
-            } catch (e: Exception) {
-                // 오류 발생 시 무시 (특정 기기나 안드로이드 버전에 따라 동작이 다를 수 있음)
-            }
         }
 
         // 조커 카드 변환 처리

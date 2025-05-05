@@ -307,6 +307,17 @@
                     android:textColor="#FFFFFF" />
 
                 <Button
+                    android:id="@+id/btnReplaceAllCards"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="4dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/main_button_selector"
+                    android:backgroundTint="@null"
+                    android:text="전체교체"
+                    android:textColor="#FFFFFF" />
+
+                <Button
                     android:id="@+id/btnConfirmHand"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
