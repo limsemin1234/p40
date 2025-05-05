@@ -24,7 +24,7 @@ object GameConfig {
     // 디펜스 유닛 설정
     const val DEFENSE_UNIT_SIZE = 30f  // 디펜스 유닛 크기
     const val DEFENSE_UNIT_COLOR = Color.BLUE  // 디펜스 유닛 색상
-    const val DEFENSE_UNIT_ATTACK_RANGE = 1000f  // 공격 범위
+    const val DEFENSE_UNIT_ATTACK_RANGE = 500f  // 공격 범위
     const val DEFENSE_UNIT_ATTACK_COOLDOWN = 1000L  // 공격속도 1초
     const val DEFENSE_UNIT_INITIAL_HEALTH = 100 // 초기 체력
     const val DEFENSE_UNIT_INITIAL_MAX_HEALTH = 100 // 초기 최대 체력
