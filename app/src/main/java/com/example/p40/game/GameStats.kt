@@ -151,6 +151,13 @@ class GameStats(private val gameConfig: GameConfig) {
     }
     
     /**
+     * 디펜스 유닛 체력 완전 회복
+     */
+    fun restoreFullHealth() {
+        unitHealth = unitMaxHealth
+    }
+    
+    /**
      * 포커 족보 효과 적용
      */
     fun applyPokerHandEffect(pokerHand: PokerHand) {

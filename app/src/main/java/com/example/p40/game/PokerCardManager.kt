@@ -29,7 +29,7 @@ class PokerCardManager(
     // 분리된 매니저 클래스들
     private val cardGenManager = CardGenerationManager(context)
     private val cardUIManager = CardUIManager(context, rootView)
-    private val cardSelectionManager = CardSelectionManager(context)
+    private val cardSelectionManager = CardSelectionManager.instance
     
     // 기본 카드 수 및 최대 카드 수 설정
     private val baseCardCount = 5 // 기본 5장
@@ -77,7 +77,7 @@ class PokerCardManager(
             // 조커 카드 롱클릭 이벤트 설정
             cardView.setOnLongClickListener {
                 if (index < cards.size && CardUtils.isJokerCard(cards[index])) {
-                    cardSelectionManager.showJokerSelectionDialog(cards[index], index) { newCard, cardIndex ->
+                    cardSelectionManager.showJokerSelectionDialog(context, cards[index], index) { newCard, cardIndex ->
                         cards[cardIndex] = newCard
                         updateUI()
                     }
@@ -283,6 +283,27 @@ class PokerCardManager(
         MessageManager.getInstance().showInfo("${result.second}장의 카드가 교체되었습니다.")
     }
     
+    // 카드 선택 관리
+    private fun handleCardSelection(cardIndex: Int) {
+        // 이미 선택된 카드인지 확인
+        if (selectedCardIndexes.contains(cardIndex)) {
+            // 선택 해제
+            selectedCardIndexes.remove(cardIndex)
+            cards[cardIndex].isSelected = false
+        } else {
+            // 선택
+            selectedCardIndexes.add(cardIndex)
+            cards[cardIndex].isSelected = true
+        }
+        
+        // UI 업데이트
+        updateUI()
+        
+        // 카드 선택 정보를 CardSelectionManager에 전달
+        val selectedCards = selectedCardIndexes.map { cards[it] }
+        CardSelectionManager.instance.setSelectedCards(selectedCards)
+    }
+    
     // 카드 선택 확정
     private fun confirmSelection() {
         // 카드가 5장 이상인 경우 최적의 5장 조합 찾기
@@ -291,6 +312,9 @@ class PokerCardManager(
         } else {
             cards
         }
+        
+        // 선택된 카드를 CardSelectionManager 싱글톤에 저장 (추가된 부분)
+        CardSelectionManager.instance.setSelectedCards(bestFiveCards)
         
         // 현재 패 평가
         val pokerDeck = PokerDeck()

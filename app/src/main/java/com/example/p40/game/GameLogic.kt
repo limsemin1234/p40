@@ -26,6 +26,7 @@ class GameLogic(
     private var showWaveMessage = false
     private var waveMessageStartTime = 0L
     private var waveMessageDuration = gameConfig.WAVE_MESSAGE_DURATION
+    private var timeFrozen = false  // 시간 멈춤 상태 변수 추가
     
     // 게임 요소
     private lateinit var defenseUnit: DefenseUnit
@@ -83,6 +84,13 @@ class GameLogic(
     }
     
     /**
+     * 시간 멈춤 상태 설정 (플러시 스킬용)
+     */
+    fun setTimeFrozen(frozen: Boolean) {
+        this.timeFrozen = frozen
+    }
+    
+    /**
      * 게임 업데이트 메인 로직
      */
     fun update() {
@@ -127,7 +135,10 @@ class GameLogic(
         val screenRect = ScreenRect(minX, minY, maxX, maxY)
         val deadEnemies = mutableListOf<Enemy>()
         
-        updateEnemies(screenRect, farOffScreenMargin, centerX, centerY, enemySpeedMultiplier, deadEnemies)
+        // 시간 멈춤 상태가 아닐 때만 적 업데이트
+        if (!timeFrozen) {
+            updateEnemies(screenRect, farOffScreenMargin, centerX, centerY, enemySpeedMultiplier, deadEnemies)
+        }
         
         // 2. 미사일 업데이트 최적화
         updateMissiles(screenRect, farOffScreenMargin, missileSpeedMultiplier)
@@ -741,6 +752,27 @@ class GameLogic(
             // 객체 풀로 반환
             enemyPool.recycle(it)
         }
+    }
+    
+    /**
+     * 화면 내 모든 적 제거 (보스 제외) - 플러시 스킬용
+     * @return 제거된 적의 수
+     */
+    fun removeAllEnemiesExceptBoss(): Int {
+        var killCount = 0
+        
+        // 보스가 아닌 모든 적을 제거 (동시 수정 오류를 방지하기 위해 복사본 생성)
+        val enemiesToRemove = enemies.filter { !it.isBoss() }
+        killCount = enemiesToRemove.size
+        
+        // 적 제거 및 자원 추가 없이 단순히 제거만 함
+        for (enemy in enemiesToRemove) {
+            enemies.remove(enemy)
+            // 적 객체를 풀에 반환
+            enemyPool.recycle(enemy)
+        }
+        
+        return killCount
     }
     
     // 게임 상태 접근자 메서드들

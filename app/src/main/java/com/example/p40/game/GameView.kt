@@ -47,6 +47,7 @@ class GameView @JvmOverloads constructor(
     // 게임 스레드
     private var gameThread: GameThread? = null
     private var isRunning = false
+    private var paused = false
     
     // 콜백 리스너
     private var gameOverListener: GameOverListener? = null
@@ -188,6 +189,7 @@ class GameView @JvmOverloads constructor(
      * 일시정지 처리
      */
     fun pause() {
+        paused = true
         if (initializeIfNeeded()) {
             gameLogic.pause()
         }
@@ -197,6 +199,7 @@ class GameView @JvmOverloads constructor(
      * 게임 재개
      */
     fun resume() {
+        paused = false
         if (initializeIfNeeded()) {
             gameLogic.resume()
         }
@@ -316,5 +319,66 @@ class GameView @JvmOverloads constructor(
             this.gameLogic = GameLogic(gameStats, gameConfig, gameOverListener, listener)
             gameLogic.initGame(width.toFloat(), height.toFloat())
         }
+    }
+    
+    // 하트 플러시 스킬: 체력 전체 회복
+    fun restoreFullHealth() {
+        gameStats.restoreFullHealth()
+    }
+    
+    // 스페이드 플러시 스킬: 화면 내 모든 적 제거 (보스 제외)
+    fun removeAllEnemiesExceptBoss(): Int {
+        return if (initializeIfNeeded()) {
+            gameLogic.removeAllEnemiesExceptBoss()
+        } else {
+            0
+        }
+    }
+    
+    // 클로버 플러시 스킬: 시간 멈춤 (모든 적 멈춤)
+    private var timeFrozen = false
+    
+    fun freezeAllEnemies(freeze: Boolean) {
+        timeFrozen = freeze
+    }
+    
+    // 다이아 플러시 스킬: 무적
+    private var isInvincible = false
+    
+    fun setInvincible(invincible: Boolean) {
+        isInvincible = invincible
+    }
+    
+    // 데미지 메서드 수정 (무적 상태 체크 추가)
+    fun takeDamage(damage: Int): Boolean {
+        // 무적 상태일 경우 데미지를 받지 않음
+        if (isInvincible) return false
+        
+        // gameStats를 통해 데미지 적용
+        val gameOver = gameStats.applyDamageToUnit(damage)
+        
+        // 체력이 0 이하면 게임 오버
+        if (gameOver) {
+            gameOverListener?.onGameOver(gameStats.getResource(), gameStats.getWaveCount())
+            return true
+        }
+        return false
+    }
+    
+    // 업데이트 메서드 수정 (시간 멈춤 상태 처리 추가)
+    fun update() {
+        // 게임이 일시정지 상태이면 업데이트 안함
+        if (paused) return
+        
+        // 시간 멈춤 상태 정보 전달 (GameLogic에서 처리하도록 변경)
+        if (::gameLogic.isInitialized) {
+            gameLogic.setTimeFrozen(timeFrozen)
+            gameLogic.update()
+        }
+    }
+    
+    // 버프 매니저 접근자
+    fun getBuffManager(): BuffManager {
+        return gameStats.getBuffManager()
     }
 } 

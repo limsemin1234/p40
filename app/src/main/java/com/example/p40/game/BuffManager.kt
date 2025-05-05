@@ -4,21 +4,6 @@ import android.graphics.Color
 import java.util.concurrent.ConcurrentHashMap
 
 /**
- * 버프 종류 정의
- */
-enum class BuffType {
-    MISSILE_DAMAGE,   // 미사일 데미지 증가
-    ATTACK_SPEED,     // 공격 속도 증가
-    MISSILE_SPEED,    // 미사일 속도 증가
-    MULTI_DIRECTION,  // 다방향 발사
-    MISSILE_PIERCE,   // 미사일 관통
-    ENEMY_SLOW,       // 적 이동속도 감소
-    DOT_DAMAGE,       // 지속 데미지
-    MASS_DAMAGE,      // 주기적 대량 데미지
-    RESOURCE_GAIN     // 자원 획득량 증가
-}
-
-/**
  * 버프 카테고리 정의
  */
 enum class BuffCategory {
@@ -58,6 +43,10 @@ data class Buff(
             BuffType.DOT_DAMAGE -> "초당 ${level * 2}데미지"
             BuffType.MASS_DAMAGE -> "5초마다 ${level * 100}데미지"
             BuffType.RESOURCE_GAIN -> "자원 획득 +${level * 15}%"
+            BuffType.HEART_FLUSH_SKILL -> "하트 플러시 스킬"
+            BuffType.SPADE_FLUSH_SKILL -> "스페이드 플러시 스킬"
+            BuffType.CLUB_FLUSH_SKILL -> "클로버 플러시 스킬"
+            BuffType.DIAMOND_FLUSH_SKILL -> "다이아 플러시 스킬"
         }
         
         return "$name Lv.$level: $effectText"
@@ -75,6 +64,10 @@ data class Buff(
             BuffType.DOT_DAMAGE -> "DoT ${level * 2}/초"
             BuffType.MASS_DAMAGE -> "5초마다 ${level * 100}"
             BuffType.RESOURCE_GAIN -> "자원 +${level * 15}%"
+            BuffType.HEART_FLUSH_SKILL -> "하트 플러시 스킬"
+            BuffType.SPADE_FLUSH_SKILL -> "스페이드 플러시 스킬"
+            BuffType.CLUB_FLUSH_SKILL -> "클로버 플러시 스킬"
+            BuffType.DIAMOND_FLUSH_SKILL -> "다이아 플러시 스킬"
         }
         
         return effectText
@@ -223,20 +216,56 @@ class BuffManager {
             }
             
             is Flush -> {
-                // 플러시 (미사일 속도 & 관통)
-                addBuff(Buff(
-                    type = BuffType.MISSILE_SPEED,
-                    level = 2,
-                    name = "플러시 - 속도",
-                    description = "미사일 속도 증가"
-                ))
-                
-                addBuff(Buff(
-                    type = BuffType.MISSILE_PIERCE,
-                    level = 1,
-                    name = "플러시 - 관통",
-                    description = "미사일 관통"
-                ))
+                // 플러시 - 문양에 따른 특수 스킬 활성화 (기존 효과 제거)
+                val cards = CardSelectionManager.instance.getSelectedCards()
+                if (cards.size >= 5) {
+                    // 모든 카드가 같은 무늬인지 확인
+                    val suit = cards[0].suit
+                    val isFlush = cards.all { it.suit == suit }
+                    
+                    if (isFlush && suit != CardSuit.JOKER) {
+                        // 문양에 맞는 스킬 버프 추가
+                        when (suit) {
+                            CardSuit.HEART -> {
+                                addBuff(Buff(
+                                    type = BuffType.HEART_FLUSH_SKILL,
+                                    level = 1,
+                                    name = "하트 플러시 스킬",
+                                    description = "체력 전체 회복 (1회용)"
+                                ))
+                            }
+                            
+                            CardSuit.SPADE -> {
+                                addBuff(Buff(
+                                    type = BuffType.SPADE_FLUSH_SKILL,
+                                    level = 1,
+                                    name = "스페이드 플러시 스킬",
+                                    description = "화면 내 모든 적 제거 (보스 제외, 1회용)"
+                                ))
+                            }
+                            
+                            CardSuit.CLUB -> {
+                                addBuff(Buff(
+                                    type = BuffType.CLUB_FLUSH_SKILL,
+                                    level = 1,
+                                    name = "클로버 플러시 스킬",
+                                    description = "시간 멈춤 - 5초 (1회용)"
+                                ))
+                            }
+                            
+                            CardSuit.DIAMOND -> {
+                                addBuff(Buff(
+                                    type = BuffType.DIAMOND_FLUSH_SKILL,
+                                    level = 1,
+                                    name = "다이아 플러시 스킬",
+                                    description = "무적 상태 - 5초 (1회용)"
+                                ))
+                            }
+                            
+                            else -> {} // 다른 슈트 처리 없음
+                        }
+                    }
+                }
             }
             
             is FullHouse -> {
@@ -435,6 +464,12 @@ class BuffManager {
     // 모든 버프 제거
     fun clearAllBuffs() {
         buffs.clear()
+        invalidateCache()
+    }
+    
+    // 특정 타입의 버프 제거
+    fun removeBuff(type: BuffType) {
+        buffs.remove(type)
         invalidateCache()
     }
 } 

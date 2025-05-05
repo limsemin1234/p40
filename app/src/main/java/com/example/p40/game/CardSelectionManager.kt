@@ -11,13 +11,33 @@ import com.example.p40.DeckBuilderFragment
 import com.example.p40.R
 
 /**
- * 카드 선택 및 교체 관리 클래스
- * PokerCardManager에서 카드 선택/교체 관련 로직만 분리함
+ * 카드 선택 정보를 관리하는 싱글톤 클래스
  */
-class CardSelectionManager(
-    private val context: Context
-) {
-    private val cardGenManager = CardGenerationManager(context)
+class CardSelectionManager private constructor() {
+    private val cardGenManager = CardGenerationManager(null)
+    private val selectedCards = mutableListOf<Card>()
+    
+    /**
+     * 선택된 카드 저장
+     */
+    fun setSelectedCards(cards: List<Card>) {
+        selectedCards.clear()
+        selectedCards.addAll(cards)
+    }
+    
+    /**
+     * 선택된 카드 조회
+     */
+    fun getSelectedCards(): List<Card> {
+        return selectedCards.toList()
+    }
+    
+    /**
+     * 선택 초기화
+     */
+    fun clearSelection() {
+        selectedCards.clear()
+    }
     
     /**
      * 선택된 카드 교체
@@ -28,9 +48,6 @@ class CardSelectionManager(
     ): Boolean {
         if (selectedCardIndexes.isEmpty()) return false
         
-        // 저장된 덱 불러오기
-        val savedDeck = DeckBuilderFragment.loadDeckFromPrefs(context)
-        
         // 현재 사용 중인 카드 확인 (중복 방지)
         val usedCards = cards
             .filterIndexed { index, _ -> index !in selectedCardIndexes }
@@ -39,26 +56,8 @@ class CardSelectionManager(
         
         // 선택된 카드 교체
         for (index in selectedCardIndexes) {
-            // 저장된 덱이 있는 경우
-            if (savedDeck != null && savedDeck.isNotEmpty()) {
-                // 덱에서 사용하지 않은 카드 필터링
-                val availableCards = savedDeck.filter { 
-                    Pair(it.suit, it.rank) !in usedCards 
-                }
-                
-                if (availableCards.isNotEmpty()) {
-                    // 사용 가능한 카드 중 랜덤 선택
-                    val randomCard = availableCards.random()
-                    cards[index] = Card(randomCard.suit, randomCard.rank)
-                    usedCards.add(Pair(randomCard.suit, randomCard.rank))
-                } else {
-                    // 덱에 사용 가능한 카드가 없는 경우, 기존 방식으로 랜덤 카드 생성
-                    cards[index] = cardGenManager.createRandomCard(usedCards)
-                }
-            } else {
-                // 저장된 덱이 없는 경우, 기존 방식으로 랜덤 카드 생성
-                cards[index] = cardGenManager.createRandomCard(usedCards)
-            }
+            // 기존 방식으로 랜덤 카드 생성
+            cards[index] = cardGenManager.createRandomCard(usedCards)
         }
         
         return true
@@ -78,9 +77,6 @@ class CardSelectionManager(
             return Pair(false, 0)
         }
         
-        // 저장된 덱 불러오기
-        val savedDeck = DeckBuilderFragment.loadDeckFromPrefs(context)
-        
         // 현재 사용 중인 카드 확인 (중복 방지)
         val usedCards = cards
             .filterIndexed { index, _ -> index !in nonJokerCardIndices }
@@ -88,40 +84,9 @@ class CardSelectionManager(
             .toMutableSet()
         
         // 모든 일반 카드 교체
-        if (savedDeck != null && savedDeck.isNotEmpty()) {
-            // 사용 가능한 모든 카드를 섞음
-            val availableCards = savedDeck.shuffled()
-            var availableIndex = 0
-            
-            for (index in nonJokerCardIndices) {
-                // 사용 가능한 카드가 남아있는지 확인
-                var cardFound = false
-                
-                // 사용하지 않은 카드 찾기
-                while (availableIndex < availableCards.size) {
-                    val card = availableCards[availableIndex]
-                    val cardPair = Pair(card.suit, card.rank)
-                    availableIndex++
-                    
-                    if (cardPair !in usedCards) {
-                        cards[index] = Card(card.suit, card.rank)
-                        usedCards.add(cardPair)
-                        cardFound = true
-                        break
-                    }
-                }
-                
-                // 사용 가능한 카드를 모두 확인했지만 적합한 카드가 없는 경우
-                if (!cardFound) {
-                    // 기존 방식으로 랜덤 카드 생성
-                    cards[index] = cardGenManager.createRandomCard(usedCards)
-                }
-            }
-        } else {
-            // 저장된 덱이 없는 경우, 기존 방식으로 모든 카드 교체
-            for (index in nonJokerCardIndices) {
-                cards[index] = cardGenManager.createRandomCard(usedCards)
-            }
+        for (index in nonJokerCardIndices) {
+            // 기존 방식으로 랜덤 카드 생성
+            cards[index] = cardGenManager.createRandomCard(usedCards)
         }
         
         return Pair(true, nonJokerCardIndices.size)
@@ -186,10 +151,14 @@ class CardSelectionManager(
      * 조커 카드 선택 다이얼로그 표시
      */
     fun showJokerSelectionDialog(
+        context: Context?,
         card: Card, 
         cardIndex: Int, 
         onJokerSelected: (Card, Int) -> Unit
     ) {
+        // Context가 null인 경우 작업을 수행할 수 없음
+        if (context == null) return
+        
         // 커스텀 다이얼로그 생성
         val dialog = Dialog(context)
         dialog.setContentView(R.layout.dialog_joker_number_picker)
@@ -265,5 +234,10 @@ class CardSelectionManager(
             isSelected = false,
             isJoker = true  // 여전히 조커지만 보이는 모양과 숫자만 변경
         )
+    }
+
+    companion object {
+        // 싱글톤 인스턴스
+        val instance: CardSelectionManager by lazy { CardSelectionManager() }
     }
 } 

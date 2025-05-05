@@ -1038,4 +1038,31 @@
         </LinearLayout>
     </LinearLayout>
 
+    <!-- 게임 컨트롤 버튼 영역 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_alignParentBottom="true">
+        
+        <!-- 플러시 스킬 버튼 컨테이너 -->
+        <LinearLayout
+            android:id="@+id/flushSkillButtonContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginBottom="8dp"
+            android:paddingHorizontal="16dp" />
+            
+        <!-- 게임 컨트롤 버튼 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            
+            <!-- ... 기존 버튼 영역 ... -->
+        </LinearLayout>
+    </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

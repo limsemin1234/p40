@@ -77,7 +77,7 @@ class Flush : PokerHand() {
     override val handName = "플러시"
     
     override fun getDescription(): String {
-        return "같은 무늬 5장 (미사일 속도 +40%, 관통 1회)"
+        return "같은 무늬 5장 (문양별 특수 스킬 획득)"
     }
 }
 

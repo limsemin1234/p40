@@ -9,7 +9,7 @@ import kotlin.random.Random
  * PokerCardManager에서 카드 생성 로직만 분리함
  */
 class CardGenerationManager(
-    private val context: Context
+    private val context: Context?
 ) {
     // 기본 생성 설정
     private val baseCardCount = 5 // 기본 5장
@@ -52,7 +52,7 @@ class CardGenerationManager(
         val cards = mutableListOf<Card>()
         
         // 저장된 덱 불러오기
-        val savedDeck = DeckBuilderFragment.loadDeckFromPrefs(context)
+        val savedDeck = if (context != null) DeckBuilderFragment.loadDeckFromPrefs(context) else null
         
         // 중복 없는 카드 생성
         val usedCards = mutableSetOf<Pair<CardSuit, CardRank>>()
@@ -157,7 +157,7 @@ class CardGenerationManager(
         val cards = mutableListOf<Card>()
         
         // 저장된 덱 불러오기
-        val savedDeck = DeckBuilderFragment.loadDeckFromPrefs(context)
+        val savedDeck = if (context != null) DeckBuilderFragment.loadDeckFromPrefs(context) else null
         
         // 조커 카드 추가 여부 결정 (20% 확률)
         val includeJoker = Random.nextFloat() < 0.2f
@@ -243,7 +243,7 @@ class CardGenerationManager(
         if (extraCardCount <= 0) return additionalCards
         
         // 저장된 덱 불러오기
-        val savedDeck = DeckBuilderFragment.loadDeckFromPrefs(context)
+        val savedDeck = context?.let { DeckBuilderFragment.loadDeckFromPrefs(it) }
         
         // 현재 사용 중인 카드 패턴 확인
         val usedCards = existingCards.map { Pair(it.suit, it.rank) }.toMutableSet()

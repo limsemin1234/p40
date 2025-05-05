@@ -37,6 +37,7 @@ import com.example.p40.game.JokerSelectionDialog
 import com.example.p40.game.PokerCardManager
 import com.example.p40.game.BuffType
 import com.example.p40.game.MessageManager
+import com.example.p40.game.FlushSkillManager
 import kotlin.random.Random
 
 class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCardManager.PokerCardListener {
@@ -75,6 +76,9 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
 
     // 포커 카드 관련 변수 추가
     private lateinit var pokerCardManager: PokerCardManager
+    
+    // 플러시 스킬 매니저 추가
+    private lateinit var flushSkillManager: FlushSkillManager
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -163,6 +167,15 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
 
         // 저장된 코인 불러오기
         coins = MainMenuFragment.loadCoins(requireContext())
+
+        // 플러시 스킬 매니저 초기화
+        val flushSkillButtonContainer = view.findViewById<LinearLayout>(R.id.flushSkillButtonContainer)
+        flushSkillManager = FlushSkillManager(
+            requireContext(),
+            gameView,
+            flushSkillButtonContainer,
+            messageManager
+        )
     }
     
     override fun onStart() {
@@ -275,74 +288,68 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
     private fun updateBuffUI() {
         if (!isAdded) return
         
-        val activeBuffs = gameView.getActiveBuffs()
-        val buffContainer = view?.findViewById<LinearLayout>(R.id.buffContainer)
-        val tvBuffList = view?.findViewById<TextView>(R.id.tvBuffList)
+        // 현재 적용된 모든 버프 목록 가져오기
+        val buffs = gameView.getBuffManager().getAllBuffs()
         
-        if (buffContainer == null || tvBuffList == null) return
+        // 버프 출력용 텍스트 구성
+        val buffText = StringBuilder()
         
-        // 이전 버프 표시 제거
-        buffContainer.removeAllViews()
+        // 플러시 스킬 감지 및 활성화
+        checkAndActivateFlushSkills(buffs)
         
-        if (activeBuffs.isEmpty()) {
-            // 버프가 없을 경우
-            tvBuffList.text = "버프 없음"
-            tvBuffList.visibility = View.VISIBLE
-            return
-        } else {
-            tvBuffList.visibility = View.GONE
+        // 일반 버프 표시 처리
+        val displayBuffs = buffs.filter { buff ->
+            // 플러시 스킬 버프는 목록에서 제외
+            buff.type !in listOf(
+                BuffType.HEART_FLUSH_SKILL,
+                BuffType.SPADE_FLUSH_SKILL, 
+                BuffType.CLUB_FLUSH_SKILL,
+                BuffType.DIAMOND_FLUSH_SKILL
+            )
         }
         
-        // 각 버프별 표시
-        for (buff in activeBuffs) {
-            // 버프 UI 요소 생성
-            val buffView = createBuffView(buff)
-            buffContainer.addView(buffView)
+        if (displayBuffs.isNotEmpty()) {
+            displayBuffs.forEach { buff ->
+                buffText.append("• ${buff.getDisplayText()}\n")
+            }
+            tvBuffList.text = buffText.toString()
+        } else {
+            tvBuffList.text = "활성화된 버프 없음"
         }
     }
     
-    // 버프 UI 요소 생성
-    private fun createBuffView(buff: Buff): View {
-        // 버프 타입에 따라 카테고리 결정
-        val isDefenseBuff = when (buff.type) {
-            BuffType.MISSILE_DAMAGE, BuffType.ATTACK_SPEED, 
-            BuffType.MISSILE_SPEED, BuffType.MULTI_DIRECTION,
-            BuffType.MISSILE_PIERCE, BuffType.RESOURCE_GAIN -> true
-            
-            BuffType.ENEMY_SLOW, BuffType.DOT_DAMAGE,
-            BuffType.MASS_DAMAGE -> false
+    // 플러시 스킬 감지 및 활성화
+    private fun checkAndActivateFlushSkills(buffs: List<Buff>) {
+        // 각 문양별 플러시 스킬 버프가 있는지 확인
+        // 버프가 있으면 해당 스킬 활성화
+        
+        // 하트 플러시 스킬
+        if (buffs.any { it.type == BuffType.HEART_FLUSH_SKILL }) {
+            flushSkillManager.activateFlushSkill(CardSuit.HEART)
+            // 버프 제거 (1회성)
+            gameView.getBuffManager().removeBuff(BuffType.HEART_FLUSH_SKILL)
         }
         
-        // 버프 뷰 생성
-        val buffView = TextView(requireContext())
-        buffView.text = buff.getShortDisplayText()
-        buffView.textSize = 12f
-        buffView.setTextColor(Color.WHITE)
-        buffView.setPadding(10, 5, 10, 5)
-        
-        // 마진 설정
-        val layoutParams = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.WRAP_CONTENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
-        )
-        layoutParams.marginEnd = 8
-        buffView.layoutParams = layoutParams
-        
-        // 배경 설정
-        val drawable = GradientDrawable()
-        drawable.cornerRadius = 8f
-        
-        if (isDefenseBuff) {
-            drawable.setColor(GameConfig.BUFF_DEFENSE_COLOR)
-            drawable.setStroke(1, GameConfig.BUFF_DEFENSE_STROKE_COLOR)
-        } else {
-            drawable.setColor(GameConfig.BUFF_ENEMY_NERF_COLOR)
-            drawable.setStroke(1, GameConfig.BUFF_ENEMY_NERF_STROKE_COLOR)
+        // 스페이드 플러시 스킬
+        if (buffs.any { it.type == BuffType.SPADE_FLUSH_SKILL }) {
+            flushSkillManager.activateFlushSkill(CardSuit.SPADE)
+            // 버프 제거 (1회성)
+            gameView.getBuffManager().removeBuff(BuffType.SPADE_FLUSH_SKILL)
         }
         
-        buffView.background = drawable
+        // 클로버 플러시 스킬
+        if (buffs.any { it.type == BuffType.CLUB_FLUSH_SKILL }) {
+            flushSkillManager.activateFlushSkill(CardSuit.CLUB)
+            // 버프 제거 (1회성)
+            gameView.getBuffManager().removeBuff(BuffType.CLUB_FLUSH_SKILL)
+        }
         
-        return buffView
+        // 다이아 플러시 스킬
+        if (buffs.any { it.type == BuffType.DIAMOND_FLUSH_SKILL }) {
+            flushSkillManager.activateFlushSkill(CardSuit.DIAMOND)
+            // 버프 제거 (1회성)
+            gameView.getBuffManager().removeBuff(BuffType.DIAMOND_FLUSH_SKILL)
+        }
     }
     
     // 내 유닛 스탯 UI 업데이트
