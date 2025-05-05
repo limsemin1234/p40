@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.cardview.widget.CardView
 import com.example.p40.DeckBuilderFragment
 import com.example.p40.R
+import com.example.p40.game.MessageManager
 import kotlin.random.Random
 
 /**
@@ -126,7 +127,7 @@ class PokerCardManager(
                 }
             } else {
                 // 자원 부족 메시지
-                cardUIManager.showToast("자원이 부족합니다! (필요: $cardDrawCost)")
+                MessageManager.getInstance().showError("자원이 부족합니다! (필요: $cardDrawCost)")
             }
         }
     }
@@ -135,13 +136,13 @@ class PokerCardManager(
     private fun purchaseExtraCard() {
         // 이미 최대로 추가 구매한 경우
         if (purchasedExtraCards >= maxExtraCards) {
-            cardUIManager.showToast("이미 최대 카드 수에 도달했습니다")
+            MessageManager.getInstance().showWarning("이미 최대 카드 수에 도달했습니다")
             return
         }
         
         // 게임 진행 중인 경우 추가 구매 불가
         if (isGameActive) {
-            cardUIManager.showToast("현재 게임이 진행 중입니다. 다음 게임에서 추가 카드를 사용할 수 있습니다.")
+            MessageManager.getInstance().showWarning("현재 게임이 진행 중입니다. 다음 게임에서 추가 카드를 사용할 수 있습니다.")
             return
         }
         
@@ -163,11 +164,11 @@ class PokerCardManager(
                 listener.updateGameInfoUI()
                 
                 // 토스트 메시지 표시
-                cardUIManager.showToast("다음 카드 게임에서 ${baseCardCount + purchasedExtraCards}장의 카드가 제공됩니다")
+                MessageManager.getInstance().showSuccess("다음 카드 게임에서 ${baseCardCount + purchasedExtraCards}장의 카드가 제공됩니다")
             }
         } else {
             // 자원 부족 메시지
-            cardUIManager.showToast("자원이 부족합니다! (필요: $extraCardCost)")
+            MessageManager.getInstance().showError("자원이 부족합니다! (필요: $extraCardCost)")
         }
     }
     
@@ -256,7 +257,7 @@ class PokerCardManager(
     // 전체 카드 교체 (조커 카드 제외)
     private fun replaceAllNonJokerCards() {
         if (replacesLeft <= 0) {
-            cardUIManager.showToast("교체 횟수를 모두 사용했습니다.")
+            MessageManager.getInstance().showWarning("교체 횟수를 모두 사용했습니다.")
             return
         }
         
@@ -265,7 +266,7 @@ class PokerCardManager(
         
         if (!result.first) {
             // 교체할 카드가 없는 경우
-            cardUIManager.showToast("교체할 일반 카드가 없습니다.")
+            MessageManager.getInstance().showInfo("교체할 일반 카드가 없습니다.")
             return
         }
         
@@ -279,7 +280,7 @@ class PokerCardManager(
         updateUI()
         
         // 토스트 메시지 표시
-        cardUIManager.showToast("${result.second}장의 카드가 교체되었습니다.")
+        MessageManager.getInstance().showInfo("${result.second}장의 카드가 교체되었습니다.")
     }
     
     // 카드 선택 확정

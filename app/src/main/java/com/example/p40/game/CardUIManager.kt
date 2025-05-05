@@ -9,6 +9,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.cardview.widget.CardView
 import com.example.p40.R
+import com.example.p40.game.MessageManager
 
 /**
  * 포커 카드 UI 관리 클래스
@@ -295,6 +296,7 @@ class CardUIManager(
      * 토스트 메시지 표시
      */
     fun showToast(message: String, duration: Int = Toast.LENGTH_SHORT) {
-        Toast.makeText(context, message, duration).show()
+        // MessageManager를 사용하여 상단에 메시지 표시
+        MessageManager.getInstance().showInfo(message)
     }
 } 

@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.p40.game.Card
 import com.example.p40.game.ShopCard
+import com.example.p40.game.MessageManager
 
 class CardShopFragment : Fragment(R.layout.fragment_card_shop) {
 
@@ -67,7 +68,7 @@ class CardShopFragment : Fragment(R.layout.fragment_card_shop) {
     private fun onCardBuyClicked(card: ShopCard) {
         // 이미 구매한 카드인지 확인
         if (card.isPurchased) {
-            Toast.makeText(requireContext(), "이미 구매한 카드입니다.", Toast.LENGTH_SHORT).show()
+            MessageManager.getInstance().showInfo(requireContext(), "이미 구매한 카드입니다.")
             return
         }
         
@@ -95,10 +96,10 @@ class CardShopFragment : Fragment(R.layout.fragment_card_shop) {
             cardShopAdapter.updateCardPurchased(card.id)
             updateCurrencyUI()
             
-            Toast.makeText(requireContext(), "${card.name} 구매 완료!", Toast.LENGTH_SHORT).show()
+            MessageManager.getInstance().showSuccess(requireContext(), "${card.name} 구매 완료!")
         } else {
             // 코인 부족
-            Toast.makeText(requireContext(), "코인이 부족합니다.", Toast.LENGTH_SHORT).show()
+            MessageManager.getInstance().showError(requireContext(), "코인이 부족합니다.")
         }
     }
     

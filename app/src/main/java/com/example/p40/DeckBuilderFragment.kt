@@ -19,6 +19,7 @@ import com.example.p40.game.CardRank
 import com.example.p40.game.CardSuit
 import com.example.p40.game.CardUtils
 import com.example.p40.game.PokerDeck
+import com.example.p40.game.MessageManager
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
@@ -225,13 +226,13 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
     private fun addCardToDeck(card: Card) {
         // 덱 최대 크기 체크 (52장 + 조커)
         if (deckCards.size >= 53) {
-            Toast.makeText(requireContext(), "덱에 최대 53장까지만 넣을 수 있습니다.", Toast.LENGTH_SHORT).show()
+            MessageManager.getInstance().showInfo(requireContext(), "덱에 최대 53장까지만 넣을 수 있습니다.")
             return
         }
         
         // 해당 카드가 이미 덱에 있는지 확인
         if (isCardInDeck(card)) {
-            Toast.makeText(requireContext(), "이미 덱에 있는 카드입니다.", Toast.LENGTH_SHORT).show()
+            MessageManager.getInstance().showInfo(requireContext(), "이미 덱에 있는 카드입니다.")
             return
         }
         
@@ -334,14 +335,14 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
     private fun saveDeck() {
         // 최소 덱 크기 체크
         if (deckCards.size < 20) {
-            Toast.makeText(requireContext(), "최소 20장 이상의 카드로 덱을 구성해야 합니다.", Toast.LENGTH_SHORT).show()
+            MessageManager.getInstance().showInfo(requireContext(), "최소 20장 이상의 카드로 덱을 구성해야 합니다.")
             return
         }
         
         // 덱 저장 처리 (기존 autoSaveDeckAndCollection() 함수 활용)
         autoSaveDeckAndCollection()
         
-        Toast.makeText(requireContext(), "덱이 저장되었습니다. (${deckCards.size}장)", Toast.LENGTH_SHORT).show()
+        MessageManager.getInstance().showInfo(requireContext(), "덱이 저장되었습니다. (${deckCards.size}장)")
     }
     
     /**
@@ -405,11 +406,7 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
             replaceJokerCard(card, selectedCard.suit, selectedCard.rank, isInDeck)
             
             // 토스트 메시지
-            Toast.makeText(
-                requireContext(),
-                "조커 카드가 ${selectedCard.suit.getName()} ${selectedCard.rank.getName()}(으)로 변환되었습니다.",
-                Toast.LENGTH_SHORT
-            ).show()
+            MessageManager.getInstance().showInfo(requireContext(), "조커 카드가 ${selectedCard.suit.getName()} ${selectedCard.rank.getName()}(으)로 변환되었습니다.")
         }
         
         jokerDialog.show()
@@ -454,7 +451,7 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
         val selectedCards = collectionAdapter.getSelectedCards()
         
         if (selectedCards.isEmpty()) {
-            Toast.makeText(requireContext(), "추가할 카드를 선택해주세요", Toast.LENGTH_SHORT).show()
+            MessageManager.getInstance().showInfo(requireContext(), "추가할 카드를 선택해주세요")
             return
         }
         
@@ -462,7 +459,7 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
         
         // 덱 최대 크기 체크
         if (deckCards.size + selectedCards.size > 53) {
-            Toast.makeText(requireContext(), "덱에 최대 53장까지만 넣을 수 있습니다.", Toast.LENGTH_SHORT).show()
+            MessageManager.getInstance().showInfo(requireContext(), "덱에 최대 53장까지만 넣을 수 있습니다.")
             return
         }
         
@@ -498,12 +495,12 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
         
         // 결과 안내 메시지
         if (addedCount > 0) {
-            Toast.makeText(requireContext(), "${addedCount}장의 카드를 덱에 추가했습니다.", Toast.LENGTH_SHORT).show()
+            MessageManager.getInstance().showInfo(requireContext(), "${addedCount}장의 카드를 덱에 추가했습니다.")
             
             // 변경사항 자동 저장
             autoSaveDeckAndCollection()
         } else {
-            Toast.makeText(requireContext(), "추가할 수 있는 카드가 없습니다.", Toast.LENGTH_SHORT).show()
+            MessageManager.getInstance().showInfo(requireContext(), "추가할 수 있는 카드가 없습니다.")
         }
     }
     
@@ -514,7 +511,7 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
         val selectedCards = deckAdapter.getSelectedCards()
         
         if (selectedCards.isEmpty()) {
-            Toast.makeText(requireContext(), "제거할 카드를 선택해주세요", Toast.LENGTH_SHORT).show()
+            MessageManager.getInstance().showInfo(requireContext(), "제거할 카드를 선택해주세요")
             return
         }
         
@@ -555,12 +552,12 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
         
         // 결과 안내 메시지
         if (removedCount > 0) {
-            Toast.makeText(requireContext(), "${removedCount}장의 카드를 덱에서 제거했습니다.", Toast.LENGTH_SHORT).show()
+            MessageManager.getInstance().showInfo(requireContext(), "${removedCount}장의 카드를 덱에서 제거했습니다.")
             
             // 변경사항 자동 저장
             autoSaveDeckAndCollection()
         } else {
-            Toast.makeText(requireContext(), "제거할 수 있는 카드가 없습니다.", Toast.LENGTH_SHORT).show()
+            MessageManager.getInstance().showInfo(requireContext(), "제거할 수 있는 카드가 없습니다.")
         }
     }
     

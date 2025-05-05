@@ -157,10 +157,26 @@ class MessageManager private constructor() {
     }
 
     /**
+     * Context를 받는 정보 메시지 표시 (파란색)
+     */
+    fun showInfo(context: Context, message: String) {
+        initIfNeeded(context)
+        showInfo(message)
+    }
+
+    /**
      * 성공 메시지 표시 (녹색)
      */
     fun showSuccess(message: String) {
         showMessage(message, MessageType.SUCCESS)
+    }
+
+    /**
+     * Context를 받는 성공 메시지 표시 (녹색)
+     */
+    fun showSuccess(context: Context, message: String) {
+        initIfNeeded(context)
+        showSuccess(message)
     }
 
     /**
@@ -171,10 +187,59 @@ class MessageManager private constructor() {
     }
 
     /**
+     * Context를 받는 경고 메시지 표시 (주황색)
+     */
+    fun showWarning(context: Context, message: String) {
+        initIfNeeded(context)
+        showWarning(message)
+    }
+
+    /**
      * 오류 메시지 표시 (빨간색)
      */
     fun showError(message: String) {
         showMessage(message, MessageType.ERROR)
+    }
+
+    /**
+     * Context를 받는 오류 메시지 표시 (빨간색)
+     */
+    fun showError(context: Context, message: String) {
+        initIfNeeded(context)
+        showError(message)
+    }
+
+    /**
+     * Context가 있을 때 필요하면 초기화
+     */
+    private fun initIfNeeded(context: Context) {
+        if (containerView == null) {
+            // Activity의 content view를 찾아 초기화
+            val activity = getActivity(context)
+            if (activity != null) {
+                init(activity.findViewById(android.R.id.content))
+            } else {
+                // 활동을 찾을 수 없는 경우 - Toast로 대체
+                android.widget.Toast.makeText(
+                    context,
+                    "메시지 시스템 초기화에 실패했습니다",
+                    android.widget.Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+
+    /**
+     * Context를 받는 Toast 대체 메시지
+     */
+    private fun showToast(context: Context, message: String) {
+        handler.post {
+            android.widget.Toast.makeText(
+                context,
+                message,
+                android.widget.Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 
     /**
