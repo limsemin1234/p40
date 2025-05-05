@@ -4,6 +4,7 @@ import android.animation.ObjectAnimator
 import android.app.Dialog
 import android.content.Context
 import android.graphics.Color
+import android.graphics.Paint
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.os.Handler
@@ -12,6 +13,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.Button
+import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.NumberPicker
 import android.widget.TextView
@@ -1360,6 +1362,10 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
             rankPicker.maxValue = ranks.size - 1
             rankPicker.displayedValues = rankValues
             
+            // NumberPicker 텍스트 색상을 흰색으로 변경
+            setNumberPickerTextColor(suitPicker, Color.WHITE)
+            setNumberPickerTextColor(rankPicker, Color.WHITE)
+            
             // 확인 버튼 설정
             val confirmButton = dialog.findViewById<Button>(R.id.btnConfirm)
             confirmButton.setOnClickListener {
@@ -1400,6 +1406,30 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
             
             // 다이얼로그 표시
             dialog.show()
+        }
+
+        // NumberPicker의 텍스트 색상을 변경하는 헬퍼 메서드
+        private fun setNumberPickerTextColor(numberPicker: NumberPicker, color: Int) {
+            try {
+                // NumberPicker 내부의 TextView 필드 가져오기 시도
+                val selectorWheelPaintField = NumberPicker::class.java.getDeclaredField("mSelectorWheelPaint")
+                selectorWheelPaintField.isAccessible = true
+                
+                // Paint 객체에 색상 설정
+                val paint = selectorWheelPaintField.get(numberPicker) as Paint
+                paint.color = color
+                
+                // 편집 모드의 EditText 색상 변경
+                val inputTextField = NumberPicker::class.java.getDeclaredField("mInputText")
+                inputTextField.isAccessible = true
+                val inputText = inputTextField.get(numberPicker) as EditText
+                inputText.setTextColor(color)
+                
+                // 변경 내용 적용을 위해 NumberPicker 갱신
+                numberPicker.invalidate()
+            } catch (e: Exception) {
+                // 오류 발생 시 무시 (특정 기기나 안드로이드 버전에 따라 동작이 다를 수 있음)
+            }
         }
 
         // 조커 카드 변환 처리
