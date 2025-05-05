@@ -50,24 +50,26 @@ object GameConfig {
     
     // 웨이브별 적 체력 배율 (ENEMY_BASE_HEALTH에 곱해짐)
     const val WAVE_1_HEALTH_MULTIPLIER = 1.0f
-    const val WAVE_2_HEALTH_MULTIPLIER = 1.15f
-    const val WAVE_3_HEALTH_MULTIPLIER = 1.3f
-    const val WAVE_4_HEALTH_MULTIPLIER = 1.45f
-    const val WAVE_5_HEALTH_MULTIPLIER = 1.6f
-    const val WAVE_6_HEALTH_MULTIPLIER = 1.75f
-    const val WAVE_7_HEALTH_MULTIPLIER = 1.9f
-    const val WAVE_8_HEALTH_MULTIPLIER = 2.05f
-    const val WAVE_9_HEALTH_MULTIPLIER = 2.2f
-    const val WAVE_10_HEALTH_MULTIPLIER = 2.4f
+    const val WAVE_2_HEALTH_MULTIPLIER = 1.1f
+    const val WAVE_3_HEALTH_MULTIPLIER = 1.2f
+    const val WAVE_4_HEALTH_MULTIPLIER = 1.3f
+    const val WAVE_5_HEALTH_MULTIPLIER = 1.4f
+    const val WAVE_6_HEALTH_MULTIPLIER = 1.5f
+    const val WAVE_7_HEALTH_MULTIPLIER = 1.6f
+    const val WAVE_8_HEALTH_MULTIPLIER = 1.7f
+    const val WAVE_9_HEALTH_MULTIPLIER = 1.8f
+    const val WAVE_10_HEALTH_MULTIPLIER = 2.0f
     
     // 보스 설정 - 멀티플라이어 방식에서 고정값으로 변경
-    const val BOSS_SIZE = 30f  // 보스 크기
+    const val BOSS_SIZE = 40f  // 보스 크기
     const val BOSS_BASE_HEALTH = 200  // 보스 기본 체력
     const val BOSS_BASE_SPEED = 0.8f  // 보스 기본 이동 속도
     const val BOSS_DAMAGE = 20  // 보스 공격력
     const val BOSS_COLOR = Color.MAGENTA  // 보스 색상
     const val BOSS_BORDER_COLOR = Color.YELLOW  // 보스 테두리 색상
     const val BOSS_BORDER_WIDTH = 5f  // 보스 테두리 두께
+    const val BOSS_DAMAGE_REDUCTION = 0.75f  // 보스의 데미지 감소율 (받는 데미지의 75%만 적용)
+    const val BOSS_ENRAGE_HEALTH_RATIO = 0.5f  // 보스 분노 모드 진입 체력 비율 (최대 체력의 50%)
     
     // 웨이브별 보스 체력 증가율
     const val BOSS_HEALTH_INCREASE_PER_WAVE = 100  // 웨이브당 보스 체력 증가량

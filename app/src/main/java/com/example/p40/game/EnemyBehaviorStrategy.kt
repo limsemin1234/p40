@@ -100,13 +100,13 @@ class BossEnemyBehavior : EnemyBehaviorStrategy {
     }
     
     override fun onDamage(enemy: Enemy, damage: Int): Boolean {
-        // 보스는 데미지 저항이 있음 (데미지 25% 감소)
-        val actualDamage = (damage * 0.75f).toInt()
+        // 보스는 데미지 저항이 있음 (데미지 감소율은 GameConfig에서 설정)
+        val actualDamage = (damage * GameConfig.BOSS_DAMAGE_REDUCTION).toInt()
         val health = enemy.getHealth() - actualDamage
         enemy.setHealth(health)
         
-        // 특수 효과: 체력이 50% 이하로 떨어지면 분노 모드 (빨간색으로 변경)
-        if (health <= enemy.getMaxHealth() / 2) {
+        // 특수 효과: 체력이 설정된 비율 이하로 떨어지면 분노 모드 (빨간색으로 변경)
+        if (health <= enemy.getMaxHealth() * GameConfig.BOSS_ENRAGE_HEALTH_RATIO) {
             enemy.setEnraged(true)
         }
         
