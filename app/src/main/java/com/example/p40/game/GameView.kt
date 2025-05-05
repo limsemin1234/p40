@@ -544,6 +544,15 @@ class GameView @JvmOverloads constructor(
         return false  // 자원 부족
     }
     
+    // 자원 소모 메서드 (포커 카드 뽑기 등에 사용)
+    fun useResource(amount: Int): Boolean {
+        if (resource >= amount) {
+            resource -= amount
+            return true
+        }
+        return false
+    }
+    
     // 공격 속도 업그레이드 - 발사 속도 증가
     private var attackSpeedLevel = 1
     private var attackSpeedCost = GameConfig.ATTACK_SPEED_UPGRADE_INITIAL_COST  // 초기 비용

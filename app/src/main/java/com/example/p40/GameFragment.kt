@@ -23,13 +23,16 @@ import com.example.p40.game.GameOverListener
 import com.example.p40.game.GameView
 import com.example.p40.game.PokerHand
 import com.example.p40.game.BossKillListener
+import com.example.p40.game.Card
+import com.example.p40.game.CardRank
+import com.example.p40.game.CardSuit
+import com.example.p40.game.PokerHandEvaluator
+import kotlin.random.Random
 
 class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
 
     private lateinit var gameView: GameView
     private var isPaused = false
-    private var cardCooldown = false
-    private val cardCooldownTime = GameConfig.CARD_COOLDOWN
     
     // 현재 열려있는 패널 추적
     private var currentOpenPanel: LinearLayout? = null
@@ -55,6 +58,9 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
             handler.postDelayed(this, 500) // 500ms마다 업데이트
         }
     }
+
+    // 포커 카드 관련 변수 추가
+    private lateinit var pokerCardPanel: PokerCardPanel
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -108,7 +114,7 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
         setupAttackUpgradeButtons(view)
         setupDefenseUpgradeButtons(view)
         
-        // 카드 패널 버튼 설정
+        // 카드 버튼 설정 - 패널에서 직접 포커 카드 기능 처리
         setupCardButtons(view)
         
         // 웨이브 완료 리스너 설정
@@ -342,16 +348,7 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
     
     // 웨이브 완료 리스너 설정
     private fun setupWaveCompletionListener() {
-        // 실제로는 GameView에 웨이브 완료 콜백이 필요하지만, 
-        // 현재 구현에서는 임시로 버튼에 리스너 연결하여 테스트
-        val cardButton = view?.findViewById<Button>(R.id.cardButton)
-        cardButton?.setOnLongClickListener {
-            // 테스트용: 카드 버튼 길게 누르면 웨이브 완료 처리 (실제 게임에서는 제거)
-            onWaveCompleted(currentWave)
-            currentWave++
-            true
-        }
-        
+        // 테스트용 코드 제거
         // 실제 구현 시에는 GameView 클래스에 웨이브 완료 콜백 추가 필요
         // gameView.setOnWaveCompletedListener { waveNumber -> 
         //     onWaveCompleted(waveNumber)
@@ -370,13 +367,17 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
     
     // 포커 카드 다이얼로그 표시
     private fun showPokerCardsDialog(waveNumber: Int) {
+        // 이전: 게임 일시 정지 제거
+        // gameView.pause()
+        // handler.removeCallbacks(uiUpdateRunnable)
+        
         val dialog = PokerCardsDialog(requireContext(), waveNumber) { pokerHand ->
             // 선택된 포커 족보 적용
             applyPokerHandEffect(pokerHand)
             
-            // 게임 재개
-            gameView.resume()
-            handler.post(uiUpdateRunnable)
+            // 게임 재개 코드 제거(게임이 계속 진행되므로)
+            // gameView.resume()
+            // handler.post(uiUpdateRunnable)
             
             // 버프 정보 업데이트
             updateBuffUI()
@@ -396,6 +397,9 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
     private fun applyPokerHandEffect(pokerHand: PokerHand) {
         // GameView에 포커 족보 효과 적용
         gameView.applyPokerHandEffect(pokerHand)
+        
+        // 버프 정보 업데이트
+        updateBuffUI()
     }
     
     private fun togglePanel(panel: LinearLayout) {
@@ -525,58 +529,382 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
         }
     }
     
+    // 카드 버튼 설정 - 패널에서 직접 포커 카드 기능 처리
     private fun setupCardButtons(view: View) {
-        val card1 = view.findViewById<Button>(R.id.card1)
-        val card2 = view.findViewById<Button>(R.id.card2)
-        val card3 = view.findViewById<Button>(R.id.card3)
+        // 포커 카드 패널 초기화
+        pokerCardPanel = PokerCardPanel(view)
         
-        card1.setOnClickListener {
-            if (!cardCooldown) {
-                gameView.useCard()
-                setCardCooldown()
-                Toast.makeText(context, "공격 카드 사용!", Toast.LENGTH_SHORT).show()
-                closePanel(view.findViewById(R.id.cardPanel))
-            } else {
-                Toast.makeText(context, "카드가 아직 쿨다운 중입니다", Toast.LENGTH_SHORT).show()
-            }
+        // 카드 버튼 - 이제 카드 패널 직접 열기
+        val cardButton = view?.findViewById<Button>(R.id.cardButton)
+        cardButton?.setOnClickListener {
+            // 패널 토글 기능 유지
+            togglePanel(view.findViewById(R.id.cardPanel))
         }
         
-        card2.setOnClickListener {
-            if (!cardCooldown) {
-                // 방어 카드 기능은 아직 미구현
-                Toast.makeText(context, "방어 카드 사용!", Toast.LENGTH_SHORT).show()
-                setCardCooldown()
-                closePanel(view.findViewById(R.id.cardPanel))
+        // 포커 카드 뽑기 버튼 리스너
+        val btnDrawPokerCards = view.findViewById<Button>(R.id.btnDrawPokerCards)
+        btnDrawPokerCards?.setOnClickListener {
+            // 자원 소모 비용 설정
+            val cardDrawCost = 50 // 기본 비용 50 자원
+            
+            // 현재 자원 확인
+            val currentResource = gameView.getResource()
+            
+            if (currentResource >= cardDrawCost) {
+                // 자원 차감
+                if (gameView.useResource(cardDrawCost)) {
+                    // 자원 차감 성공 시 패널에서 카드 처리 시작
+                    pokerCardPanel.startPokerCards(currentWave)
+                }
             } else {
-                Toast.makeText(context, "카드가 아직 쿨다운 중입니다", Toast.LENGTH_SHORT).show()
-            }
-        }
-        
-        card3.setOnClickListener {
-            if (!cardCooldown) {
-                // 특수 카드 기능은 아직 미구현
-                Toast.makeText(context, "특수 카드 사용!", Toast.LENGTH_SHORT).show()
-                setCardCooldown()
-                closePanel(view.findViewById(R.id.cardPanel))
-            } else {
-                Toast.makeText(context, "카드가 아직 쿨다운 중입니다", Toast.LENGTH_SHORT).show()
+                // 자원 부족 메시지
+                Toast.makeText(context, "자원이 부족합니다! (필요: $cardDrawCost)", Toast.LENGTH_SHORT).show()
             }
         }
     }
     
-    private fun setCardCooldown() {
-        cardCooldown = true
-        view?.findViewById<Button>(R.id.cardButton)?.isEnabled = false
-        view?.findViewById<Button>(R.id.cardButton)?.text = "쿨다운"
+    // 포커 카드 패널 클래스 (카드 패널 내에서 포커 카드 기능 처리)
+    inner class PokerCardPanel(private val rootView: View) {
+        // 카드 관련 UI 요소들
+        private val cardInfoLayout: LinearLayout = rootView.findViewById(R.id.cardInfoLayout)
+        private val btnDrawPokerCards: Button = rootView.findViewById(R.id.btnDrawPokerCards)
+        private val replaceButton: Button = rootView.findViewById(R.id.btnReplaceCards)
+        private val confirmButton: Button = rootView.findViewById(R.id.btnConfirmHand)
+        private val replaceCountText: TextView = rootView.findViewById(R.id.tvReplaceCount)
+        private val currentHandText: TextView = rootView.findViewById(R.id.tvCurrentHand)
+        private val handDescriptionText: TextView = rootView.findViewById(R.id.tvHandDescription)
         
-        view?.postDelayed({
-            cardCooldown = false
-            view?.findViewById<Button>(R.id.cardButton)?.isEnabled = true
-            view?.findViewById<Button>(R.id.cardButton)?.text = "카드"
-            if (isAdded) {
-                Toast.makeText(context, "카드가 다시 사용 가능합니다!", Toast.LENGTH_SHORT).show()
+        private val cardViews: List<androidx.cardview.widget.CardView> = listOf(
+            rootView.findViewById(R.id.cardView1),
+            rootView.findViewById(R.id.cardView2),
+            rootView.findViewById(R.id.cardView3),
+            rootView.findViewById(R.id.cardView4),
+            rootView.findViewById(R.id.cardView5)
+        )
+        
+        private val cards = mutableListOf<Card>()
+        private var replacesLeft = 2 // 교체 가능한 횟수
+        private val selectedCardIndexes = mutableSetOf<Int>() // 선택된 카드의 인덱스
+        
+        init {
+            // 카드 선택 이벤트 설정
+            cardViews.forEachIndexed { index, cardView ->
+                cardView.setOnClickListener {
+                    toggleCardSelection(index)
+                }
             }
-        }, cardCooldownTime)
+            
+            // 교체 버튼 이벤트
+            replaceButton.setOnClickListener {
+                replaceSelectedCards()
+            }
+            
+            // 확인 버튼 이벤트
+            confirmButton.setOnClickListener {
+                confirmSelection()
+            }
+        }
+        
+        // 포커 카드 시작
+        fun startPokerCards(waveNumber: Int) {
+            // 상태 초기화
+            cards.clear()
+            selectedCardIndexes.clear()
+            replacesLeft = 2
+            
+            // UI 초기화
+            cardInfoLayout.visibility = View.VISIBLE
+            btnDrawPokerCards.visibility = View.GONE
+            
+            // 카드 생성
+            dealCards(waveNumber)
+            
+            // UI 업데이트
+            updateUI()
+        }
+        
+        // 카드 생성
+        private fun dealCards(waveNumber: Int) {
+            // 웨이브 번호에 따라 더 좋은 카드가 나올 확률 증가
+            // 기본 확률 0.15에서 웨이브 번호에 따라 증가
+            val goodHandProbability = minOf(0.15f + (waveNumber * 0.03f), 0.5f)
+            
+            // 좋은 패가 나올 확률 계산
+            if (Random.nextFloat() < goodHandProbability) {
+                // 좋은 패 생성 (스트레이트 이상)
+                generateGoodHand(waveNumber)
+            } else {
+                // 일반 랜덤 패 생성
+                generateRandomHand()
+            }
+        }
+        
+        // 랜덤 패 생성
+        private fun generateRandomHand() {
+            cards.clear()
+            
+            // 랜덤 카드 5장 생성
+            val suits = CardSuit.values().filter { it != CardSuit.JOKER }
+            val ranks = CardRank.values().filter { it != CardRank.JOKER }
+            
+            // 중복 없는 카드 5장 생성
+            val usedCards = mutableSetOf<Pair<CardSuit, CardRank>>()
+            
+            while (cards.size < 5) {
+                val suit = suits.random()
+                val rank = ranks.random()
+                val cardPair = Pair(suit, rank)
+                
+                if (cardPair !in usedCards) {
+                    usedCards.add(cardPair)
+                    cards.add(Card(suit, rank))
+                }
+            }
+        }
+        
+        // 좋은 패 생성
+        private fun generateGoodHand(waveNumber: Int) {
+            // 웨이브 번호에 따라 더 좋은 족보 가능성 증가
+            val handType = when {
+                waveNumber >= 8 && Random.nextFloat() < 0.2f -> "royal_flush"
+                waveNumber >= 6 && Random.nextFloat() < 0.3f -> "straight_flush"
+                waveNumber >= 5 && Random.nextFloat() < 0.4f -> "four_of_a_kind"
+                waveNumber >= 4 && Random.nextFloat() < 0.5f -> "full_house"
+                waveNumber >= 3 && Random.nextFloat() < 0.6f -> "flush"
+                else -> "straight"
+            }
+            
+            cards.clear()
+            
+            when (handType) {
+                "royal_flush" -> {
+                    // 로얄 플러시 (스페이드 10, J, Q, K, A)
+                    val suit = CardSuit.SPADE
+                    cards.add(Card(suit, CardRank.TEN))
+                    cards.add(Card(suit, CardRank.JACK))
+                    cards.add(Card(suit, CardRank.QUEEN))
+                    cards.add(Card(suit, CardRank.KING))
+                    cards.add(Card(suit, CardRank.ACE))
+                }
+                "straight_flush" -> {
+                    // 스트레이트 플러시 (같은 무늬의 연속된 숫자)
+                    val suit = CardSuit.values().filter { it != CardSuit.JOKER }.random()
+                    val startRank = Random.nextInt(1, 10) // 1(A)부터 9까지의 시작 숫자
+                    
+                    for (i in 0 until 5) {
+                        val rankValue = startRank + i
+                        val rank = CardRank.values().find { it.value == rankValue }
+                            ?: CardRank.values().find { it.value == (rankValue % 13) + 1 }
+                            ?: CardRank.ACE
+                        
+                        cards.add(Card(suit, rank))
+                    }
+                }
+                "four_of_a_kind" -> {
+                    // 포카드 (같은 숫자 4장)
+                    val rank = CardRank.values().filter { it != CardRank.JOKER }.random()
+                    val suits = CardSuit.values().filter { it != CardSuit.JOKER }.shuffled()
+                    
+                    // 같은 숫자 4장
+                    for (i in 0 until 4) {
+                        cards.add(Card(suits[i], rank))
+                    }
+                    
+                    // 다른 숫자 1장
+                    var otherRank: CardRank
+                    do {
+                        otherRank = CardRank.values().filter { it != CardRank.JOKER }.random()
+                    } while (otherRank == rank)
+                    
+                    cards.add(Card(suits.random(), otherRank))
+                }
+                "full_house" -> {
+                    // 풀하우스 (트리플 + 원페어)
+                    val tripleRank = CardRank.values().filter { it != CardRank.JOKER }.random()
+                    var pairRank: CardRank
+                    do {
+                        pairRank = CardRank.values().filter { it != CardRank.JOKER }.random()
+                    } while (pairRank == tripleRank)
+                    
+                    val suits = CardSuit.values().filter { it != CardSuit.JOKER }.shuffled()
+                    
+                    // 같은 숫자 3장
+                    for (i in 0 until 3) {
+                        cards.add(Card(suits[i], tripleRank))
+                    }
+                    
+                    // 다른 같은 숫자 2장
+                    for (i in 0 until 2) {
+                        cards.add(Card(suits[i], pairRank))
+                    }
+                }
+                "flush" -> {
+                    // 플러시 (같은 무늬 5장)
+                    val suit = CardSuit.values().filter { it != CardSuit.JOKER }.random()
+                    val ranks = CardRank.values().filter { it != CardRank.JOKER }.shuffled().take(5)
+                    
+                    for (rank in ranks) {
+                        cards.add(Card(suit, rank))
+                    }
+                }
+                else -> { // 스트레이트
+                    // 스트레이트 (연속된 숫자 5장)
+                    val startRank = Random.nextInt(1, 10) // 1(A)부터 9까지의 시작 숫자
+                    val suits = CardSuit.values().filter { it != CardSuit.JOKER }
+                    
+                    for (i in 0 until 5) {
+                        val rankValue = startRank + i
+                        val rank = CardRank.values().find { it.value == rankValue }
+                            ?: CardRank.values().find { it.value == (rankValue % 13) + 1 }
+                            ?: CardRank.ACE
+                        
+                        cards.add(Card(suits.random(), rank))
+                    }
+                }
+            }
+            
+            // 카드 순서 섞기
+            cards.shuffle()
+        }
+        
+        // UI 업데이트
+        private fun updateUI() {
+            // 카드 이미지 업데이트
+            cards.forEachIndexed { index, card ->
+                val cardView = cardViews[index]
+                
+                // 카드 정보 표시
+                val suitTextView = cardView.findViewById<TextView>(
+                    when (index) {
+                        0 -> R.id.tvCardSuit1
+                        1 -> R.id.tvCardSuit2
+                        2 -> R.id.tvCardSuit3
+                        3 -> R.id.tvCardSuit4
+                        else -> R.id.tvCardSuit5
+                    }
+                )
+                
+                val rankTextView = cardView.findViewById<TextView>(
+                    when (index) {
+                        0 -> R.id.tvCardRank1
+                        1 -> R.id.tvCardRank2
+                        2 -> R.id.tvCardRank3
+                        3 -> R.id.tvCardRank4
+                        else -> R.id.tvCardRank5
+                    }
+                )
+                
+                // 카드 무늬와 숫자 설정
+                suitTextView.text = card.suit.getSymbol()
+                suitTextView.setTextColor(card.suit.getColor())
+                
+                rankTextView.text = card.rank.getName()
+                rankTextView.setTextColor(card.suit.getColor())
+                
+                // 선택 상태 표시
+                cardView.setCardBackgroundColor(
+                    if (index in selectedCardIndexes) Color.YELLOW else Color.WHITE
+                )
+                
+                // 카드 선택 가능 여부 설정
+                cardView.isEnabled = replacesLeft > 0
+            }
+            
+            // 교체 버튼 활성화/비활성화
+            replaceButton.isEnabled = replacesLeft > 0 && selectedCardIndexes.isNotEmpty()
+            
+            // 교체 횟수 텍스트 업데이트
+            replaceCountText.text = "교체 가능 횟수: $replacesLeft"
+            
+            // 현재 패 평가 및 표시
+            val currentHand = PokerHandEvaluator.evaluate(cards)
+            currentHandText.text = "현재 족보: ${currentHand.handName}"
+            
+            // 족보 설명 업데이트
+            handDescriptionText.text = "효과: ${currentHand.getDescription()}"
+        }
+        
+        // 카드 선택 토글
+        private fun toggleCardSelection(index: Int) {
+            // 교체 횟수가 남아있는 경우에만 선택 가능
+            if (replacesLeft <= 0) return
+            
+            if (index in selectedCardIndexes) {
+                selectedCardIndexes.remove(index)
+            } else {
+                selectedCardIndexes.add(index)
+            }
+            
+            updateUI()
+        }
+        
+        // 선택된 카드 교체
+        private fun replaceSelectedCards() {
+            if (selectedCardIndexes.isEmpty() || replacesLeft <= 0) return
+            
+            // 선택된 카드 교체
+            val suits = CardSuit.values().filter { it != CardSuit.JOKER }
+            val ranks = CardRank.values().filter { it != CardRank.JOKER }
+            
+            // 현재 사용 중인 카드 확인 (중복 방지)
+            val usedCards = cards
+                .filterIndexed { index, _ -> index !in selectedCardIndexes }
+                .map { Pair(it.suit, it.rank) }
+                .toMutableSet()
+            
+            // 선택된 카드 교체
+            for (index in selectedCardIndexes) {
+                var newCard: Card
+                do {
+                    val suit = suits.random()
+                    val rank = ranks.random()
+                    val cardPair = Pair(suit, rank)
+                    
+                    if (cardPair !in usedCards) {
+                        newCard = Card(suit, rank)
+                        usedCards.add(cardPair)
+                        break
+                    }
+                } while (true)
+                
+                cards[index] = newCard
+            }
+            
+            // 교체 횟수 감소
+            replacesLeft--
+            
+            // 선택 초기화
+            selectedCardIndexes.clear()
+            
+            // UI 업데이트
+            updateUI()
+        }
+        
+        // 카드 선택 확정
+        private fun confirmSelection() {
+            // 현재 패 평가 결과 전달
+            val pokerHand = PokerHandEvaluator.evaluate(cards)
+            applyPokerHandEffect(pokerHand)
+            
+            // 토스트 메시지 표시
+            Toast.makeText(
+                context,
+                "적용된 효과: ${pokerHand.handName}",
+                Toast.LENGTH_LONG
+            ).show()
+            
+            // 패널 초기 상태로 복귀
+            resetPanel()
+        }
+        
+        // 패널 초기 상태로 복귀
+        private fun resetPanel() {
+            cardInfoLayout.visibility = View.GONE
+            btnDrawPokerCards.visibility = View.VISIBLE
+            
+            // 추가로 패널 닫기를 원한다면 아래 코드 활성화
+            // closePanel(rootView.findViewById(R.id.cardPanel))
+        }
     }
     
     // 모든 업그레이드 버튼 텍스트 업데이트
@@ -794,3 +1122,4 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
         MainMenuFragment.saveCoins(requireContext(), coins)
     }
 }
+

@@ -20,7 +20,7 @@ import kotlin.random.Random
 
 /**
  * 포커 카드 다이얼로그 클래스
- * 웨이브를 완료했을 때 표시되는 포커 카드 선택 다이얼로그
+ * 자원을 소모하여 포커 카드를 뽑고 선택할 수 있는 다이얼로그
  */
 class PokerCardsDialog(
     context: Context,
@@ -84,7 +84,8 @@ class PokerCardsDialog(
     
     private fun dealCards() {
         // 웨이브 번호에 따라 더 좋은 카드가 나올 확률 증가
-        val goodHandProbability = minOf(0.1f + (waveNumber * 0.05f), 0.5f)
+        // 기본 확률 0.15에서 웨이브 번호에 따라 증가
+        val goodHandProbability = minOf(0.15f + (waveNumber * 0.03f), 0.5f)
         
         // 좋은 패가 나올 확률 계산
         if (Random.nextFloat() < goodHandProbability) {
