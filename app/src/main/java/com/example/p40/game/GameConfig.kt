@@ -34,6 +34,22 @@ object GameConfig {
     const val ENEMY_COLOR = Color.RED  // 적 색상
     const val NORMAL_ENEMY_DAMAGE = 5  // 일반 적의 공격력
     
+    // 적 생성 및 이동 속도 기본 설정
+    const val BASE_ENEMY_SPAWN_INTERVAL = 3000L  // 기본 적 생성 간격 (밀리초)
+    const val BASE_ENEMY_SPEED = 1.0f           // 기본 적 이동 속도
+    const val ENEMY_SPAWN_INTERVAL_DECREASE_PER_WAVE = 0.1f // 웨이브당 생성 간격 감소율 (10%)
+    const val ENEMY_SPEED_INCREASE_PER_WAVE = 0.15f        // 웨이브당 이동 속도 증가율 (15%)
+    const val MIN_ENEMY_SPAWN_INTERVAL = 700L   // 최소 적 생성 간격 (밀리초)
+    
+    // 웨이브별 적 생성 간격 및 이동 속도 맵
+    val WAVE_ENEMY_SPAWN_COOLDOWNS: Map<Int, Long> = (1..TOTAL_WAVES).associateWith { wave ->
+        getEnemySpawnIntervalForWave(wave)
+    }
+    
+    val WAVE_ENEMY_SPEEDS: Map<Int, Float> = (1..TOTAL_WAVES).associateWith { wave ->
+        getEnemySpeedForWave(wave)
+    }
+    
     // 웨이브별 적 체력 배율 (ENEMY_BASE_HEALTH에 곱해짐)
     const val WAVE_1_HEALTH_MULTIPLIER = 1.0f
     const val WAVE_2_HEALTH_MULTIPLIER = 1.15f
@@ -63,35 +79,12 @@ object GameConfig {
     const val CARD_DAMAGE_BOSS = 80  // 보스에게 주는 데미지 (50에서 80으로 증가)
     const val CARD_COOLDOWN = 8000L  // 카드 사용 쿨다운 (10000에서 8000으로 감소)
     
-    // 웨이브별 적 생성 간격 (밀리초)
-    val WAVE_ENEMY_SPAWN_COOLDOWNS = mapOf(
-        1 to 3000L,
-        2 to 2700L,
-        3 to 2400L,
-        4 to 2200L,
-        5 to 2000L,
-        6 to 1800L,
-        7 to 1600L,
-        8 to 1400L,
-        9 to 1200L,
-        10 to 1000L
-    )
-    
-    // 웨이브별 적 이동 속도
-    val WAVE_ENEMY_SPEEDS = mapOf(
-        1 to 1.0f,
-        2 to 1.15f,
-        3 to 1.3f,
-        4 to 1.45f,
-        5 to 1.6f,
-        6 to 1.75f,
-        7 to 1.9f,
-        8 to 2.05f,
-        9 to 2.2f,
-        10 to 2.4f
-    )
-    
-    // 웨이브별 적 체력 계산 (ENEMY_BASE_HEALTH에 배율을 곱함)
+    /**
+     * 웨이브별 적 체력 계산 (ENEMY_BASE_HEALTH에 배율을 곱함)
+     * @param wave 현재 웨이브
+     * @param isBoss 보스 여부
+     * @return 적 체력
+     */
     fun getEnemyHealthForWave(wave: Int, isBoss: Boolean = false): Int {
         val multiplier = when(wave) {
             1 -> WAVE_1_HEALTH_MULTIPLIER
@@ -115,15 +108,53 @@ object GameConfig {
         }
     }
     
-    // 웨이브별 적 데미지 계산
+    /**
+     * 웨이브별 적 데미지 계산
+     * @param wave 웨이브 번호
+     * @param isBoss 보스 여부
+     * @return 적 데미지
+     */
     fun getEnemyDamageForWave(wave: Int, isBoss: Boolean): Int {
         val baseDamage = if (isBoss) BOSS_DAMAGE else NORMAL_ENEMY_DAMAGE
         val additionalDamage = (wave - 1) * ENEMY_DAMAGE_PER_WAVE
         return baseDamage + additionalDamage
     }
     
+    /**
+     * 웨이브에 따른 적 생성 간격 계산 (밀리초)
+     * @param wave 현재 웨이브
+     * @return 적 생성 간격 (밀리초)
+     */
+    fun getEnemySpawnIntervalForWave(wave: Int): Long {
+        // 웨이브가 증가할 수록 생성 간격 감소
+        val decrease = (wave - 1) * ENEMY_SPAWN_INTERVAL_DECREASE_PER_WAVE
+        // 기본 생성 간격에서 감소율 적용 (최소값 보장)
+        val interval = BASE_ENEMY_SPAWN_INTERVAL * (1 - minOf(decrease, 0.75f))
+        return maxOf(interval.toLong(), MIN_ENEMY_SPAWN_INTERVAL)
+    }
+    
+    /**
+     * 웨이브에 따른 적 이동 속도 계산
+     * @param wave 현재 웨이브
+     * @param isBoss 보스 여부
+     * @return 적 이동 속도
+     */
+    fun getEnemySpeedForWave(wave: Int, isBoss: Boolean = false): Float {
+        // 웨이브가 증가할 수록 이동 속도 증가
+        val increase = 1 + ((wave - 1) * ENEMY_SPEED_INCREASE_PER_WAVE)
+        // 기본 이동 속도에 증가율 적용
+        val speed = BASE_ENEMY_SPEED * increase
+        
+        // 보스인 경우 속도 조정
+        return if (isBoss) {
+            speed * BOSS_SPEED_MULTIPLIER
+        } else {
+            speed
+        }
+    }
+    
     // 점수 설정
-    const val SCORE_PER_NORMAL_ENEMY = 15  // 일반 적 처치 시 얻는 점수(자원) (10에서 15로 증가)
+    const val SCORE_PER_NORMAL_ENEMY = 200  // 일반 적 처치 시 얻는 점수(자원) (10에서 15로 증가)
     const val SCORE_PER_BOSS = 120  // 보스 처치 시 얻는 점수(자원) (100에서 120으로 증가)
     
     // 게임 오버 조건
@@ -264,27 +295,21 @@ object GameConfig {
     }
 
     /**
-     * 적 이동 속도 반환
+     * 웨이브별 적 생성 간격 반환
+     * @param wave 웨이브 번호
+     * @return 적 생성 간격 (밀리초)
+     */
+    fun getEnemySpawnCooldown(wave: Int): Long {
+        return getEnemySpawnIntervalForWave(wave)
+    }
+    
+    /**
+     * 기본 적 이동 속도 반환 (웨이브 1 기준)
      * @param isBoss 보스 여부
-     * @return 적 이동 속도
+     * @return 기본 적 이동 속도
      */
     fun getEnemySpeed(isBoss: Boolean): Float {
-        val baseSpeed = WAVE_ENEMY_SPEEDS[1] ?: 1.0f
-        return if (isBoss) {
-            baseSpeed * BOSS_SPEED_MULTIPLIER
-        } else {
-            baseSpeed
-        }
-    }
-
-    /**
-     * 웨이브에 따른 적 이동 속도 반환
-     * @param wave 웨이브 번호
-     * @param isBoss 보스 여부
-     * @return 적 이동 속도
-     */
-    fun getEnemySpeedForWave(wave: Int, isBoss: Boolean): Float {
-        val baseSpeed = WAVE_ENEMY_SPEEDS[wave] ?: WAVE_ENEMY_SPEEDS[1] ?: 1.0f
+        val baseSpeed = getEnemySpeedForWave(1, isBoss)
         return if (isBoss) {
             baseSpeed * BOSS_SPEED_MULTIPLIER
         } else {

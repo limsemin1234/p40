@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp"
+    android:padding="12dp"
     android:background="@drawable/dialog_background">
 
     <TextView
@@ -11,63 +11,74 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="조커 카드 변환"
-        android:textSize="20sp"
+        android:textSize="18sp"
         android:textStyle="bold"
         android:gravity="center"
         android:textColor="#FFFFFF"
-        android:layout_marginBottom="16dp" />
+        android:layout_marginBottom="12dp" />
 
     <TextView
         android:id="@+id/tvDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="조커를 변환할 숫자를 선택하세요"
-        android:textSize="16sp"
+        android:text="조커를 변환할 무늬와 숫자를 선택하세요"
+        android:textSize="14sp"
         android:gravity="center"
         android:textColor="#FFFFFF"
-        android:layout_marginBottom="16dp" />
+        android:layout_marginBottom="12dp" />
 
-    <!-- 카드 미리보기 -->
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cardPreview"
-        android:layout_width="120dp"
-        android:layout_height="160dp"
-        android:layout_gravity="center"
-        android:layout_marginBottom="16dp">
-        
+    <!-- 선택기 레이아웃 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginBottom="12dp">
+
+        <!-- 무늬 선택기 -->
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
             android:gravity="center">
 
             <TextView
-                android:id="@+id/tvPreviewSuit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="♥"
-                android:textSize="40sp"
-                android:textStyle="bold"
-                android:textColor="#FF0000"/>
+                android:text="무늬"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:layout_marginBottom="4dp"/>
+
+            <NumberPicker
+                android:id="@+id/suitPicker"
+                android:layout_width="wrap_content"
+                android:layout_height="120dp" />
+        </LinearLayout>
+
+        <!-- 숫자 선택기 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
 
             <TextView
-                android:id="@+id/tvPreviewRank"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="A"
-                android:textSize="40sp"
-                android:textStyle="bold"
-                android:textColor="#FF0000"/>
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
+                android:text="숫자"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:layout_marginBottom="4dp"/>
 
-    <!-- 숫자 선택기 -->
-    <NumberPicker
-        android:id="@+id/numberPicker"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginBottom="16dp" />
+            <NumberPicker
+                android:id="@+id/rankPicker"
+                android:layout_width="wrap_content"
+                android:layout_height="120dp" />
+        </LinearLayout>
+    </LinearLayout>
 
     <!-- 버튼 레이아웃 -->
     <LinearLayout
@@ -80,7 +91,7 @@
             android:id="@+id/btnCancel"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:text="취소"
             android:background="@drawable/button_secondary_background"
             android:layout_marginEnd="8dp" />
@@ -89,7 +100,7 @@
             android:id="@+id/btnConfirm"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:text="확인"
             android:background="@drawable/button_background"
             android:layout_marginStart="8dp" />
