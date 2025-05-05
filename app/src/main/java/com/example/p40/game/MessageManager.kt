@@ -34,10 +34,6 @@ class MessageManager private constructor() {
                 instance ?: MessageManager().also { instance = it }
             }
         }
-
-        // 메시지 상수
-        private const val MESSAGE_DURATION = 2000L // 메시지 표시 시간 (2초)
-        private const val MAX_MESSAGES = 5 // 최대 메시지 수
     }
 
     // 메시지 큐 및 현재 표시된 메시지 수 관리
@@ -188,7 +184,7 @@ class MessageManager private constructor() {
         val container = containerView ?: return
 
         // 최대 메시지 수를 초과하지 않고, 큐에 메시지가 있는 경우에만 처리
-        if (currentMessageCount < MAX_MESSAGES && messageQueue.isNotEmpty()) {
+        if (currentMessageCount < GameConfig.MESSAGE_MAX_COUNT && messageQueue.isNotEmpty()) {
             val messageInfo = messageQueue.poll() ?: return
             
             // 메시지 뷰 생성
@@ -206,7 +202,7 @@ class MessageManager private constructor() {
             // MESSAGE_DURATION 후 메시지 제거
             handler.postDelayed({
                 hideMessageWithAnimation(messageView)
-            }, MESSAGE_DURATION)
+            }, GameConfig.MESSAGE_DURATION)
         }
     }
 
@@ -220,17 +216,22 @@ class MessageManager private constructor() {
         // 텍스트 및 스타일 설정
         messageView.apply {
             text = messageInfo.message
-            textSize = 16f // 텍스트 크기 증가
+            textSize = GameConfig.MESSAGE_TEXT_SIZE // GameConfig에서 설정한, 텍스트 크기 사용
             setTextColor(Color.WHITE)
             // 텍스트에 그림자 추가하여 가독성 향상
             setShadowLayer(2f, 1f, 1f, Color.BLACK)
-            // 패딩 약간 증가
-            setPadding(dpToPx(context, 16), dpToPx(context, 10), dpToPx(context, 16), dpToPx(context, 10))
+            // 패딩 설정
+            setPadding(
+                dpToPx(context, GameConfig.MESSAGE_PADDING_HORIZONTAL), 
+                dpToPx(context, GameConfig.MESSAGE_PADDING_VERTICAL), 
+                dpToPx(context, GameConfig.MESSAGE_PADDING_HORIZONTAL), 
+                dpToPx(context, GameConfig.MESSAGE_PADDING_VERTICAL)
+            )
             gravity = Gravity.CENTER
             
             // 너비 제약조건 설정
-            minimumWidth = dpToPx(context, 200)
-            maxWidth = dpToPx(context, 350)
+            minimumWidth = dpToPx(context, GameConfig.MESSAGE_MIN_WIDTH)
+            maxWidth = dpToPx(context, GameConfig.MESSAGE_MAX_WIDTH)
             
             // 초기에는 보이지 않게 설정
             alpha = 0f
@@ -244,8 +245,8 @@ class MessageManager private constructor() {
             MessageType.ERROR -> Color.parseColor("#e74c3c")    // 빨간색
         }
         
-        // 알파값 적용 (60% 불투명도 = 40% 투명도)
-        val alpha = 153 // 60% 불투명도 (255 * 0.6)
+        // 알파값 적용 (GameConfig에서 설정한 불투명도)
+        val alpha = (255 * GameConfig.MESSAGE_OPACITY).toInt()
         val backgroundColor = Color.argb(
             alpha,
             Color.red(baseColor),
@@ -289,7 +290,7 @@ class MessageManager private constructor() {
         return android.graphics.drawable.GradientDrawable().apply {
             setColor(fillColor)
             setStroke(dpToPx(null, 1), strokeColor)
-            cornerRadius = dpToPx(null, 8).toFloat()
+            cornerRadius = dpToPx(null, GameConfig.MESSAGE_CORNER_RADIUS).toFloat()
         }
     }
 
