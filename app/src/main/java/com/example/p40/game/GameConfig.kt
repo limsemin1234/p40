@@ -14,7 +14,7 @@ object GameConfig {
     const val WAVE_MESSAGE_DURATION = 2000L  // 웨이브 메시지 표시 시간 (밀리초)
     
     // 디버그 모드 설정
-    const val DEBUG_MODE = false // 디버그 정보 표시 여부
+    const val DEBUG_MODE = true // 디버그 정보 표시 여부
     
     // 성능 및 제한 설정
     const val FRAME_LIMIT = 60 // 최대 FPS
@@ -43,11 +43,11 @@ object GameConfig {
     const val NORMAL_ENEMY_DAMAGE = 5  // 일반 적의 공격력
     
     // 적 생성 및 이동 속도 기본 설정
-    const val BASE_ENEMY_SPAWN_INTERVAL = 3000L  // 기본 적 생성 간격 (밀리초)
+    const val BASE_ENEMY_SPAWN_INTERVAL = 2000L  // 기본 적 생성 간격 (2초로 변경)
     const val BASE_ENEMY_SPEED = 1.0f           // 기본 적 이동 속도
     const val ENEMY_SPAWN_INTERVAL_DECREASE_PER_WAVE = 0.1f // 웨이브당 생성 간격 감소율 (10%)
     const val ENEMY_SPEED_INCREASE_PER_WAVE = 0.15f        // 웨이브당 이동 속도 증가율 (15%)
-    const val MIN_ENEMY_SPAWN_INTERVAL = 700L   // 최소 적 생성 간격 (밀리초)
+    const val MIN_ENEMY_SPAWN_INTERVAL = 500L   // 최소 적 생성 간격 (밀리초)
     
     // 웨이브별 적 생성 간격 및 이동 속도 맵
     val WAVE_ENEMY_SPAWN_COOLDOWNS: Map<Int, Long> = (1..TOTAL_WAVES).associateWith { wave ->
@@ -134,11 +134,11 @@ object GameConfig {
      * @return 적 생성 간격 (밀리초)
      */
     fun getEnemySpawnIntervalForWave(wave: Int): Long {
-        // 웨이브가 증가할 수록 생성 간격 감소
-        val decrease = (wave - 1) * ENEMY_SPAWN_INTERVAL_DECREASE_PER_WAVE
-        // 기본 생성 간격에서 감소율 적용 (최소값 보장)
-        val interval = BASE_ENEMY_SPAWN_INTERVAL * (1 - minOf(decrease, 0.75f))
-        return maxOf(interval.toLong(), MIN_ENEMY_SPAWN_INTERVAL)
+        // 웨이브당 100ms씩 생성 간격 감소
+        val decreasePerWave = 100L
+        // 기본 생성 간격에서 감소 시간 적용
+        val interval = BASE_ENEMY_SPAWN_INTERVAL - ((wave - 1) * decreasePerWave)
+        return maxOf(interval, MIN_ENEMY_SPAWN_INTERVAL)
     }
     
     /**
@@ -162,7 +162,7 @@ object GameConfig {
     }
     
     // 점수 설정
-    const val SCORE_PER_NORMAL_ENEMY = 200  // 일반 적 처치 시 얻는 점수(자원) (10에서 15로 증가)
+    const val SCORE_PER_NORMAL_ENEMY = 10  // 일반 적 처치 시 얻는 점수(자원) (10에서 15로 증가)
     const val SCORE_PER_BOSS = 120  // 보스 처치 시 얻는 점수(자원) (100에서 120으로 증가)
     
     // 게임 오버 조건
@@ -253,6 +253,27 @@ object GameConfig {
     // 성능 관련 설정
     const val OFFSCREEN_MARGIN = 300f // 화면 외부 마진 (오브젝트 제거 범위)
     const val OBJECT_POOL_SIZE = 100 // 오브젝트 풀 크기
+    
+    // --------- 렌더링 관련 설정 ----------
+    
+    // 적 렌더링 설정
+    const val ENEMY_RENDER_MARGIN_X = 200f // 적 렌더링 X축 마진 (화면 밖에서도 그리기 위함)
+    const val ENEMY_RENDER_MARGIN_Y = 200f // 적 렌더링 Y축 마진 (화면 밖에서도 그리기 위함)
+    
+    // 미사일 렌더링 설정
+    const val MISSILE_RENDER_MARGIN_X = 20f // 미사일 렌더링 X축 마진
+    const val MISSILE_RENDER_MARGIN_Y = 20f // 미사일 렌더링 Y축 마진
+    
+    // 디버그 정보 설정
+    const val DEBUG_TEXT_SIZE = 30f // 디버그 텍스트 크기
+    const val DEBUG_TEXT_COLOR = Color.GREEN // 디버그 텍스트 색상
+    const val DEBUG_TEXT_MARGIN_X = 10f // 디버그 텍스트 X축 마진
+    const val DEBUG_TEXT_SPACING = 30f // 디버그 텍스트 줄 간격
+    
+    // 게임 로직 설정
+    const val FAR_OFFSCREEN_MARGIN = 1000f // 적이 제거되는 화면 외부 거리 (300f에서 1000f로 증가)
+    const val ENEMY_SPAWN_DISTANCE_FACTOR = 0.4f // 적 생성 거리 계수 (화면 크기의 비율)
+    const val BOSS_SPAWN_DISTANCE_FACTOR = 0.7f // 보스 생성 거리 계수 (화면 크기의 비율)
 
     /**
      * 게임 난이도 설정

@@ -70,6 +70,8 @@ class GameStats(private val gameConfig: GameConfig) {
         waveCount = 1
         killCount = 0
         spawnedCount = 0
+        totalEnemiesInWave = gameConfig.ENEMIES_PER_WAVE
+        bossSpawned = false
         unitHealth = gameConfig.DEFENSE_UNIT_INITIAL_HEALTH
         unitMaxHealth = gameConfig.DEFENSE_UNIT_INITIAL_MAX_HEALTH
         unitAttackPower = gameConfig.MISSILE_DAMAGE
@@ -114,6 +116,7 @@ class GameStats(private val gameConfig: GameConfig) {
         killCount = 0
         spawnedCount = 0
         bossSpawned = false
+        totalEnemiesInWave = gameConfig.ENEMIES_PER_WAVE
     }
     
     /**

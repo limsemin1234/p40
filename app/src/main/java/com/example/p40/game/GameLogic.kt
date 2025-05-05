@@ -69,6 +69,10 @@ class GameLogic(
         // 게임 요소 초기화
         enemies.clear()
         missiles.clear()
+        
+        // 게임 시작 시 1웨이브 메시지 표시
+        showWaveMessage = true
+        waveMessageStartTime = System.currentTimeMillis()
     }
     
     /**
@@ -84,18 +88,16 @@ class GameLogic(
             showWaveMessage = false
         }
         
-        // 보스를 처치하고 다음 웨이브로 넘어가거나 웨이브 내 적 생성
-        if (!showWaveMessage) {
-            if (gameStats.getWaveCount() <= gameConfig.getTotalWaves()) {
-                handleEnemySpawning(currentTime)
-            }
+        // 웨이브 내 적 생성 (웨이브 메시지와 상관없이 항상 적 생성)
+        if (gameStats.getWaveCount() <= gameConfig.getTotalWaves()) {
+            handleEnemySpawning(currentTime)
         }
         
         // 화면 범위 계산 (성능 최적화를 위한 값)
         val centerX = screenWidth / 2
         val centerY = screenHeight / 2
         val visibleMargin = 100f // 화면 밖 여유 공간
-        val farOffScreenMargin = 300f // 더 먼 화면 밖 거리
+        val farOffScreenMargin = gameConfig.FAR_OFFSCREEN_MARGIN // GameConfig에서 설정값 사용
         
         // 화면 범위 계산 (화면 밖 일정 거리까지 포함)
         val minX = -visibleMargin
@@ -125,8 +127,10 @@ class GameLogic(
         // 5. 적 처리 및 점수 계산
         processDeadEnemies(deadEnemies)
         
-        // 웨이브의 일반 적 모두 처치 시 보스 소환
-        if (!gameStats.isBossSpawned() && gameStats.getKillCount() >= gameStats.getTotalEnemiesInWave()) {
+        // 웨이브의 일반 적 모두 생성 후 처치 시 보스 소환
+        if (!gameStats.isBossSpawned() && 
+            gameStats.getSpawnedCount() >= gameStats.getTotalEnemiesInWave() && 
+            enemies.isEmpty()) {
             spawnBoss()
             gameStats.spawnBoss()
         }
@@ -365,9 +369,12 @@ class GameLogic(
     private fun handleEnemySpawning(currentTime: Long) {
         try {
             val waveCount = gameStats.getWaveCount()
+            val spawnedCount = gameStats.getSpawnedCount()
+            val totalEnemiesInWave = gameStats.getTotalEnemiesInWave()
+            val isBossSpawned = gameStats.isBossSpawned()
+            
             // 웨이브당 정확히 적 수만큼만 생성되도록 수정
-            if (gameStats.getSpawnedCount() < gameStats.getTotalEnemiesInWave() && 
-                !gameStats.isBossSpawned() && !isGameOver) {
+            if (spawnedCount < totalEnemiesInWave && !isBossSpawned && !isGameOver) {
                 
                 // 웨이브에 맞는 적 생성 간격으로 적 생성
                 val spawnCooldown = gameConfig.getEnemySpawnIntervalForWave(waveCount)
@@ -375,6 +382,11 @@ class GameLogic(
                 if (currentTime - lastEnemySpawnTime > spawnCooldown) {
                     spawnEnemy()
                     lastEnemySpawnTime = currentTime
+                    
+                    // 디버그 모드인 경우에만 로그 출력
+                    if (gameConfig.DEBUG_MODE) {
+                        println("적 생성: ${gameStats.getSpawnedCount()}/${totalEnemiesInWave} - 웨이브: $waveCount")
+                    }
                 }
             }
         } catch (e: Exception) {
@@ -384,41 +396,40 @@ class GameLogic(
     }
     
     /**
-     * 보통 적 생성
+     * 적 생성
      */
     private fun spawnEnemy() {
-        // 적 수 제한 확인
-        if (enemies.size >= gameConfig.MAX_ENEMIES) {
-            // 가장 멀리 있는 적 제거 후 새로운 적 생성
-            removeDistantEnemy()
+        try {
+            val centerX = screenWidth / 2
+            val centerY = screenHeight / 2
+            
+            // 화면 가장자리에서 적 스폰
+            val angle = Random.nextDouble(0.0, 2 * PI)
+            val spawnDistance = screenWidth.coerceAtLeast(screenHeight) * gameConfig.ENEMY_SPAWN_DISTANCE_FACTOR
+            
+            val spawnX = centerX + cos(angle).toFloat() * spawnDistance
+            val spawnY = centerY + sin(angle).toFloat() * spawnDistance
+            
+            val waveCount = gameStats.getWaveCount()
+            // 현재 웨이브에 맞는 적 능력치 설정
+            val speed = gameConfig.getEnemySpeedForWave(waveCount)
+            val health = gameConfig.getEnemyHealthForWave(waveCount)
+            
+            // 객체 풀에서 적 가져오기
+            val enemy = enemyPool.obtain(
+                position = PointF(spawnX, spawnY),
+                target = PointF(centerX, centerY),
+                speed = speed,
+                health = health,
+                wave = waveCount
+            )
+            
+            enemies.add(enemy)
+            gameStats.incrementSpawnCount()
+        } catch (e: Exception) {
+            // 예외 발생 시 로그 출력 (실제 앱에서는 logger 사용)
+            e.printStackTrace()
         }
-        
-        val centerX = screenWidth / 2
-        val centerY = screenHeight / 2
-        
-        // 화면 가장자리에서 적 스폰
-        val angle = Random.nextDouble(0.0, 2 * PI)
-        val spawnDistance = screenWidth.coerceAtLeast(screenHeight) * 0.6f
-        
-        val spawnX = centerX + cos(angle).toFloat() * spawnDistance
-        val spawnY = centerY + sin(angle).toFloat() * spawnDistance
-        
-        val waveCount = gameStats.getWaveCount()
-        // 현재 웨이브에 맞는 적 능력치 설정
-        val speed = gameConfig.getEnemySpeedForWave(waveCount)
-        val health = gameConfig.getEnemyHealthForWave(waveCount)
-        
-        // 객체 풀에서 적 가져오기
-        val enemy = enemyPool.obtain(
-            position = PointF(spawnX, spawnY),
-            target = PointF(centerX, centerY),
-            speed = speed,
-            health = health,
-            wave = waveCount
-        )
-        
-        enemies.add(enemy)
-        gameStats.incrementSpawnCount()
     }
     
     /**
@@ -430,7 +441,7 @@ class GameLogic(
         
         // 보스는 랜덤한 방향에서 생성
         val angle = Random.nextDouble(0.0, 2 * PI)
-        val spawnDistance = screenWidth.coerceAtLeast(screenHeight) * 0.7f
+        val spawnDistance = screenWidth.coerceAtLeast(screenHeight) * gameConfig.BOSS_SPAWN_DISTANCE_FACTOR // 보스는 더 멀리서 생성
         
         val spawnX = centerX + cos(angle).toFloat() * spawnDistance
         val spawnY = centerY + sin(angle).toFloat() * spawnDistance
@@ -490,8 +501,8 @@ class GameLogic(
             // 미사일 초기화
             missiles.clear()
             
-            // 웨이브 시작 준비 시간 설정
-            lastEnemySpawnTime = System.currentTimeMillis() + gameConfig.WAVE_MESSAGE_DURATION
+            // 웨이브 시작 준비 시간 설정 (웨이브 메시지가 끝나면 즉시 적 생성 시작)
+            lastEnemySpawnTime = System.currentTimeMillis()
         } catch (e: Exception) {
             // 예외 발생 시 로그 출력 (실제 앱에서는 logger 사용)
             e.printStackTrace()

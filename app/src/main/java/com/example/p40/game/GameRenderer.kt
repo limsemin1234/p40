@@ -70,8 +70,8 @@ class GameRenderer(
         // 적 그리기 - 화면 내 적만 그리기
         for (enemy in enemies) {
             val pos = enemy.getPosition()
-            if (pos.x >= -50 && pos.x <= screenWidth + 50 && 
-                pos.y >= -50 && pos.y <= screenHeight + 50) {
+            if (pos.x >= -gameConfig.ENEMY_RENDER_MARGIN_X && pos.x <= screenWidth + gameConfig.ENEMY_RENDER_MARGIN_X && 
+                pos.y >= -gameConfig.ENEMY_RENDER_MARGIN_Y && pos.y <= screenHeight + gameConfig.ENEMY_RENDER_MARGIN_Y) {
                 enemy.draw(canvas)
             }
         }
@@ -79,8 +79,8 @@ class GameRenderer(
         // 미사일 그리기 - 화면 내 미사일만 그리기
         for (missile in missiles) {
             val pos = missile.getPosition()
-            if (pos.x >= -20 && pos.x <= screenWidth + 20 && 
-                pos.y >= -20 && pos.y <= screenHeight + 20) {
+            if (pos.x >= -gameConfig.MISSILE_RENDER_MARGIN_X && pos.x <= screenWidth + gameConfig.MISSILE_RENDER_MARGIN_X && 
+                pos.y >= -gameConfig.MISSILE_RENDER_MARGIN_Y && pos.y <= screenHeight + gameConfig.MISSILE_RENDER_MARGIN_Y) {
                 missile.draw(canvas)
             }
         }
@@ -182,16 +182,16 @@ class GameRenderer(
      */
     private fun drawDebugInfo(canvas: Canvas, enemyCount: Int, missileCount: Int) {
         val debugPaint = Paint().apply {
-            color = Color.GREEN
-            textSize = 30f
+            color = gameConfig.DEBUG_TEXT_COLOR
+            textSize = gameConfig.DEBUG_TEXT_SIZE
             textAlign = Paint.Align.LEFT
         }
         
         // 디버그 정보 표시
-        canvas.drawText("FPS: $currentFPS", 10f, 30f, debugPaint)
-        canvas.drawText("적: $enemyCount/${gameConfig.MAX_ENEMIES}", 10f, 60f, debugPaint)
-        canvas.drawText("미사일: $missileCount/${gameConfig.MAX_MISSILES}", 10f, 90f, debugPaint)
-        canvas.drawText("Wave: ${gameStats.getWaveCount()}", 10f, 120f, debugPaint)
+        canvas.drawText("FPS: $currentFPS", gameConfig.DEBUG_TEXT_MARGIN_X, gameConfig.DEBUG_TEXT_SPACING, debugPaint)
+        canvas.drawText("적: $enemyCount/${gameConfig.MAX_ENEMIES}", gameConfig.DEBUG_TEXT_MARGIN_X, gameConfig.DEBUG_TEXT_SPACING * 2, debugPaint)
+        canvas.drawText("미사일: $missileCount/${gameConfig.MAX_MISSILES}", gameConfig.DEBUG_TEXT_MARGIN_X, gameConfig.DEBUG_TEXT_SPACING * 3, debugPaint)
+        canvas.drawText("Wave: ${gameStats.getWaveCount()}", gameConfig.DEBUG_TEXT_MARGIN_X, gameConfig.DEBUG_TEXT_SPACING * 4, debugPaint)
     }
     
     /**
