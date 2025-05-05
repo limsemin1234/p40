@@ -37,7 +37,7 @@ object GameConfig {
     const val MISSILE_MAX_DISTANCE = 3000f  // 미사일 최대 이동 거리 (2000f -> 3000f로 증가)
     
     // 일반 적 설정
-    const val ENEMY_BASE_SIZE = 10f  // 기본 크기
+    const val ENEMY_BASE_SIZE = 10f  // 기본 크기 (30f에서 10f로 줄임)
     const val ENEMY_BASE_HEALTH = 50  // 기본 체력
     const val ENEMY_COLOR = Color.RED  // 적 색상
     const val NORMAL_ENEMY_DAMAGE = 5  // 일반 적의 공격력

@@ -22,22 +22,6 @@ class LobbyFragment : Fragment(R.layout.fragment_lobby) {
             description = "10 웨이브 구성, 보통 난이도",
             totalWaves = 10,
             difficulty = 1.0f
-        ),
-        GameLevel(
-            id = 2,
-            number = 2,
-            title = "중급 난이도",
-            description = "15 웨이브 구성, 어려운 난이도",
-            totalWaves = 15,
-            difficulty = 1.3f
-        ),
-        GameLevel(
-            id = 3,
-            number = 3,
-            title = "고급 난이도",
-            description = "20 웨이브 구성, 매우 어려운 난이도",
-            totalWaves = 20,
-            difficulty = 1.6f
         )
     )
 

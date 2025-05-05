@@ -109,46 +109,6 @@ class Enemy(
         
         // 전략 패턴: 그리기 로직을 전략에 위임
         behaviorStrategy.draw(this, canvas)
-        
-        // 체력바 그리기 (공통)
-        drawHealthBar(canvas)
-    }
-    
-    /**
-     * 체력바 그리기
-     */
-    private fun drawHealthBar(canvas: Canvas) {
-        val healthBarWidth = size * 2
-        val healthBarHeight = 3f
-        val healthRatio = health.toFloat() / maxHealth
-        
-        // 체력바 배경
-        val bgPaint = Paint().apply { color = Color.DKGRAY }
-        canvas.drawRect(
-            position.x - healthBarWidth / 2,
-            position.y - size - 8f,
-            position.x + healthBarWidth / 2,
-            position.y - size - 5f,
-            bgPaint
-        )
-        
-        // 체력바 색상 설정 (체력에 따라)
-        val healthColor = when {
-            enraged -> Color.MAGENTA // 분노 상태면 보라색
-            healthRatio > 0.7f -> Color.GREEN
-            healthRatio > 0.3f -> Color.YELLOW
-            else -> Color.RED
-        }
-        
-        // 체력바
-        val healthPaint = Paint().apply { color = healthColor }
-        canvas.drawRect(
-            position.x - healthBarWidth / 2,
-            position.y - size - 8f,
-            position.x - healthBarWidth / 2 + healthBarWidth * healthRatio,
-            position.y - size - 5f,
-            healthPaint
-        )
     }
     
     /**

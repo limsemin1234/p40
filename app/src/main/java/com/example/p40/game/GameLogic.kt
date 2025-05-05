@@ -170,7 +170,7 @@ class GameLogic(
                     val enemyDamage = enemy.getDamage()
                     val isUnitDead = gameStats.applyDamageToUnit(enemyDamage)
                     
-                    // 체력이 0이 되면 게임 오버
+                    // 체력이 0 이하일 때만 게임오버 처리
                     if (isUnitDead && !isGameOver) {
                         isGameOver = true
                         // 게임 오버 처리 - UI 스레드에서 실행
@@ -258,11 +258,8 @@ class GameLogic(
         val adjustedAttackCooldown = (gameStats.getUnitAttackSpeed() * attackSpeedMultiplier).toLong()
         val missileDamageMultiplier = gameStats.getBuffManager().getMissileDamageMultiplier()
         
-        // 화면 내 적이 있는 경우에만 공격 처리
-        val screenEnemies = enemies.filter { 
-            val pos = it.getPosition()
-            screenRect.contains(pos.x, pos.y) && !it.isDead()
-        }
+        // 모든 살아있는 적을 대상으로 공격 처리 (화면 내 적으로 제한하지 않음)
+        val aliveEnemies = enemies.filter { !it.isDead() }
         
         // 다방향 발사 지원
         val multiDirCount = gameStats.getMultiDirectionCount()
@@ -272,7 +269,7 @@ class GameLogic(
             
             for (i in 0 until multiDirCount) {
                 val newMissile = defenseUnit.attack(
-                    screenEnemies, 
+                    aliveEnemies, 
                     currentTime, 
                     adjustedAttackCooldown, 
                     missileDamageMultiplier,
@@ -286,7 +283,7 @@ class GameLogic(
         } else {
             // 기본 1방향 발사
             val newMissile = defenseUnit.attack(
-                screenEnemies, 
+                aliveEnemies, 
                 currentTime, 
                 adjustedAttackCooldown,
                 missileDamageMultiplier

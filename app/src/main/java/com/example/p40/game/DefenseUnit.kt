@@ -93,22 +93,22 @@ class DefenseUnit(
             return null
         }
         
-        lastAttackTime = currentTime
-        
         // 가장 가까운 적 찾기
         val target = if (enemies.isNotEmpty()) findNearestEnemy(enemies) else null
         
-        // 타겟 좌표 계산 (타겟이 없으면 기본 방향으로)
-        val angle = if (target != null) {
-            val targetPos = target.getPosition()
-            // 벡터 계산 캐싱 활용
-            val dx = tempDx[target] ?: (targetPos.x - position.x).also { tempDx[target] = it }
-            val dy = tempDy[target] ?: (targetPos.y - position.y).also { tempDy[target] = it }
-            atan2(dy.toDouble(), dx.toDouble()) + angleOffset
-        } else {
-            // 타겟이 없으면 기본 방향 (오른쪽)으로 발사
-            0.0 + angleOffset
+        // 타겟이 없으면 미사일을 발사하지 않음
+        if (target == null) {
+            return null
         }
+        
+        lastAttackTime = currentTime
+        
+        // 타겟 좌표 계산
+        val targetPos = target.getPosition()
+        // 벡터 계산 캐싱 활용
+        val dx = tempDx[target] ?: (targetPos.x - position.x).also { tempDx[target] = it }
+        val dy = tempDy[target] ?: (targetPos.y - position.y).also { tempDy[target] = it }
+        val angle = atan2(dy.toDouble(), dx.toDouble()) + angleOffset
         
         // 각도 관련 삼각함수 계산 결과 캐싱
         cacheAngleCalculation(angle)
@@ -163,8 +163,8 @@ class DefenseUnit(
                 tempDistanceSquared[enemy] = distanceSquared
             }
             
-            // 공격 범위 제한 임시 제거 - 항상 가장 가까운 적을 타겟팅
-            if (distanceSquared < minDistance) {
+            // 공격 범위 내에 있는 적만 타겟팅
+            if (distanceSquared <= attackRangeSquared && distanceSquared < minDistance) {
                 minDistance = distanceSquared
                 nearest = enemy
             }

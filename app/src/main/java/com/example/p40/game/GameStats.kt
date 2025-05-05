@@ -249,7 +249,10 @@ class GameStats(private val gameConfig: GameConfig) {
     fun getUnitMaxHealth(): Int = unitMaxHealth
     fun getUnitAttackPower(): Int = unitAttackPower
     fun getUnitAttackSpeed(): Long = unitAttackSpeed
-    fun getUnitAttackRange(): Float = 1000f // 임시로 매우 큰 값으로 설정 (원래는 unitAttackRange)
+    fun getUnitAttackRange(): Float = unitAttackRange
+    
+    // 현재 체력 가져오기 메서드 추가
+    fun getCurrentHealth(): Int = unitHealth
     
     fun getDamageLevel(): Int = damageLevel
     fun getAttackSpeedLevel(): Int = attackSpeedLevel
