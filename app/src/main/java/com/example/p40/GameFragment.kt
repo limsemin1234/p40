@@ -76,10 +76,9 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         arguments?.let { args ->
             val levelId = args.getInt("levelId", 1)
             val totalWaves = args.getInt("totalWaves", 10)
-            val difficulty = args.getFloat("difficulty", 1.0f)
             
-            // GameConfig에 게임 레벨 설정 적용
-            GameConfig.setGameLevel(difficulty, totalWaves)
+            // 웨이브 수만 설정 (난이도 설정은 제거됨)
+            GameConfig.setTotalWaves(totalWaves)
         }
         
         // 게임 뷰 초기화
@@ -235,7 +234,6 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         val killCount = gameView.getKillCount()
         val totalEnemies = gameView.getTotalEnemiesInWave()
         val totalWaves = GameConfig.getTotalWaves()
-        val difficulty = GameConfig.getDifficulty()
         
         // 각 정보를 개별 TextView에 업데이트
         view?.apply {
