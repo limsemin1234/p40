@@ -68,8 +68,8 @@ class BossEnemyBehavior : EnemyBehaviorStrategy {
     override fun move(enemy: Enemy, speedMultiplier: Float) {
         val position = enemy.getPosition()
         val target = enemy.getTarget()
-        // 보스는 일반 적보다 약간 느리게 설정
-        val speed = enemy.getSpeed() * speedMultiplier * 0.8f
+        // 보스는 일반 적보다 약간 느리게 설정 (GameConfig 값 사용)
+        val speed = enemy.getSpeed() * speedMultiplier * GameConfig.BOSS_SPEED_MULTIPLIER
         
         // 목표 방향으로 이동 (지그재그 패턴)
         val dx = target.x - position.x
@@ -77,9 +77,9 @@ class BossEnemyBehavior : EnemyBehaviorStrategy {
         val distance = Math.sqrt((dx * dx + dy * dy).toDouble()).toFloat()
         
         if (distance > 0) {
-            // 지그재그 움직임 구현 (시간에 따른 사인파)
-            val time = System.currentTimeMillis() / 500.0 // 반 초 단위로 변화
-            val offsetX = Math.sin(time) * 2.0 // 좌우 진폭
+            // 지그재그 움직임 구현 (시간에 따른 사인파) (GameConfig 값 사용)
+            val time = System.currentTimeMillis() / GameConfig.BOSS_ZIGZAG_PERIOD // 지그재그 주기 단위로 변화
+            val offsetX = Math.sin(time) * GameConfig.BOSS_ZIGZAG_AMPLITUDE // 좌우 진폭
             
             position.x += (dx / distance * speed) + offsetX.toFloat()
             position.y += dy / distance * speed
