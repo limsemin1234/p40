@@ -32,7 +32,7 @@ object GameConfig {
     // 미사일 설정
     const val MISSILE_SIZE = 5f  // 미사일 크기
     const val MISSILE_SPEED = 10f  // 미사일 속도 (5f -> 10f로 증가)
-    const val MISSILE_DAMAGE = 50  // 미사일 기본 데미지
+    const val MISSILE_DAMAGE = 50  // 미사일 기본 데미지 (50에서 100으로 증가)
     const val MISSILE_COLOR = Color.YELLOW  // 미사일 색상
     const val MISSILE_MAX_DISTANCE = 3000f  // 미사일 최대 이동 거리 (2000f -> 3000f로 증가)
     

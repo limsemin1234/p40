@@ -47,7 +47,12 @@ class BasicEnemyBehavior : EnemyBehaviorStrategy {
         enemy.setHealth(health)
         
         // 죽었는지 확인
-        return health <= 0
+        if (health <= 0) {
+            enemy.setDead(true)
+            return true
+        }
+        
+        return false
     }
     
     override fun onReachCenter(enemy: Enemy) {
