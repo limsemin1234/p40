@@ -34,7 +34,6 @@ object GameConfig {
     const val MISSILE_SPEED = 10f  // 미사일 속도
     const val MISSILE_DAMAGE = 50  // 미사일 기본 데미지
     const val MISSILE_COLOR = Color.YELLOW  // 미사일 색상
-    const val MISSILE_MAX_DISTANCE = 3000f  // 미사일 최대 이동 거리
     
     // 일반 적 설정
     const val ENEMY_BASE_SIZE = 10f  // 기본 크기
@@ -65,18 +64,10 @@ object GameConfig {
     const val BOSS_SIZE_MULTIPLIER = 2.0f  // 보스 크기 배율
     const val BOSS_HEALTH_MULTIPLIER = 4  // 보스 체력 배율
     const val BOSS_SPEED_MULTIPLIER = 0.8f  // 보스 속도 배율
-    const val BOSS_COLOR = Color.MAGENTA  // 보스 색상
-    const val BOSS_BORDER_COLOR = Color.YELLOW  // 보스 테두리 색상
-    const val BOSS_BORDER_WIDTH = 5f  // 보스 테두리 두께
     const val BOSS_DAMAGE = 12  // 보스 적의 공격력
     
     // 웨이브별 적 데미지 증가량
     const val ENEMY_DAMAGE_PER_WAVE = 1  // 웨이브당 적 데미지 증가량
-    
-    // 카드 스킬 설정
-    const val CARD_DAMAGE_NORMAL = 120  // 일반 적에게 주는 데미지
-    const val CARD_DAMAGE_BOSS = 80  // 보스에게 주는 데미지
-    const val CARD_COOLDOWN = 8000L  // 카드 사용 쿨다운
     
     // 점수 설정
     const val SCORE_PER_NORMAL_ENEMY = 15  // 일반 적 처치 시 얻는 점수(자원) - 주석과 일치하도록 수정
@@ -96,27 +87,27 @@ object GameConfig {
     
     // 데미지 업그레이드 설정
     const val DAMAGE_UPGRADE_INITIAL_COST = 10  // 초기 비용
-    const val DAMAGE_UPGRADE_COST_INCREASE = 4  // 레벨당 비용 증가량
-    const val DAMAGE_UPGRADE_VALUE = 2  // 업그레이드당 데미지 증가량
-    const val DAMAGE_UPGRADE_MAX_LEVEL = 40  // 최대 업그레이드 레벨
+    const val DAMAGE_UPGRADE_COST_INCREASE = 5  // 레벨당 비용 증가량
+    const val DAMAGE_UPGRADE_VALUE = 1  // 업그레이드당 데미지 증가량
+    const val DAMAGE_UPGRADE_MAX_LEVEL = 100  // 최대 업그레이드 레벨
     
     // 공격속도 업그레이드 설정
     const val ATTACK_SPEED_UPGRADE_INITIAL_COST = 10  // 초기 비용
-    const val ATTACK_SPEED_UPGRADE_COST_INCREASE = 6  // 레벨당 비용 증가량
-    const val ATTACK_SPEED_UPGRADE_PERCENT = 0.015f  // 업그레이드당 속도 증가율 (1.5%)
-    const val ATTACK_SPEED_UPGRADE_MAX_LEVEL = 25  // 최대 업그레이드 레벨
+    const val ATTACK_SPEED_UPGRADE_COST_INCREASE = 5  // 레벨당 비용 증가량
+    const val ATTACK_SPEED_UPGRADE_PERCENT = 0.02f  // 업그레이드당 속도 증가율 0.02%
+    const val ATTACK_SPEED_UPGRADE_MAX_LEVEL = 100  // 최대 업그레이드 레벨
     
     // 공격범위 업그레이드 설정
     const val ATTACK_RANGE_UPGRADE_INITIAL_COST = 10  // 초기 비용
     const val ATTACK_RANGE_UPGRADE_COST_INCREASE = 5  // 레벨당 비용 증가량
-    const val ATTACK_RANGE_UPGRADE_VALUE = 8f  // 업그레이드당 범위 증가량
-    const val ATTACK_RANGE_UPGRADE_MAX_LEVEL = 30  // 최대 업그레이드 레벨
+    const val ATTACK_RANGE_UPGRADE_VALUE = 5f  // 업그레이드당 범위 증가량
+    const val ATTACK_RANGE_UPGRADE_MAX_LEVEL = 60  // 최대 업그레이드 레벨
     
     // 체력 업그레이드 설정
     const val DEFENSE_UPGRADE_INITIAL_COST = 10  // 초기 비용
-    const val DEFENSE_UPGRADE_COST_INCREASE = 4  // 레벨당 비용 증가량
-    const val DEFENSE_UPGRADE_VALUE = 25  // 업그레이드당 최대 체력 증가량
-    const val DEFENSE_UPGRADE_MAX_LEVEL = 40  // 최대 업그레이드 레벨
+    const val DEFENSE_UPGRADE_COST_INCREASE = 5  // 레벨당 비용 증가량
+    const val DEFENSE_UPGRADE_VALUE = 20  // 업그레이드당 최대 체력 증가량
+    const val DEFENSE_UPGRADE_MAX_LEVEL = 100  // 최대 업그레이드 레벨
     
     // --------- 버프 관련 설정 ----------
     
