@@ -26,9 +26,9 @@
 
     <style name="NumberPickerTextColorStyle">
         <!-- NumberPicker 스타일 설정 -->
-        <item name="android:textColorPrimary">#000000</item>
-        <item name="colorControlNormal">#444444</item>
-        <item name="android:background">#FFFFFF</item>
+        <item name="android:textColorPrimary">#FFFFFF</item>
+        <item name="colorControlNormal">#BBBBBB</item>
+        <item name="android:background">#444444</item>
     </style>
 
 </resources>

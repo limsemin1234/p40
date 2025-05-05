@@ -1402,6 +1402,9 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
             dialog.setContentView(R.layout.dialog_joker_number_picker)
             dialog.setCancelable(true)
             
+            // 다이얼로그 창 배경을 투명하게 설정 (레이아웃에서 배경 색상을 직접 지정)
+            dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+            
             // 다이얼로그 제목 설정
             val titleTextView = dialog.findViewById<TextView>(R.id.tvTitle)
             titleTextView.text = "조커 카드 변환"
