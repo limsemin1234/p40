@@ -41,11 +41,19 @@ object GameConfig {
     const val ENEMY_COLOR = Color.RED  // 적 색상
     const val NORMAL_ENEMY_DAMAGE = 5  // 일반 적의 공격력
     
+    // 공중 적(Flying Enemy) 설정
+    const val FLYING_ENEMY_WAVE_THRESHOLD = 6  // 공중 적이 등장하기 시작하는 웨이브
+    const val FLYING_ENEMY_SPAWN_CHANCE = 0.3f  // 공중 적 등장 확률 (0~1)
+    const val FLYING_ENEMY_SPEED_MULTIPLIER = 1.2f  // 공중 적 이동 속도 계수
+    const val FLYING_ENEMY_DAMAGE_MULTIPLIER = 1.2f  // 공중 적이 받는 데미지 계수 (취약함)
+    const val FLYING_ENEMY_HOVER_AMPLITUDE = 3.0  // 공중 적 호버링 진폭
+    const val FLYING_ENEMY_HOVER_PERIOD = 300.0  // 공중 적 호버링 주기 (밀리초)
+    
     // 적 생성 및 이동 속도 기본 설정
     const val BASE_ENEMY_SPAWN_INTERVAL = 2000L  // 기본 적 생성 간격 (2초)
     const val BASE_ENEMY_SPEED = 1.0f           // 기본 적 이동 속도
     const val ENEMY_SPAWN_INTERVAL_DECREASE_PER_WAVE = 0.1f // 웨이브당 생성 간격 감소율 (10%)
-    const val ENEMY_SPEED_INCREASE_PER_WAVE = 0.15f        // 웨이브당 이동 속도 증가율 (15%)
+    const val ENEMY_SPEED_INCREASE_PER_WAVE = 0.05f        // 웨이브당 이동 속도 증가율 (5%)
     const val MIN_ENEMY_SPAWN_INTERVAL = 500L   // 최소 적 생성 간격 (밀리초)
     
     // 웨이브별 적 체력 배율 (ENEMY_BASE_HEALTH에 곱해짐)
@@ -161,7 +169,7 @@ object GameConfig {
     // --------- 메시지 관련 설정 ----------
     
     // 메시지 표시 설정
-    const val MESSAGE_OPACITY = 0.4f // 메시지 불투명도 (0~1)
+    const val MESSAGE_OPACITY = 0.3f // 메시지 불투명도 (0~1)
     const val MESSAGE_MIN_WIDTH = 200 // 메시지 최소 너비 (dp)
     const val MESSAGE_MAX_WIDTH = 350 // 메시지 최대 너비 (dp)
     const val MESSAGE_PADDING_HORIZONTAL = 16 // 메시지 가로 패딩 (dp)
@@ -169,7 +177,7 @@ object GameConfig {
     const val MESSAGE_CORNER_RADIUS = 8 // 메시지 모서리 둥글기 (dp)
     const val MESSAGE_DURATION = 2000L // 메시지 표시 시간 (ms)
     const val MESSAGE_MAX_COUNT = 5 // 최대 메시지 수
-    const val MESSAGE_TEXT_SIZE = 16f // 메시지 텍스트 크기 (sp)
+    const val MESSAGE_TEXT_SIZE = 15f // 메시지 텍스트 크기 (sp)
     
     // 디버그 정보 설정
     const val DEBUG_TEXT_SIZE = 30f // 디버그 텍스트 크기
@@ -237,10 +245,9 @@ object GameConfig {
      * @return 적 생성 간격 (밀리초)
      */
     fun getEnemySpawnIntervalForWave(wave: Int): Long {
-        // 웨이브당 100ms씩 생성 간격 감소
-        val decreasePerWave = 100L
-        // 기본 생성 간격에서 감소 시간 적용
-        val interval = BASE_ENEMY_SPAWN_INTERVAL - ((wave - 1) * decreasePerWave)
+        // ENEMY_SPAWN_INTERVAL_DECREASE_PER_WAVE 적용 (비율 기반 감소)
+        val decreaseFactor = 1 - ((wave - 1) * ENEMY_SPAWN_INTERVAL_DECREASE_PER_WAVE)
+        val interval = (BASE_ENEMY_SPAWN_INTERVAL * decreaseFactor).toLong()
         return maxOf(interval, MIN_ENEMY_SPAWN_INTERVAL)
     }
     
