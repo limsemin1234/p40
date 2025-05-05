@@ -137,12 +137,12 @@ class FlyingEnemyBehavior : EnemyBehaviorStrategy {
     override fun move(enemy: Enemy, speedMultiplier: Float) {
         val position = enemy.getPosition()
         val target = enemy.getTarget()
-        // 날아다니는 적은 좀 더 빠르게 설정
-        val speed = enemy.getSpeed() * speedMultiplier * 1.2f
+        // 날아다니는 적은 좀 더 빠르게 설정 (GameConfig 값 사용)
+        val speed = enemy.getSpeed() * speedMultiplier * GameConfig.FLYING_ENEMY_SPEED_MULTIPLIER
         
-        // 호버링 효과 (상하로 움직임 추가)
-        val time = System.currentTimeMillis() / 300.0 // 0.3초 단위로 변화
-        val offsetY = Math.sin(time) * 3.0 // 상하 진폭
+        // 호버링 효과 (상하로 움직임 추가) (GameConfig 값 사용)
+        val time = System.currentTimeMillis() / GameConfig.FLYING_ENEMY_HOVER_PERIOD // 호버링 주기 단위로 변화
+        val offsetY = Math.sin(time) * GameConfig.FLYING_ENEMY_HOVER_AMPLITUDE // 상하 진폭
         
         val dx = target.x - position.x
         val dy = target.y - position.y
@@ -176,8 +176,8 @@ class FlyingEnemyBehavior : EnemyBehaviorStrategy {
     }
     
     override fun onDamage(enemy: Enemy, damage: Int): Boolean {
-        // 날아다니는 적은 데미지를 더 많이 받음 (20% 증가)
-        val actualDamage = (damage * 1.2f).toInt()
+        // 날아다니는 적은 데미지를 더 많이 받음 (GameConfig 값 사용)
+        val actualDamage = (damage * GameConfig.FLYING_ENEMY_DAMAGE_MULTIPLIER).toInt()
         val health = enemy.getHealth() - actualDamage
         enemy.setHealth(health)
         

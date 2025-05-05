@@ -40,7 +40,7 @@ class Enemy(
     // 행동 전략 설정 (전략 패턴)
     private var behaviorStrategy: EnemyBehaviorStrategy = when {
         isBoss -> BossEnemyBehavior()
-        wave > 5 && Math.random() < 0.3 -> FlyingEnemyBehavior() // 5웨이브 이후 30% 확률로 날아다니는 적
+        wave >= GameConfig.FLYING_ENEMY_WAVE_THRESHOLD && Math.random() < GameConfig.FLYING_ENEMY_SPAWN_CHANCE -> FlyingEnemyBehavior() // GameConfig에서 설정한 웨이브와 확률로 공중 적 생성
         else -> BasicEnemyBehavior()
     }
     
@@ -77,7 +77,7 @@ class Enemy(
         // 행동 전략 재설정
         behaviorStrategy = when {
             isBoss -> BossEnemyBehavior()
-            newWave > 5 && Math.random() < 0.3 -> FlyingEnemyBehavior() 
+            newWave >= GameConfig.FLYING_ENEMY_WAVE_THRESHOLD && Math.random() < GameConfig.FLYING_ENEMY_SPAWN_CHANCE -> FlyingEnemyBehavior() 
             else -> BasicEnemyBehavior()
         }
     }
@@ -149,7 +149,7 @@ class Enemy(
         // 웨이브 변경에 따른 행동 전략 재평가
         behaviorStrategy = when {
             isBoss -> BossEnemyBehavior()
-            newWave > 5 && Math.random() < 0.3 -> FlyingEnemyBehavior() 
+            newWave >= GameConfig.FLYING_ENEMY_WAVE_THRESHOLD && Math.random() < GameConfig.FLYING_ENEMY_SPAWN_CHANCE -> FlyingEnemyBehavior() 
             else -> BasicEnemyBehavior()
         }
     }

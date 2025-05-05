@@ -41,14 +41,6 @@ object GameConfig {
     const val ENEMY_COLOR = Color.RED  // 적 색상
     const val NORMAL_ENEMY_DAMAGE = 5  // 일반 적의 공격력
     
-    // 공중 적(Flying Enemy) 설정
-    const val FLYING_ENEMY_WAVE_THRESHOLD = 6  // 공중 적이 등장하기 시작하는 웨이브
-    const val FLYING_ENEMY_SPAWN_CHANCE = 0.3f  // 공중 적 등장 확률 (0~1)
-    const val FLYING_ENEMY_SPEED_MULTIPLIER = 1.2f  // 공중 적 이동 속도 계수
-    const val FLYING_ENEMY_DAMAGE_MULTIPLIER = 1.2f  // 공중 적이 받는 데미지 계수 (취약함)
-    const val FLYING_ENEMY_HOVER_AMPLITUDE = 3.0  // 공중 적 호버링 진폭
-    const val FLYING_ENEMY_HOVER_PERIOD = 300.0  // 공중 적 호버링 주기 (밀리초)
-    
     // 적 생성 및 이동 속도 기본 설정
     const val BASE_ENEMY_SPAWN_INTERVAL = 2000L  // 기본 적 생성 간격 (2초)
     const val BASE_ENEMY_SPEED = 1.0f           // 기본 적 이동 속도
@@ -175,7 +167,7 @@ object GameConfig {
     const val MESSAGE_PADDING_HORIZONTAL = 16 // 메시지 가로 패딩 (dp)
     const val MESSAGE_PADDING_VERTICAL = 10 // 메시지 세로 패딩 (dp)
     const val MESSAGE_CORNER_RADIUS = 8 // 메시지 모서리 둥글기 (dp)
-    const val MESSAGE_DURATION = 2000L // 메시지 표시 시간 (ms)
+    const val MESSAGE_DURATION = 1500L // 메시지 표시 시간 (ms)
     const val MESSAGE_MAX_COUNT = 5 // 최대 메시지 수
     const val MESSAGE_TEXT_SIZE = 15f // 메시지 텍스트 크기 (sp)
     
