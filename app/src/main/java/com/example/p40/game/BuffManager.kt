@@ -87,6 +87,17 @@ data class Buff(
 class BuffManager {
     private val buffs = ConcurrentHashMap<BuffType, Buff>()
     
+    // 효과 계산 결과 캐싱을 위한 변수들
+    private var cachedMissileDamageMultiplier: Float = 1.0f
+    private var cachedAttackSpeedMultiplier: Float = 1.0f
+    private var cachedMissileSpeedMultiplier: Float = 1.0f
+    private var cachedEnemySpeedMultiplier: Float = 1.0f
+    private var cachedMultiDirectionCount: Int = 1
+    private var cachedMissilePierceCount: Int = 0
+    
+    // 캐시 유효성 플래그
+    private var isBuffCacheValid: Boolean = false
+    
     init {
         // 버프 초기화
         // (실제 게임에서는 아무 버프도 없는 상태로 시작)
@@ -102,6 +113,46 @@ class BuffManager {
             // 새 버프 추가
             buffs[buff.type] = buff
         }
+        
+        // 캐시 무효화
+        invalidateCache()
+    }
+    
+    // 캐시 무효화
+    private fun invalidateCache() {
+        isBuffCacheValid = false
+    }
+    
+    // 캐시 재계산
+    private fun recalculateCache() {
+        if (isBuffCacheValid) return
+        
+        // 미사일 데미지 배율 계산
+        val missileDamageLevel = getBuffLevel(BuffType.MISSILE_DAMAGE)
+        cachedMissileDamageMultiplier = 1f + (missileDamageLevel * 0.15f)
+        
+        // 공격 속도 배율 계산
+        val attackSpeedLevel = getBuffLevel(BuffType.ATTACK_SPEED)
+        cachedAttackSpeedMultiplier = 1f - (attackSpeedLevel * 0.12f)
+        
+        // 미사일 속도 배율 계산
+        val missileSpeedLevel = getBuffLevel(BuffType.MISSILE_SPEED)
+        cachedMissileSpeedMultiplier = 1f + (missileSpeedLevel * 0.2f)
+        
+        // 적 이동속도 배율 계산
+        val enemySlowLevel = getBuffLevel(BuffType.ENEMY_SLOW)
+        cachedEnemySpeedMultiplier = 1f - (enemySlowLevel * 0.15f)
+        
+        // 다방향 발사 계산
+        val multiDirectionLevel = getBuffLevel(BuffType.MULTI_DIRECTION)
+        cachedMultiDirectionCount = 1 + multiDirectionLevel
+        
+        // 미사일 관통 횟수 계산
+        val missilePierceLevel = getBuffLevel(BuffType.MISSILE_PIERCE)
+        cachedMissilePierceCount = missilePierceLevel
+        
+        // 캐시 유효성 표시
+        isBuffCacheValid = true
     }
     
     // 포커 족보에 따른 버프 추가
@@ -298,6 +349,9 @@ class BuffManager {
                 ))
             }
         }
+        
+        // 버프 추가 후 캐시 무효화
+        invalidateCache()
     }
     
     // 특정 버프 타입의 레벨 가져오기
@@ -337,53 +391,50 @@ class BuffManager {
     
     // 미사일 데미지 배율 계산
     fun getMissileDamageMultiplier(): Float {
-        val level = getBuffLevel(BuffType.MISSILE_DAMAGE)
-        // 레벨당 15% 데미지 증가
-        return 1f + (level * 0.15f)
+        if (!isBuffCacheValid) recalculateCache()
+        return cachedMissileDamageMultiplier
     }
     
     // 공격 속도 배율 계산
     fun getAttackSpeedMultiplier(): Float {
-        val level = getBuffLevel(BuffType.ATTACK_SPEED)
-        // 레벨당 12% 공격속도 증가 (쿨다운 감소)
-        return 1f - (level * 0.12f)
+        if (!isBuffCacheValid) recalculateCache()
+        return cachedAttackSpeedMultiplier
     }
     
     // 미사일 속도 배율 계산
     fun getMissileSpeedMultiplier(): Float {
-        val level = getBuffLevel(BuffType.MISSILE_SPEED)
-        // 레벨당 20% 미사일 속도 증가
-        return 1f + (level * 0.2f)
-    }
-    
-    // 다방향 발사 횟수 계산
-    fun getMultiDirectionCount(): Int {
-        val level = getBuffLevel(BuffType.MULTI_DIRECTION)
-        // 레벨이 0이면 기본 1방향, 그 이상이면 레벨+1 방향
-        return if (level > 0) level + 1 else 1
-    }
-    
-    // 미사일 관통 횟수 계산
-    fun getMissilePierceCount(): Int {
-        return getBuffLevel(BuffType.MISSILE_PIERCE)
+        if (!isBuffCacheValid) recalculateCache()
+        return cachedMissileSpeedMultiplier
     }
     
     // 적 이동속도 배율 계산
     fun getEnemySpeedMultiplier(): Float {
-        val level = getBuffLevel(BuffType.ENEMY_SLOW)
-        // 레벨당 15% 적 이동속도 감소
-        return maxOf(0.3f, 1f - (level * 0.15f))  // 최소 30%까지만 감소
+        if (!isBuffCacheValid) recalculateCache()
+        return cachedEnemySpeedMultiplier
     }
     
-    // 자원 획득 배율 계산
+    // 다방향 발사 수 계산
+    fun getMultiDirectionCount(): Int {
+        if (!isBuffCacheValid) recalculateCache()
+        return cachedMultiDirectionCount
+    }
+    
+    // 미사일 관통 횟수 계산
+    fun getMissilePierceCount(): Int {
+        if (!isBuffCacheValid) recalculateCache()
+        return cachedMissilePierceCount
+    }
+    
+    // 자원 획득량 배율 계산 (새 메서드)
     fun getResourceGainMultiplier(): Float {
+        if (!isBuffCacheValid) recalculateCache()
         val level = getBuffLevel(BuffType.RESOURCE_GAIN)
-        // 레벨당 15% 자원 획득량 증가
         return 1f + (level * 0.15f)
     }
     
     // 모든 버프 제거
     fun clearAllBuffs() {
         buffs.clear()
+        invalidateCache()
     }
 } 

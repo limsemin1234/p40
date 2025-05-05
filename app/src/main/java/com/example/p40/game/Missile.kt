@@ -10,21 +10,48 @@ import kotlin.math.sin
  * 미사일 클래스
  */
 class Missile(
-    private val position: PointF,
-    private val angle: Double,
-    private val speed: Float,
-    private val size: Float,
-    private val damage: Int,
-    private val target: Enemy
+    private var position: PointF,
+    private var angle: Double,
+    private var speed: Float,
+    private var size: Float,
+    private var damage: Int,
+    private var target: Enemy?
 ) {
-    private var isDead = false
-    private val paint = Paint().apply {
-        color = GameConfig.MISSILE_COLOR
-        style = Paint.Style.FILL
+    // 페인트 객체를 정적으로 공유하여 객체 생성 최소화
+    companion object {
+        private val MISSILE_PAINT = Paint().apply {
+            color = GameConfig.MISSILE_COLOR
+            style = Paint.Style.FILL
+        }
     }
     
+    private var isDead = false
+    
     // 충돌 범위 제곱값을 미리 계산 (제곱근 연산 최소화)
-    private val collisionRadiusSquared = size * size
+    private var collisionRadiusSquared = size * size
+    
+    /**
+     * 객체 풀링을 위한 재설정 메서드
+     */
+    fun reset(
+        newPosition: PointF,
+        newAngle: Double,
+        newSpeed: Float,
+        newSize: Float,
+        newDamage: Int,
+        newTarget: Enemy?
+    ) {
+        position = newPosition
+        angle = newAngle
+        speed = newSpeed
+        size = newSize
+        damage = newDamage
+        target = newTarget
+        isDead = false
+        
+        // 충돌 범위 제곱값 재계산
+        collisionRadiusSquared = newSize * newSize
+    }
     
     /**
      * 미사일 업데이트
@@ -50,7 +77,7 @@ class Missile(
      */
     fun draw(canvas: Canvas) {
         if (!isDead) {
-            canvas.drawCircle(position.x, position.y, size, paint)
+            canvas.drawCircle(position.x, position.y, size, MISSILE_PAINT)
         }
     }
     
@@ -68,10 +95,11 @@ class Missile(
         val dy = position.y - enemyPos.y
         val distanceSquared = dx * dx + dy * dy
         
-        // 충돌 범위 계산 최적화 (제곱근 연산 회피)
-        val collisionRadiusSquared = (size + enemySize) * (size + enemySize)
+        // 충돌 범위 계산 (사전 계산된 값이 아닌 실제 충돌 범위 계산)
+        val totalRadius = size + enemySize
+        val totalRadiusSquared = totalRadius * totalRadius
         
-        if (distanceSquared < collisionRadiusSquared) {
+        if (distanceSquared < totalRadiusSquared) {
             enemy.takeDamage(damage)
             isDead = true
             return true

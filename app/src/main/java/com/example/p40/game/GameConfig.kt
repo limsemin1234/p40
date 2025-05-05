@@ -13,6 +13,14 @@ object GameConfig {
     const val ENEMIES_PER_WAVE = 50  // 웨이브 당 적 수
     const val WAVE_MESSAGE_DURATION = 2000L  // 웨이브 메시지 표시 시간 (밀리초)
     
+    // 디버그 모드 설정
+    const val DEBUG_MODE = false // 디버그 정보 표시 여부
+    
+    // 성능 및 제한 설정
+    const val FRAME_LIMIT = 60 // 최대 FPS
+    const val MAX_ENEMIES = 100 // 화면에 표시되는 최대 적 수
+    const val MAX_MISSILES = 200 // 화면에 표시되는 최대 미사일 수
+    
     // 디펜스 유닛 설정
     const val DEFENSE_UNIT_SIZE = 30f  // 디펜스 유닛 크기
     const val DEFENSE_UNIT_COLOR = Color.BLUE  // 디펜스 유닛 색상
@@ -243,12 +251,8 @@ object GameConfig {
     private var currentTotalWaves: Int = 10       // 기본 총 웨이브 수
     
     // 성능 관련 설정
-    const val DEBUG_MODE = false // 디버그 정보 표시 여부
-    const val MAX_MISSILES = 100 // 최대 미사일 수 제한
-    const val MAX_ENEMIES = 50  // 최대 적 수 제한
     const val OFFSCREEN_MARGIN = 300f // 화면 외부 마진 (오브젝트 제거 범위)
     const val OBJECT_POOL_SIZE = 100 // 오브젝트 풀 크기
-    const val FRAME_LIMIT = 60 // 최대 FPS
 
     /**
      * 게임 난이도 설정

@@ -10,11 +10,11 @@ import kotlin.math.sin
 
 class Enemy(
     private var position: PointF,
-    private val target: PointF,
-    private val speed: Float = GameConfig.ENEMY_BASE_SIZE,
-    private val size: Float = GameConfig.ENEMY_BASE_SIZE,
+    private var target: PointF,
+    private var speed: Float = GameConfig.ENEMY_BASE_SIZE,
+    private var size: Float = GameConfig.ENEMY_BASE_SIZE,
     var health: Int = GameConfig.ENEMY_BASE_HEALTH,
-    val isBoss: Boolean = false,
+    var isBoss: Boolean = false,
     private var wave: Int = 1
 ) {
     // 페인트 객체를 정적으로 공유하여 객체 생성 최소화
@@ -43,33 +43,72 @@ class Enemy(
     }
     
     private var isDead = false
-    private val paint = if (isBoss) BOSS_PAINT else NORMAL_PAINT
+    private var paint = if (isBoss) BOSS_PAINT else NORMAL_PAINT
     
     // 방향 벡터 - 계산을 한 번만 하도록 최적화
-    private var directionX: Float
-    private var directionY: Float
+    private var directionX: Float = 0f
+    private var directionY: Float = 0f
     
     // 캐싱된 데미지 값
-    private val damage: Int
+    private var damage: Int = 0
     
-    // 이동 방향 계산
     init {
-        // 이동 방향 계산 - 한 번만 수행
+        initDirection()
+        calculateDamage()
+    }
+    
+    /**
+     * 객체 풀링을 위한 재설정 메서드
+     */
+    fun reset(
+        newPosition: PointF,
+        newTarget: PointF,
+        newSpeed: Float,
+        newSize: Float,
+        newHealth: Int,
+        newIsBoss: Boolean,
+        newWave: Int
+    ) {
+        position = newPosition
+        target = newTarget
+        speed = newSpeed
+        size = newSize
+        health = newHealth
+        isBoss = newIsBoss
+        wave = newWave
+        isDead = false
+        
+        // 보스 여부에 따라 페인트 설정
+        paint = if (isBoss) BOSS_PAINT else NORMAL_PAINT
+        
+        // 보스일 경우 체력 보정
+        if (isBoss) {
+            health = GameConfig.getScaledEnemyHealth(health, wave, isBoss)
+        } else {
+            health = GameConfig.getScaledEnemyHealth(health, wave, isBoss)
+        }
+        
+        // 방향 및 데미지 재계산
+        initDirection()
+        calculateDamage()
+    }
+    
+    /**
+     * 이동 방향 초기화
+     */
+    private fun initDirection() {
         val dx = target.x - position.x
         val dy = target.y - position.y
         val distance = kotlin.math.sqrt(dx * dx + dy * dy)
         
         directionX = dx / distance
         directionY = dy / distance
-        
-        // 보스일 경우 체력 보정
-        if (isBoss) {
-            health = GameConfig.getScaledEnemyHealth(health * 5, wave, isBoss)
-        } else {
-            health = GameConfig.getScaledEnemyHealth(health, wave, isBoss)
-        }
-        
-        // 데미지 미리 계산하여 캐싱
+    }
+    
+    /**
+     * 데미지 계산
+     */
+    private fun calculateDamage() {
         val baseDamage = if (isBoss) GameConfig.BOSS_DAMAGE else GameConfig.NORMAL_ENEMY_DAMAGE
         damage = GameConfig.getScaledEnemyDamage(baseDamage, wave, isBoss)
     }
@@ -85,6 +124,8 @@ class Enemy(
         } else {
             health = GameConfig.getScaledEnemyHealth(GameConfig.ENEMY_BASE_HEALTH, wave, isBoss)
         }
+        // 데미지 재계산
+        calculateDamage()
     }
 
     /**

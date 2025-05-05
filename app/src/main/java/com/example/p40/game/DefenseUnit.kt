@@ -9,7 +9,7 @@ import kotlin.math.sin
 class DefenseUnit(
     private val position: PointF,
     attackRange: Float,
-    private val attackCooldown: Long
+    private var attackCooldown: Long
 ) {
     private var lastAttackTime: Long = 0
     
@@ -37,6 +37,11 @@ class DefenseUnit(
     fun setAttackRange(newRange: Float) {
         _attackRange = newRange
         updateAttackRangeSquared()
+    }
+    
+    // 공격 쿨다운 설정 메서드 추가
+    fun setAttackCooldown(newCooldown: Long) {
+        attackCooldown = newCooldown
     }
     
     // 가장 가까운 적을 찾아 공격
@@ -72,8 +77,8 @@ class DefenseUnit(
             val startX = position.x + cos(angle).toFloat() * 20
             val startY = position.y + sin(angle).toFloat() * 20
             
-            // 미사일 생성 (미리 계산된 값 사용)
-            return Missile(
+            // 객체 풀에서 미사일 가져오기
+            return MissilePool.getInstance().obtain(
                 position = PointF(startX, startY),
                 angle = angle,
                 speed = missileSpeed,
@@ -110,15 +115,6 @@ class DefenseUnit(
         }
         
         return nearest
-    }
-    
-    // 적들까지의 거리 계산 (디버깅용, 실제 게임에서는 호출 최소화)
-    fun getEnemyDistances(enemies: List<Enemy>): List<Float> {
-        return enemies.map { enemy ->
-            val dx = enemy.getPosition().x - position.x
-            val dy = enemy.getPosition().y - position.y
-            kotlin.math.sqrt(dx * dx + dy * dy)
-        }
     }
     
     fun getPosition(): PointF = position
