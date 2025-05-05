@@ -555,19 +555,26 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
                 if (gameView.useResource(cardDrawCost)) {
                     // 자원 차감 성공 시 패널에서 카드 처리 시작
                     pokerCardPanel.startPokerCards(currentWave)
+                    
+                    // 자원 정보 업데이트
+                    updateGameInfoUI()
                 }
             } else {
                 // 자원 부족 메시지
                 Toast.makeText(context, "자원이 부족합니다! (필요: $cardDrawCost)", Toast.LENGTH_SHORT).show()
             }
         }
+        
+        // 카드 추가 버튼 리스너는 PokerCardPanel 클래스 내부에서 처리
     }
     
     // 포커 카드 패널 클래스 (카드 패널 내에서 포커 카드 기능 처리)
     inner class PokerCardPanel(private val rootView: View) {
         // 카드 관련 UI 요소들
         private val cardInfoLayout: LinearLayout = rootView.findViewById(R.id.cardInfoLayout)
+        private val cardButtonsLayout: LinearLayout = rootView.findViewById(R.id.cardButtonsLayout)
         private val btnDrawPokerCards: Button = rootView.findViewById(R.id.btnDrawPokerCards)
+        private val btnAddCard: Button = rootView.findViewById(R.id.btnAddCard)
         private val replaceButton: Button = rootView.findViewById(R.id.btnReplaceCards)
         private val confirmButton: Button = rootView.findViewById(R.id.btnConfirmHand)
         private val replaceCountText: TextView = rootView.findViewById(R.id.tvReplaceCount)
@@ -579,12 +586,29 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
             rootView.findViewById(R.id.cardView2),
             rootView.findViewById(R.id.cardView3),
             rootView.findViewById(R.id.cardView4),
-            rootView.findViewById(R.id.cardView5)
+            rootView.findViewById(R.id.cardView5),
+            rootView.findViewById(R.id.cardView6),
+            rootView.findViewById(R.id.cardView7)
         )
+        
+        // 기본 카드 수 및 최대 카드 수 설정
+        private val baseCardCount = 5 // 기본 5장
+        private val maxExtraCards = 2 // 최대 2장 추가 가능
+        
+        // 현재 사용 중인 카드 수 (기본 5장, 최대 7장까지 확장 가능)
+        private var purchasedExtraCards = 0 // 구매한 추가 카드 수
+        private val activeCardCount: Int
+            get() = baseCardCount + purchasedExtraCards
+        
+        // 추가 카드 구매 비용
+        private val extraCardCost = 100 // 추가 카드 1장당 100 자원
         
         private val cards = mutableListOf<Card>()
         private var replacesLeft = 2 // 교체 가능한 횟수
         private val selectedCardIndexes = mutableSetOf<Int>() // 선택된 카드의 인덱스
+        
+        // 현재 카드 게임이 진행 중인지 여부
+        private var isGameActive = false
         
         init {
             // 카드 선택 이벤트 설정
@@ -603,6 +627,74 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
             confirmButton.setOnClickListener {
                 confirmSelection()
             }
+            
+            // 카드 추가 버튼 이벤트
+            btnAddCard.setOnClickListener {
+                purchaseExtraCard()
+            }
+            
+            // 초기 버튼 상태 업데이트
+            updateAddCardButtonState()
+        }
+        
+        // 추가 카드 구매
+        private fun purchaseExtraCard() {
+            // 이미 최대로 추가 구매한 경우
+            if (purchasedExtraCards >= maxExtraCards) {
+                Toast.makeText(context, "이미 최대 카드 수에 도달했습니다", Toast.LENGTH_SHORT).show()
+                return
+            }
+            
+            // 게임 진행 중인 경우 추가 구매 불가
+            if (isGameActive) {
+                Toast.makeText(context, "현재 게임이 진행 중입니다. 다음 게임에서 추가 카드를 사용할 수 있습니다.", Toast.LENGTH_SHORT).show()
+                return
+            }
+            
+            // 자원 확인
+            val currentResource = gameView.getResource()
+            if (currentResource >= extraCardCost) {
+                // 자원 차감
+                if (gameView.useResource(extraCardCost)) {
+                    // 추가 카드 수 증가
+                    purchasedExtraCards++
+                    
+                    // 버튼 상태 업데이트
+                    updateAddCardButtonState()
+                    
+                    // 카드 뽑기 버튼 텍스트 업데이트
+                    updateDrawCardButtonText()
+                    
+                    // 자원 정보 업데이트
+                    updateGameInfoUI()
+                    
+                    // 토스트 메시지 표시
+                    Toast.makeText(context, "다음 카드 게임에서 ${baseCardCount + purchasedExtraCards}장의 카드가 제공됩니다", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                // 자원 부족 메시지
+                Toast.makeText(context, "자원이 부족합니다! (필요: $extraCardCost)", Toast.LENGTH_SHORT).show()
+            }
+        }
+        
+        // 추가 카드 버튼 상태 업데이트
+        private fun updateAddCardButtonState() {
+            if (purchasedExtraCards >= maxExtraCards) {
+                btnAddCard.isEnabled = false
+                btnAddCard.text = "최대 카드 수\n도달"
+            } else {
+                btnAddCard.isEnabled = true
+                btnAddCard.text = "카드 추가 +1\n(💰 $extraCardCost 자원)"
+            }
+        }
+        
+        // 카드 뽑기 버튼 텍스트 업데이트
+        private fun updateDrawCardButtonText() {
+            if (purchasedExtraCards > 0) {
+                btnDrawPokerCards.text = "포커 카드 뽑기\n(${baseCardCount + purchasedExtraCards}장, 💰 50 자원)"
+            } else {
+                btnDrawPokerCards.text = "포커 카드 뽑기\n(💰 50 자원)"
+            }
         }
         
         // 포커 카드 시작
@@ -611,12 +703,13 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
             cards.clear()
             selectedCardIndexes.clear()
             replacesLeft = 2
+            isGameActive = true
             
             // UI 초기화
             cardInfoLayout.visibility = View.VISIBLE
-            btnDrawPokerCards.visibility = View.GONE
+            cardButtonsLayout.visibility = View.GONE
             
-            // 카드 생성
+            // 카드 생성 (추가 구매한 카드 수 반영)
             dealCards(waveNumber)
             
             // UI 업데이트
@@ -637,20 +730,52 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
                 // 일반 랜덤 패 생성
                 generateRandomHand()
             }
+            
+            // 필요한 경우 추가 카드 생성
+            addExtraCardsIfNeeded()
+        }
+        
+        // 필요한 경우 추가 카드 생성
+        private fun addExtraCardsIfNeeded() {
+            if (purchasedExtraCards > 0 && cards.size < activeCardCount) {
+                // 추가 카드가 필요한 경우
+                val suits = CardSuit.values().filter { it != CardSuit.JOKER }
+                val ranks = CardRank.values().filter { it != CardRank.JOKER }
+                val usedCards = cards.map { Pair(it.suit, it.rank) }.toMutableSet()
+                
+                // 필요한 만큼 추가 카드 생성
+                while (cards.size < activeCardCount) {
+                    var newCard: Card
+                    do {
+                        val suit = suits.random()
+                        val rank = ranks.random()
+                        val cardPair = Pair(suit, rank)
+                        
+                        if (cardPair !in usedCards) {
+                            newCard = Card(suit, rank)
+                            usedCards.add(cardPair)
+                            break
+                        }
+                    } while (true)
+                    
+                    // 카드 추가
+                    cards.add(newCard)
+                }
+            }
         }
         
         // 랜덤 패 생성
         private fun generateRandomHand() {
             cards.clear()
             
-            // 랜덤 카드 5장 생성
+            // 랜덤 카드 생성 (기본 카드 수만큼)
             val suits = CardSuit.values().filter { it != CardSuit.JOKER }
             val ranks = CardRank.values().filter { it != CardRank.JOKER }
             
-            // 중복 없는 카드 5장 생성
+            // 중복 없는 카드 생성
             val usedCards = mutableSetOf<Pair<CardSuit, CardRank>>()
             
-            while (cards.size < 5) {
+            while (cards.size < baseCardCount) {
                 val suit = suits.random()
                 val rank = ranks.random()
                 val cardPair = Pair(suit, rank)
@@ -676,6 +801,7 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
             
             cards.clear()
             
+            // 기본 5장 패 생성
             when (handType) {
                 "royal_flush" -> {
                     // 로얄 플러시 (스페이드 10, J, Q, K, A)
@@ -770,44 +896,61 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
         // UI 업데이트
         private fun updateUI() {
             // 카드 이미지 업데이트
-            cards.forEachIndexed { index, card ->
-                val cardView = cardViews[index]
+            for (i in 0 until cardViews.size) {
+                val cardView = cardViews[i]
                 
-                // 카드 정보 표시
-                val suitTextView = cardView.findViewById<TextView>(
-                    when (index) {
-                        0 -> R.id.tvCardSuit1
-                        1 -> R.id.tvCardSuit2
-                        2 -> R.id.tvCardSuit3
-                        3 -> R.id.tvCardSuit4
-                        else -> R.id.tvCardSuit5
+                // 활성화된 카드 인덱스 범위만 표시
+                if (i < activeCardCount) {
+                    cardView.visibility = View.VISIBLE
+                    
+                    // 카드 정보가 있는 경우에만 표시
+                    if (i < cards.size) {
+                        val card = cards[i]
+                        
+                        // 카드 정보 표시
+                        val suitTextView = cardView.findViewById<TextView>(
+                            when (i) {
+                                0 -> R.id.tvCardSuit1
+                                1 -> R.id.tvCardSuit2
+                                2 -> R.id.tvCardSuit3
+                                3 -> R.id.tvCardSuit4
+                                4 -> R.id.tvCardSuit5
+                                5 -> R.id.tvCardSuit6
+                                else -> R.id.tvCardSuit7
+                            }
+                        )
+                        
+                        val rankTextView = cardView.findViewById<TextView>(
+                            when (i) {
+                                0 -> R.id.tvCardRank1
+                                1 -> R.id.tvCardRank2
+                                2 -> R.id.tvCardRank3
+                                3 -> R.id.tvCardRank4
+                                4 -> R.id.tvCardRank5
+                                5 -> R.id.tvCardRank6
+                                else -> R.id.tvCardRank7
+                            }
+                        )
+                        
+                        // 카드 무늬와 숫자 설정
+                        suitTextView.text = card.suit.getSymbol()
+                        suitTextView.setTextColor(card.suit.getColor())
+                        
+                        rankTextView.text = card.rank.getName()
+                        rankTextView.setTextColor(card.suit.getColor())
+                        
+                        // 선택 상태 표시
+                        cardView.setCardBackgroundColor(
+                            if (i in selectedCardIndexes) Color.YELLOW else Color.WHITE
+                        )
+                        
+                        // 카드 선택 가능 여부 설정
+                        cardView.isEnabled = replacesLeft > 0
                     }
-                )
-                
-                val rankTextView = cardView.findViewById<TextView>(
-                    when (index) {
-                        0 -> R.id.tvCardRank1
-                        1 -> R.id.tvCardRank2
-                        2 -> R.id.tvCardRank3
-                        3 -> R.id.tvCardRank4
-                        else -> R.id.tvCardRank5
-                    }
-                )
-                
-                // 카드 무늬와 숫자 설정
-                suitTextView.text = card.suit.getSymbol()
-                suitTextView.setTextColor(card.suit.getColor())
-                
-                rankTextView.text = card.rank.getName()
-                rankTextView.setTextColor(card.suit.getColor())
-                
-                // 선택 상태 표시
-                cardView.setCardBackgroundColor(
-                    if (index in selectedCardIndexes) Color.YELLOW else Color.WHITE
-                )
-                
-                // 카드 선택 가능 여부 설정
-                cardView.isEnabled = replacesLeft > 0
+                } else {
+                    // 활성화되지 않은 카드는 숨김
+                    cardView.visibility = View.GONE
+                }
             }
             
             // 교체 버튼 활성화/비활성화
@@ -900,7 +1043,8 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener {
         // 패널 초기 상태로 복귀
         private fun resetPanel() {
             cardInfoLayout.visibility = View.GONE
-            btnDrawPokerCards.visibility = View.VISIBLE
+            cardButtonsLayout.visibility = View.VISIBLE
+            isGameActive = false
             
             // 추가로 패널 닫기를 원한다면 아래 코드 활성화
             // closePanel(rootView.findViewById(R.id.cardPanel))
