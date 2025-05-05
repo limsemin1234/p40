@@ -670,17 +670,6 @@ class GameLogic(
     }
     
     /**
-     * 모든 적에게 데미지를 주는 카드 사용 효과
-     */
-    fun useCard() {
-        enemies.forEach { enemy ->
-            // 보스는 카드 효과가 약하게
-            val damage = if (enemy.isBoss()) gameConfig.CARD_DAMAGE_BOSS else gameConfig.CARD_DAMAGE_NORMAL
-            enemy.takeDamage(damage)
-        }
-    }
-    
-    /**
      * 일시정지 처리
      */
     fun pause() {

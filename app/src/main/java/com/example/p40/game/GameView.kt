@@ -185,15 +185,6 @@ class GameView @JvmOverloads constructor(
     }
     
     /**
-     * 모든 적에게 데미지를 주는 카드 사용 효과
-     */
-    fun useCard() {
-        if (initializeIfNeeded()) {
-            gameLogic.useCard()
-        }
-    }
-    
-    /**
      * 일시정지 처리
      */
     fun pause() {
