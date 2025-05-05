@@ -110,6 +110,11 @@ class BossEnemyBehavior : EnemyBehaviorStrategy {
             enemy.setEnraged(true)
         }
         
+        // 체력이 0 이하이면 사망 처리 추가
+        if (health <= 0) {
+            enemy.setDead(true)
+        }
+        
         return health <= 0
     }
     

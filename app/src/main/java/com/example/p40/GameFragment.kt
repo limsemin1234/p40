@@ -92,10 +92,13 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         // 보스 처치 리스너 설정
         gameView.setBossKillListener(object : BossKillListener {
             override fun onBossKilled() {
-                // 보스 처치 시 100코인 획득
-                coins += 100
-                updateCoinUI()
-                Toast.makeText(context, "보스 처치! +100 코인", Toast.LENGTH_SHORT).show()
+                // UI 스레드에서 실행하기 위해 Handler 사용
+                Handler(Looper.getMainLooper()).post {
+                    // 보스 처치 시 100코인 획득
+                    coins += 100
+                    updateCoinUI()
+                    Toast.makeText(context, "보스 처치! +100 코인", Toast.LENGTH_SHORT).show()
+                }
             }
         })
         
@@ -383,12 +386,20 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         val wave = gameView.getWaveCount()
         
         // GameConfig를 통해 웨이브별 보스 스탯 정보 계산
-        val health = GameConfig.getEnemyHealthForWave(wave, true)
+        val maxHealth = GameConfig.getEnemyHealthForWave(wave, true)
         val damage = GameConfig.getEnemyDamageForWave(wave, true)
         val speed = GameConfig.getEnemySpeedForWave(wave, true)
         
-        // 체력 정보 업데이트
-        view?.findViewById<TextView>(R.id.bossHealthText)?.text = "체력: $health"
+        // 현재 보스 체력 정보 가져오기
+        val currentBossHealth = gameView.getCurrentBossHealth()
+        
+        // 체력 정보 업데이트 - 현재/최대 체력 표시 형식으로 변경
+        val healthText = if (currentBossHealth > 0) {
+            "체력: $currentBossHealth/$maxHealth"
+        } else {
+            "체력: $maxHealth"
+        }
+        view?.findViewById<TextView>(R.id.bossHealthText)?.text = healthText
         
         // 공격력 정보 업데이트
         view?.findViewById<TextView>(R.id.bossAttackText)?.text = "공격력: $damage"
@@ -571,7 +582,6 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
                 updateUnitStatsUI() // 스탯 정보 갱신
                 updateUpgradeButtonsText() // 모든 버튼 텍스트 갱신
                 Toast.makeText(context, "방어력 +20 향상! (비용: $cost)", Toast.LENGTH_SHORT).show()
-                closePanel(view.findViewById(R.id.defenseUpgradePanel))
             } else {
                 // 자원 부족
                 Toast.makeText(context, "자원이 부족합니다! (필요: $cost)", Toast.LENGTH_SHORT).show()

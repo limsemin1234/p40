@@ -435,8 +435,9 @@ class GameLogic(
                 
                 println("[디버그] 적 제거 완료: ID=${enemy.hashCode()}, 보스=${enemy.isBoss()}")
                 
-                if (isBossKilled) {
+                if (isBossKilled && enemy.isDead()) {
                     // 보스 처치 이벤트 발생
+                    println("[디버그] 보스 처치 이벤트 발생!")
                     bossKillListener?.onBossKilled()
                     
                     // 보스 처치 시 다음 웨이브로 이동
@@ -763,5 +764,15 @@ class GameLogic(
         fun contains(x: Float, y: Float): Boolean {
             return x >= left && x <= right && y >= top && y <= bottom
         }
+    }
+    
+    /**
+     * 현재 보스 체력 반환
+     * 목록에서 보스를 찾아 체력 반환, 없으면 0
+     */
+    fun getCurrentBossHealth(): Int {
+        // enemies 목록에서 보스 찾기
+        val boss = enemies.find { it.isBoss() && !it.isDead() }
+        return boss?.getHealth() ?: 0
     }
 } 

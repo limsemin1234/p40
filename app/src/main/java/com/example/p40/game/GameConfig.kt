@@ -61,21 +61,21 @@ object GameConfig {
     const val WAVE_10_HEALTH_MULTIPLIER = 2.4f
     
     // 보스 설정 - 멀티플라이어 방식에서 고정값으로 변경
-    const val BOSS_SIZE = 20f  // 보스 크기
+    const val BOSS_SIZE = 30f  // 보스 크기
     const val BOSS_BASE_HEALTH = 200  // 보스 기본 체력
     const val BOSS_BASE_SPEED = 0.8f  // 보스 기본 이동 속도
-    const val BOSS_DAMAGE = 12  // 보스 공격력
+    const val BOSS_DAMAGE = 20  // 보스 공격력
     const val BOSS_COLOR = Color.MAGENTA  // 보스 색상
     const val BOSS_BORDER_COLOR = Color.YELLOW  // 보스 테두리 색상
     const val BOSS_BORDER_WIDTH = 5f  // 보스 테두리 두께
     
     // 웨이브별 보스 체력 증가율
-    const val BOSS_HEALTH_INCREASE_PER_WAVE = 50  // 웨이브당 보스 체력 증가량
-    const val BOSS_DAMAGE_INCREASE_PER_WAVE = 2   // 웨이브당 보스 공격력 증가량
+    const val BOSS_HEALTH_INCREASE_PER_WAVE = 100  // 웨이브당 보스 체력 증가량
+    const val BOSS_DAMAGE_INCREASE_PER_WAVE = 10   // 웨이브당 보스 공격력 증가량
     const val BOSS_SPEED_INCREASE_PER_WAVE = 0.05f // 웨이브당 보스 속도 증가량
     
     // 웨이브별 적 데미지 증가량
-    const val ENEMY_DAMAGE_PER_WAVE = 1  // 웨이브당 적 데미지 증가량
+    const val ENEMY_DAMAGE_PER_WAVE = 5  // 웨이브당 적 데미지 증가량
     
     // 점수 설정
     const val SCORE_PER_NORMAL_ENEMY = 15  // 일반 적 처치 시 얻는 점수(자원) - 주석과 일치하도록 수정

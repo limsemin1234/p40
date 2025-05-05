@@ -249,6 +249,17 @@ class GameView @JvmOverloads constructor(
     fun getDamageUpgradeInfo(): UpgradeInfo = gameStats.getDamageUpgradeInfo()
     
     /**
+     * 현재 보스 체력 반환
+     */
+    fun getCurrentBossHealth(): Int {
+        return if (::gameLogic.isInitialized) {
+            gameLogic.getCurrentBossHealth()
+        } else {
+            0
+        }
+    }
+    
+    /**
      * 공격 속도 업그레이드 정보 반환
      */
     fun getAttackSpeedUpgradeInfo(): UpgradeInfo = gameStats.getAttackSpeedUpgradeInfo()
