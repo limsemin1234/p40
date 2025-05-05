@@ -11,6 +11,7 @@ import android.os.Handler
 import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.Button
 import android.widget.EditText
@@ -35,6 +36,7 @@ import com.example.p40.game.CardUtils
 import com.example.p40.game.JokerSelectionDialog
 import com.example.p40.game.PokerCardManager
 import com.example.p40.game.BuffType
+import com.example.p40.game.MessageManager
 import kotlin.random.Random
 
 class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCardManager.PokerCardListener {
@@ -53,6 +55,9 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
     
     // 버프 정보 UI
     private lateinit var tvBuffList: TextView
+    
+    // 메시지 관리자 추가
+    private lateinit var messageManager: MessageManager
     
     // UI 업데이트 핸들러
     private val handler = Handler(Looper.getMainLooper())
@@ -74,6 +79,9 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // 메시지 관리자 초기화는 onStart로 이동
+        messageManager = MessageManager.getInstance()
+        
         // 게임 레벨 정보 가져오기
         arguments?.let { args ->
             val levelId = args.getInt("levelId", 1)
@@ -97,7 +105,8 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
                     // 보스 처치 시 100코인 획득
                     coins += 100
                     updateCoinUI()
-                    Toast.makeText(context, "보스 처치! +100 코인", Toast.LENGTH_SHORT).show()
+                    // Toast 대신 메시지 매니저 사용
+                    messageManager.showSuccess("보스 처치! +100 코인")
                 }
             }
         })
@@ -107,16 +116,6 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         
         // 탭 버튼 초기화
         setupStatTabs(view)
-        
-        // 저장된 덱 확인
-        val savedDeck = DeckBuilderFragment.loadDeckFromPrefs(requireContext())
-        if (savedDeck != null && savedDeck.isNotEmpty()) {
-            Toast.makeText(
-                requireContext(),
-                "저장된 덱이 게임에 적용되었습니다 (${savedDeck.size}장)",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
         
         // 게임 메뉴 초기화
         setupGameMenu(view)
@@ -164,6 +163,20 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
 
         // 저장된 코인 불러오기
         coins = MainMenuFragment.loadCoins(requireContext())
+    }
+    
+    override fun onStart() {
+        super.onStart()
+        
+        // 메시지 관리자 초기화
+        // 액티비티가 완전히 준비된 후 초기화
+        view?.let { messageManager.init(requireActivity().findViewById(android.R.id.content)) }
+        
+        // 저장된 덱 확인
+        val savedDeck = DeckBuilderFragment.loadDeckFromPrefs(requireContext())
+        if (savedDeck != null && savedDeck.isNotEmpty()) {
+            messageManager.showInfo("저장된 덱이 게임에 적용되었습니다 (${savedDeck.size}장)")
+        }
     }
     
     // 버프 UI 초기화
@@ -445,12 +458,8 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
             // 버프 정보 업데이트
             updateBuffUI()
             
-            // 토스트 메시지 표시
-            Toast.makeText(
-                context,
-                "적용된 효과: ${pokerHand.handName}",
-                Toast.LENGTH_LONG
-            ).show()
+            // 메시지 표시
+            messageManager.showSuccess("적용된 효과: ${pokerHand.handName}")
         }
         
         dialog.show()
@@ -464,12 +473,8 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         // 버프 정보 업데이트
         updateBuffUI()
         
-        // 토스트 메시지 표시
-        Toast.makeText(
-            context,
-            "적용된 효과: ${pokerHand.handName}",
-            Toast.LENGTH_LONG
-        ).show()
+        // 메시지 표시
+        messageManager.showSuccess("적용된 효과: ${pokerHand.handName}")
     }
     
     private fun togglePanel(panel: LinearLayout) {
@@ -531,10 +536,11 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
                 updateGameInfoUI() // 자원 정보 갱신
                 updateUnitStatsUI() // 스탯 정보 갱신
                 updateUpgradeButtonsText() // 모든 버튼 텍스트 갱신
-                Toast.makeText(context, "데미지 +1 향상! (비용: $cost)", Toast.LENGTH_SHORT).show()
+                // Toast 대신 메시지 매니저 사용
+                messageManager.showSuccess("데미지 +1 향상! (비용: $cost)")
             } else {
                 // 자원 부족
-                Toast.makeText(context, "자원이 부족합니다! (필요: $cost)", Toast.LENGTH_SHORT).show()
+                messageManager.showWarning("자원이 부족합니다! (필요: $cost)")
             }
         }
         
@@ -546,10 +552,10 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
                 updateGameInfoUI() // 자원 정보 갱신
                 updateUnitStatsUI() // 스탯 정보 갱신
                 updateUpgradeButtonsText() // 모든 버튼 텍스트 갱신
-                Toast.makeText(context, "공격속도 +1% 향상! (비용: $cost)", Toast.LENGTH_SHORT).show()
+                messageManager.showSuccess("공격속도 +1% 향상! (비용: $cost)")
             } else {
                 // 자원 부족
-                Toast.makeText(context, "자원이 부족합니다! (필요: $cost)", Toast.LENGTH_SHORT).show()
+                messageManager.showWarning("자원이 부족합니다! (필요: $cost)")
             }
         }
         
@@ -561,10 +567,10 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
                 updateGameInfoUI() // 자원 정보 갱신
                 updateUnitStatsUI() // 스탯 정보 갱신
                 updateUpgradeButtonsText() // 모든 버튼 텍스트 갱신
-                Toast.makeText(context, "공격범위 +5 향상! (비용: $cost)", Toast.LENGTH_SHORT).show()
+                messageManager.showSuccess("공격범위 +5 향상! (비용: $cost)")
             } else {
                 // 자원 부족
-                Toast.makeText(context, "자원이 부족합니다! (필요: $cost)", Toast.LENGTH_SHORT).show()
+                messageManager.showWarning("자원이 부족합니다! (필요: $cost)")
             }
         }
     }
@@ -581,20 +587,21 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
                 updateGameInfoUI() // 자원 정보 갱신
                 updateUnitStatsUI() // 스탯 정보 갱신
                 updateUpgradeButtonsText() // 모든 버튼 텍스트 갱신
-                Toast.makeText(context, "방어력 +20 향상! (비용: $cost)", Toast.LENGTH_SHORT).show()
+                messageManager.showSuccess("방어력 +20 향상! (비용: $cost)")
+                // 패널을 닫지 않도록 수정됨
             } else {
                 // 자원 부족
-                Toast.makeText(context, "자원이 부족합니다! (필요: $cost)", Toast.LENGTH_SHORT).show()
+                messageManager.showWarning("자원이 부족합니다! (필요: $cost)")
             }
         }
         
         // 다른 버튼들은 아직 구현하지 않음
         defenseUpgrade2.setOnClickListener {
-            Toast.makeText(context, "준비 중인 기능입니다", Toast.LENGTH_SHORT).show()
+            messageManager.showInfo("준비 중인 기능입니다")
         }
         
         defenseUpgrade3.setOnClickListener {
-            Toast.makeText(context, "준비 중인 기능입니다", Toast.LENGTH_SHORT).show()
+            messageManager.showInfo("준비 중인 기능입니다")
         }
     }
     
@@ -825,7 +832,7 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
             saveCoins() // 코인이 변경될 때마다 저장
             true
         } else {
-            Toast.makeText(context, "코인이 부족합니다!", Toast.LENGTH_SHORT).show()
+            messageManager.showWarning("코인이 부족합니다!")
             false
         }
     }
