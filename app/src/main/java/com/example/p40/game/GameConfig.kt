@@ -79,8 +79,8 @@ object GameConfig {
     const val BOSS_DAMAGE_REDUCTION = 0.75f  // 보스의 데미지 감소율 (받는 데미지의 75%만 적용)
     const val BOSS_ENRAGE_HEALTH_RATIO = 0.5f  // 보스 분노 모드 진입 체력 비율 (최대 체력의 50%)
     const val BOSS_SPEED_MULTIPLIER = 0.8f  // 보스 이동 속도 계수 (일반 적보다 느림)
-    const val BOSS_ZIGZAG_AMPLITUDE = 2.0  // 보스 지그재그 좌우 진폭
-    const val BOSS_ZIGZAG_PERIOD = 500.0  // 보스 지그재그 주기 (밀리초)
+    const val BOSS_ZIGZAG_AMPLITUDE = 2.0  // 보스 지그재그 좌우 진폭(값을 높이면 더 넒게 좌우로 진동)
+    const val BOSS_ZIGZAG_PERIOD = 500.0  // 보스 지그재그 주기 (밀리초)(값을 낮추면 보스가 더 빠르게 좌우 진동)
     
     // 웨이브별 보스 체력 증가율
     const val BOSS_HEALTH_INCREASE_PER_WAVE = 100  // 웨이브당 보스 체력 증가량
