@@ -222,6 +222,24 @@
                 android:textColor="#808080"
                 android:gravity="center"
                 android:background="@android:color/transparent" />
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="#444444" />
+
+            <TextView
+                android:id="@+id/bosUnitTabButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="적 보스 정보"
+                android:textStyle="bold"
+                android:textSize="12sp"
+                android:paddingVertical="6dp"
+                android:textColor="#808080"
+                android:gravity="center"
+                android:background="@android:color/transparent" />
         </LinearLayout>
 
         <!-- 스탯 정보 컨테이너 -->
@@ -319,6 +337,46 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="이동속도: 1.0"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    android:gravity="center" />
+            </LinearLayout>
+
+            <!-- 보스 유닛 스탯 정보 -->
+            <LinearLayout
+                android:id="@+id/bossStatsContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingVertical="4dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/bossHealthText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="체력: 200"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    android:gravity="center" />
+
+                <TextView
+                    android:id="@+id/bossAttackText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="공격력: 12"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    android:gravity="center" />
+
+                <TextView
+                    android:id="@+id/bossSpeedText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="이동속도: 0.8"
                     android:textColor="#FFFFFF"
                     android:textSize="12sp"
                     android:gravity="center" />

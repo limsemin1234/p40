@@ -60,11 +60,19 @@ object GameConfig {
     const val WAVE_9_HEALTH_MULTIPLIER = 2.2f
     const val WAVE_10_HEALTH_MULTIPLIER = 2.4f
     
-    // 보스 설정
-    const val BOSS_SIZE_MULTIPLIER = 2.0f  // 보스 크기 배율
-    const val BOSS_HEALTH_MULTIPLIER = 4  // 보스 체력 배율
-    const val BOSS_SPEED_MULTIPLIER = 0.8f  // 보스 속도 배율
-    const val BOSS_DAMAGE = 12  // 보스 적의 공격력
+    // 보스 설정 - 멀티플라이어 방식에서 고정값으로 변경
+    const val BOSS_SIZE = 20f  // 보스 크기
+    const val BOSS_BASE_HEALTH = 200  // 보스 기본 체력
+    const val BOSS_BASE_SPEED = 0.8f  // 보스 기본 이동 속도
+    const val BOSS_DAMAGE = 12  // 보스 공격력
+    const val BOSS_COLOR = Color.MAGENTA  // 보스 색상
+    const val BOSS_BORDER_COLOR = Color.YELLOW  // 보스 테두리 색상
+    const val BOSS_BORDER_WIDTH = 5f  // 보스 테두리 두께
+    
+    // 웨이브별 보스 체력 증가율
+    const val BOSS_HEALTH_INCREASE_PER_WAVE = 50  // 웨이브당 보스 체력 증가량
+    const val BOSS_DAMAGE_INCREASE_PER_WAVE = 2   // 웨이브당 보스 공격력 증가량
+    const val BOSS_SPEED_INCREASE_PER_WAVE = 0.05f // 웨이브당 보스 속도 증가량
     
     // 웨이브별 적 데미지 증가량
     const val ENEMY_DAMAGE_PER_WAVE = 1  // 웨이브당 적 데미지 증가량
@@ -170,25 +178,25 @@ object GameConfig {
      * @return 적 체력
      */
     fun getEnemyHealthForWave(wave: Int, isBoss: Boolean = false): Int {
-        val multiplier = when(wave) {
-            1 -> WAVE_1_HEALTH_MULTIPLIER
-            2 -> WAVE_2_HEALTH_MULTIPLIER
-            3 -> WAVE_3_HEALTH_MULTIPLIER
-            4 -> WAVE_4_HEALTH_MULTIPLIER
-            5 -> WAVE_5_HEALTH_MULTIPLIER
-            6 -> WAVE_6_HEALTH_MULTIPLIER
-            7 -> WAVE_7_HEALTH_MULTIPLIER
-            8 -> WAVE_8_HEALTH_MULTIPLIER
-            9 -> WAVE_9_HEALTH_MULTIPLIER
-            10 -> WAVE_10_HEALTH_MULTIPLIER
-            else -> WAVE_1_HEALTH_MULTIPLIER
-        }
-        val baseHealth = ENEMY_BASE_HEALTH
-        
-        return if (isBoss) {
-            (baseHealth * multiplier * BOSS_HEALTH_MULTIPLIER).toInt()
+        if (isBoss) {
+            // 보스는 기본 체력 + 웨이브당 증가량
+            return BOSS_BASE_HEALTH + ((wave - 1) * BOSS_HEALTH_INCREASE_PER_WAVE)
         } else {
-            (baseHealth * multiplier).toInt()
+            // 일반 적은 기존 방식대로 계산
+            val multiplier = when(wave) {
+                1 -> WAVE_1_HEALTH_MULTIPLIER
+                2 -> WAVE_2_HEALTH_MULTIPLIER
+                3 -> WAVE_3_HEALTH_MULTIPLIER
+                4 -> WAVE_4_HEALTH_MULTIPLIER
+                5 -> WAVE_5_HEALTH_MULTIPLIER
+                6 -> WAVE_6_HEALTH_MULTIPLIER
+                7 -> WAVE_7_HEALTH_MULTIPLIER
+                8 -> WAVE_8_HEALTH_MULTIPLIER
+                9 -> WAVE_9_HEALTH_MULTIPLIER
+                10 -> WAVE_10_HEALTH_MULTIPLIER
+                else -> WAVE_1_HEALTH_MULTIPLIER
+            }
+            return (ENEMY_BASE_HEALTH * multiplier).toInt()
         }
     }
     
@@ -199,9 +207,13 @@ object GameConfig {
      * @return 적 데미지
      */
     fun getEnemyDamageForWave(wave: Int, isBoss: Boolean): Int {
-        val baseDamage = if (isBoss) BOSS_DAMAGE else NORMAL_ENEMY_DAMAGE
-        val additionalDamage = (wave - 1) * ENEMY_DAMAGE_PER_WAVE
-        return baseDamage + additionalDamage
+        if (isBoss) {
+            // 보스는 기본 데미지 + 웨이브당 증가량
+            return BOSS_DAMAGE + ((wave - 1) * BOSS_DAMAGE_INCREASE_PER_WAVE)
+        } else {
+            // 일반 적은 기존 방식대로 계산
+            return NORMAL_ENEMY_DAMAGE + ((wave - 1) * ENEMY_DAMAGE_PER_WAVE)
+        }
     }
     
     /**
@@ -224,16 +236,13 @@ object GameConfig {
      * @return 적 이동 속도
      */
     fun getEnemySpeedForWave(wave: Int, isBoss: Boolean = false): Float {
-        // 웨이브가 증가할 수록 이동 속도 증가
-        val increase = 1 + ((wave - 1) * ENEMY_SPEED_INCREASE_PER_WAVE)
-        // 기본 이동 속도에 증가율 적용
-        val speed = BASE_ENEMY_SPEED * increase
-        
-        // 보스인 경우 속도 조정
-        return if (isBoss) {
-            speed * BOSS_SPEED_MULTIPLIER
+        if (isBoss) {
+            // 보스는 기본 속도 + 웨이브당 증가량
+            return BOSS_BASE_SPEED + ((wave - 1) * BOSS_SPEED_INCREASE_PER_WAVE)
         } else {
-            speed
+            // 일반 적은 기존 방식대로 계산
+            val increase = 1 + ((wave - 1) * ENEMY_SPEED_INCREASE_PER_WAVE)
+            return BASE_ENEMY_SPEED * increase
         }
     }
     

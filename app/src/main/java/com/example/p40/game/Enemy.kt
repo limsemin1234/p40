@@ -26,15 +26,15 @@ class Enemy(
     
     // 페인트 객체 (색상)
     private val paint = Paint().apply {
-        color = if (isBoss) Color.RED else Color.YELLOW
+        color = if (isBoss) GameConfig.BOSS_COLOR else GameConfig.ENEMY_COLOR
         style = Paint.Style.FILL
     }
     
     // 외곽선용 페인트 객체
     private val strokePaint = Paint().apply {
-        color = Color.WHITE
+        color = if (isBoss) GameConfig.BOSS_BORDER_COLOR else Color.WHITE
         style = Paint.Style.STROKE
-        strokeWidth = 2f
+        strokeWidth = if (isBoss) GameConfig.BOSS_BORDER_WIDTH else 2f
     }
     
     // 행동 전략 설정 (전략 패턴)
@@ -68,7 +68,11 @@ class Enemy(
         enraged = false
         
         // 페인트 색상 재설정
-        paint.color = if (isBoss) Color.RED else Color.YELLOW
+        paint.color = if (isBoss) GameConfig.BOSS_COLOR else GameConfig.ENEMY_COLOR
+        
+        // 외곽선 페인트 재설정
+        strokePaint.color = if (isBoss) GameConfig.BOSS_BORDER_COLOR else Color.WHITE
+        strokePaint.strokeWidth = if (isBoss) GameConfig.BOSS_BORDER_WIDTH else 2f
         
         // 행동 전략 재설정
         behaviorStrategy = when {

@@ -34,6 +34,7 @@ import com.example.p40.game.PokerDeck
 import com.example.p40.game.CardUtils
 import com.example.p40.game.JokerSelectionDialog
 import com.example.p40.game.PokerCardManager
+import com.example.p40.game.BuffType
 import kotlin.random.Random
 
 class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCardManager.PokerCardListener {
@@ -61,6 +62,7 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
             updateBuffUI()
             updateUnitStatsUI()
             updateEnemyStatsUI()
+            updateBossStatsUI()
             updateCoinUI()
             handler.postDelayed(this, 500) // 500ms마다 업데이트
         }
@@ -170,185 +172,230 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
     private fun setupStatTabs(view: View) {
         val myUnitTabButton = view.findViewById<TextView>(R.id.myUnitTabButton)
         val enemyUnitTabButton = view.findViewById<TextView>(R.id.enemyUnitTabButton)
+        val bosUnitTabButton = view.findViewById<TextView>(R.id.bosUnitTabButton)
         val myUnitStatsContainer = view.findViewById<LinearLayout>(R.id.myUnitStatsContainer)
         val enemyStatsContainer = view.findViewById<LinearLayout>(R.id.enemyStatsContainer)
+        val bossStatsContainer = view.findViewById<LinearLayout>(R.id.bossStatsContainer)
         
         // 초기 상태 설정 (내 유닛 정보 탭이 활성화)
-        updateTabState(true, myUnitTabButton, enemyUnitTabButton, myUnitStatsContainer, enemyStatsContainer)
+        updateTabState(0, myUnitTabButton, enemyUnitTabButton, bosUnitTabButton, myUnitStatsContainer, enemyStatsContainer, bossStatsContainer)
         
         // 내 유닛 정보 탭 클릭 시
         myUnitTabButton.setOnClickListener {
-            updateTabState(true, myUnitTabButton, enemyUnitTabButton, myUnitStatsContainer, enemyStatsContainer)
+            updateTabState(0, myUnitTabButton, enemyUnitTabButton, bosUnitTabButton, myUnitStatsContainer, enemyStatsContainer, bossStatsContainer)
         }
         
         // 적 유닛 정보 탭 클릭 시
         enemyUnitTabButton.setOnClickListener {
-            updateTabState(false, myUnitTabButton, enemyUnitTabButton, myUnitStatsContainer, enemyStatsContainer)
+            updateTabState(1, myUnitTabButton, enemyUnitTabButton, bosUnitTabButton, myUnitStatsContainer, enemyStatsContainer, bossStatsContainer)
+        }
+        
+        // 보스 유닛 정보 탭 클릭 시
+        bosUnitTabButton.setOnClickListener {
+            updateTabState(2, myUnitTabButton, enemyUnitTabButton, bosUnitTabButton, myUnitStatsContainer, enemyStatsContainer, bossStatsContainer)
         }
     }
     
-    // 탭 상태 업데이트 (코드 중복 제거 및 일관성 유지)
+    // 탭 상태 업데이트 (3개 탭 지원)
     private fun updateTabState(
-        isMyUnitTab: Boolean, 
-        myUnitTabButton: TextView, 
+        selectedTab: Int, // 0: 내 유닛, 1: 적 유닛, 2: 보스 유닛
+        myUnitTabButton: TextView,
         enemyUnitTabButton: TextView,
+        bossUnitTabButton: TextView,
         myUnitStatsContainer: LinearLayout,
-        enemyStatsContainer: LinearLayout
+        enemyStatsContainer: LinearLayout,
+        bossStatsContainer: LinearLayout
     ) {
-        if (isMyUnitTab) {
-            // 내 유닛 탭 활성화
-            myUnitTabButton.setTextColor(resources.getColor(android.R.color.white, null))
-            myUnitTabButton.setBackgroundResource(R.drawable.tab_selected_background)
-            enemyUnitTabButton.setTextColor(resources.getColor(android.R.color.darker_gray, null))
-            enemyUnitTabButton.setBackgroundResource(R.drawable.tab_unselected_background)
-            
-            // 내 유닛 정보 표시, 적 정보 숨김
-            myUnitStatsContainer.visibility = View.VISIBLE
-            enemyStatsContainer.visibility = View.GONE
-            
-            // 최신 유닛 스탯 업데이트
-            updateUnitStatsUI()
-        } else {
-            // 적 유닛 탭 활성화
-            myUnitTabButton.setTextColor(resources.getColor(android.R.color.darker_gray, null))
-            myUnitTabButton.setBackgroundResource(R.drawable.tab_unselected_background)
-            enemyUnitTabButton.setTextColor(resources.getColor(android.R.color.white, null))
-            enemyUnitTabButton.setBackgroundResource(R.drawable.tab_selected_background)
-            
-            // 적 정보 표시, 내 유닛 정보 숨김
-            myUnitStatsContainer.visibility = View.GONE
-            enemyStatsContainer.visibility = View.VISIBLE
-            
-            // 최신 적 스탯 업데이트
-            updateEnemyStatsUI()
+        // 모든 탭 버튼 비활성화 스타일로 변경
+        myUnitTabButton.setTextColor(Color.parseColor("#808080"))
+        enemyUnitTabButton.setTextColor(Color.parseColor("#808080"))
+        bossUnitTabButton.setTextColor(Color.parseColor("#808080"))
+        
+        // 모든 컨테이너 숨기기
+        myUnitStatsContainer.visibility = View.GONE
+        enemyStatsContainer.visibility = View.GONE
+        bossStatsContainer.visibility = View.GONE
+        
+        // 선택된 탭에 따라 활성화
+        when (selectedTab) {
+            0 -> { // 내 유닛 정보
+                myUnitTabButton.setTextColor(Color.WHITE)
+                myUnitStatsContainer.visibility = View.VISIBLE
+            }
+            1 -> { // 적 유닛 정보
+                enemyUnitTabButton.setTextColor(Color.WHITE)
+                enemyStatsContainer.visibility = View.VISIBLE
+            }
+            2 -> { // 보스 유닛 정보
+                bossUnitTabButton.setTextColor(Color.WHITE)
+                bossStatsContainer.visibility = View.VISIBLE
+            }
         }
     }
     
     // 게임 정보 UI 업데이트
     public override fun updateGameInfoUI() {
-        if (!::gameView.isInitialized || !isAdded) return
+        if (!isAdded) return
         
-        // 게임 상태 정보 가져오기
         val resource = gameView.getResource()
-        val waveCount = gameView.getWaveCount()
-        val killCount = gameView.getKillCount()
+        val wave = gameView.getWaveCount()
+        val enemiesKilled = gameView.getKillCount()
         val totalEnemies = gameView.getTotalEnemiesInWave()
-        val totalWaves = GameConfig.getTotalWaves()
         
-        // 각 정보를 개별 TextView에 업데이트
-        view?.apply {
-            findViewById<TextView>(R.id.tvResourceInfo)?.text = "자원: $resource"
-            findViewById<TextView>(R.id.tvWaveInfo)?.text = "웨이브: $waveCount/$totalWaves"
-            findViewById<TextView>(R.id.tvKillInfo)?.text = "처치: $killCount/$totalEnemies"
-        }
+        // 현재 웨이브 정보 업데이트
+        currentWave = wave
+        
+        // 웨이브 정보 업데이트
+        view?.findViewById<TextView>(R.id.tvWaveInfo)?.text = "웨이브: $wave/${GameConfig.getTotalWaves()}"
+        
+        // 자원 정보 업데이트
+        view?.findViewById<TextView>(R.id.tvResourceInfo)?.text = "자원: $resource"
+        
+        // 적 처치 정보 업데이트
+        view?.findViewById<TextView>(R.id.tvKillInfo)?.text = "처치: $enemiesKilled/$totalEnemies"
     }
     
-    // 유닛 스탯 UI 업데이트
-    private fun updateUnitStatsUI() {
-        if (!::gameView.isInitialized || !isAdded) return
-        
-        // 유닛 스탯 정보 가져오기
-        val health = gameView.getUnitHealth()
-        val maxHealth = gameView.getUnitMaxHealth()
-        val attack = gameView.getUnitAttack()
-        val attackSpeed = gameView.getUnitAttackSpeed()
-        val attacksPerSecond = 1000f / attackSpeed
-        val attackRange = gameView.getUnitAttackRange()
-        
-        // UI 요소 찾기
-        view?.findViewById<TextView>(R.id.unitHealthText)?.text = "체력: $health/$maxHealth"
-        view?.findViewById<TextView>(R.id.unitAttackText)?.text = "공격력: $attack"
-        view?.findViewById<TextView>(R.id.unitAttackSpeedText)?.text = "공격속도: ${String.format("%.2f", attacksPerSecond)}/초"
-        view?.findViewById<TextView>(R.id.unitRangeText)?.text = "사거리: ${attackRange.toInt()}"
-        
-        // 이전 코드 유지 (이전 레이아웃과의 호환성을 위해)
-        view?.findViewById<TextView>(R.id.tvUnitStats)?.text = 
-            "체력: $health/$maxHealth  |  공격력: $attack  |  공격속도: ${String.format("%.2f", attacksPerSecond)}/초  |  범위: ${attackRange.toInt()}"
-    }
-    
-    // 적 스탯 UI 업데이트 (새 메서드)
-    private fun updateEnemyStatsUI() {
-        if (!::gameView.isInitialized || !isAdded) return
-        
-        // 현재 웨이브 정보 가져오기
-        val waveCount = gameView.getWaveCount()
-        
-        // 현재 웨이브의 적 스탯 계산
-        val normalEnemyHealth = GameConfig.getEnemyHealthForWave(waveCount, false)
-        val normalEnemyDamage = GameConfig.getEnemyDamageForWave(waveCount, false)
-        val normalEnemySpeed = GameConfig.getEnemySpeedForWave(waveCount, false)
-        
-        // UI 요소 찾기
-        view?.findViewById<TextView>(R.id.enemyHealthText)?.text = "체력: $normalEnemyHealth"
-        view?.findViewById<TextView>(R.id.enemyAttackText)?.text = "공격력: $normalEnemyDamage"
-        view?.findViewById<TextView>(R.id.enemySpeedText)?.text = "이동속도: ${String.format("%.1f", normalEnemySpeed)}"
-    }
-    
-    // 버프 정보 업데이트
+    // 버프 UI 업데이트
     private fun updateBuffUI() {
-        if (!::gameView.isInitialized || !isAdded) return
+        if (!isAdded) return
         
-        // 버프 컨테이너 가져오기
-        val buffContainer = view?.findViewById<LinearLayout>(R.id.buffContainer) ?: return
+        val activeBuffs = gameView.getActiveBuffs()
+        val buffContainer = view?.findViewById<LinearLayout>(R.id.buffContainer)
+        val tvBuffList = view?.findViewById<TextView>(R.id.tvBuffList)
         
-        // 기존 버프 항목 모두 제거
+        if (buffContainer == null || tvBuffList == null) return
+        
+        // 이전 버프 표시 제거
         buffContainer.removeAllViews()
         
-        // 버프 정보 가져오기
-        val defenseBuffs = gameView.getDefenseBuffs()
-        val enemyNerfs = gameView.getEnemyNerfs()
-        
-        // 버프가 있는지 확인
-        val hasBuffs = defenseBuffs.isNotEmpty() || enemyNerfs.isNotEmpty()
-        
-        if (hasBuffs) {
-            // 디펜스 유닛 버프 먼저 추가
-            for (buff in defenseBuffs) {
-                addBuffItem(buffContainer, buff, true)
-            }
-            
-            // 적 너프 추가
-            for (buff in enemyNerfs) {
-                addBuffItem(buffContainer, buff, false)
-            }
+        if (activeBuffs.isEmpty()) {
+            // 버프가 없을 경우
+            tvBuffList.text = "버프 없음"
+            tvBuffList.visibility = View.VISIBLE
+            return
         } else {
-            // 버프가 없으면 "없음" 텍스트뷰 표시
-            val noBuff = TextView(context)
-            noBuff.text = "없음"
-            noBuff.textSize = 14f
-            noBuff.setTextColor(resources.getColor(android.R.color.white, null))
-            buffContainer.addView(noBuff)
+            tvBuffList.visibility = View.GONE
+        }
+        
+        // 각 버프별 표시
+        for (buff in activeBuffs) {
+            // 버프 UI 요소 생성
+            val buffView = createBuffView(buff)
+            buffContainer.addView(buffView)
         }
     }
     
-    // 버프 항목 추가
-    private fun addBuffItem(container: LinearLayout, buff: Buff, isDefenseBuff: Boolean) {
-        // 레이아웃 인플레이터로 버프 항목 생성
-        val inflater = LayoutInflater.from(context)
-        val buffView = inflater.inflate(R.layout.item_buff, container, false) as TextView
+    // 버프 UI 요소 생성
+    private fun createBuffView(buff: Buff): View {
+        // 버프 타입에 따라 카테고리 결정
+        val isDefenseBuff = when (buff.type) {
+            BuffType.MISSILE_DAMAGE, BuffType.ATTACK_SPEED, 
+            BuffType.MISSILE_SPEED, BuffType.MULTI_DIRECTION,
+            BuffType.MISSILE_PIERCE, BuffType.RESOURCE_GAIN -> true
+            
+            BuffType.ENEMY_SLOW, BuffType.DOT_DAMAGE,
+            BuffType.MASS_DAMAGE -> false
+        }
         
-        // 버프 텍스트 설정
+        // 버프 뷰 생성
+        val buffView = TextView(requireContext())
         buffView.text = buff.getShortDisplayText()
+        buffView.textSize = 12f
+        buffView.setTextColor(Color.WHITE)
+        buffView.setPadding(10, 5, 10, 5)
+        
+        // 마진 설정
+        val layoutParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        layoutParams.marginEnd = 8
+        buffView.layoutParams = layoutParams
         
         // 배경 설정
-        val drawable = if (isDefenseBuff) {
-            GradientDrawable().apply {
-                cornerRadius = resources.getDimension(R.dimen.buff_corner_radius)
-                setColor(GameConfig.BUFF_DEFENSE_COLOR)
-                setStroke(1, GameConfig.BUFF_DEFENSE_STROKE_COLOR)
-            }
+        val drawable = GradientDrawable()
+        drawable.cornerRadius = 8f
+        
+        if (isDefenseBuff) {
+            drawable.setColor(GameConfig.BUFF_DEFENSE_COLOR)
+            drawable.setStroke(1, GameConfig.BUFF_DEFENSE_STROKE_COLOR)
         } else {
-            GradientDrawable().apply {
-                cornerRadius = resources.getDimension(R.dimen.buff_corner_radius)
-                setColor(GameConfig.BUFF_ENEMY_NERF_COLOR)
-                setStroke(1, GameConfig.BUFF_ENEMY_NERF_STROKE_COLOR)
-            }
+            drawable.setColor(GameConfig.BUFF_ENEMY_NERF_COLOR)
+            drawable.setStroke(1, GameConfig.BUFF_ENEMY_NERF_STROKE_COLOR)
         }
         
         buffView.background = drawable
         
-        // 컨테이너에 추가
-        container.addView(buffView)
+        return buffView
+    }
+    
+    // 내 유닛 스탯 UI 업데이트
+    private fun updateUnitStatsUI() {
+        if (!isAdded) return
+        
+        val health = gameView.getUnitHealth()
+        val maxHealth = gameView.getUnitMaxHealth()
+        val attack = gameView.getUnitAttack()
+        val attackSpeed = gameView.getUnitAttackSpeed()
+        val attackRange = gameView.getUnitAttackRange()
+        
+        // 체력 정보 업데이트
+        view?.findViewById<TextView>(R.id.unitHealthText)?.text = "체력: $health/$maxHealth"
+        
+        // 공격력 정보 업데이트
+        view?.findViewById<TextView>(R.id.unitAttackText)?.text = "공격력: $attack"
+        
+        // 공격속도 정보 업데이트
+        val attacksPerSecond = 1000.0 / attackSpeed
+        val formattedAttackSpeed = String.format("%.2f", attacksPerSecond)
+        view?.findViewById<TextView>(R.id.unitAttackSpeedText)?.text = "공격속도: ${formattedAttackSpeed}/초"
+        
+        // 사거리 정보 업데이트
+        view?.findViewById<TextView>(R.id.unitRangeText)?.text = "사거리: ${attackRange.toInt()}"
+    }
+    
+    // 적 유닛 스탯 UI 업데이트
+    private fun updateEnemyStatsUI() {
+        if (!isAdded) return
+        
+        val wave = gameView.getWaveCount()
+        
+        // GameConfig를 통해 웨이브별 적 스탯 정보 계산
+        val health = GameConfig.getEnemyHealthForWave(wave)
+        val damage = GameConfig.getEnemyDamageForWave(wave, false)
+        val speed = GameConfig.getEnemySpeedForWave(wave)
+        
+        // 체력 정보 업데이트
+        view?.findViewById<TextView>(R.id.enemyHealthText)?.text = "체력: $health"
+        
+        // 공격력 정보 업데이트
+        view?.findViewById<TextView>(R.id.enemyAttackText)?.text = "공격력: $damage"
+        
+        // 이동속도 정보 업데이트
+        val formattedSpeed = String.format("%.2f", speed)
+        view?.findViewById<TextView>(R.id.enemySpeedText)?.text = "이동속도: $formattedSpeed"
+    }
+    
+    // 보스 유닛 스탯 UI 업데이트
+    private fun updateBossStatsUI() {
+        if (!isAdded) return
+        
+        val wave = gameView.getWaveCount()
+        
+        // GameConfig를 통해 웨이브별 보스 스탯 정보 계산
+        val health = GameConfig.getEnemyHealthForWave(wave, true)
+        val damage = GameConfig.getEnemyDamageForWave(wave, true)
+        val speed = GameConfig.getEnemySpeedForWave(wave, true)
+        
+        // 체력 정보 업데이트
+        view?.findViewById<TextView>(R.id.bossHealthText)?.text = "체력: $health"
+        
+        // 공격력 정보 업데이트
+        view?.findViewById<TextView>(R.id.bossAttackText)?.text = "공격력: $damage"
+        
+        // 이동속도 정보 업데이트
+        val formattedSpeed = String.format("%.2f", speed)
+        view?.findViewById<TextView>(R.id.bossSpeedText)?.text = "이동속도: $formattedSpeed"
     }
     
     // 웨이브 완료 리스너 설정

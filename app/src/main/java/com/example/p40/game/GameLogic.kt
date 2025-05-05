@@ -560,10 +560,10 @@ class GameLogic(
         val spawnY = centerY + sin(angle).toFloat() * spawnDistance
         
         val waveCount = gameStats.getWaveCount()
-        // 현재 웨이브에 맞는 보스 능력치 설정 (일반 적보다 느리지만 크고 강함)
+        // 현재 웨이브에 맞는 보스 능력치 설정
         val speed = gameConfig.getEnemySpeedForWave(waveCount, true)
         val health = gameConfig.getEnemyHealthForWave(waveCount, true)
-        val bossSize = gameConfig.ENEMY_BASE_SIZE * gameConfig.BOSS_SIZE_MULTIPLIER
+        val bossSize = gameConfig.BOSS_SIZE // 배율이 아닌 직접 크기 사용
         
         // 객체 풀에서 보스 가져오기
         val boss = enemyPool.obtain(

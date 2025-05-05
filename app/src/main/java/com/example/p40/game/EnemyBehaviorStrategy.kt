@@ -96,7 +96,7 @@ class BossEnemyBehavior : EnemyBehaviorStrategy {
         
         // 보스 특수 효과 (외곽선)
         val strokePaint = enemy.getStrokePaint()
-        canvas.drawCircle(position.x, position.y, size * 1.2f, strokePaint)
+        canvas.drawCircle(position.x, position.y, size, strokePaint)
     }
     
     override fun onDamage(enemy: Enemy, damage: Int): Boolean {
