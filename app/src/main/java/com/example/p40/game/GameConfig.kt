@@ -14,7 +14,7 @@ object GameConfig {
     const val WAVE_MESSAGE_DURATION = 2000L  // 웨이브 메시지 표시 시간 (밀리초)
     
     // 디버그 모드 설정
-    const val DEBUG_MODE = true // 디버그 정보 표시 여부
+    const val DEBUG_MODE = false // 디버그 정보 표시 여부
     
     // 성능 및 제한 설정
     const val FRAME_LIMIT = 60 // 최대 FPS
