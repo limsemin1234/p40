@@ -98,6 +98,11 @@ class DefenseUnit(
         
         // 타겟이 없으면 미사일을 발사하지 않음
         if (target == null) {
+            // 적은 있지만 타겟이 없는 경우 디버깅용
+            if (enemies.isNotEmpty() && enemies.any { !it.isDead() }) {
+                // 여기에 로그를 추가하거나 디버깅용 변수를 설정할 수 있음
+                // 실제 앱에서는 android.util.Log를 사용할 수 있음
+            }
             return null
         }
         
@@ -142,6 +147,16 @@ class DefenseUnit(
         tempDy.entries.removeAll { it.key.isDead() }
         tempDistanceSquared.entries.removeAll { it.key.isDead() }
         
+        // 적이 범위 내로 이동했을 때 감지하기 위해 모든 적에 대한 거리 재계산
+        // (최적화에는 좋지 않지만 적이 범위 내로 들어왔을 때 감지하기 위함)
+        for (enemy in enemies) {
+            if (!enemy.isDead()) {
+                tempDx.remove(enemy)
+                tempDy.remove(enemy)
+                tempDistanceSquared.remove(enemy)
+            }
+        }
+        
         // 디버깅: 적의 수 확인
         val enemyCount = enemies.filter { !it.isDead() }.size
         if (enemyCount == 0) {
@@ -169,7 +184,7 @@ class DefenseUnit(
                 tempDistanceSquared[enemy] = distanceSquared
             }
             
-            // 공격 범위 내에 있는 적만 타겟팅 (제한 완화 - 현재는 범위 제한을 10배 늘림)
+            // 공격 범위 내에 있는 적만 타겟팅 (제한 완화 - 범위를 2배로 설정)
             if (distanceSquared <= attackRangeSquared && distanceSquared < minDistance) {
                 minDistance = distanceSquared
                 nearest = enemy
@@ -191,5 +206,20 @@ class DefenseUnit(
             tempDy.remove(enemy)
             tempDistanceSquared.remove(enemy)
         }
+    }
+    
+    /**
+     * 디펜스 유닛 공격 범위 그리기
+     */
+    fun drawAttackRange(canvas: Canvas) {
+        // 공격 범위 원 그리기
+        val rangePaint = android.graphics.Paint().apply {
+            color = android.graphics.Color.argb(80, 100, 180, 255) // 반투명 파란색
+            style = android.graphics.Paint.Style.STROKE
+            strokeWidth = 2f
+        }
+        
+        // 실제 공격 범위 원
+        canvas.drawCircle(position.x, position.y, _attackRange, rangePaint)
     }
 } 

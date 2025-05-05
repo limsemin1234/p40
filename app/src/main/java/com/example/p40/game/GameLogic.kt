@@ -158,6 +158,9 @@ class GameLogic(
                 // 버프에 의한 적 이동 속도 조정 적용
                 enemy.update(enemySpeedMultiplier)
                 
+                // 적 위치가 변경되었으므로 디펜스 유닛의 캐시 업데이트
+                defenseUnit.updateEnemyPosition(enemy)
+                
                 // 중앙에 도달했는지 확인
                 val dx = enemyPos.x - centerX
                 val dy = enemyPos.y - centerY

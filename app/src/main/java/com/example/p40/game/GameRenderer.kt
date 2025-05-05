@@ -59,6 +59,9 @@ class GameRenderer(
         // 배경 지우기
         canvas.drawColor(Color.BLACK)
         
+        // 디펜스 유닛 공격 범위 표시
+        defenseUnit.drawAttackRange(canvas)
+        
         // 중앙에 방어 타워 그리기
         val centerX = screenWidth / 2
         val centerY = screenHeight / 2
