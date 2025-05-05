@@ -258,8 +258,11 @@ class GameLogic(
         val adjustedAttackCooldown = (gameStats.getUnitAttackSpeed() * attackSpeedMultiplier).toLong()
         val missileDamageMultiplier = gameStats.getBuffManager().getMissileDamageMultiplier()
         
-        // 모든 살아있는 적을 대상으로 공격 처리 (화면 내 적으로 제한하지 않음)
+        // 모든 적을 대상으로 공격 처리 (죽지 않은 모든 적)
         val aliveEnemies = enemies.filter { !it.isDead() }
+        
+        // 적이 없으면 처리하지 않음
+        if (aliveEnemies.isEmpty()) return
         
         // 다방향 발사 지원
         val multiDirCount = gameStats.getMultiDirectionCount()

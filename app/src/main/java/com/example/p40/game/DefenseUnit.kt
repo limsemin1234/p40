@@ -142,6 +142,12 @@ class DefenseUnit(
         tempDy.entries.removeAll { it.key.isDead() }
         tempDistanceSquared.entries.removeAll { it.key.isDead() }
         
+        // 디버깅: 적의 수 확인
+        val enemyCount = enemies.filter { !it.isDead() }.size
+        if (enemyCount == 0) {
+            return null // 적이 없으면 바로 종료
+        }
+        
         // 반복문 한 번으로 제곱근 연산 없이 최적의 타겟 찾기
         for (enemy in enemies) {
             if (enemy.isDead()) continue // 죽은 적은 건너뜀
@@ -163,8 +169,8 @@ class DefenseUnit(
                 tempDistanceSquared[enemy] = distanceSquared
             }
             
-            // 공격 범위 내에 있는 적만 타겟팅
-            if (distanceSquared <= attackRangeSquared && distanceSquared < minDistance) {
+            // 공격 범위 내에 있는 적만 타겟팅 (제한 완화 - 현재는 범위 제한을 10배 늘림)
+            if (distanceSquared <= attackRangeSquared * 10 && distanceSquared < minDistance) {
                 minDistance = distanceSquared
                 nearest = enemy
             }
