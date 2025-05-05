@@ -158,6 +158,18 @@ object GameConfig {
     const val MISSILE_RENDER_MARGIN_X = 20f // 미사일 렌더링 X축 마진
     const val MISSILE_RENDER_MARGIN_Y = 20f // 미사일 렌더링 Y축 마진
     
+    // --------- 메시지 관련 설정 ----------
+    
+    // 메시지 표시 설정
+    const val MESSAGE_OPACITY = 0.6f // 메시지 불투명도 (0~1)
+    const val MESSAGE_MIN_WIDTH = 200 // 메시지 최소 너비 (dp)
+    const val MESSAGE_MAX_WIDTH = 350 // 메시지 최대 너비 (dp)
+    const val MESSAGE_PADDING_HORIZONTAL = 16 // 메시지 가로 패딩 (dp)
+    const val MESSAGE_PADDING_VERTICAL = 10 // 메시지 세로 패딩 (dp)
+    const val MESSAGE_CORNER_RADIUS = 8 // 메시지 모서리 둥글기 (dp)
+    const val MESSAGE_DURATION = 2000L // 메시지 표시 시간 (ms)
+    const val MESSAGE_MAX_COUNT = 5 // 최대 메시지 수
+    
     // 디버그 정보 설정
     const val DEBUG_TEXT_SIZE = 30f // 디버그 텍스트 크기
     const val DEBUG_TEXT_COLOR = Color.GREEN // 디버그 텍스트 색상
