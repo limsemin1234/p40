@@ -45,6 +45,12 @@ class GameLogic(
     private var gameStartTime = 0L
     
     /**
+     * 보스 소환 조건 체크
+     */
+    private var lastBossCheckTime = 0L
+    private val bossForceSpawnDelay = 5000L // 5초 후 강제 소환
+    
+    /**
      * 게임 초기화
      */
     fun initGame(width: Float, height: Float) {
@@ -62,6 +68,7 @@ class GameLogic(
         
         gameStartTime = System.currentTimeMillis()
         lastEnemySpawnTime = gameStartTime
+        lastBossCheckTime = 0L  // 보스 체크 타이머 초기화
         isRunning = true
         isGameOver = false
         isPaused = false
@@ -93,10 +100,17 @@ class GameLogic(
             handleEnemySpawning(currentTime)
         }
         
+        // 보스 소환 조건 체크
+        checkBossSpawnCondition(currentTime)
+        
         // 화면 범위 계산 (성능 최적화를 위한 값)
         val centerX = screenWidth / 2
         val centerY = screenHeight / 2
-        val visibleMargin = 100f // 화면 밖 여유 공간
+        
+        // 적 생성 거리보다 크게 visibleMargin 설정 (적 생성 거리 + 여유 공간)
+        val spawnDistance = screenWidth.coerceAtLeast(screenHeight) * gameConfig.ENEMY_SPAWN_DISTANCE_FACTOR
+        val visibleMargin = spawnDistance + gameConfig.ENEMY_UPDATE_MARGIN // GameConfig에서 여유 공간 값 사용
+        
         val farOffScreenMargin = gameConfig.FAR_OFFSCREEN_MARGIN // GameConfig에서 설정값 사용
         
         // 화면 범위 계산 (화면 밖 일정 거리까지 포함)
@@ -126,14 +140,6 @@ class GameLogic(
         
         // 5. 적 처리 및 점수 계산
         processDeadEnemies(deadEnemies)
-        
-        // 웨이브의 일반 적 모두 생성 후 처치 시 보스 소환
-        if (!gameStats.isBossSpawned() && 
-            gameStats.getSpawnedCount() >= gameStats.getTotalEnemiesInWave() && 
-            enemies.isEmpty()) {
-            spawnBoss()
-            gameStats.spawnBoss()
-        }
     }
     
     /**
@@ -147,6 +153,12 @@ class GameLogic(
         enemySpeedMultiplier: Float,
         deadEnemies: MutableList<Enemy>
     ) {
+        val currentTime = System.currentTimeMillis()
+        
+        // 업데이트 체크를 위한 카운터 추가
+        var updatedCount = 0
+        var notUpdatedCount = 0
+        
         for (enemy in enemies) {
             val enemyPos = enemy.getPosition()
             
@@ -154,6 +166,10 @@ class GameLogic(
             if (enemyPos.x < -farOffScreenMargin || enemyPos.x > screenWidth + farOffScreenMargin ||
                 enemyPos.y < -farOffScreenMargin || enemyPos.y > screenHeight + farOffScreenMargin) {
                 deadEnemies.add(enemy)
+                // 화면 밖으로 완전히 벗어난 적의 경우 처리된 것으로 간주
+                if (!enemy.isBoss()) {
+                    enemy.takeDamage(1000) // 충분한 데미지를 줘서 죽은 것으로 처리
+                }
                 continue
             }
             
@@ -170,21 +186,77 @@ class GameLogic(
                 val dy = enemyPos.y - centerY
                 val distanceToCenter = kotlin.math.sqrt(dx * dx + dy * dy)
                 
-                if (distanceToCenter < gameConfig.DEFENSE_UNIT_SIZE) {
-                    enemy.takeDamage(gameConfig.CENTER_REACHED_DAMAGE) // 중앙에 도달하면 죽음
-                    
-                    // 적의 공격력에 따라 디펜스 유닛 체력 감소
-                    val enemyDamage = enemy.getDamage()
-                    val isUnitDead = gameStats.applyDamageToUnit(enemyDamage)
-                    
-                    // 체력이 0 이하일 때만 게임오버 처리
-                    if (isUnitDead && !isGameOver) {
-                        isGameOver = true
-                        // 게임 오버 처리 - UI 스레드에서 실행
-                        Handler(Looper.getMainLooper()).post {
-                            gameOverListener?.onGameOver(gameStats.getResource(), gameStats.getWaveCount())
+                updatedCount++
+                
+                try {
+                    // 디펜스 유닛과의 충돌 처리
+                    if (distanceToCenter < gameConfig.DEFENSE_UNIT_SIZE) {
+                        // 중앙에 도달한 적 처리
+                        if (enemy.isBoss()) {
+                            // 보스의 경우 다르게 처리 (죽이지는 않음)
+                            // 플레이어에게 데미지를 주고 약간 밀어내기
+                            val enemyDamage = enemy.getDamage()
+                            val isUnitDead = gameStats.applyDamageToUnit(enemyDamage)
+                            
+                            // 보스를 약간 밀어내기 (중앙에서 같은 방향으로 조금 더 멀어지게)
+                            val pushDistance = gameConfig.DEFENSE_UNIT_SIZE * 1.5f
+                            val pushDirX = if (dx != 0f) dx / distanceToCenter else 0f
+                            val pushDirY = if (dy != 0f) dy / distanceToCenter else 0f
+                            
+                            // NaN이나 무한대 값 검사
+                            val newX = if (pushDirX.isNaN() || pushDirX.isInfinite()) enemyPos.x else enemyPos.x + pushDirX * pushDistance
+                            val newY = if (pushDirY.isNaN() || pushDirY.isInfinite()) enemyPos.y else enemyPos.y + pushDirY * pushDistance
+                            
+                            // 유효한 위치 값인지 확인 (화면 내부로 제한)
+                            val safeX = newX.coerceIn(0f, screenWidth)
+                            val safeY = newY.coerceIn(0f, screenHeight)
+                            
+                            enemy.setPosition(safeX, safeY)
+                            
+                            if (gameConfig.DEBUG_MODE) {
+                                println("보스가 디펜스 유닛과 충돌: 데미지 ${enemyDamage} 적용")
+                            }
+                            
+                            // 체력이 0 이하일 때만 게임오버 처리
+                            if (isUnitDead && !isGameOver) {
+                                isGameOver = true
+                                // 게임 오버 처리 - UI 스레드에서 실행
+                                Handler(Looper.getMainLooper()).post {
+                                    gameOverListener?.onGameOver(gameStats.getResource(), gameStats.getWaveCount())
+                                }
+                            }
+                        } else {
+                            // 일반 적은 기존 방식대로 처리
+                            enemy.takeDamage(gameConfig.CENTER_REACHED_DAMAGE) // 중앙에 도달하면 죽음
+                            
+                            // 적의 공격력에 따라 디펜스 유닛 체력 감소
+                            val enemyDamage = enemy.getDamage()
+                            val isUnitDead = gameStats.applyDamageToUnit(enemyDamage)
+                            
+                            // 체력이 0 이하일 때만 게임오버 처리
+                            if (isUnitDead && !isGameOver) {
+                                isGameOver = true
+                                // 게임 오버 처리 - UI 스레드에서 실행
+                                Handler(Looper.getMainLooper()).post {
+                                    gameOverListener?.onGameOver(gameStats.getResource(), gameStats.getWaveCount())
+                                }
+                            }
                         }
                     }
+                } catch (e: Exception) {
+                    // 충돌 처리 중 예외 발생 시 적 제거하고 로그 출력
+                    if (gameConfig.DEBUG_MODE) {
+                        println("적 충돌 처리 중 오류 발생: ${e.message}")
+                        e.printStackTrace()
+                    }
+                    deadEnemies.add(enemy)
+                }
+            } else {
+                notUpdatedCount++
+                
+                // 화면 밖에 있어 업데이트되지 않는 적의 위치 정보 로깅 (디버깅용)
+                if (currentTime % 3000 < 20) { // 3초마다 로그
+                    println("[디버그] 업데이트 안된 적: ID=${enemy.hashCode()}, 위치=(${enemyPos.x.toInt()}, ${enemyPos.y.toInt()})")
                 }
             }
             
@@ -192,6 +264,11 @@ class GameLogic(
             if (enemy.isDead()) {
                 deadEnemies.add(enemy)
             }
+        }
+        
+        // 업데이트 현황 로깅 (디버깅용)
+        if (currentTime % 3000 < 20) { // 3초마다 로그
+            println("[디버그] 적 업데이트 현황: 업데이트=${updatedCount}, 미업데이트=${notUpdatedCount}, 총합=${updatedCount + notUpdatedCount}")
         }
     }
     
@@ -340,15 +417,23 @@ class GameLogic(
     private fun processDeadEnemies(deadEnemies: List<Enemy>) {
         if (deadEnemies.isEmpty()) return
         
+        // 죽은 적 수 로깅
+        println("[디버그] 죽은 적 처리: ${deadEnemies.size}개")
+        
         // 킬 카운트 및 점수(자원) 갱신
         for (enemy in deadEnemies) {
-            if (!enemies.remove(enemy)) continue // 이미 제거된 경우 스킵
+            if (!enemies.remove(enemy)) {
+                println("[디버그] 이미 제거된 적: ID=${enemy.hashCode()}")
+                continue
+            } // 이미 제거된 경우 스킵
             
             if (enemy.isDead()) { // 실제로 죽은 경우만 점수 처리
                 val isBossKilled = gameStats.enemyKilled(enemy.isBoss())
                 
                 // 객체 풀에 적 반환 (재사용)
                 enemyPool.recycle(enemy)
+                
+                println("[디버그] 적 제거 완료: ID=${enemy.hashCode()}, 보스=${enemy.isBoss()}")
                 
                 if (isBossKilled) {
                     // 보스 처치 이벤트 발생
@@ -359,6 +444,9 @@ class GameLogic(
                         startNextWave()
                     }
                 }
+            } else {
+                println("[디버그] 적 제거 (죽지 않음): ID=${enemy.hashCode()}, 위치=${enemy.getPosition()}")
+                enemyPool.recycle(enemy)
             }
         }
     }
@@ -373,6 +461,12 @@ class GameLogic(
             val totalEnemiesInWave = gameStats.getTotalEnemiesInWave()
             val isBossSpawned = gameStats.isBossSpawned()
             
+            // 디버그: 현재 적 상태 및 생성 조건 확인
+            if (currentTime % 3000 < 20) {  // 3초마다 한 번씩만 로그 출력
+                println("[디버그] 적 현황: 생성=${spawnedCount}/${totalEnemiesInWave}, 화면상=${enemies.size}, 웨이브=${waveCount}, 보스=${isBossSpawned}")
+                println("[디버그] 적 생성 조건: ${spawnedCount < totalEnemiesInWave} && ${!isBossSpawned} && ${!isGameOver}")
+            }
+            
             // 웨이브당 정확히 적 수만큼만 생성되도록 수정
             if (spawnedCount < totalEnemiesInWave && !isBossSpawned && !isGameOver) {
                 
@@ -380,13 +474,16 @@ class GameLogic(
                 val spawnCooldown = gameConfig.getEnemySpawnIntervalForWave(waveCount)
                 
                 if (currentTime - lastEnemySpawnTime > spawnCooldown) {
+                    // 생성 전 로그
+                    println("[디버그] 적 생성 시도: ${spawnedCount+1}/${totalEnemiesInWave}")
+                    
+                    val prevCount = enemies.size
                     spawnEnemy()
+                    val newCount = enemies.size
                     lastEnemySpawnTime = currentTime
                     
-                    // 디버그 모드인 경우에만 로그 출력
-                    if (gameConfig.DEBUG_MODE) {
-                        println("적 생성: ${gameStats.getSpawnedCount()}/${totalEnemiesInWave} - 웨이브: $waveCount")
-                    }
+                    // 생성 후 로그 - 실제로 enemies 배열에 추가되었는지 확인
+                    println("[디버그] 적 생성 완료: ${gameStats.getSpawnedCount()}/${totalEnemiesInWave}, enemies 배열 변화: ${prevCount} -> ${newCount}")
                 }
             }
         } catch (e: Exception) {
@@ -400,6 +497,12 @@ class GameLogic(
      */
     private fun spawnEnemy() {
         try {
+            // 최대 적 수 제한 확인
+            if (enemies.size >= gameConfig.MAX_ENEMIES) {
+                println("[디버그] ⚠️ 적 생성 실패: MAX_ENEMIES(${gameConfig.MAX_ENEMIES}) 제한에 도달")
+                return
+            }
+            
             val centerX = screenWidth / 2
             val centerY = screenHeight / 2
             
@@ -409,6 +512,11 @@ class GameLogic(
             
             val spawnX = centerX + cos(angle).toFloat() * spawnDistance
             val spawnY = centerY + sin(angle).toFloat() * spawnDistance
+            
+            // 생성 좌표가 화면 범위를 벗어나는지 확인
+            val isOffScreen = spawnX < 0 || spawnX > screenWidth || spawnY < 0 || spawnY > screenHeight
+            
+            println("[디버그] 적 생성 위치: (${spawnX.toInt()}, ${spawnY.toInt()}), 화면 중심에서 거리: ${spawnDistance.toInt()}, 화면 밖: $isOffScreen")
             
             val waveCount = gameStats.getWaveCount()
             // 현재 웨이브에 맞는 적 능력치 설정
@@ -424,8 +532,13 @@ class GameLogic(
                 wave = waveCount
             )
             
-            enemies.add(enemy)
-            gameStats.incrementSpawnCount()
+            if (enemy != null) {
+                enemies.add(enemy)
+                gameStats.incrementSpawnCount()
+                println("[디버그] 적 생성 성공: ID=${enemy.hashCode()}, 체력=${health}, 속도=${speed}")
+            } else {
+                println("[디버그] ⚠️ 적 생성 실패: 객체 풀에서 Enemy 객체를 가져올 수 없음")
+            }
         } catch (e: Exception) {
             // 예외 발생 시 로그 출력 (실제 앱에서는 logger 사용)
             e.printStackTrace()
@@ -503,9 +616,56 @@ class GameLogic(
             
             // 웨이브 시작 준비 시간 설정 (웨이브 메시지가 끝나면 즉시 적 생성 시작)
             lastEnemySpawnTime = System.currentTimeMillis()
+            
+            // 보스 타이머 초기화
+            lastBossCheckTime = 0L
         } catch (e: Exception) {
             // 예외 발생 시 로그 출력 (실제 앱에서는 logger 사용)
             e.printStackTrace()
+        }
+    }
+    
+    /**
+     * 보스 소환 조건 체크
+     */
+    private fun checkBossSpawnCondition(currentTime: Long) {
+        // 이미 보스가 소환되었으면 체크하지 않음
+        if (gameStats.isBossSpawned()) {
+            return
+        }
+        
+        val spawnedCount = gameStats.getSpawnedCount()
+        val totalEnemiesInWave = gameStats.getTotalEnemiesInWave()
+        
+        // 모든 일반 적이 생성되면 타이머 시작
+        if (spawnedCount >= totalEnemiesInWave) {
+            // 첫 체크 시 시간 기록
+            if (lastBossCheckTime == 0L) {
+                lastBossCheckTime = currentTime
+                println("[디버그] 보스 생성 타이머 시작: 웨이브=${gameStats.getWaveCount()}, 적=${spawnedCount}/${totalEnemiesInWave}")
+            }
+            
+            // 현재 진행 상황 로깅
+            if (currentTime % 1000 < 20) { // 1초마다 로그
+                val timeLeft = bossForceSpawnDelay - (currentTime - lastBossCheckTime)
+                println("[디버그] 보스 생성 대기 중: ${timeLeft/1000}초 남음, 화면상 적=${enemies.size}")
+            }
+            
+            // 5초 경과 후 보스 소환
+            if (currentTime - lastBossCheckTime > bossForceSpawnDelay) {
+                println("[디버그] 보스 생성 시작: 웨이브=${gameStats.getWaveCount()}, 화면상 적=${enemies.size}")
+                
+                // 보스 소환
+                spawnBoss()
+                gameStats.spawnBoss()
+                
+                println("[디버그] 보스 생성 완료: 웨이브=${gameStats.getWaveCount()}, 화면상 적=${enemies.size}")
+                
+                // 타이머 초기화
+                lastBossCheckTime = 0L
+            }
+        } else if (currentTime % 5000 < 20) { // 5초마다 로그
+            println("[디버그] 보스 생성 대기 중: 적=${spawnedCount}/${totalEnemiesInWave}, 조건 미충족")
         }
     }
     
@@ -554,6 +714,7 @@ class GameLogic(
         // 게임 시작 시간 재설정
         gameStartTime = System.currentTimeMillis()
         lastEnemySpawnTime = gameStartTime
+        lastBossCheckTime = 0L  // 보스 체크 타이머 초기화
         
         // 디펜스 유닛 업데이트
         if (this::defenseUnit.isInitialized) {

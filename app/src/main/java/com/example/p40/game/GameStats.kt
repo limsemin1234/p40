@@ -134,6 +134,13 @@ class GameStats(private val gameConfig: GameConfig) {
     }
     
     /**
+     * 킬 카운트 증가
+     */
+    fun incrementKillCount() {
+        killCount++
+    }
+    
+    /**
      * 디펜스 유닛 데미지 적용
      * @param damage 받은 데미지
      * @return 체력이 0 이하면 true

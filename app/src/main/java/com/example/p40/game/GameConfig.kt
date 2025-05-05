@@ -24,15 +24,15 @@ object GameConfig {
     // 디펜스 유닛 설정
     const val DEFENSE_UNIT_SIZE = 30f  // 디펜스 유닛 크기
     const val DEFENSE_UNIT_COLOR = Color.BLUE  // 디펜스 유닛 색상
-    const val DEFENSE_UNIT_ATTACK_RANGE = 500f  // 공격 범위
+    const val DEFENSE_UNIT_ATTACK_RANGE = 300f  // 공격 범위
     const val DEFENSE_UNIT_ATTACK_COOLDOWN = 1000L  // 공격속도 1초
     const val DEFENSE_UNIT_INITIAL_HEALTH = 100 // 초기 체력
     const val DEFENSE_UNIT_INITIAL_MAX_HEALTH = 100 // 초기 최대 체력
     
     // 미사일 설정
     const val MISSILE_SIZE = 5f  // 미사일 크기
-    const val MISSILE_SPEED = 10f  // 미사일 속도 (5f -> 10f로 증가)
-    const val MISSILE_DAMAGE = 50  // 미사일 기본 데미지 (50에서 100으로 증가)
+    const val MISSILE_SPEED = 10f  // 미사일 속도
+    const val MISSILE_DAMAGE = 50  // 미사일 기본 데미지
     const val MISSILE_COLOR = Color.YELLOW  // 미사일 색상
     const val MISSILE_MAX_DISTANCE = 3000f  // 미사일 최대 이동 거리 (2000f -> 3000f로 증가)
     
@@ -257,8 +257,8 @@ object GameConfig {
     // --------- 렌더링 관련 설정 ----------
     
     // 적 렌더링 설정
-    const val ENEMY_RENDER_MARGIN_X = 200f // 적 렌더링 X축 마진 (화면 밖에서도 그리기 위함)
-    const val ENEMY_RENDER_MARGIN_Y = 200f // 적 렌더링 Y축 마진 (화면 밖에서도 그리기 위함)
+    const val ENEMY_RENDER_MARGIN_X = 600f // 적 렌더링 X축 마진 (화면 밖에서도 그리기 위함)
+    const val ENEMY_RENDER_MARGIN_Y = 600f // 적 렌더링 Y축 마진 (화면 밖에서도 그리기 위함)
     
     // 미사일 렌더링 설정
     const val MISSILE_RENDER_MARGIN_X = 20f // 미사일 렌더링 X축 마진
@@ -271,9 +271,10 @@ object GameConfig {
     const val DEBUG_TEXT_SPACING = 30f // 디버그 텍스트 줄 간격
     
     // 게임 로직 설정
-    const val FAR_OFFSCREEN_MARGIN = 1000f // 적이 제거되는 화면 외부 거리 (300f에서 1000f로 증가)
-    const val ENEMY_SPAWN_DISTANCE_FACTOR = 0.4f // 적 생성 거리 계수 (화면 크기의 비율)
-    const val BOSS_SPAWN_DISTANCE_FACTOR = 0.7f // 보스 생성 거리 계수 (화면 크기의 비율)
+    const val FAR_OFFSCREEN_MARGIN = 1500f // 적이 제거되는 화면 외부 거리 (1000f에서 1500f로 증가)
+    const val ENEMY_SPAWN_DISTANCE_FACTOR = 0.5f // 적 생성 거리 계수 (0.4f에서 0.6f로 증가)
+    const val BOSS_SPAWN_DISTANCE_FACTOR = 0.5f // 보스 생성 거리 계수 (화면 크기의 비율)
+    const val ENEMY_UPDATE_MARGIN = 200f // 적 생성 거리에 추가되는 여유 공간 (화면 밖 적 업데이트 범위 확장)
 
     /**
      * 게임 난이도 설정

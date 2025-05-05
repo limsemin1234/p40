@@ -73,7 +73,7 @@ class Enemy(
         // 행동 전략 재설정
         behaviorStrategy = when {
             isBoss -> BossEnemyBehavior()
-            wave > 5 && Math.random() < 0.3 -> FlyingEnemyBehavior() 
+            newWave > 5 && Math.random() < 0.3 -> FlyingEnemyBehavior() 
             else -> BasicEnemyBehavior()
         }
     }
@@ -170,6 +170,16 @@ class Enemy(
         if (enraged) {
             paint.color = Color.MAGENTA // 분노 상태일 때 색상 변경
         }
+    }
+    
+    /**
+     * 적의 위치 설정
+     * @param x X 좌표
+     * @param y Y 좌표
+     */
+    fun setPosition(x: Float, y: Float) {
+        position.x = x
+        position.y = y
     }
     
     /**
