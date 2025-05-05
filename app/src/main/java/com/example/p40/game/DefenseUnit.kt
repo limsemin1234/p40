@@ -170,7 +170,7 @@ class DefenseUnit(
             }
             
             // 공격 범위 내에 있는 적만 타겟팅 (제한 완화 - 현재는 범위 제한을 10배 늘림)
-            if (distanceSquared <= attackRangeSquared * 10 && distanceSquared < minDistance) {
+            if (distanceSquared <= attackRangeSquared * 2 && distanceSquared < minDistance) {
                 minDistance = distanceSquared
                 nearest = enemy
             }
