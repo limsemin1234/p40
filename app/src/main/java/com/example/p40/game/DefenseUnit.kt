@@ -88,49 +88,48 @@ class DefenseUnit(
         damageMultiplier: Float = 1.0f,
         angleOffset: Double = 0.0
     ): Missile? {
-        if (enemies.isEmpty()) return null
-        
         // 쿨다운 체크
         if (currentTime - lastAttackTime < adjustedCooldown) {
             return null
         }
         
+        lastAttackTime = currentTime
+        
         // 가장 가까운 적 찾기
-        val target = findNearestEnemy(enemies)
-        if (target != null) {
-            lastAttackTime = currentTime
-            
+        val target = if (enemies.isNotEmpty()) findNearestEnemy(enemies) else null
+        
+        // 타겟 좌표 계산 (타겟이 없으면 기본 방향으로)
+        val angle = if (target != null) {
             val targetPos = target.getPosition()
-            
             // 벡터 계산 캐싱 활용
             val dx = tempDx[target] ?: (targetPos.x - position.x).also { tempDx[target] = it }
             val dy = tempDy[target] ?: (targetPos.y - position.y).also { tempDy[target] = it }
-            
-            val angle = atan2(dy.toDouble(), dx.toDouble()) + angleOffset
-            
-            // 각도 관련 삼각함수 계산 결과 캐싱
-            cacheAngleCalculation(angle)
-            
-            val missileSpeed = GameConfig.MISSILE_SPEED
-            val damage = (GameConfig.MISSILE_DAMAGE * damageMultiplier).toInt()
-            val missileSize = GameConfig.MISSILE_SIZE
-            
-            // 미사일 시작 위치 계산 (캐싱된 결과 활용)
-            val startX = position.x + lastCosValue * 20
-            val startY = position.y + lastSinValue * 20
-            
-            // 객체 풀에서 미사일 가져오기
-            return MissilePool.getInstance().obtain(
-                position = PointF(startX, startY),
-                angle = angle,
-                speed = missileSpeed,
-                size = missileSize,
-                damage = damage,
-                target = target
-            )
+            atan2(dy.toDouble(), dx.toDouble()) + angleOffset
+        } else {
+            // 타겟이 없으면 기본 방향 (오른쪽)으로 발사
+            0.0 + angleOffset
         }
         
-        return null
+        // 각도 관련 삼각함수 계산 결과 캐싱
+        cacheAngleCalculation(angle)
+        
+        val missileSpeed = GameConfig.MISSILE_SPEED
+        val damage = (GameConfig.MISSILE_DAMAGE * damageMultiplier).toInt()
+        val missileSize = GameConfig.MISSILE_SIZE
+        
+        // 미사일 시작 위치 계산 (캐싱된 결과 활용)
+        val startX = position.x + lastCosValue * 20
+        val startY = position.y + lastSinValue * 20
+        
+        // 객체 풀에서 미사일 가져오기
+        return MissilePool.getInstance().obtain(
+            position = PointF(startX, startY),
+            angle = angle,
+            speed = missileSpeed,
+            size = missileSize,
+            damage = damage,
+            target = target
+        )
     }
     
     // 가장 가까운 적 찾기 (최적화 버전)
@@ -164,8 +163,8 @@ class DefenseUnit(
                 tempDistanceSquared[enemy] = distanceSquared
             }
             
-            // attackRange 제곱값을 미리 계산해두어 성능 향상
-            if (distanceSquared < attackRangeSquared && distanceSquared < minDistance) {
+            // 공격 범위 제한 임시 제거 - 항상 가장 가까운 적을 타겟팅
+            if (distanceSquared < minDistance) {
                 minDistance = distanceSquared
                 nearest = enemy
             }

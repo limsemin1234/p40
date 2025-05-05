@@ -39,7 +39,7 @@ class MissilePool {
         speed: Float = GameConfig.MISSILE_SPEED,
         size: Float = GameConfig.MISSILE_SIZE,
         damage: Int = GameConfig.MISSILE_DAMAGE,
-        target: Enemy
+        target: Enemy?
     ): Missile {
         // 풀에서 객체 가져오기
         val missile = pool.poll()

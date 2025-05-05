@@ -253,8 +253,6 @@ class GameLogic(
      * 디펜스 유닛 공격 처리
      */
     private fun updateDefenseUnitAttack(screenRect: ScreenRect, currentTime: Long) {
-        if (enemies.isEmpty()) return
-        
         // 공격 쿨다운 계산 (한 번만 계산)
         val attackSpeedMultiplier = gameStats.getBuffManager().getAttackSpeedMultiplier()
         val adjustedAttackCooldown = (gameStats.getUnitAttackSpeed() * attackSpeedMultiplier).toLong()
@@ -266,38 +264,36 @@ class GameLogic(
             screenRect.contains(pos.x, pos.y) && !it.isDead()
         }
         
-        if (screenEnemies.isNotEmpty()) {
-            // 다방향 발사 지원
-            val multiDirCount = gameStats.getMultiDirectionCount()
-            if (multiDirCount > 1) {
-                // 다방향 발사 (기본 1방향 + 추가 방향)
-                val angleStep = (2 * Math.PI) / multiDirCount
-                
-                for (i in 0 until multiDirCount) {
-                    val newMissile = defenseUnit.attack(
-                        screenEnemies, 
-                        currentTime, 
-                        adjustedAttackCooldown, 
-                        missileDamageMultiplier,
-                        i * angleStep
-                    )
-                    
-                    if (newMissile != null) {
-                        missiles.add(newMissile)
-                    }
-                }
-            } else {
-                // 기본 1방향 발사
+        // 다방향 발사 지원
+        val multiDirCount = gameStats.getMultiDirectionCount()
+        if (multiDirCount > 1) {
+            // 다방향 발사 (기본 1방향 + 추가 방향)
+            val angleStep = (2 * Math.PI) / multiDirCount
+            
+            for (i in 0 until multiDirCount) {
                 val newMissile = defenseUnit.attack(
                     screenEnemies, 
                     currentTime, 
-                    adjustedAttackCooldown,
-                    missileDamageMultiplier
+                    adjustedAttackCooldown, 
+                    missileDamageMultiplier,
+                    i * angleStep
                 )
                 
                 if (newMissile != null) {
                     missiles.add(newMissile)
                 }
+            }
+        } else {
+            // 기본 1방향 발사
+            val newMissile = defenseUnit.attack(
+                screenEnemies, 
+                currentTime, 
+                adjustedAttackCooldown,
+                missileDamageMultiplier
+            )
+            
+            if (newMissile != null) {
+                missiles.add(newMissile)
             }
         }
     }

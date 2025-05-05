@@ -65,11 +65,7 @@ class Missile(
         position.x += cos(angle).toFloat() * adjustedSpeed
         position.y += sin(angle).toFloat() * adjustedSpeed
         
-        // 화면 밖으로 나가면 제거
-        if (position.x < -50 || position.x > GameConfig.MISSILE_MAX_DISTANCE || 
-            position.y < -50 || position.y > GameConfig.MISSILE_MAX_DISTANCE) {
-            isDead = true
-        }
+        // 화면 밖으로 나가는 것은 GameLogic에서 처리
     }
     
     /**
