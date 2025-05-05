@@ -1,6 +1,32 @@
 package com.example.p40.game
 
 /**
+ * 게임 상태 관련 데이터 클래스들
+ * 연관된 데이터를 그룹화하여 관리 용이성 향상
+ */
+data class UnitStats(
+    val health: Int,
+    val maxHealth: Int,
+    val attackPower: Int,
+    val attackSpeed: Float,
+    val attackRange: Float
+)
+
+data class GameProgress(
+    val resource: Int,
+    val waveCount: Int,
+    val killCount: Int,
+    val spawnedCount: Int,
+    val totalEnemiesInWave: Int,
+    val bossSpawned: Boolean
+)
+
+data class UpgradeInfo(
+    val level: Int,
+    val cost: Int
+)
+
+/**
  * 게임 상태 관리 클래스
  * GameView에서 게임 상태 변수와 관련 메서드들을 분리함
  */
@@ -270,5 +296,60 @@ class GameStats(private val gameConfig: GameConfig) {
     
     fun getMissilePierceCount(): Int {
         return buffManager.getMissilePierceCount()
+    }
+    
+    /**
+     * 유닛 스탯 정보를 한번에 반환
+     */
+    fun getUnitStats(): UnitStats {
+        return UnitStats(
+            health = unitHealth,
+            maxHealth = unitMaxHealth,
+            attackPower = getEffectiveAttackPower(),
+            attackSpeed = getEffectiveAttackSpeed(),
+            attackRange = unitAttackRange
+        )
+    }
+    
+    /**
+     * 게임 진행 정보를 한번에 반환
+     */
+    fun getGameProgress(): GameProgress {
+        return GameProgress(
+            resource = resource,
+            waveCount = waveCount,
+            killCount = killCount,
+            spawnedCount = spawnedCount,
+            totalEnemiesInWave = totalEnemiesInWave,
+            bossSpawned = bossSpawned
+        )
+    }
+    
+    /**
+     * 데미지 업그레이드 정보 반환
+     */
+    fun getDamageUpgradeInfo(): UpgradeInfo {
+        return UpgradeInfo(level = damageLevel, cost = damageCost)
+    }
+    
+    /**
+     * 공격 속도 업그레이드 정보 반환
+     */
+    fun getAttackSpeedUpgradeInfo(): UpgradeInfo {
+        return UpgradeInfo(level = attackSpeedLevel, cost = attackSpeedCost)
+    }
+    
+    /**
+     * 공격 범위 업그레이드 정보 반환
+     */
+    fun getAttackRangeUpgradeInfo(): UpgradeInfo {
+        return UpgradeInfo(level = attackRangeLevel, cost = attackRangeCost)
+    }
+    
+    /**
+     * 방어력 업그레이드 정보 반환
+     */
+    fun getDefenseUpgradeInfo(): UpgradeInfo {
+        return UpgradeInfo(level = defenseLevel, cost = defenseCost)
     }
 } 

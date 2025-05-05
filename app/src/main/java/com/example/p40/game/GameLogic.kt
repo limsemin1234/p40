@@ -342,7 +342,7 @@ class GameLogic(
             if (!enemies.remove(enemy)) continue // 이미 제거된 경우 스킵
             
             if (enemy.isDead()) { // 실제로 죽은 경우만 점수 처리
-                val isBossKilled = gameStats.enemyKilled(enemy.isBoss)
+                val isBossKilled = gameStats.enemyKilled(enemy.isBoss())
                 
                 // 객체 풀에 적 반환 (재사용)
                 enemyPool.recycle(enemy)
@@ -505,7 +505,7 @@ class GameLogic(
     fun useCard() {
         enemies.forEach { enemy ->
             // 보스는 카드 효과가 약하게
-            val damage = if (enemy.isBoss) gameConfig.CARD_DAMAGE_BOSS else gameConfig.CARD_DAMAGE_NORMAL
+            val damage = if (enemy.isBoss()) gameConfig.CARD_DAMAGE_BOSS else gameConfig.CARD_DAMAGE_NORMAL
             enemy.takeDamage(damage)
         }
     }

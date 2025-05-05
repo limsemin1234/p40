@@ -14,6 +14,16 @@ interface GameOverListener {
 }
 
 /**
+ * 게임 컴포넌트 인터페이스
+ * 컴포넌트 간 의존성 감소를 위한 인터페이스 정의
+ */
+interface GameComponent {
+    fun initialize()
+    fun update()
+    fun destroy()
+}
+
+/**
  * 게임 뷰 클래스 - 리팩토링 버전
  * 이전 버전에서 크게 3가지 책임으로 나누어 분리했습니다:
  * 1. GameRenderer: 렌더링(그리기) 관련 로직
@@ -230,7 +240,39 @@ class GameView @JvmOverloads constructor(
     }
     fun upgradeDefense(): Boolean = gameStats.upgradeDefense()
     
-    // 게임 상태 접근자 메서드들
+    // 게임 상태 접근자 메서드들 - 데이터 클래스를 활용한 통합 접근자
+    
+    /**
+     * 유닛 스탯 정보를 한번에 반환
+     */
+    fun getUnitStats(): UnitStats = gameStats.getUnitStats()
+    
+    /**
+     * 게임 진행 정보를 한번에 반환
+     */
+    fun getGameProgress(): GameProgress = gameStats.getGameProgress()
+    
+    /**
+     * 데미지 업그레이드 정보 반환
+     */
+    fun getDamageUpgradeInfo(): UpgradeInfo = gameStats.getDamageUpgradeInfo()
+    
+    /**
+     * 공격 속도 업그레이드 정보 반환
+     */
+    fun getAttackSpeedUpgradeInfo(): UpgradeInfo = gameStats.getAttackSpeedUpgradeInfo()
+    
+    /**
+     * 공격 범위 업그레이드 정보 반환
+     */
+    fun getAttackRangeUpgradeInfo(): UpgradeInfo = gameStats.getAttackRangeUpgradeInfo()
+    
+    /**
+     * 방어력 업그레이드 정보 반환
+     */
+    fun getDefenseUpgradeInfo(): UpgradeInfo = gameStats.getDefenseUpgradeInfo()
+    
+    // 기존 개별 접근자들도 일단 유지 (호환성)
     fun getActivePokerHandInfo(): String = gameStats.getActivePokerHandInfo()
     fun getUnitHealth(): Int = gameStats.getUnitHealth()
     fun getUnitMaxHealth(): Int = gameStats.getUnitMaxHealth()
