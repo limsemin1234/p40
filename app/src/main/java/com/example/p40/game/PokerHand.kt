@@ -14,11 +14,11 @@ abstract class PokerHand(val cards: List<Card> = emptyList(), val handName: Stri
 /**
  * 하이 카드 (가장 낮은 족보)
  */
-class HighCard(cards: List<Card> = emptyList()) : PokerHand(cards, "하이 카드") {
+class HighCard(cards: List<Card> = emptyList()) : PokerHand(cards, "족보 없음") {
     override val handRank = 0
     
     override fun getDescription(): String {
-        return "가장 높은 카드"
+        return "족보 없음"
     }
 }
 
@@ -79,7 +79,7 @@ class Flush(cards: List<Card> = emptyList()) : PokerHand(cards, "플러시") {
     
     override fun getDescription(): String {
         val suit = if (cards.isNotEmpty()) cards[0].suit.name else "?"
-        return "$suit 플러시 (데미지 50% 증가, 문양 스킬 활성화)"
+        return "$suit 플러시 (문양 스킬 활성화)"
     }
 }
 
@@ -119,11 +119,11 @@ class StraightFlush(cards: List<Card> = emptyList()) : PokerHand(cards, "스트�
 /**
  * 로얄 플러시 (A, K, Q, J, 10 + 같은 무늬)
  */
-class RoyalFlush(cards: List<Card> = emptyList()) : PokerHand(cards, "로얄 플러시") {
+class RoyalFlush(cards: List<Card> = emptyList()) : PokerHand(cards, "로열 플러시") {
     override val handRank = 9
     
     override fun getDescription(): String {
-        return "로얄 플러시 (데미지 90% 증가)"
+        return "로열 플러시 (데미지 90% 증가)"
     }
 }
 

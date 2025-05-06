@@ -334,8 +334,8 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
      */
     private fun saveDeck() {
         // 최소 덱 크기 체크
-        if (deckCards.size < 20) {
-            MessageManager.getInstance().showInfo(requireContext(), "최소 20장 이상의 카드로 덱을 구성해야 합니다.")
+        if (deckCards.size < 25) {
+            MessageManager.getInstance().showInfo(requireContext(), "최소 25장 이상의 카드로 덱을 구성해야 합니다.")
             return
         }
         

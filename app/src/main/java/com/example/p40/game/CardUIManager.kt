@@ -100,7 +100,7 @@ class CardUIManager(
         
         // 카드가 5장을 초과하는 경우 최적의 5장 조합 찾기
         if (cards.size > 5 && bestFiveCards != null) {
-            highlightBestCards(cards, bestFiveCards, selectedCardIndexes)
+            // 초록색 강조 표시 기능 제거 (모든 카드는 선택 여부에 따라 노란색 또는 흰색으로만 표시)
             
             // 최적의 조합으로 족보 업데이트
             val tempDeck = PokerDeck()
@@ -121,12 +121,30 @@ class CardUIManager(
             handDescriptionText.text = "효과: ${pokerHand.getDescription()}"
         }
         
-        // 교체 버튼 활성화/비활성화
+        // 교체 버튼 활성화/비활성화 (교체 횟수가 0이면 항상 비활성화)
         replaceButton.isEnabled = replacesLeft > 0 && selectedCardIndexes.isNotEmpty()
         replaceAllButton.isEnabled = replacesLeft > 0
         
-        // 교체 횟수 텍스트 업데이트
-        replaceCountText.text = "교체 가능 횟수: $replacesLeft"
+        // 6장 이상인 경우의 처리
+        if (activeCardCount > 5) {
+            // 확정 버튼은 5장 선택했을 때만 활성화
+            confirmButton.isEnabled = selectedCardIndexes.size == 5
+            
+            // 교체 횟수 표시 (교체 가능 여부 함께 표시)
+            if (replacesLeft > 0) {
+                replaceCountText.text = "교체 가능 횟수: $replacesLeft"
+            } else {
+                replaceCountText.text = "교체 불가능"
+            }
+            
+            if (selectedCardIndexes.size != 5) {
+                // 선택된 카드가 5장이 아닌 경우 안내 메시지
+                handDescriptionText.text = "5장의 카드를 선택하세요 (현재 ${selectedCardIndexes.size}장 선택됨)"
+            }
+        } else {
+            // 원래 교체 횟수 표시
+            replaceCountText.text = "교체 가능 횟수: $replacesLeft"
+        }
     }
     
     /**
@@ -187,12 +205,9 @@ class CardUIManager(
                         cardView.setCardBackgroundColor(Color.WHITE)
                     }
                     
-                    // 조커 카드 체크
-                    val isJoker = CardUtils.isJokerCard(card)
-                    
-                    // 카드 선택 가능 여부 설정 - 클릭 이벤트에만 적용
-                    // 조커 카드는 항상 활성화(변환 가능), 다른 카드는 교체 횟수가 있을 때만 활성화
-                    cardView.isEnabled = true // 클릭은 항상 가능하도록 설정
+                    // 카드 선택 가능 여부 설정
+                    // 모든 카드는 항상 클릭 가능하도록 설정 (선택/해제는 toggleCardSelection에서 관리)
+                    cardView.isEnabled = true
                 }
             } else {
                 // 활성화되지 않은 카드는 숨김
@@ -215,74 +230,15 @@ class CardUIManager(
             }
         }
         
-        // 족보를 분석하여 관련 카드만 초록색으로 표시
-        val pokerDeck = PokerDeck()
-        pokerDeck.playerHand = bestFiveCards.toMutableList()
-        val pokerHand = pokerDeck.evaluateHand()
-        
-        // 족보에 따라 강조할 카드 결정
-        val cardsToHighlight = findCardsToHighlight(bestFiveCards, pokerHand.handName)
-        
-        // 강조할 카드 초록색으로 표시
-        for (i in 0 until cards.size) {
-            if (i in selectedCardIndexes) continue // 선택된 카드는 건너뛰기
-            
-            val card = cards[i]
-            if (cardsToHighlight.any { it.suit == card.suit && it.rank == card.rank }) {
-                cardViews[i].setCardBackgroundColor(Color.GREEN)
-            }
-        }
+        // 초록색 강조 표시 기능 삭제 - 모든 카드는 선택 여부에 따라 노란색 또는 흰색으로만 표시
     }
     
     /**
-     * 족보에 따라 강조할 카드 찾기
+     * 족보에 따라 강조할 카드 찾기 (사용하지 않음)
      */
     private fun findCardsToHighlight(bestCards: List<Card>, handName: String): List<Card> {
-        // 족보별로 강조할 카드 결정
-        return when (handName) {
-            "원 페어" -> {
-                // 같은 숫자 2장 찾기
-                val rankGroups = bestCards.groupBy { it.rank }
-                val pairRank = rankGroups.entries.find { it.value.size == 2 }?.key
-                bestCards.filter { it.rank == pairRank }
-            }
-            "투 페어" -> {
-                // 두 쌍의 같은 숫자 찾기
-                val rankGroups = bestCards.groupBy { it.rank }
-                val pairRanks = rankGroups.entries.filter { it.value.size == 2 }.map { it.key }
-                bestCards.filter { it.rank in pairRanks }
-            }
-            "트리플" -> {
-                // 같은 숫자 3장 찾기
-                val rankGroups = bestCards.groupBy { it.rank }
-                val tripleRank = rankGroups.entries.find { it.value.size == 3 }?.key
-                bestCards.filter { it.rank == tripleRank }
-            }
-            "포카드" -> {
-                // 같은 숫자 4장 찾기
-                val rankGroups = bestCards.groupBy { it.rank }
-                val fourOfAKindRank = rankGroups.entries.find { it.value.size == 4 }?.key
-                bestCards.filter { it.rank == fourOfAKindRank }
-            }
-            "풀 하우스" -> {
-                // 트리플 + 페어 찾기
-                val rankGroups = bestCards.groupBy { it.rank }
-                val tripleRank = rankGroups.entries.find { it.value.size == 3 }?.key
-                val pairRank = rankGroups.entries.find { it.value.size == 2 }?.key
-                bestCards.filter { it.rank == tripleRank || it.rank == pairRank }
-            }
-            "플러시", "스트레이트", "스트레이트 플러시", "로얄 플러시" -> {
-                // 모든 카드 강조
-                bestCards
-            }
-            else -> {
-                // 하이카드인 경우 가장 높은 카드 1장만 강조
-                val highestCard = bestCards.maxByOrNull { 
-                    if (it.rank == CardRank.ACE) 14 else it.rank.value 
-                }
-                listOfNotNull(highestCard)
-            }
-        }
+        // 더 이상 초록색 강조가 없으므로 빈 리스트 반환
+        return emptyList()
     }
     
     // 버튼 관련 getter
@@ -298,5 +254,22 @@ class CardUIManager(
     fun showToast(message: String, duration: Int = Toast.LENGTH_SHORT) {
         // MessageManager를 사용하여 상단에 메시지 표시
         MessageManager.getInstance().showInfo(message)
+    }
+    
+    /**
+     * 확정 버튼 클릭 처리 - 5장 선택 확인
+     * 새로 추가된 메서드
+     */
+    fun validateCardSelection(cards: List<Card>, selectedCardIndexes: Set<Int>): Boolean {
+        // 카드가 5장 이하인 경우는 항상 유효
+        if (cards.size <= 5) return true
+        
+        // 6장 이상일 경우 정확히 5장이 선택되었는지 확인
+        if (selectedCardIndexes.size != 5) {
+            showToast("카드를 정확히 5장 선택해야 합니다. (현재 ${selectedCardIndexes.size}장 선택됨)")
+            return false
+        }
+        
+        return true
     }
 } 

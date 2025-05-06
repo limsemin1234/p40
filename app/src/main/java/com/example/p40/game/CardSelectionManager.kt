@@ -14,8 +14,16 @@ import com.example.p40.R
  * 카드 선택 정보를 관리하는 싱글톤 클래스
  */
 class CardSelectionManager private constructor() {
-    private val cardGenManager = CardGenerationManager(null)
+    private var context: Context? = null
+    private val cardGenManager by lazy { CardGenerationManager(context) }
     private val selectedCards = mutableListOf<Card>()
+    
+    /**
+     * 컨텍스트 설정 - 카드 덱을 로드하기 위해 필요
+     */
+    fun setContext(newContext: Context?) {
+        context = newContext
+    }
     
     /**
      * 선택된 카드 저장
@@ -56,7 +64,7 @@ class CardSelectionManager private constructor() {
         
         // 선택된 카드 교체
         for (index in selectedCardIndexes) {
-            // 기존 방식으로 랜덤 카드 생성
+            // 저장된 덱에서만 카드 생성
             cards[index] = cardGenManager.createRandomCard(usedCards)
         }
         
@@ -85,7 +93,7 @@ class CardSelectionManager private constructor() {
         
         // 모든 일반 카드 교체
         for (index in nonJokerCardIndices) {
-            // 기존 방식으로 랜덤 카드 생성
+            // 저장된 덱에서만 카드 생성
             cards[index] = cardGenManager.createRandomCard(usedCards)
         }
         

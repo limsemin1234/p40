@@ -159,7 +159,8 @@ class BuffManager(private val context: Context) {
     fun addPokerHandBuff(pokerHand: PokerHand) {
         when (pokerHand) {
             is HighCard -> {
-                // 하이카드는 버프 없음
+                // 하이카드는 버프 없음 (아무 작업도 하지 않음)
+                // 메시지는 PokerHand 클래스에서 "족보 없음"으로 표시됨
             }
             
             is OnePair -> {
@@ -207,7 +208,7 @@ class BuffManager(private val context: Context) {
             }
             
             is Flush -> {
-                // 플러시 - 문양에 따른 특수 스킬 활성화
+                // 플러시 - 문양에 따른 특수 스킬만 활성화 (데미지 증가 없음)
                 val cards = CardSelectionManager.instance.getSelectedCards()
                 if (cards.size >= 5) {
                     // 모든 카드가 같은 무늬인지 확인 (조커는 변환된 문양으로 취급)
@@ -264,15 +265,6 @@ class BuffManager(private val context: Context) {
                         }
                     }
                 }
-                
-                // 플러시 데미지 증가 (50%)
-                addBuff(Buff(
-                    type = BuffType.MISSILE_DAMAGE,
-                    level = 1,
-                    value = 0.5f,
-                    name = "플러시",
-                    description = "데미지 50% 증가"
-                ))
             }
             
             is FullHouse -> {
