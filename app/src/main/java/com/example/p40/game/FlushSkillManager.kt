@@ -31,7 +31,7 @@ class FlushSkillManager(
     private val handler = Handler(Looper.getMainLooper())
     
     // 버튼 크기 상수
-    private val BUTTON_WIDTH = 60 // dp 단위로 설정 (100dp에서 60dp로 줄임)
+    private val BUTTON_WIDTH = 80 // dp 단위로 설정 (100dp에서 60dp로 줄임)
     private val BUTTON_HEIGHT = ViewGroup.LayoutParams.WRAP_CONTENT
     
     // 초기화
@@ -100,7 +100,7 @@ class FlushSkillManager(
                 dpToPx(BUTTON_WIDTH),  // 고정 너비
                 BUTTON_HEIGHT // 높이는 콘텐츠에 맞게
             ).apply {
-                setMargins(dpToPx(2), dpToPx(2), dpToPx(2), dpToPx(2)) // 마진 설정을 2dp로 줄임
+                setMargins(dpToPx(1), dpToPx(1), dpToPx(1), dpToPx(1)) // 마진 설정을 2dp로 줄임
             }
             
             // 버튼 스타일 설정

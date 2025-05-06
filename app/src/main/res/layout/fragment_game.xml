@@ -649,7 +649,7 @@
         android:orientation="vertical"
         android:background="#AA333333"
         android:visibility="gone"
-        android:paddingBottom="8dp"
+        android:paddingBottom="12dp"
         android:elevation="15dp"
         app:layout_constraintBottom_toTopOf="@id/bottomBar">
 
@@ -664,10 +664,10 @@
             android:layout_height="wrap_content"
             android:text="포커 카드"
             android:textColor="#CCCCFF"
-            android:textSize="14sp"
+            android:textSize="16sp"
             android:textStyle="bold"
             android:gravity="center"
-            android:paddingVertical="4dp" />
+            android:paddingVertical="6dp" />
             
         <!-- 카드 정보 영역 -->
         <LinearLayout
@@ -1032,33 +1032,41 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:padding="8dp">
+            android:padding="12dp">
             
             <Button
                 android:id="@+id/btnDrawPokerCards"
                 android:layout_width="0dp"
-                android:layout_height="40dp"
+                android:layout_height="65dp"
                 android:layout_weight="1"
-                android:text="포커 카드 뽑기(5장)\n(💰 100 자원)"
+                android:text="포커 카드 뽑기 (5장)\n💰 100 자원"
                 android:textStyle="bold"
-                android:textSize="12sp"
+                android:textSize="14sp"
                 android:textColor="#FFFFFF"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:lineSpacingExtra="6dp"
+                android:gravity="center"
                 android:background="@drawable/main_button_selector"
                 android:backgroundTint="#444488"
-                android:layout_marginEnd="4dp" />
+                android:layout_marginEnd="5dp" />
                 
             <Button
                 android:id="@+id/btnAddCard"
                 android:layout_width="0dp"
-                android:layout_height="40dp"
+                android:layout_height="65dp"
                 android:layout_weight="1"
-                android:text="카드 추가 +1\n(💰 500 자원)"
+                android:text="카드 6장으로 변경\n💰 500 자원"
                 android:textStyle="bold"
-                android:textSize="12sp"
+                android:textSize="14sp"
                 android:textColor="#FFFFFF"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:lineSpacingExtra="6dp"
+                android:gravity="center"
                 android:background="@drawable/main_button_selector"
                 android:backgroundTint="#444466"
-                android:layout_marginStart="4dp" />
+                android:layout_marginStart="5dp" />
         </LinearLayout>
     </LinearLayout>
 

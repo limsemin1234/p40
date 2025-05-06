@@ -56,8 +56,19 @@ class CardUIManager(
             btnAddCard.isEnabled = true
             
             // 추가 카드 순서에 따라 텍스트 구성
-            val cardNumber = purchasedExtraCards + 1 // 1차 또는 2차
-            btnAddCard.text = "카드 추가 +1\n(${cardNumber}번째: 💰 $extraCardCost)"
+            val currentCardCount = baseCardCount + purchasedExtraCards
+            val nextCardCount = currentCardCount + 1
+            
+            // HTML 서식 적용 (API 레벨에 따른 호환성 처리)
+            val htmlText = "카드 ${nextCardCount}장으로 변경<br/><font color='#FFFF99'>💰 $extraCardCost 자원</font>"
+            val buttonText = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                android.text.Html.fromHtml(htmlText, android.text.Html.FROM_HTML_MODE_LEGACY)
+            } else {
+                @Suppress("DEPRECATION")
+                android.text.Html.fromHtml(htmlText)
+            }
+            
+            btnAddCard.text = buttonText
         }
     }
     
@@ -65,12 +76,22 @@ class CardUIManager(
      * 카드 뽑기 버튼 텍스트 업데이트
      */
     fun updateDrawCardButtonText(purchasedExtraCards: Int) {
-        if (purchasedExtraCards > 0) {
-            val totalCards = baseCardCount + purchasedExtraCards
-            btnDrawPokerCards.text = "포커 카드 뽑기 (${totalCards}장)\n💰 ${GameConfig.POKER_CARD_DRAW_COST}자원"
+        val totalCards = if (purchasedExtraCards > 0) {
+            baseCardCount + purchasedExtraCards
         } else {
-            btnDrawPokerCards.text = "포커 카드 뽑기 (5장)\n💰 ${GameConfig.POKER_CARD_DRAW_COST}자원"
+            5
         }
+        
+        // HTML 서식 적용 (API 레벨에 따른 호환성 처리)
+        val htmlText = "포커 카드 뽑기 (${totalCards}장)<br/><font color='#FFFF99'>💰 ${GameConfig.POKER_CARD_DRAW_COST} 자원</font>"
+        val buttonText = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            android.text.Html.fromHtml(htmlText, android.text.Html.FROM_HTML_MODE_LEGACY)
+        } else {
+            @Suppress("DEPRECATION")
+            android.text.Html.fromHtml(htmlText)
+        }
+        
+        btnDrawPokerCards.text = buttonText
     }
     
     /**
