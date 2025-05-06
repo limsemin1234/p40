@@ -176,6 +176,9 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
             flushSkillButtonContainer,
             messageManager
         )
+        
+        // 플러시 스킬 버튼 컨테이너 초기 설정
+        flushSkillButtonContainer.visibility = View.VISIBLE
     }
     
     override fun onStart() {
@@ -194,7 +197,13 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
     
     // 버프 UI 초기화
     private fun initBuffUI(view: View) {
+        // 버프 컨테이너 찾기
+        val buffContainer = view.findViewById<LinearLayout>(R.id.buffContainer)
+        // 버프 리스트 텍스트뷰 찾기
         tvBuffList = view.findViewById(R.id.tvBuffList)
+        // 버프 리스트 텍스트뷰 초기 설정
+        tvBuffList.visibility = View.VISIBLE
+        tvBuffList.text = "활성화된 버프 없음"
     }
     
     // 스탯 탭 설정
@@ -309,12 +318,15 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         }
         
         if (displayBuffs.isNotEmpty()) {
+            buffText.append("활성화된 버프:\n")
             displayBuffs.forEach { buff ->
                 buffText.append("• ${buff.getDisplayText()}\n")
             }
             tvBuffList.text = buffText.toString()
+            tvBuffList.visibility = View.VISIBLE
         } else {
             tvBuffList.text = "활성화된 버프 없음"
+            tvBuffList.visibility = View.VISIBLE
         }
     }
     

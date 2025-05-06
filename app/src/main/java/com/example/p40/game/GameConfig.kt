@@ -143,17 +143,44 @@ object GameConfig {
     
     // 포커 카드 관련 설정
     const val POKER_CARD_REPLACE_COUNT = 3  // 포커 카드 교체 가능 횟수
+    const val POKER_HAND_DURATION = 30000L  // 포커 핸드 효과 지속 시간 (30초)
     
-    // 디펜스 유닛 버프 효과 설정
-    const val MISSILE_DAMAGE_BUFF_PER_LEVEL = 0.1f  // 레벨당 데미지 증가율(10%)
-    const val ATTACK_SPEED_BUFF_PER_LEVEL = 0.1f  // 레벨당 공격속도 증가율(10%)
-    const val MISSILE_SPEED_BUFF_PER_LEVEL = 0.2f  // 레벨당 미사일 속도 증가율(20%)
-    const val MISSILE_RANGE_BUFF_PER_LEVEL = 0.2f  // 레벨당 미사일 사거리 증가율(20%)
+    // 포커 핸드별 효과 설정
+    const val ROYAL_FLUSH_DAMAGE_BOOST = 3.0f  // 로열 플러시 데미지 증가율 (300%)
+    const val STRAIGHT_FLUSH_DAMAGE_BOOST = 2.5f  // 스트레이트 플러시 데미지 증가율 (250%)
+    const val FOUR_OF_A_KIND_DAMAGE_BOOST = 2.0f  // 포카드 데미지 증가율 (200%)
+    const val FULL_HOUSE_DAMAGE_BOOST = 1.8f  // 풀하우스 데미지 증가율 (180%)
+    const val FLUSH_DAMAGE_BOOST = 1.5f  // 플러시 데미지 증가율 (150%)
+    const val STRAIGHT_DAMAGE_BOOST = 1.3f  // 스트레이트 데미지 증가율 (130%)
+    const val THREE_OF_A_KIND_DAMAGE_BOOST = 1.2f  // 트리플 데미지 증가율 (120%)
+    const val TWO_PAIR_DAMAGE_BOOST = 1.1f  // 투페어 데미지 증가율 (110%)
+    const val ONE_PAIR_DAMAGE_BOOST = 1.05f  // 원페어 데미지 증가율 (105%)
     
-    // 적 너프 효과 설정
-    const val ENEMY_SLOW_BUFF_PER_LEVEL = 0.1f  // 레벨당 적 이동속도 감소율(10%)
-    const val DOT_DAMAGE_PER_LEVEL = 1  // 레벨당 초당 데미지
-    const val MASS_DAMAGE_PER_LEVEL = 100  // 레벨당 대량 데미지
+    // 플러시 스킬 설정
+    const val FLUSH_SKILL_COOLDOWN = 10000L  // 플러시 스킬 쿨타임 (10초)
+    const val FLUSH_SKILL_DURATION = 5000L   // 플러시 스킬 지속 시간 (5초)
+    
+    // 문양별 플러시 스킬 효과
+    const val HEART_FLUSH_HEAL_AMOUNT = 50  // 하트 플러시 회복량
+    const val SPADE_FLUSH_DAMAGE_BOOST = 2.0f  // 스페이드 플러시 데미지 증가율 (200%)
+    const val DIAMOND_FLUSH_RESOURCE_GAIN = 100  // 다이아몬드 플러시 자원 획득량
+    const val CLUB_FLUSH_SLOW_AMOUNT = 0.5f  // 클로버 플러시 적 이동속도 감소율 (50%)
+    
+    // 플러시 스킬 버튼 UI 설정
+    const val FLUSH_SKILL_BUTTON_SIZE = 60  // 스킬 버튼 크기 (dp)
+    const val FLUSH_SKILL_BUTTON_MARGIN = 8  // 스킬 버튼 간격 (dp)
+    const val FLUSH_SKILL_BUTTON_ALPHA_DISABLED = 0.5f  // 비활성화 상태 투명도
+    
+    // 플러시 스킬 색상 설정
+    val HEART_FLUSH_COLOR = Color.parseColor("#FF4081")  // 하트 플러시 색상
+    val SPADE_FLUSH_COLOR = Color.parseColor("#212121")  // 스페이드 플러시 색상
+    val DIAMOND_FLUSH_COLOR = Color.parseColor("#FF5252")  // 다이아몬드 플러시 색상
+    val CLUB_FLUSH_COLOR = Color.parseColor("#4CAF50")  // 클로버 플러시 색상
+    
+    // 플러시 스킬 효과 표시 설정
+    const val FLUSH_EFFECT_PARTICLE_COUNT = 20  // 효과 파티클 수
+    const val FLUSH_EFFECT_DURATION = 1000L  // 효과 표시 지속 시간 (1초)
+    const val FLUSH_EFFECT_SIZE = 30f  // 효과 파티클 크기
     
     // 성능 관련 설정
     const val OFFSCREEN_MARGIN = 300f // 화면 외부 마진 (오브젝트 제거 범위)

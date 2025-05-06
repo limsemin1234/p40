@@ -161,6 +161,24 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- 플러시 스킬 버튼 컨테이너 -->
+    <LinearLayout
+        android:id="@+id/flushSkillButtonContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="16dp"
+        android:padding="8dp"
+        android:background="#33000000"
+        android:gravity="center"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/bottomBar"
+        app:layout_constraintEnd_toEndOf="parent">
+        
+        <!-- 스킬 버튼들이 여기에 동적으로 추가됩니다 -->
+        
+    </LinearLayout>
+
     <!-- 하단바 -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottomBar"
@@ -1044,16 +1062,6 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_alignParentBottom="true">
-        
-        <!-- 플러시 스킬 버튼 컨테이너 -->
-        <LinearLayout
-            android:id="@+id/flushSkillButtonContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_marginBottom="8dp"
-            android:paddingHorizontal="16dp" />
             
         <!-- 게임 컨트롤 버튼 -->
         <LinearLayout
