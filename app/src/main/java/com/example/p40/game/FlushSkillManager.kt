@@ -108,7 +108,7 @@ class FlushSkillManager(
             
             // 문양 + 스킬명 설정
             text = "${suit.getSymbol()}\n$skillName"
-            textSize = 13f // 텍스트 크기 키움
+            textSize = 12f // 텍스트 크기 키움
             
             // 버튼 텍스트 색상 설정 (더 밝은 색상으로)
             val textColor = when (suit) {
