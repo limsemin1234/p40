@@ -79,8 +79,8 @@ object GameConfig {
     const val BOSS_DAMAGE_REDUCTION = 0.75f  // 보스의 데미지 감소율 (받는 데미지의 75%만 적용)
     const val BOSS_ENRAGE_HEALTH_RATIO = 0.5f  // 보스 분노 모드 진입 체력 비율 (최대 체력의 50%)
     const val BOSS_SPEED_MULTIPLIER = 0.8f  // 보스 이동 속도 계수 (일반 적보다 느림)
-    const val BOSS_ZIGZAG_AMPLITUDE = 2.0  // 보스 지그재그 좌우 진폭(값을 높이면 더 넒게 좌우로 진동)
-    const val BOSS_ZIGZAG_PERIOD = 500.0  // 보스 지그재그 주기 (밀리초)(값을 낮추면 보스가 더 빠르게 좌우 진동)
+    const val BOSS_ZIGZAG_AMPLITUDE = 3.0  // 보스 지그재그 좌우 진폭(값을 높이면 더 넒게 좌우로 진동)
+    const val BOSS_ZIGZAG_PERIOD = 400.0  // 보스 지그재그 주기 (밀리초)(값을 낮추면 보스가 더 빠르게 좌우 진동)
     
     // 웨이브별 보스 체력 증가율
     const val BOSS_HEALTH_INCREASE_PER_WAVE = 100  // 웨이브당 보스 체력 증가량
@@ -168,6 +168,15 @@ object GameConfig {
 
     // 게임 레벨 설정
     private var currentTotalWaves: Int = 10       // 기본 총 웨이브 수
+    
+    // --------- 포커 카드 관련 설정 ----------
+    
+    // 포커 카드 뽑기 비용
+    const val POKER_CARD_DRAW_COST = 100  // 포커 카드 뽑기 기본 비용
+    
+    // 추가 카드 구매 비용
+    const val FIRST_EXTRA_CARD_COST = 500  // 첫 번째 추가 카드 비용
+    const val SECOND_EXTRA_CARD_COST = 2000  // 두 번째 추가 카드 비용
     
     /**
      * 웨이브별 적 체력 계산 (ENEMY_BASE_HEALTH에 배율을 곱함)

@@ -63,9 +63,9 @@ class CardUIManager(
      */
     fun updateDrawCardButtonText(purchasedExtraCards: Int) {
         if (purchasedExtraCards > 0) {
-            btnDrawPokerCards.text = "포커 카드 뽑기\n(${baseCardCount + purchasedExtraCards}장, 💰 50 자원)"
+            btnDrawPokerCards.text = "포커 카드 뽑기\n(${baseCardCount + purchasedExtraCards}장, 💰 ${GameConfig.POKER_CARD_DRAW_COST} 자원)"
         } else {
-            btnDrawPokerCards.text = "포커 카드 뽑기\n(💰 50 자원)"
+            btnDrawPokerCards.text = "포커 카드 뽑기\n(💰 ${GameConfig.POKER_CARD_DRAW_COST} 자원)"
         }
     }
     

@@ -40,8 +40,14 @@ class PokerCardManager(
     private val activeCardCount: Int
         get() = baseCardCount + purchasedExtraCards
     
-    // 추가 카드 구매 비용
-    private val extraCardCost = 100 // 추가 카드 1장당 100 자원
+    // 추가 카드 구매 비용 - 추가 카드 수에 따라 다르게 적용
+    private fun getExtraCardCost(): Int {
+        return when (purchasedExtraCards) {
+            0 -> GameConfig.FIRST_EXTRA_CARD_COST // 첫 번째 추가 카드 비용
+            1 -> GameConfig.SECOND_EXTRA_CARD_COST // 두 번째 추가 카드 비용
+            else -> 0 // 이미 최대 카드 수에 도달
+        }
+    }
     
     private val cards = mutableListOf<Card>()
     private var replacesLeft = 2 // 교체 가능한 횟수
@@ -113,8 +119,8 @@ class PokerCardManager(
         
         // 포커 카드 뽑기 버튼 이벤트
         cardUIManager.getDrawPokerCardsButton().setOnClickListener {
-            // 자원 소모 비용 설정
-            val cardDrawCost = 50 // 기본 비용 50 자원
+            // 자원 소모 비용 설정 (GameConfig에서 가져옴)
+            val cardDrawCost = GameConfig.POKER_CARD_DRAW_COST
             
             // 현재 자원 확인
             val currentResource = listener.getResource()
@@ -151,9 +157,9 @@ class PokerCardManager(
         
         // 자원 확인
         val currentResource = listener.getResource()
-        if (currentResource >= extraCardCost) {
+        if (currentResource >= getExtraCardCost()) {
             // 자원 차감
-            if (listener.useResource(extraCardCost)) {
+            if (listener.useResource(getExtraCardCost())) {
                 // 추가 카드 수 증가
                 purchasedExtraCards++
                 
@@ -171,7 +177,7 @@ class PokerCardManager(
             }
         } else {
             // 자원 부족 메시지
-            MessageManager.getInstance().showError("자원이 부족합니다! (필요: $extraCardCost)")
+            MessageManager.getInstance().showError("자원이 부족합니다! (필요: ${getExtraCardCost()})")
         }
     }
     
@@ -195,7 +201,7 @@ class PokerCardManager(
     
     // UI 관련 메서드들
     private fun updateAddCardButtonState() {
-        cardUIManager.updateAddCardButtonState(purchasedExtraCards, extraCardCost)
+        cardUIManager.updateAddCardButtonState(purchasedExtraCards, getExtraCardCost())
     }
     
     private fun updateDrawCardButtonText() {
