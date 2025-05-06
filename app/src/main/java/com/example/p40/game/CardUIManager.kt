@@ -54,7 +54,10 @@ class CardUIManager(
             btnAddCard.text = "최대 카드 수\n도달"
         } else {
             btnAddCard.isEnabled = true
-            btnAddCard.text = "카드 추가 +1\n(💰 $extraCardCost 자원)"
+            
+            // 추가 카드 순서에 따라 텍스트 구성
+            val cardNumber = purchasedExtraCards + 1 // 1차 또는 2차
+            btnAddCard.text = "카드 추가 +1\n(${cardNumber}번째: 💰 $extraCardCost)"
         }
     }
     
@@ -63,9 +66,10 @@ class CardUIManager(
      */
     fun updateDrawCardButtonText(purchasedExtraCards: Int) {
         if (purchasedExtraCards > 0) {
-            btnDrawPokerCards.text = "포커 카드 뽑기\n(${baseCardCount + purchasedExtraCards}장, 💰 ${GameConfig.POKER_CARD_DRAW_COST} 자원)"
+            val totalCards = baseCardCount + purchasedExtraCards
+            btnDrawPokerCards.text = "포커 카드 뽑기 (${totalCards}장)\n💰 ${GameConfig.POKER_CARD_DRAW_COST}자원"
         } else {
-            btnDrawPokerCards.text = "포커 카드 뽑기\n(💰 ${GameConfig.POKER_CARD_DRAW_COST} 자원)"
+            btnDrawPokerCards.text = "포커 카드 뽑기 (5장)\n💰 ${GameConfig.POKER_CARD_DRAW_COST}자원"
         }
     }
     

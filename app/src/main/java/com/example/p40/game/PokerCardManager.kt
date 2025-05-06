@@ -50,7 +50,7 @@ class PokerCardManager(
     }
     
     private val cards = mutableListOf<Card>()
-    private var replacesLeft = 2 // 교체 가능한 횟수
+    private var replacesLeft = GameConfig.POKER_CARD_REPLACE_COUNT // 교체 가능한 횟수
     private val selectedCardIndexes = mutableSetOf<Int>() // 선택된 카드의 인덱스
     
     // 현재 카드 게임이 진행 중인지 여부
@@ -186,7 +186,7 @@ class PokerCardManager(
         // 상태 초기화
         cards.clear()
         selectedCardIndexes.clear()
-        replacesLeft = 2
+        replacesLeft = GameConfig.POKER_CARD_REPLACE_COUNT
         isGameActive = true
         
         // UI 초기화

@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Color
 import android.os.Handler
 import android.os.Looper
+import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
@@ -29,6 +30,10 @@ class FlushSkillManager(
     // 시간 멈춤 관련 핸들러
     private val handler = Handler(Looper.getMainLooper())
     
+    // 버튼 크기 상수
+    private val BUTTON_WIDTH = 100 // dp 단위로 설정
+    private val BUTTON_HEIGHT = ViewGroup.LayoutParams.WRAP_CONTENT
+    
     // 초기화
     init {
         // 기본적으로 모든 스킬 비활성화
@@ -37,6 +42,18 @@ class FlushSkillManager(
                 activeSkills[suit] = false
             }
         }
+        
+        // 버튼 컨테이너의 orientation과 gravity만 설정하고, 레이아웃 파라미터는 건드리지 않음
+        skillButtonContainer.orientation = LinearLayout.HORIZONTAL
+        skillButtonContainer.gravity = Gravity.CENTER
+    }
+    
+    /**
+     * dp값을 픽셀로 변환하는 유틸리티 함수
+     */
+    private fun dpToPx(dp: Int): Int {
+        val density = context.resources.displayMetrics.density
+        return (dp * density).toInt()
     }
     
     /**
@@ -45,7 +62,6 @@ class FlushSkillManager(
     fun activateFlushSkill(suit: CardSuit) {
         // 이미 해당 문양의 스킬이 활성화되어 있지 않은 경우에만 처리
         if (activeSkills[suit] == true) {
-            messageManager.showWarning("이미 $suit 플러시 스킬이 활성화되어 있습니다")
             return
         }
         
@@ -55,8 +71,10 @@ class FlushSkillManager(
         // 활성화 상태로 변경
         activeSkills[suit] = true
         
-        // 플러시 스킬 획득 메시지
-        messageManager.showSuccess("${suit.getName()} 플러시 스킬이 활성화되었습니다! 하단 버튼을 눌러 사용하세요.")
+        // 버튼 컨테이너를 보이게 설정
+        skillButtonContainer.post {
+            skillButtonContainer.visibility = View.VISIBLE
+        }
     }
     
     /**
@@ -66,29 +84,38 @@ class FlushSkillManager(
         // 이미 버튼이 있으면 리턴
         if (skillButtons.containsKey(suit)) return
         
+        // 스킬 이름 설정
+        val skillName = when (suit) {
+            CardSuit.HEART -> "회복"
+            CardSuit.SPADE -> "소멸"
+            CardSuit.CLUB -> "정지"
+            CardSuit.DIAMOND -> "무적"
+            else -> ""
+        }
+        
         // 버튼 생성
         val button = Button(context).apply {
-            // 레이아웃 설정
+            // 레이아웃 설정 - 고정 크기 사용
             layoutParams = LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
+                dpToPx(BUTTON_WIDTH),  // 고정 너비
+                BUTTON_HEIGHT // 높이는 콘텐츠에 맞게
             ).apply {
-                // 마진 설정
-                setMargins(2, 2, 2, 2)
+                setMargins(dpToPx(4), dpToPx(4), dpToPx(4), dpToPx(4)) // 마진 설정
             }
             
             // 버튼 스타일 설정
             setBackgroundResource(R.drawable.flush_skill_button_bg)
-            minimumWidth = 0
-            minimumHeight = 0
             
-            // 문양 아이콘 설정
-            text = suit.getSymbol()
-            textSize = 14f
+            // 문양 + 스킬명 설정
+            text = "${suit.getSymbol()}\n$skillName"
+            textSize = 10f // 텍스트 크기 축소
             setTextColor(suit.getColor())
             
-            // 패딩 설정
-            setPadding(4, 4, 4, 4)
+            // 패딩 설정 - 좀 더 여유 있게
+            setPadding(dpToPx(6), dpToPx(6), dpToPx(6), dpToPx(6))
+            
+            // 버튼 텍스트를 가운데 정렬
+            gravity = Gravity.CENTER
             
             // 클릭 리스너 설정
             setOnClickListener {
@@ -114,36 +141,30 @@ class FlushSkillManager(
             CardSuit.HEART -> {
                 // 하트 플러시: 체력 전체 회복
                 gameView.restoreFullHealth()
-                messageManager.showSuccess("체력이 모두 회복되었습니다!")
             }
             
             CardSuit.SPADE -> {
                 // 스페이드 플러시: 화면 내 모든 적 제거 (보스 제외)
                 val killedEnemies = gameView.removeAllEnemiesExceptBoss()
-                messageManager.showSuccess("모든 일반 적이 제거되었습니다! (${killedEnemies}마리)")
             }
             
             CardSuit.CLUB -> {
                 // 클로버 플러시: 시간 멈춤 (5초 동안 모든 적 멈춤)
                 gameView.freezeAllEnemies(true)
-                messageManager.showInfo("시간이 멈췄습니다! (5초)")
                 
                 // 5초 후 효과 해제
                 handler.postDelayed({
                     gameView.freezeAllEnemies(false)
-                    messageManager.showWarning("시간 멈춤 효과가 해제되었습니다.")
                 }, 5000)
             }
             
             CardSuit.DIAMOND -> {
                 // 다이아 플러시: 무적 (5초)
                 gameView.setInvincible(true)
-                messageManager.showInfo("5초 동안 무적 상태가 되었습니다!")
                 
                 // 5초 후 효과 해제
                 handler.postDelayed({
                     gameView.setInvincible(false)
-                    messageManager.showWarning("무적 효과가 해제되었습니다.")
                 }, 5000)
             }
             
@@ -152,6 +173,11 @@ class FlushSkillManager(
         
         // 스킬 사용 후 비활성화
         deactivateSkill(suit)
+        
+        // 모든 스킬이 비활성화되었는지 확인하여 컨테이너 숨김 처리
+        if (activeSkills.none { it.value }) {
+            skillButtonContainer.visibility = View.GONE
+        }
     }
     
     /**
@@ -180,5 +206,8 @@ class FlushSkillManager(
         // 버튼 컨테이너 비우기
         skillButtonContainer.removeAllViews()
         skillButtons.clear()
+        
+        // 활성화된 스킬이 없으므로 컨테이너 숨김
+        skillButtonContainer.visibility = View.GONE
     }
 } 

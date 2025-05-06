@@ -178,7 +178,7 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         )
         
         // 플러시 스킬 버튼 컨테이너 초기 설정
-        flushSkillButtonContainer.visibility = View.VISIBLE
+        flushSkillButtonContainer.visibility = View.GONE
     }
     
     override fun onStart() {
@@ -189,10 +189,7 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         view?.let { messageManager.init(requireActivity().findViewById(android.R.id.content)) }
         
         // 저장된 덱 확인
-        val savedDeck = DeckBuilderFragment.loadDeckFromPrefs(requireContext())
-        if (savedDeck != null && savedDeck.isNotEmpty()) {
-            messageManager.showInfo("저장된 덱이 게임에 적용되었습니다 (${savedDeck.size}장)")
-        }
+        DeckBuilderFragment.loadDeckFromPrefs(requireContext())
     }
     
     // 버프 UI 초기화
@@ -471,23 +468,12 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
     
     // 포커 카드 다이얼로그 표시
     private fun showPokerCardsDialog(waveNumber: Int) {
-        // 이전: 게임 일시 정지 제거
-        // gameView.pause()
-        // handler.removeCallbacks(uiUpdateRunnable)
-        
         val dialog = PokerCardsDialog(requireContext(), waveNumber) { pokerHand ->
             // 선택된 포커 족보 적용
             applyPokerHandEffect(pokerHand)
             
-            // 게임 재개 코드 제거(게임이 계속 진행되므로)
-            // gameView.resume()
-            // handler.post(uiUpdateRunnable)
-            
             // 버프 정보 업데이트
             updateBuffUI()
-            
-            // 메시지 표시
-            messageManager.showSuccess("적용된 효과: ${pokerHand.handName}")
         }
         
         dialog.show()
@@ -500,9 +486,6 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         
         // 버프 정보 업데이트
         updateBuffUI()
-        
-        // 메시지 표시
-        messageManager.showSuccess("적용된 효과: ${pokerHand.handName}")
     }
     
     private fun togglePanel(panel: LinearLayout) {
@@ -564,8 +547,6 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
                 updateGameInfoUI() // 자원 정보 갱신
                 updateUnitStatsUI() // 스탯 정보 갱신
                 updateUpgradeButtonsText() // 모든 버튼 텍스트 갱신
-                // Toast 대신 메시지 매니저 사용
-                messageManager.showSuccess("데미지 +1 향상! (비용: $cost)")
             } else {
                 // 자원 부족
                 messageManager.showWarning("자원이 부족합니다! (필요: $cost)")
@@ -580,7 +561,6 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
                 updateGameInfoUI() // 자원 정보 갱신
                 updateUnitStatsUI() // 스탯 정보 갱신
                 updateUpgradeButtonsText() // 모든 버튼 텍스트 갱신
-                messageManager.showSuccess("공격속도 +1% 향상! (비용: $cost)")
             } else {
                 // 자원 부족
                 messageManager.showWarning("자원이 부족합니다! (필요: $cost)")
@@ -595,7 +575,6 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
                 updateGameInfoUI() // 자원 정보 갱신
                 updateUnitStatsUI() // 스탯 정보 갱신
                 updateUpgradeButtonsText() // 모든 버튼 텍스트 갱신
-                messageManager.showSuccess("공격범위 +5 향상! (비용: $cost)")
             } else {
                 // 자원 부족
                 messageManager.showWarning("자원이 부족합니다! (필요: $cost)")
@@ -615,8 +594,6 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
                 updateGameInfoUI() // 자원 정보 갱신
                 updateUnitStatsUI() // 스탯 정보 갱신
                 updateUpgradeButtonsText() // 모든 버튼 텍스트 갱신
-                messageManager.showSuccess("방어력 +20 향상! (비용: $cost)")
-                // 패널을 닫지 않도록 수정됨
             } else {
                 // 자원 부족
                 messageManager.showWarning("자원이 부족합니다! (필요: $cost)")
@@ -625,11 +602,11 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         
         // 다른 버튼들은 아직 구현하지 않음
         defenseUpgrade2.setOnClickListener {
-            messageManager.showInfo("준비 중인 기능입니다")
+            // 준비 중인 기능
         }
         
         defenseUpgrade3.setOnClickListener {
-            messageManager.showInfo("준비 중인 기능입니다")
+            // 준비 중인 기능
         }
     }
     

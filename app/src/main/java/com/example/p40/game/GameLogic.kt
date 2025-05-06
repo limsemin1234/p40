@@ -225,7 +225,7 @@ class GameLogic(
                             enemy.setPosition(safeX, safeY)
                             
                             if (gameConfig.DEBUG_MODE) {
-                                println("보스가 디펜스 유닛과 충돌: 데미지 ${enemyDamage} 적용")
+                                // 디버그 로그 제거
                             }
                             
                             // 체력이 0 이하일 때만 게임오버 처리
@@ -257,18 +257,12 @@ class GameLogic(
                 } catch (e: Exception) {
                     // 충돌 처리 중 예외 발생 시 적 제거하고 로그 출력
                     if (gameConfig.DEBUG_MODE) {
-                        println("적 충돌 처리 중 오류 발생: ${e.message}")
-                        e.printStackTrace()
+                        // 디버그 로그 제거
                     }
                     deadEnemies.add(enemy)
                 }
             } else {
                 notUpdatedCount++
-                
-                // 화면 밖에 있어 업데이트되지 않는 적의 위치 정보 로깅 (디버깅용)
-                if (currentTime % 3000 < 20) { // 3초마다 로그
-                    println("[디버그] 업데이트 안된 적: ID=${enemy.hashCode()}, 위치=(${enemyPos.x.toInt()}, ${enemyPos.y.toInt()})")
-                }
             }
             
             // 죽은 적 확인
@@ -279,7 +273,7 @@ class GameLogic(
         
         // 업데이트 현황 로깅 (디버깅용)
         if (currentTime % 3000 < 20) { // 3초마다 로그
-            println("[디버그] 적 업데이트 현황: 업데이트=${updatedCount}, 미업데이트=${notUpdatedCount}, 총합=${updatedCount + notUpdatedCount}")
+            // 디버그 로그 제거
         }
     }
     
@@ -428,13 +422,12 @@ class GameLogic(
     private fun processDeadEnemies(deadEnemies: List<Enemy>) {
         if (deadEnemies.isEmpty()) return
         
-        // 죽은 적 수 로깅
-        println("[디버그] 죽은 적 처리: ${deadEnemies.size}개")
+        // 디버그 로그 제거
         
         // 킬 카운트 및 점수(자원) 갱신
         for (enemy in deadEnemies) {
             if (!enemies.remove(enemy)) {
-                println("[디버그] 이미 제거된 적: ID=${enemy.hashCode()}")
+                // 디버그 로그 제거
                 continue
             } // 이미 제거된 경우 스킵
             
@@ -444,11 +437,11 @@ class GameLogic(
                 // 객체 풀에 적 반환 (재사용)
                 enemyPool.recycle(enemy)
                 
-                println("[디버그] 적 제거 완료: ID=${enemy.hashCode()}, 보스=${enemy.isBoss()}")
+                // 디버그 로그 제거
                 
                 if (isBossKilled && enemy.isDead()) {
                     // 보스 처치 이벤트 발생
-                    println("[디버그] 보스 처치 이벤트 발생!")
+                    // 디버그 로그 제거
                     bossKillListener?.onBossKilled()
                     
                     // 보스 처치 시 다음 웨이브로 이동
@@ -457,7 +450,7 @@ class GameLogic(
                     }
                 }
             } else {
-                println("[디버그] 적 제거 (죽지 않음): ID=${enemy.hashCode()}, 위치=${enemy.getPosition()}")
+                // 디버그 로그 제거
                 enemyPool.recycle(enemy)
             }
         }
@@ -475,8 +468,7 @@ class GameLogic(
             
             // 디버그: 현재 적 상태 및 생성 조건 확인
             if (currentTime % 3000 < 20) {  // 3초마다 한 번씩만 로그 출력
-                println("[디버그] 적 현황: 생성=${spawnedCount}/${totalEnemiesInWave}, 화면상=${enemies.size}, 웨이브=${waveCount}, 보스=${isBossSpawned}")
-                println("[디버그] 적 생성 조건: ${spawnedCount < totalEnemiesInWave} && ${!isBossSpawned} && ${!isGameOver}")
+                // 디버그 로그 제거
             }
             
             // 웨이브당 정확히 적 수만큼만 생성되도록 수정
@@ -486,21 +478,18 @@ class GameLogic(
                 val spawnCooldown = gameConfig.getEnemySpawnIntervalForWave(waveCount)
                 
                 if (currentTime - lastEnemySpawnTime > spawnCooldown) {
-                    // 생성 전 로그
-                    println("[디버그] 적 생성 시도: ${spawnedCount+1}/${totalEnemiesInWave}")
+                    // 디버그 로그 제거
                     
                     val prevCount = enemies.size
                     spawnEnemy()
                     val newCount = enemies.size
                     lastEnemySpawnTime = currentTime
                     
-                    // 생성 후 로그 - 실제로 enemies 배열에 추가되었는지 확인
-                    println("[디버그] 적 생성 완료: ${gameStats.getSpawnedCount()}/${totalEnemiesInWave}, enemies 배열 변화: ${prevCount} -> ${newCount}")
+                    // 디버그 로그 제거
                 }
             }
         } catch (e: Exception) {
-            // 예외 발생 시 로그 출력 (실제 앱에서는 logger 사용)
-            e.printStackTrace()
+            // 예외 처리만 하고 로그는 출력하지 않음
         }
     }
     
@@ -511,7 +500,7 @@ class GameLogic(
         try {
             // 최대 적 수 제한 확인
             if (enemies.size >= gameConfig.MAX_ENEMIES) {
-                println("[디버그] ⚠️ 적 생성 실패: MAX_ENEMIES(${gameConfig.MAX_ENEMIES}) 제한에 도달")
+                // 디버그 로그 제거
                 return
             }
             
@@ -528,7 +517,7 @@ class GameLogic(
             // 생성 좌표가 화면 범위를 벗어나는지 확인
             val isOffScreen = spawnX < 0 || spawnX > screenWidth || spawnY < 0 || spawnY > screenHeight
             
-            println("[디버그] 적 생성 위치: (${spawnX.toInt()}, ${spawnY.toInt()}), 화면 중심에서 거리: ${spawnDistance.toInt()}, 화면 밖: $isOffScreen")
+            // 디버그 로그 제거
             
             val waveCount = gameStats.getWaveCount()
             // 현재 웨이브에 맞는 적 능력치 설정
@@ -544,16 +533,14 @@ class GameLogic(
                 wave = waveCount
             )
             
-            if (enemy != null) {
-                enemies.add(enemy)
-                gameStats.incrementSpawnCount()
-                println("[디버그] 적 생성 성공: ID=${enemy.hashCode()}, 체력=${health}, 속도=${speed}")
-            } else {
-                println("[디버그] ⚠️ 적 생성 실패: 객체 풀에서 Enemy 객체를 가져올 수 없음")
-            }
+            // 생성된 적 추가 및 스폰 카운트 증가
+            enemies.add(enemy)
+            gameStats.incrementSpawnCount()
+            
+            // 디버그 로그 제거
+            
         } catch (e: Exception) {
-            // 예외 발생 시 로그 출력 (실제 앱에서는 logger 사용)
-            e.printStackTrace()
+            // 예외 처리만 하고 로그는 출력하지 않음
         }
     }
     
@@ -632,8 +619,7 @@ class GameLogic(
             // 보스 타이머 초기화
             lastBossCheckTime = 0L
         } catch (e: Exception) {
-            // 예외 발생 시 로그 출력 (실제 앱에서는 logger 사용)
-            e.printStackTrace()
+            // 예외 처리만 하고 로그는 출력하지 않음
         }
     }
     
@@ -654,30 +640,30 @@ class GameLogic(
             // 첫 체크 시 시간 기록
             if (lastBossCheckTime == 0L) {
                 lastBossCheckTime = currentTime
-                println("[디버그] 보스 생성 타이머 시작: 웨이브=${gameStats.getWaveCount()}, 적=${spawnedCount}/${totalEnemiesInWave}")
+                // 디버그 로그 제거
             }
             
             // 현재 진행 상황 로깅
             if (currentTime % 1000 < 20) { // 1초마다 로그
                 val timeLeft = bossForceSpawnDelay - (currentTime - lastBossCheckTime)
-                println("[디버그] 보스 생성 대기 중: ${timeLeft/1000}초 남음, 화면상 적=${enemies.size}")
+                // 디버그 로그 제거
             }
             
             // 5초 경과 후 보스 소환
             if (currentTime - lastBossCheckTime > bossForceSpawnDelay) {
-                println("[디버그] 보스 생성 시작: 웨이브=${gameStats.getWaveCount()}, 화면상 적=${enemies.size}")
+                // 디버그 로그 제거
                 
                 // 보스 소환
                 spawnBoss()
                 gameStats.spawnBoss()
                 
-                println("[디버그] 보스 생성 완료: 웨이브=${gameStats.getWaveCount()}, 화면상 적=${enemies.size}")
+                // 디버그 로그 제거
                 
                 // 타이머 초기화
                 lastBossCheckTime = 0L
             }
         } else if (currentTime % 5000 < 20) { // 5초마다 로그
-            println("[디버그] 보스 생성 대기 중: 적=${spawnedCount}/${totalEnemiesInWave}, 조건 미충족")
+            // 디버그 로그 제거
         }
     }
     
