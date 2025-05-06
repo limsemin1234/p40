@@ -167,13 +167,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_margin="16dp"
-        android:padding="8dp"
+        android:layout_margin="8dp"
+        android:padding="4dp"
         android:background="#33000000"
         android:gravity="center"
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/bottomBar"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintStart_toStartOf="parent">
         
         <!-- 스킬 버튼들이 여기에 동적으로 추가됩니다 -->
         
