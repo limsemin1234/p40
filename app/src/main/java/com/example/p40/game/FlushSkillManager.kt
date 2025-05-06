@@ -31,7 +31,7 @@ class FlushSkillManager(
     private val handler = Handler(Looper.getMainLooper())
     
     // 버튼 크기 상수
-    private val BUTTON_WIDTH = 100 // dp 단위로 설정
+    private val BUTTON_WIDTH = 80 // dp 단위로 설정 (100dp에서 80dp로 줄임)
     private val BUTTON_HEIGHT = ViewGroup.LayoutParams.WRAP_CONTENT
     
     // 초기화
@@ -45,7 +45,7 @@ class FlushSkillManager(
         
         // 버튼 컨테이너의 orientation과 gravity만 설정하고, 레이아웃 파라미터는 건드리지 않음
         skillButtonContainer.orientation = LinearLayout.HORIZONTAL
-        skillButtonContainer.gravity = Gravity.CENTER
+        skillButtonContainer.gravity = Gravity.START
     }
     
     /**
@@ -100,7 +100,7 @@ class FlushSkillManager(
                 dpToPx(BUTTON_WIDTH),  // 고정 너비
                 BUTTON_HEIGHT // 높이는 콘텐츠에 맞게
             ).apply {
-                setMargins(dpToPx(4), dpToPx(4), dpToPx(4), dpToPx(4)) // 마진 설정
+                setMargins(dpToPx(2), dpToPx(2), dpToPx(2), dpToPx(2)) // 마진 설정을 2dp로 줄임
             }
             
             // 버튼 스타일 설정
@@ -108,11 +108,11 @@ class FlushSkillManager(
             
             // 문양 + 스킬명 설정
             text = "${suit.getSymbol()}\n$skillName"
-            textSize = 10f // 텍스트 크기 축소
+            textSize = 12f // 텍스트 크기 축소
             setTextColor(suit.getColor())
             
             // 패딩 설정 - 좀 더 여유 있게
-            setPadding(dpToPx(6), dpToPx(6), dpToPx(6), dpToPx(6))
+            setPadding(dpToPx(2), dpToPx(2), dpToPx(2), dpToPx(2))
             
             // 버튼 텍스트를 가운데 정렬
             gravity = Gravity.CENTER

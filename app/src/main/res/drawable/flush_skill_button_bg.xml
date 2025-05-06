@@ -13,9 +13,4 @@
     <!-- 모서리 둥글기 설정 (좀 더 둥글게) -->
     <corners android:radius="6dp" />
     
-    <!-- 크기 설정 (높이 증가) -->
-    <size
-        android:width="32dp"
-        android:height="40dp" />
-    
 </shape> 
