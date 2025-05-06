@@ -74,16 +74,21 @@ class FlushSkillManager(
                 ViewGroup.LayoutParams.WRAP_CONTENT
             ).apply {
                 // 마진 설정
-                setMargins(8, 8, 8, 8)
+                setMargins(2, 2, 2, 2)
             }
             
             // 버튼 스타일 설정
             setBackgroundResource(R.drawable.flush_skill_button_bg)
+            minimumWidth = 0
+            minimumHeight = 0
             
             // 문양 아이콘 설정
             text = suit.getSymbol()
-            textSize = 24f
+            textSize = 14f
             setTextColor(suit.getColor())
+            
+            // 패딩 설정
+            setPadding(4, 4, 4, 4)
             
             // 클릭 리스너 설정
             setOnClickListener {

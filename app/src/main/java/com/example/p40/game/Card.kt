@@ -85,6 +85,29 @@ class Card(
     var isSelected: Boolean = false,
     val isJoker: Boolean = false
 ) {
+    // 조커가 변환된 문양을 저장
+    private var transformedSuit: CardSuit? = null
+    
+    // 카드의 실제 문양을 반환 (조커의 경우 변환된 문양 반환)
+    fun getEffectiveSuit(): CardSuit {
+        return if (isJoker && transformedSuit != null) {
+            transformedSuit!!
+        } else {
+            suit
+        }
+    }
+    
+    // 조커 카드의 문양 변환
+    fun transformJoker(newSuit: CardSuit) {
+        if (isJoker) {
+            transformedSuit = newSuit
+        }
+    }
+    
+    // 조커 카드의 문양 변환 초기화
+    fun resetJokerTransform() {
+        transformedSuit = null
+    }
     
     // 카드 출력 문자열
     override fun toString(): String {

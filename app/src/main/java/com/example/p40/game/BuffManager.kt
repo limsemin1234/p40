@@ -205,11 +205,11 @@ class BuffManager {
                 // 플러시 - 문양에 따른 특수 스킬 활성화
                 val cards = CardSelectionManager.instance.getSelectedCards()
                 if (cards.size >= 5) {
-                    // 모든 카드가 같은 무늬인지 확인
-                    val suit = cards[0].suit
-                    val isFlush = cards.all { it.suit == suit }
+                    // 모든 카드가 같은 무늬인지 확인 (조커는 변환된 문양으로 취급)
+                    val suit = cards[0].getEffectiveSuit() // 조커의 경우 변환된 문양 반환
+                    val isFlush = cards.all { it.getEffectiveSuit() == suit }
                     
-                    if (isFlush && suit != CardSuit.JOKER) {
+                    if (isFlush) {
                         // 문양에 맞는 스킬 버프 추가
                         when (suit) {
                             CardSuit.HEART -> {
@@ -247,6 +247,11 @@ class BuffManager {
                                     description = "자원 100 획득 (1회용)"
                                 ))
                             }
+
+                            CardSuit.JOKER -> {
+                                // 조커 자체는 문양이 아니므로 스킬 발동하지 않음
+                                // (getEffectiveSuit()에서 이미 변환된 문양을 반환하므로 이 케이스는 실행되지 않음)
+                            }
                         }
                     }
                 }
@@ -282,12 +287,12 @@ class BuffManager {
                 ))
             }
             
-            is RoyalStraightFlush -> {
-                // 로열 스트레이트 플러시 (데미지 90% 증가)
+            is RoyalFlush -> {
+                // 로열 플러시 (데미지 90% 증가)
                 addBuff(Buff(
                     type = BuffType.MISSILE_DAMAGE,
                     level = 9,
-                    name = "로열 스트레이트 플러시",
+                    name = "로열 플러시",
                     description = "데미지 90% 증가"
                 ))
             }

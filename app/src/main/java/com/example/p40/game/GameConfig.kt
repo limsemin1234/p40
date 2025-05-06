@@ -139,7 +139,6 @@ object GameConfig {
     
     // 포커 카드 기본 설정
     const val POKER_CARD_REPLACE_COUNT = 3  // 포커 카드 교체 가능 횟수
-    const val POKER_HAND_DURATION = 30000L  // 포커 핸드 효과 지속 시간 (30초)
     
     // 포커 핸드별 버프 효과 설정
     object PokerBuffs {
@@ -174,13 +173,8 @@ object GameConfig {
         const val ROYAL_FLUSH_DAMAGE = 0.9f  // 데미지 90% 증가
     }
     
-    // 플러시 스킬 설정
-    const val FLUSH_SKILL_COOLDOWN = 10000L  // 플러시 스킬 쿨타임 (10초)
-    const val FLUSH_SKILL_DURATION = 5000L   // 플러시 스킬 지속 시간 (5초)
-    
     // 문양별 플러시 스킬 효과
     const val HEART_FLUSH_HEAL_AMOUNT = 50  // 하트 플러시 회복량
-    const val SPADE_FLUSH_DAMAGE_BOOST = 2.0f  // 스페이드 플러시 데미지 증가율 (200%)
     const val DIAMOND_FLUSH_RESOURCE_GAIN = 100  // 다이아몬드 플러시 자원 획득량
     const val CLUB_FLUSH_SLOW_AMOUNT = 0.5f  // 클로버 플러시 적 이동속도 감소율 (50%)
     
