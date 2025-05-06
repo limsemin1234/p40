@@ -132,29 +132,47 @@ object GameConfig {
     
     // --------- 버프 관련 설정 ----------
     
-    // 버프 UI 설정
-    val BUFF_DEFENSE_COLOR = Color.parseColor("#3F51B5")  // 디펜스 버프 배경색
-    val BUFF_ENEMY_NERF_COLOR = Color.parseColor("#F44336")  // 적 너프 배경색
-    val BUFF_DEFENSE_STROKE_COLOR = Color.parseColor("#5F71D5")  // 디펜스 버프 테두리 색상
-    val BUFF_ENEMY_NERF_STROKE_COLOR = Color.parseColor("#FF6356")  // 적 너프 테두리 색상
-    
     // 버프 최대 레벨
     const val BUFF_MAX_LEVEL = 5  // 각 버프의 최대 레벨
     
-    // 포커 카드 관련 설정
+    // --------- 포커 카드 관련 설정 ----------
+    
+    // 포커 카드 기본 설정
     const val POKER_CARD_REPLACE_COUNT = 3  // 포커 카드 교체 가능 횟수
     const val POKER_HAND_DURATION = 30000L  // 포커 핸드 효과 지속 시간 (30초)
     
-    // 포커 핸드별 효과 설정
-    const val ROYAL_FLUSH_DAMAGE_BOOST = 3.0f  // 로열 플러시 데미지 증가율 (300%)
-    const val STRAIGHT_FLUSH_DAMAGE_BOOST = 2.5f  // 스트레이트 플러시 데미지 증가율 (250%)
-    const val FOUR_OF_A_KIND_DAMAGE_BOOST = 2.0f  // 포카드 데미지 증가율 (200%)
-    const val FULL_HOUSE_DAMAGE_BOOST = 1.8f  // 풀하우스 데미지 증가율 (180%)
-    const val FLUSH_DAMAGE_BOOST = 1.5f  // 플러시 데미지 증가율 (150%)
-    const val STRAIGHT_DAMAGE_BOOST = 1.3f  // 스트레이트 데미지 증가율 (130%)
-    const val THREE_OF_A_KIND_DAMAGE_BOOST = 1.2f  // 트리플 데미지 증가율 (120%)
-    const val TWO_PAIR_DAMAGE_BOOST = 1.1f  // 투페어 데미지 증가율 (110%)
-    const val ONE_PAIR_DAMAGE_BOOST = 1.05f  // 원페어 데미지 증가율 (105%)
+    // 포커 핸드별 버프 효과 설정
+    object PokerBuffs {
+        // 하이카드 효과
+        const val HIGH_CARD_DAMAGE = 0.1f  // 데미지 10% 증가
+        
+        // 원페어 효과
+        const val ONE_PAIR_DAMAGE = 0.2f  // 데미지 20% 증가
+        
+        // 투페어 효과
+        const val TWO_PAIR_DAMAGE = 0.3f  // 데미지 30% 증가
+        
+        // 트리플 효과
+        const val THREE_OF_A_KIND_DAMAGE = 0.4f  // 데미지 40% 증가
+        
+        // 스트레이트 효과
+        const val STRAIGHT_DAMAGE = 0.5f  // 데미지 50% 증가
+        
+        // 플러시 효과 - 스킬만 유지
+        const val FLUSH_SKILL_UNLOCK = true  // 플러시 스킬 해금
+        
+        // 풀하우스 효과
+        const val FULL_HOUSE_DAMAGE = 0.6f  // 데미지 60% 증가
+        
+        // 포카드 효과
+        const val FOUR_OF_A_KIND_DAMAGE = 0.7f  // 데미지 70% 증가
+        
+        // 스트레이트 플러시 효과
+        const val STRAIGHT_FLUSH_DAMAGE = 0.8f  // 데미지 80% 증가
+        
+        // 로열 스트레이트 플러시 효과
+        const val ROYAL_FLUSH_DAMAGE = 0.9f  // 데미지 90% 증가
+    }
     
     // 플러시 스킬 설정
     const val FLUSH_SKILL_COOLDOWN = 10000L  // 플러시 스킬 쿨타임 (10초)
@@ -166,21 +184,10 @@ object GameConfig {
     const val DIAMOND_FLUSH_RESOURCE_GAIN = 100  // 다이아몬드 플러시 자원 획득량
     const val CLUB_FLUSH_SLOW_AMOUNT = 0.5f  // 클로버 플러시 적 이동속도 감소율 (50%)
     
-    // 플러시 스킬 버튼 UI 설정
-    const val FLUSH_SKILL_BUTTON_SIZE = 60  // 스킬 버튼 크기 (dp)
-    const val FLUSH_SKILL_BUTTON_MARGIN = 8  // 스킬 버튼 간격 (dp)
-    const val FLUSH_SKILL_BUTTON_ALPHA_DISABLED = 0.5f  // 비활성화 상태 투명도
-    
-    // 플러시 스킬 색상 설정
-    val HEART_FLUSH_COLOR = Color.parseColor("#FF4081")  // 하트 플러시 색상
-    val SPADE_FLUSH_COLOR = Color.parseColor("#212121")  // 스페이드 플러시 색상
-    val DIAMOND_FLUSH_COLOR = Color.parseColor("#FF5252")  // 다이아몬드 플러시 색상
-    val CLUB_FLUSH_COLOR = Color.parseColor("#4CAF50")  // 클로버 플러시 색상
-    
-    // 플러시 스킬 효과 표시 설정
-    const val FLUSH_EFFECT_PARTICLE_COUNT = 20  // 효과 파티클 수
-    const val FLUSH_EFFECT_DURATION = 1000L  // 효과 표시 지속 시간 (1초)
-    const val FLUSH_EFFECT_SIZE = 30f  // 효과 파티클 크기
+    // 버프 효과 계수
+    object BuffMultipliers {
+        const val DAMAGE_PER_LEVEL = 0.1f  // 레벨당 데미지 증가율 (10%)
+    }
     
     // 성능 관련 설정
     const val OFFSCREEN_MARGIN = 300f // 화면 외부 마진 (오브젝트 제거 범위)

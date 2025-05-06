@@ -152,71 +152,57 @@ class BuffManager {
     fun addPokerHandBuff(pokerHand: PokerHand) {
         when (pokerHand) {
             is HighCard -> {
-                // 하이 카드는 약한 버프 제공 (데미지 증가)
+                // 하이 카드 (데미지 10% 증가)
                 addBuff(Buff(
                     type = BuffType.MISSILE_DAMAGE,
                     level = 1,
                     name = "하이 카드",
-                    description = "약한 데미지 증가"
+                    description = "데미지 10% 증가"
                 ))
             }
             
             is OnePair -> {
-                // 원 페어 (데미지 증가)
+                // 원 페어 (데미지 20% 증가)
                 addBuff(Buff(
                     type = BuffType.MISSILE_DAMAGE,
                     level = 2,
                     name = "원 페어",
-                    description = "데미지 증가"
+                    description = "데미지 20% 증가"
                 ))
             }
             
             is TwoPair -> {
-                // 투 페어 (데미지 & 공격 속도 증가)
+                // 투 페어 (데미지 30% 증가)
                 addBuff(Buff(
                     type = BuffType.MISSILE_DAMAGE,
-                    level = 1,
-                    name = "투 페어 - 데미지",
-                    description = "데미지 증가"
-                ))
-                
-                addBuff(Buff(
-                    type = BuffType.ATTACK_SPEED,
-                    level = 1,
-                    name = "투 페어 - 공격속도",
-                    description = "공격 속도 증가"
+                    level = 3,
+                    name = "투 페어",
+                    description = "데미지 30% 증가"
                 ))
             }
             
             is ThreeOfAKind -> {
-                // 트리플 (데미지 & 적 이동속도 감소)
+                // 트리플 (데미지 40% 증가)
                 addBuff(Buff(
                     type = BuffType.MISSILE_DAMAGE,
-                    level = 2,
-                    name = "트리플 - 데미지",
-                    description = "데미지 대폭 증가"
-                ))
-                
-                addBuff(Buff(
-                    type = BuffType.ENEMY_SLOW,
-                    level = 1,
-                    name = "트리플 - 슬로우",
-                    description = "적 이동속도 감소"
+                    level = 4,
+                    name = "트리플",
+                    description = "데미지 40% 증가"
                 ))
             }
             
             is Straight -> {
-                // 스트레이트 (다방향 발사)
+                // 스트레이트 (데미지 50% 증가)
                 addBuff(Buff(
-                    type = BuffType.MULTI_DIRECTION,
-                    level = 2,
+                    type = BuffType.MISSILE_DAMAGE,
+                    level = 5,
                     name = "스트레이트",
-                    description = "3방향 발사"
+                    description = "데미지 50% 증가"
                 ))
             }
             
             is Flush -> {
-                // 플러시 - 문양에 따른 특수 스킬 활성화 (기존 효과 제거)
+                // 플러시 - 문양에 따른 특수 스킬 활성화
                 val cards = CardSelectionManager.instance.getSelectedCards()
                 if (cards.size >= 5) {
                     // 모든 카드가 같은 무늬인지 확인
@@ -249,7 +235,7 @@ class BuffManager {
                                     type = BuffType.CLUB_FLUSH_SKILL,
                                     level = 1,
                                     name = "클로버 플러시 스킬",
-                                    description = "시간 멈춤 - 5초 (1회용)"
+                                    description = "적 이동속도 50% 감소 (1회용)"
                                 ))
                             }
                             
@@ -258,123 +244,51 @@ class BuffManager {
                                     type = BuffType.DIAMOND_FLUSH_SKILL,
                                     level = 1,
                                     name = "다이아 플러시 스킬",
-                                    description = "무적 상태 - 5초 (1회용)"
+                                    description = "자원 100 획득 (1회용)"
                                 ))
                             }
-                            
-                            else -> {} // 다른 슈트 처리 없음
                         }
                     }
                 }
             }
             
             is FullHouse -> {
-                // 풀 하우스 (지속 데미지 & 공격속도)
+                // 풀하우스 (데미지 60% 증가)
                 addBuff(Buff(
-                    type = BuffType.DOT_DAMAGE,
-                    level = 3,
-                    name = "풀 하우스 - DoT",
-                    description = "적에게 지속 데미지"
-                ))
-                
-                addBuff(Buff(
-                    type = BuffType.ATTACK_SPEED,
-                    level = 2,
-                    name = "풀 하우스 - 공격속도",
-                    description = "공격 속도 대폭 증가"
+                    type = BuffType.MISSILE_DAMAGE,
+                    level = 6,
+                    name = "풀하우스",
+                    description = "데미지 60% 증가"
                 ))
             }
             
             is FourOfAKind -> {
-                // 포카드 (데미지 & 관통 & 다방향)
+                // 포카드 (데미지 70% 증가)
                 addBuff(Buff(
                     type = BuffType.MISSILE_DAMAGE,
-                    level = 3,
-                    name = "포카드 - 데미지",
-                    description = "데미지 대폭 증가"
-                ))
-                
-                addBuff(Buff(
-                    type = BuffType.MISSILE_PIERCE,
-                    level = 2,
-                    name = "포카드 - 관통",
-                    description = "미사일 관통 강화"
-                ))
-                
-                addBuff(Buff(
-                    type = BuffType.MULTI_DIRECTION,
-                    level = 1,
-                    name = "포카드 - 다방향",
-                    description = "2방향 발사"
+                    level = 7,
+                    name = "포카드",
+                    description = "데미지 70% 증가"
                 ))
             }
             
             is StraightFlush -> {
-                // 스트레이트 플러시 (모든 능력치 증가)
+                // 스트레이트 플러시 (데미지 80% 증가)
                 addBuff(Buff(
                     type = BuffType.MISSILE_DAMAGE,
-                    level = 2,
-                    name = "스트레이트 플러시 - 데미지",
-                    description = "데미지 증가"
-                ))
-                
-                addBuff(Buff(
-                    type = BuffType.ATTACK_SPEED,
-                    level = 2,
-                    name = "스트레이트 플러시 - 속도",
-                    description = "공격 속도 증가"
-                ))
-                
-                addBuff(Buff(
-                    type = BuffType.MULTI_DIRECTION,
-                    level = 2,
-                    name = "스트레이트 플러시 - 다방향",
-                    description = "3방향 발사"
-                ))
-                
-                addBuff(Buff(
-                    type = BuffType.ENEMY_SLOW,
-                    level = 2,
-                    name = "스트레이트 플러시 - 슬로우",
-                    description = "적 이동속도 크게 감소"
+                    level = 8,
+                    name = "스트레이트 플러시",
+                    description = "데미지 80% 증가"
                 ))
             }
             
-            is RoyalFlush -> {
-                // 로얄 플러시 (초강력 효과)
+            is RoyalStraightFlush -> {
+                // 로열 스트레이트 플러시 (데미지 90% 증가)
                 addBuff(Buff(
                     type = BuffType.MISSILE_DAMAGE,
-                    level = 3,
-                    name = "로얄 플러시 - 데미지",
-                    description = "데미지 대폭 증가"
-                ))
-                
-                addBuff(Buff(
-                    type = BuffType.ATTACK_SPEED,
-                    level = 3,
-                    name = "로얄 플러시 - 속도",
-                    description = "공격 속도 대폭 증가"
-                ))
-                
-                addBuff(Buff(
-                    type = BuffType.MULTI_DIRECTION,
-                    level = 3,
-                    name = "로얄 플러시 - 다방향",
-                    description = "4방향 발사"
-                ))
-                
-                addBuff(Buff(
-                    type = BuffType.MASS_DAMAGE,
-                    level = 3,
-                    name = "로얄 플러시 - 대량 데미지",
-                    description = "정기적인 대량 데미지"
-                ))
-                
-                addBuff(Buff(
-                    type = BuffType.MISSILE_PIERCE,
-                    level = 2,
-                    name = "로얄 플러시 - 관통",
-                    description = "미사일 관통 강화"
+                    level = 9,
+                    name = "로열 스트레이트 플러시",
+                    description = "데미지 90% 증가"
                 ))
             }
         }
