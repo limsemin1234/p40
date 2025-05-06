@@ -40,7 +40,7 @@ class GameView @JvmOverloads constructor(
     private val gameConfig = GameConfig
     
     // 분리된 책임들
-    private val gameStats = GameStats(gameConfig)
+    private val gameStats = GameStats(gameConfig, context)
     private lateinit var gameRenderer: GameRenderer
     private lateinit var gameLogic: GameLogic
     

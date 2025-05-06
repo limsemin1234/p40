@@ -300,9 +300,6 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         // 현재 적용된 모든 버프 목록 가져오기
         val buffs = gameView.getBuffManager().getAllBuffs()
         
-        // 버프 출력용 텍스트 구성
-        val buffText = StringBuilder()
-        
         // 플러시 스킬 감지 및 활성화
         checkAndActivateFlushSkills(buffs)
         
@@ -317,16 +314,28 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
             )
         }
         
+        // 버프 컨테이너 찾기
+        val buffContainer = view?.findViewById<LinearLayout>(R.id.buffContainer)
+        buffContainer?.removeAllViews()
+        
+        // 버프 없음 메시지 참조
+        val tvBuffList = view?.findViewById<TextView>(R.id.tvBuffList)
+        
         if (displayBuffs.isNotEmpty()) {
-            buffText.append("활성화된 버프:\n")
+            // 새로운 방식: BuffManager를 통해 생성된 버프 뷰 추가
             displayBuffs.forEach { buff ->
-                buffText.append("• ${buff.getDisplayText()}\n")
+                val buffView = gameView.getBuffManager().createBuffView(buff)
+                buffContainer?.addView(buffView)
             }
-            tvBuffList.text = buffText.toString()
-            tvBuffList.visibility = View.VISIBLE
+            
+            // 기존 텍스트 뷰 숨기기
+            tvBuffList?.visibility = View.GONE
+            buffContainer?.visibility = View.VISIBLE
         } else {
-            tvBuffList.text = "활성화된 버프 없음"
-            tvBuffList.visibility = View.VISIBLE
+            // 버프가 없을 경우
+            tvBuffList?.text = "버프 없음"
+            tvBuffList?.visibility = View.VISIBLE
+            buffContainer?.visibility = View.GONE
         }
     }
     

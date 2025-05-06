@@ -1,5 +1,7 @@
 package com.example.p40.game
 
+import android.content.Context
+
 /**
  * 게임 상태 관련 데이터 클래스들
  * 연관된 데이터를 그룹화하여 관리 용이성 향상
@@ -30,7 +32,10 @@ data class UpgradeInfo(
  * 게임 상태 관리 클래스
  * GameView에서 게임 상태 변수와 관련 메서드들을 분리함
  */
-class GameStats(private val gameConfig: GameConfig) {
+class GameStats(
+    private val gameConfig: GameConfig,
+    private val context: Context
+) {
     // 게임 상태
     private var resource = 0
     private var waveCount = 1
@@ -60,7 +65,7 @@ class GameStats(private val gameConfig: GameConfig) {
     private var defenseCost = gameConfig.DEFENSE_UPGRADE_INITIAL_COST
     
     // 버프 관리자
-    private val buffManager = BuffManager()
+    private val buffManager = BuffManager(context)
     
     /**
      * 게임 상태 초기화

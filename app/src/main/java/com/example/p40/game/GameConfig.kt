@@ -91,7 +91,7 @@ object GameConfig {
     const val ENEMY_DAMAGE_PER_WAVE = 5  // 웨이브당 적 데미지 증가량
     
     // 점수 설정
-    const val SCORE_PER_NORMAL_ENEMY = 15  // 일반 적 처치 시 얻는 점수(자원) - 주석과 일치하도록 수정
+    const val SCORE_PER_NORMAL_ENEMY = 1000  // 일반 적 처치 시 얻는 점수(자원) - 주석과 일치하도록 수정
     const val SCORE_PER_BOSS = 120  // 보스 처치 시 얻는 점수(자원)
     
     // 게임 오버 조건
@@ -129,63 +129,7 @@ object GameConfig {
     const val DEFENSE_UPGRADE_COST_INCREASE = 5  // 레벨당 비용 증가량
     const val DEFENSE_UPGRADE_VALUE = 20  // 업그레이드당 최대 체력 증가량
     const val DEFENSE_UPGRADE_MAX_LEVEL = 100  // 최대 업그레이드 레벨
-    
-    // --------- 버프 관련 설정 ----------
-    
-    // 버프 최대 레벨
-    const val BUFF_MAX_LEVEL = 5  // 각 버프의 최대 레벨
-    
-    // --------- 포커 카드 관련 설정 ----------
-    
-    // 포커 카드 기본 설정
-    const val POKER_CARD_REPLACE_COUNT = 3  // 포커 카드 교체 가능 횟수
-    
-    // 포커 핸드별 버프 효과 설정
-    object PokerBuffs {
-        // 하이카드 효과
-        const val HIGH_CARD_DAMAGE = 0.1f  // 데미지 10% 증가
-        
-        // 원페어 효과
-        const val ONE_PAIR_DAMAGE = 0.2f  // 데미지 20% 증가
-        
-        // 투페어 효과
-        const val TWO_PAIR_DAMAGE = 0.3f  // 데미지 30% 증가
-        
-        // 트리플 효과
-        const val THREE_OF_A_KIND_DAMAGE = 0.4f  // 데미지 40% 증가
-        
-        // 스트레이트 효과
-        const val STRAIGHT_DAMAGE = 0.5f  // 데미지 50% 증가
-        
-        // 플러시 효과 - 스킬만 유지
-        const val FLUSH_SKILL_UNLOCK = true  // 플러시 스킬 해금
-        
-        // 풀하우스 효과
-        const val FULL_HOUSE_DAMAGE = 0.6f  // 데미지 60% 증가
-        
-        // 포카드 효과
-        const val FOUR_OF_A_KIND_DAMAGE = 0.7f  // 데미지 70% 증가
-        
-        // 스트레이트 플러시 효과
-        const val STRAIGHT_FLUSH_DAMAGE = 0.8f  // 데미지 80% 증가
-        
-        // 로열 스트레이트 플러시 효과
-        const val ROYAL_FLUSH_DAMAGE = 0.9f  // 데미지 90% 증가
-    }
-    
-    // 문양별 플러시 스킬 효과
-    const val HEART_FLUSH_HEAL_AMOUNT = 50  // 하트 플러시 회복량
-    const val DIAMOND_FLUSH_RESOURCE_GAIN = 100  // 다이아몬드 플러시 자원 획득량
-    const val CLUB_FLUSH_SLOW_AMOUNT = 0.5f  // 클로버 플러시 적 이동속도 감소율 (50%)
-    
-    // 버프 효과 계수
-    object BuffMultipliers {
-        const val DAMAGE_PER_LEVEL = 0.1f  // 레벨당 데미지 증가율 (10%)
-    }
-    
-    // 성능 관련 설정
-    const val OFFSCREEN_MARGIN = 300f // 화면 외부 마진 (오브젝트 제거 범위)
-    const val OBJECT_POOL_SIZE = 100 // 오브젝트 풀 크기
+
     
     // --------- 렌더링 관련 설정 ----------
     

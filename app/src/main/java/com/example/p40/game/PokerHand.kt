@@ -3,231 +3,229 @@ package com.example.p40.game
 /**
  * 포커 족보 기본 클래스 (상속용)
  */
-abstract class PokerHand {
-    abstract val handName: String
+abstract class PokerHand(val cards: List<Card> = emptyList(), val handName: String) {
+    // 족보 순위 (1이 가장 낮음)
+    abstract val handRank: Int
     
     // 족보 효과 설명 반환
     abstract fun getDescription(): String
-    
-    // 족보 표시 문자열 반환
-    override fun toString(): String {
-        return "$handName: ${getDescription()}"
-    }
 }
 
 /**
  * 하이 카드 (가장 낮은 족보)
  */
-class HighCard : PokerHand() {
-    override val handName = "하이 카드"
+class HighCard(cards: List<Card> = emptyList()) : PokerHand(cards, "하이 카드") {
+    override val handRank = 0
     
     override fun getDescription(): String {
-        return "가장 높은 카드로 승부 (데미지 +15%)"
+        return "가장 높은 카드"
     }
 }
 
 /**
  * 원 페어 (같은 숫자 2장)
  */
-class OnePair : PokerHand() {
-    override val handName = "원 페어"
+class OnePair(cards: List<Card> = emptyList(), val pairRank: CardRank? = null) : PokerHand(cards, "원페어") {
+    override val handRank = 1
     
     override fun getDescription(): String {
-        return "같은 숫자 2장 (데미지 +30%)"
+        return "원페어 (데미지 10% 증가)"
+    }
+    
+    // 페어의 랭크(숫자) 반환
+    fun getActualPairRank(): CardRank {
+        return pairRank ?: CardRank.TWO // 기본값으로 2 반환
     }
 }
 
 /**
  * 투 페어 (두 쌍의 같은 숫자)
  */
-class TwoPair : PokerHand() {
-    override val handName = "투 페어"
+class TwoPair(cards: List<Card> = emptyList()) : PokerHand(cards, "투 페어") {
+    override val handRank = 2
     
     override fun getDescription(): String {
-        return "두 쌍의 같은 숫자 (데미지 +15%, 공격속도 +12%)"
+        return "투 페어 (데미지 20% 증가)"
     }
 }
 
 /**
  * 트리플 (같은 숫자 3장)
  */
-class ThreeOfAKind : PokerHand() {
-    override val handName = "트리플"
+class ThreeOfAKind(cards: List<Card> = emptyList()) : PokerHand(cards, "트리플") {
+    override val handRank = 3
     
     override fun getDescription(): String {
-        return "같은 숫자 3장 (데미지 +30%, 적 이동속도 -15%)"
+        return "트리플 (데미지 30% 증가)"
     }
 }
 
 /**
  * 스트레이트 (연속된 숫자 5장)
  */
-class Straight : PokerHand() {
-    override val handName = "스트레이트"
+class Straight(cards: List<Card> = emptyList()) : PokerHand(cards, "스트레이트") {
+    override val handRank = 4
     
     override fun getDescription(): String {
-        return "연속된 숫자 5장 (3방향 발사)"
+        return "스트레이트 (데미지 40% 증가)"
     }
 }
 
 /**
  * 플러시 (같은 무늬 5장)
  */
-class Flush : PokerHand() {
-    override val handName = "플러시"
+class Flush(cards: List<Card> = emptyList()) : PokerHand(cards, "플러시") {
+    override val handRank = 5
     
     override fun getDescription(): String {
-        return "같은 무늬 5장 (문양별 특수 스킬 획득)"
+        val suit = if (cards.isNotEmpty()) cards[0].suit.name else "?"
+        return "$suit 플러시 (데미지 50% 증가, 문양 스킬 활성화)"
     }
 }
 
 /**
  * 풀하우스 (트리플 + 원페어)
  */
-class FullHouse : PokerHand() {
-    override val handName = "풀 하우스"
+class FullHouse(cards: List<Card> = emptyList()) : PokerHand(cards, "풀 하우스") {
+    override val handRank = 6
     
     override fun getDescription(): String {
-        return "트리플 + 원페어 (지속 데미지 6/초, 공격속도 +24%)"
+        return "풀 하우스 (데미지 60% 증가)"
     }
 }
 
 /**
  * 포카드 (같은 숫자 4장)
  */
-class FourOfAKind : PokerHand() {
-    override val handName = "포카드"
+class FourOfAKind(cards: List<Card> = emptyList()) : PokerHand(cards, "포카드") {
+    override val handRank = 7
     
     override fun getDescription(): String {
-        return "같은 숫자 4장 (데미지 +45%, 관통 2회, 2방향 발사)"
+        return "포카드 (데미지 70% 증가)"
     }
 }
 
 /**
  * 스트레이트 플러시 (같은 무늬 연속된 숫자 5장)
  */
-class StraightFlush : PokerHand() {
-    override val handName = "스트레이트 플러시"
+class StraightFlush(cards: List<Card> = emptyList()) : PokerHand(cards, "스트레이트 플러시") {
+    override val handRank = 8
     
     override fun getDescription(): String {
-        return "같은 무늬 연속된 숫자 5장 (데미지 +30%, 공격속도 +24%, 3방향 발사, 적 이동속도 -30%)"
+        return "스트레이트 플러시 (데미지 80% 증가)"
     }
 }
 
 /**
- * 로얄 플러시 (스페이드 10,J,Q,K,A)
+ * 로얄 플러시 (A, K, Q, J, 10 + 같은 무늬)
  */
-class RoyalFlush : PokerHand() {
-    override val handName = "로얄 플러시"
+class RoyalFlush(cards: List<Card> = emptyList()) : PokerHand(cards, "로얄 플러시") {
+    override val handRank = 9
     
     override fun getDescription(): String {
-        return "최고의 패 (데미지 +45%, 공격속도 +36%, 4방향 발사, 5초마다 300데미지, 관통 2회)"
+        return "로얄 플러시 (데미지 90% 증가)"
     }
 }
 
 /**
- * 포커 패 평가기
+ * 포커 족보 평가 클래스
  */
 object PokerHandEvaluator {
     /**
-     * 포커 패의 족보 평가
-     * @param cards 5장의 카드 리스트
-     * @return 포커 족보
+     * 카드 5장으로 포커 족보 평가
      */
     fun evaluate(cards: List<Card>): PokerHand {
-        // 이미 합계가 계산된 족보 텍스트를 사용
-        return when (evaluateRank(cards)) {
-            10 -> RoyalFlush()
-            9 -> StraightFlush()
-            8 -> FourOfAKind()
-            7 -> FullHouse()
-            6 -> Flush()
-            5 -> Straight()
-            4 -> ThreeOfAKind()
-            3 -> TwoPair()
-            2 -> OnePair()
-            else -> HighCard()
-        }
-    }
-    
-    /**
-     * 족보 순위 계산
-     */
-    private fun evaluateRank(cards: List<Card>): Int {
-        // 카드 5장 확인
-        if (cards.size != 5) return 1
-        
-        // 효율성을 위해 필요한 카드 정보를 한 번만 계산
-        val suits = cards.groupBy { it.suit }
-        val ranks = cards.groupBy { it.rank }
-        val rankValues = cards.map { it.rank.value }.sorted()
-        val isAllSameSuit = suits.size == 1
-        val isStraight = checkStraight(rankValues)
-        
-        // 로얄 플러시 체크
-        if (isAllSameSuit && 
-            rankValues.containsAll(listOf(1, 10, 11, 12, 13))) {
-            return 10
-        }
-        
-        // 스트레이트 플러시 체크
-        if (isAllSameSuit && isStraight) {
-            return 9
-        }
-        
-        // 포카드 체크
-        if (ranks.any { it.value.size >= 4 }) {
-            return 8
-        }
-        
-        // 풀하우스 체크
-        if (ranks.size == 2 && ranks.any { it.value.size == 3 }) {
-            return 7
-        }
+        if (cards.size < 5) return HighCard(cards)
         
         // 플러시 체크
-        if (isAllSameSuit) {
-            return 6
-        }
+        val isFlush = isFlush(cards)
         
         // 스트레이트 체크
-        if (isStraight) {
-            return 5
+        val isStraight = isStraight(cards)
+        
+        // 스트레이트 플러시 체크
+        if (isFlush && isStraight) {
+            // 로열 스트레이트 플러시 체크 (A,K,Q,J,10)
+            val sortedRanks = cards.map { it.rank.value }.sorted()
+            if (sortedRanks == listOf(CardRank.TEN.value, CardRank.JACK.value, 
+                                       CardRank.QUEEN.value, CardRank.KING.value, 
+                                       CardRank.ACE.value)) {
+                return RoyalFlush(cards)
+            }
+            return StraightFlush(cards)
         }
         
-        // 트리플 체크
-        if (ranks.any { it.value.size >= 3 }) {
-            return 4
-        }
+        // 카드 랭크별 그룹화
+        val rankGroups = cards.groupBy { it.rank }
         
-        // 투페어 체크
-        val pairs = ranks.filter { it.value.size >= 2 }
-        if (pairs.size >= 2) {
-            return 3
-        }
+        // 같은 랭크 카드가 몇 장씩 있는지 확인
+        val maxOfAKind = rankGroups.values.maxOf { it.size }
         
-        // 원페어 체크
-        if (pairs.size == 1) {
-            return 2
+        return when (maxOfAKind) {
+            4 -> FourOfAKind(cards)
+            3 -> {
+                // 풀하우스 체크 (트리플 + 페어)
+                if (rankGroups.values.any { it.size == 2 }) {
+                    FullHouse(cards)
+                } else {
+                    ThreeOfAKind(cards)
+                }
+            }
+            2 -> {
+                // 투페어 체크
+                if (rankGroups.values.count { it.size == 2 } >= 2) {
+                    TwoPair(cards)
+                } else {
+                    // 원페어: 페어의 랭크(숫자)를 찾아서 생성자에 전달
+                    val pairRank = rankGroups.entries.first { it.value.size == 2 }.key
+                    OnePair(cards, pairRank)
+                }
+            }
+            else -> {
+                if (isFlush) Flush(cards)
+                else if (isStraight) Straight(cards)
+                else HighCard(cards)
+            }
         }
-        
-        // 하이카드
-        return 1
     }
     
     /**
      * 스트레이트 체크 (연속된 5장의 카드)
      */
-    private fun checkStraight(sortedValues: List<Int>): Boolean {
-        // A,2,3,4,5 스트레이트 특수 처리
-        if (sortedValues == listOf(1, 2, 3, 4, 5)) return true
+    private fun isStraight(cards: List<Card>): Boolean {
+        val sortedValues = cards.map { it.rank.value }.sorted()
         
-        // 일반적인 스트레이트 확인
-        for (i in 1 until sortedValues.size) {
-            if (sortedValues[i] != sortedValues[i-1] + 1) {
+        // 일반적인 스트레이트 체크
+        if (isConsecutive(sortedValues)) return true
+        
+        // A-5 스트레이트 체크 (A,2,3,4,5)
+        if (sortedValues.contains(CardRank.ACE.value)) {
+            val tempValues = sortedValues.toMutableList()
+            tempValues.remove(CardRank.ACE.value)
+            tempValues.add(1) // A를 1로 취급
+            return isConsecutive(tempValues.sorted())
+        }
+        
+        return false
+    }
+    
+    /**
+     * 숫자가 연속되었는지 확인
+     */
+    private fun isConsecutive(values: List<Int>): Boolean {
+        for (i in 0 until values.size - 1) {
+            if (values[i + 1] - values[i] != 1) {
                 return false
             }
         }
         return true
+    }
+    
+    /**
+     * 플러시 체크 (같은 무늬 5장의 카드)
+     */
+    private fun isFlush(cards: List<Card>): Boolean {
+        val suits = cards.groupBy { it.suit }
+        return suits.size == 1
     }
 } 
