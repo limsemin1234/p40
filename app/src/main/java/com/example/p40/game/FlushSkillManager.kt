@@ -31,7 +31,7 @@ class FlushSkillManager(
     private val handler = Handler(Looper.getMainLooper())
     
     // 버튼 크기 상수
-    private val BUTTON_WIDTH = 80 // dp 단위로 설정 (100dp에서 80dp로 줄임)
+    private val BUTTON_WIDTH = 60 // dp 단위로 설정 (100dp에서 60dp로 줄임)
     private val BUTTON_HEIGHT = ViewGroup.LayoutParams.WRAP_CONTENT
     
     // 초기화
@@ -108,11 +108,21 @@ class FlushSkillManager(
             
             // 문양 + 스킬명 설정
             text = "${suit.getSymbol()}\n$skillName"
-            textSize = 12f // 텍스트 크기 축소
-            setTextColor(suit.getColor())
+            textSize = 13f // 텍스트 크기 키움
+            
+            // 버튼 텍스트 색상 설정 (더 밝은 색상으로)
+            val textColor = when (suit) {
+                CardSuit.HEART, CardSuit.DIAMOND -> Color.parseColor("#FF6666") // 밝은 빨간색
+                CardSuit.SPADE, CardSuit.CLUB -> Color.parseColor("#FFFFFF") // 흰색
+                else -> Color.WHITE
+            }
+            setTextColor(textColor)
+            
+            // 텍스트에 그림자 효과 추가하여 더 잘 보이게 함
+            setShadowLayer(2.0f, 1.0f, 1.0f, Color.BLACK)
             
             // 패딩 설정 - 좀 더 여유 있게
-            setPadding(dpToPx(2), dpToPx(2), dpToPx(2), dpToPx(2))
+            setPadding(dpToPx(3), dpToPx(3), dpToPx(3), dpToPx(3))
             
             // 버튼 텍스트를 가운데 정렬
             gravity = Gravity.CENTER
