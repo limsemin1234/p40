@@ -16,7 +16,7 @@ class StatsUpgradeFragment : Fragment(R.layout.fragment_stats_upgrade) {
     private lateinit var userManager: UserManager
     private lateinit var statsManager: StatsManager
     private lateinit var messageManager: MessageManager
-    private lateinit var tvCurrency: TextView
+    private lateinit var tvCoinAmount: TextView
     
     // 현재 스탯 표시 텍스트뷰
     private lateinit var tvCurrentHealth: TextView
@@ -66,7 +66,7 @@ class StatsUpgradeFragment : Fragment(R.layout.fragment_stats_upgrade) {
     // UI 요소 초기화
     private fun initViews(view: View) {
         // 코인 정보 텍스트뷰
-        tvCurrency = view.findViewById(R.id.tvCurrency)
+        tvCoinAmount = view.findViewById(R.id.tvCoinAmount)
         
         // 현재 스탯 텍스트뷰
         tvCurrentHealth = view.findViewById(R.id.tvCurrentHealth)
@@ -138,7 +138,7 @@ class StatsUpgradeFragment : Fragment(R.layout.fragment_stats_upgrade) {
     
     // 코인 정보 업데이트
     private fun updateCoinUI() {
-        tvCurrency.text = "코인: ${userManager.getCoin()}"
+        tvCoinAmount.text = "코인: ${userManager.getCoin()}"
     }
     
     // 체력 강화

@@ -72,8 +72,8 @@ class MainMenuFragment : Fragment(R.layout.fragment_main_menu) {
     
     // 코인 UI 업데이트 (UserManager 사용)
     private fun updateCoinUI(view: View) {
-        val tvMainMenuCoin = view.findViewById<TextView>(R.id.tvMainMenuCoin)
-        tvMainMenuCoin.text = "코인: ${userManager.getCoin()}"
+        val tvCoinAmount = view.findViewById<TextView>(R.id.tvCoinAmount)
+        tvCoinAmount.text = "코인: ${userManager.getCoin()}"
     }
 
     private fun showJokerCardsDialog() {

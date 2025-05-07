@@ -14,7 +14,7 @@ class LobbyFragment : Fragment(R.layout.fragment_lobby) {
 
     private lateinit var levelAdapter: GameLevelAdapter
     private lateinit var userManager: UserManager
-    private lateinit var tvCurrency: TextView
+    private lateinit var tvCoinAmount: TextView
     private var selectedLevel: GameLevel? = null
     
     // 게임 레벨 데이터
@@ -36,7 +36,7 @@ class LobbyFragment : Fragment(R.layout.fragment_lobby) {
         userManager = UserManager.getInstance(requireContext())
         
         // 코인 정보 표시 텍스트뷰 초기화
-        tvCurrency = view.findViewById(R.id.tvCurrency)
+        tvCoinAmount = view.findViewById(R.id.tvCoinAmount)
         
         // 코인 정보 업데이트
         updateCoinUI()
@@ -76,7 +76,7 @@ class LobbyFragment : Fragment(R.layout.fragment_lobby) {
     
     // 코인 정보 업데이트
     private fun updateCoinUI() {
-        tvCurrency.text = "코인: ${userManager.getCoin()}"
+        tvCoinAmount.text = "코인: ${userManager.getCoin()}"
     }
     
     override fun onResume() {

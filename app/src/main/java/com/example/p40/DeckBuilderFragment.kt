@@ -43,7 +43,7 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
     // 뷰 참조
     private lateinit var tvDeckCount: TextView
     private lateinit var btnSaveDeck: Button
-    private lateinit var tvCurrency: TextView
+    private lateinit var tvCoinAmount: TextView
     
     // 유저 매니저
     private lateinit var userManager: UserManager
@@ -96,7 +96,7 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
         tvDeckCount = view.findViewById(R.id.tvDeckCount)
         
         // 코인 정보 표시 텍스트뷰
-        tvCurrency = view.findViewById(R.id.tvCurrency)
+        tvCoinAmount = view.findViewById(R.id.tvCoinAmount)
         
         // 버튼 초기화
         btnSaveDeck = view.findViewById(R.id.btnSaveDeck)
@@ -572,7 +572,7 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
     
     // 코인 정보 업데이트
     private fun updateCoinUI() {
-        tvCurrency.text = "코인: ${userManager.getCoin()}"
+        tvCoinAmount.text = "코인: ${userManager.getCoin()}"
     }
     
     override fun onResume() {

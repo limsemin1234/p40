@@ -19,7 +19,7 @@ class CardShopFragment : Fragment(R.layout.fragment_card_shop) {
     private lateinit var userManager: UserManager
     private lateinit var cardShopAdapter: CardShopAdapter
     private lateinit var shopCards: MutableList<ShopCard>
-    private lateinit var tvCurrency: TextView
+    private lateinit var tvCoinAmount: TextView
     
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -28,7 +28,7 @@ class CardShopFragment : Fragment(R.layout.fragment_card_shop) {
         userManager = UserManager.getInstance(requireContext())
         
         // 뷰 초기화
-        tvCurrency = view.findViewById(R.id.tvCurrency)
+        tvCoinAmount = view.findViewById(R.id.tvCoinAmount)
         val rvCardShop = view.findViewById<RecyclerView>(R.id.rvCardShop)
         val btnBack = view.findViewById<ImageButton>(R.id.btnBack)
         
@@ -105,6 +105,6 @@ class CardShopFragment : Fragment(R.layout.fragment_card_shop) {
     
     // 코인 표시 UI 업데이트
     private fun updateCurrencyUI() {
-        tvCurrency.text = "코인: ${userManager.getCoin()}"
+        tvCoinAmount.text = "코인: ${userManager.getCoin()}"
     }
 } 
