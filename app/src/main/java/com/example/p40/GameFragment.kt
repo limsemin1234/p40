@@ -52,8 +52,8 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
     // 현재 웨이브 정보
     private var currentWave = 1
     
-    // 코인 정보
-    private var coins = 0
+    // UserManager 추가
+    private lateinit var userManager: UserManager
     
     // 버프 정보 UI
     private lateinit var tvBuffList: TextView
@@ -84,6 +84,9 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // UserManager 초기화
+        userManager = UserManager.getInstance(requireContext())
+        
         // 메시지 관리자 초기화는 onStart로 이동
         messageManager = MessageManager.getInstance()
         
@@ -108,7 +111,7 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
                 // UI 스레드에서 실행하기 위해 Handler 사용
                 Handler(Looper.getMainLooper()).post {
                     // 보스 처치 시 100코인 획득
-                    coins += 100
+                    userManager.addCoin(100)
                     updateCoinUI()
                     // Toast 대신 메시지 매니저 사용
                     messageManager.showSuccess("보스 처치! +100 코인")
@@ -165,9 +168,6 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         handler.post {
             updateUpgradeButtonsText()
         }
-
-        // 저장된 코인 불러오기
-        coins = MainMenuFragment.loadCoins(requireContext())
 
         // 플러시 스킬 매니저 초기화
         val flushSkillButtonContainer = view.findViewById<LinearLayout>(R.id.flushSkillButtonContainer)
@@ -701,82 +701,61 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         }
     }
     
-    // 게임 오버 다이얼로그 표시
+    // 게임 종료 처리
+    fun exitGame() {
+        // 게임 중지
+        gameView.pause()
+        isPaused = true
+        
+        // 코인 저장은 UserManager에서 자동 처리되므로 별도 호출 필요 없음
+    }
+
+    // 게임 일시정지 처리
+    private fun pauseGame() {
+        if (!isPaused) {
+            isPaused = true
+            gameView.pause()
+            showPauseDialog()
+        }
+    }
+    
+    // 게임 오버 처리
     override fun onGameOver(resource: Int, waveCount: Int) {
-        // 코인 저장
-        saveCoins()
+        if (!isAdded) return
         
-        // 게임 오버 다이얼로그 생성
         val dialog = Dialog(requireContext())
+        dialog.setContentView(R.layout.dialog_game_over)
         
-        // 게임 오버 다이얼로그 레이아웃 설정
-        val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_game_over, null)
-        dialog.setContentView(dialogView)
-        dialog.setCancelable(false)
-        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
-        
-        // 다이얼로그 내용 설정
-        val tvGameOverScore = dialogView.findViewById<TextView>(R.id.tvGameOverScore)
-        val tvGameOverWave = dialogView.findViewById<TextView>(R.id.tvGameOverWave)
-        val tvGameOverCoins = dialogView.findViewById<TextView>(R.id.tvGameOverCoins)
+        // 점수와 웨이브 표시
+        val tvGameOverScore = dialog.findViewById<TextView>(R.id.tvGameOverScore)
+        val tvGameOverWave = dialog.findViewById<TextView>(R.id.tvGameOverWave)
         
         tvGameOverScore.text = "최종 자원: $resource"
         tvGameOverWave.text = "도달한 웨이브: $waveCount"
-        tvGameOverCoins?.text = "보유 코인: $coins"
         
-        // 메인 메뉴 버튼 설정
-        val btnMainMenu = dialogView.findViewById<Button>(R.id.btnMainMenu)
-        btnMainMenu.setOnClickListener {
-            dialog.dismiss()
-            findNavController().navigate(R.id.action_gameFragment_to_mainMenuFragment)
-        }
+        // 획득한 코인 계산 (웨이브 * 10)
+        val earnedCoins = waveCount * 10
+        val tvGameOverCoins = dialog.findViewById<TextView>(R.id.tvGameOverCoins)
+        tvGameOverCoins.text = "획득한 코인: $earnedCoins"
         
-        // 게임 종료 버튼 설정
-        val btnExit = dialogView.findViewById<Button>(R.id.btnExit)
+        // 코인 저장 (기존 코인 + 획득한 코인)
+        userManager.addCoin(earnedCoins)
+        
+        // 종료 버튼 - 앱 종료
+        val btnExit = dialog.findViewById<Button>(R.id.btnExit)
         btnExit.setOnClickListener {
+            requireActivity().finish()
+        }
+        
+        // 메인 메뉴 버튼
+        val btnMainMenu = dialog.findViewById<Button>(R.id.btnMainMenu)
+        btnMainMenu.setOnClickListener {
+            findNavController().navigate(R.id.action_gameFragment_to_mainMenuFragment)
             dialog.dismiss()
-            requireActivity().finish()  // 앱 종료
         }
         
-        // 다이얼로그 표시
+        dialog.setCancelable(false)
         dialog.show()
-    }
-    
-    override fun onPause() {
-        super.onPause()
-        gameView.pause()
-        handler.removeCallbacks(uiUpdateRunnable)
-    }
-    
-    override fun onResume() {
-        super.onResume()
-        if (!isPaused) {
-            gameView.resume()
-            handler.post(uiUpdateRunnable)
-        }
-    }
-    
-    override fun onDestroyView() {
-        super.onDestroyView()
-        handler.removeCallbacks(uiUpdateRunnable)
-        
-        // 코인 저장
-        saveCoins()
-    }
-
-    // setupGameMenu 함수 추가 (pauseButton과 exitButton 설정 코드를 여기로 이동)
-    private fun setupGameMenu(view: View) {
-        // 종료(일시정지) 버튼
-        val exitButton = view.findViewById<Button>(R.id.exitButton)
-        exitButton.setOnClickListener {
-            // 게임 일시정지
-            isPaused = true
-            gameView.pause()
-            handler.removeCallbacks(uiUpdateRunnable)
-            
-            // 일시정지 메뉴 보여주기
-            showPauseDialog()
-        }
     }
 
     // 일시정지 다이얼로그 표시
@@ -844,9 +823,6 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
                 // 게임 리소스 정리
                 cleanupGameResources()
                 
-                // 코인 저장
-                saveCoins()
-                
                 // 메인화면으로 이동
                 findNavController().navigate(R.id.action_gameFragment_to_mainMenuFragment)
             }
@@ -902,23 +878,20 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
 
     // 코인 UI 업데이트
     private fun updateCoinUI() {
-        if (!isAdded) return
-        view?.findViewById<TextView>(R.id.tvCoinInfo)?.text = "코인: $coins"
+        view?.findViewById<TextView>(R.id.tvCoinInfo)?.text = "보유 코인: ${userManager.getCoin()}"
     }
 
     // 코인 획득
     private fun addCoins(amount: Int) {
-        coins += amount
+        userManager.addCoin(amount)
         updateCoinUI()
-        saveCoins() // 코인이 변경될 때마다 저장
     }
 
     // 코인 사용
     private fun useCoins(amount: Int): Boolean {
-        return if (coins >= amount) {
-            coins -= amount
+        return if (userManager.getCoin() >= amount) {
+            userManager.addCoin(-amount)
             updateCoinUI()
-            saveCoins() // 코인이 변경될 때마다 저장
             true
         } else {
             messageManager.showWarning("코인이 부족합니다!")
@@ -926,9 +899,19 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         }
     }
 
-    // 코인 저장
-    private fun saveCoins() {
-        MainMenuFragment.saveCoins(requireContext(), coins)
+    // setupGameMenu 함수 추가 (pauseButton과 exitButton 설정 코드)
+    private fun setupGameMenu(view: View) {
+        // 종료(일시정지) 버튼
+        val exitButton = view.findViewById<Button>(R.id.exitButton)
+        exitButton.setOnClickListener {
+            // 게임 일시정지
+            isPaused = true
+            gameView.pause()
+            handler.removeCallbacks(uiUpdateRunnable)
+            
+            // 일시정지 메뉴 보여주기
+            showPauseDialog()
+        }
     }
 }
 

@@ -17,31 +17,16 @@ import com.example.p40.game.CardSuit
 
 class MainMenuFragment : Fragment(R.layout.fragment_main_menu) {
 
-    companion object {
-        private const val PREFS_NAME = "GamePrefs"
-        private const val KEY_COINS = "playerCoins"
-        
-        // 코인 저장하기
-        fun saveCoins(context: Context, coins: Int) {
-            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            prefs.edit().putInt(KEY_COINS, coins).apply()
-        }
-        
-        // 코인 불러오기
-        fun loadCoins(context: Context): Int {
-            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            return prefs.getInt(KEY_COINS, 0)
-        }
-    }
-    
-    // 플레이어의 코인
-    private var playerCoins = 0
+    // UserManager 추가
+    private lateinit var userManager: UserManager
     
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
-        // 저장된 코인 불러오기
-        playerCoins = loadCoins(requireContext())
+        // UserManager 초기화
+        userManager = UserManager.getInstance(requireContext())
+        
+        // UserManager에서 코인 정보 불러오기
         updateCoinUI(view)
 
         // 게임 로비 버튼 클릭 시 로비 화면으로 이동
@@ -71,15 +56,14 @@ class MainMenuFragment : Fragment(R.layout.fragment_main_menu) {
     
     override fun onResume() {
         super.onResume()
-        // 화면이 다시 보일 때마다 코인 정보 갱신
-        playerCoins = loadCoins(requireContext())
+        // 화면이 다시 보일 때마다 UserManager에서 코인 정보 갱신
         view?.let { updateCoinUI(it) }
     }
     
-    // 코인 UI 업데이트
+    // 코인 UI 업데이트 (UserManager 사용)
     private fun updateCoinUI(view: View) {
         val tvMainMenuCoin = view.findViewById<TextView>(R.id.tvMainMenuCoin)
-        tvMainMenuCoin.text = "코인: $playerCoins"
+        tvMainMenuCoin.text = "보유 코인: ${userManager.getCoin()}"
     }
 
     private fun showJokerCardsDialog() {

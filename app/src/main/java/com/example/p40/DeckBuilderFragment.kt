@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.Window
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.NumberPicker
 import android.widget.TextView
 import android.widget.Toast
@@ -42,7 +43,7 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
     // 뷰 참조
     private lateinit var tvDeckCount: TextView
     private lateinit var btnSaveDeck: Button
-    private lateinit var btnBack: Button
+    private lateinit var tvCurrency: TextView
     
     // 유저 매니저
     private lateinit var userManager: UserManager
@@ -55,6 +56,9 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
         
         // 뷰 초기화
         initViews(view)
+        
+        // 코인 정보 업데이트
+        updateCoinUI()
         
         // 어댑터 생성 및 설정
         setupAdapters()
@@ -91,9 +95,11 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
         // 카드 수량 표시 텍스트뷰
         tvDeckCount = view.findViewById(R.id.tvDeckCount)
         
+        // 코인 정보 표시 텍스트뷰
+        tvCurrency = view.findViewById(R.id.tvCurrency)
+        
         // 버튼 초기화
         btnSaveDeck = view.findViewById(R.id.btnSaveDeck)
-        btnBack = view.findViewById(R.id.btnBack)
     }
     
     private fun setupButtons() {
@@ -103,7 +109,7 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
         }
         
         // 뒤로가기 버튼 설정
-        btnBack.setOnClickListener {
+        view?.findViewById<ImageButton>(R.id.btnBack)?.setOnClickListener {
             navigateBack()
         }
         
@@ -563,6 +569,17 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
     
     // 카드 데이터 직렬화를 위한 클래스
     data class CardData(val suit: String, val rank: String)
+    
+    // 코인 정보 업데이트
+    private fun updateCoinUI() {
+        tvCurrency.text = "보유 코인: ${userManager.getCoin()}"
+    }
+    
+    override fun onResume() {
+        super.onResume()
+        // 화면이 다시 보일 때마다 코인 정보 갱신
+        updateCoinUI()
+    }
     
     companion object {
         const val DECK_PREFS_NAME = "deck_preferences"

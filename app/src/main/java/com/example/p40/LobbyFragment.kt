@@ -3,6 +3,8 @@ package com.example.p40
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import android.widget.ImageButton
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -11,6 +13,8 @@ import androidx.recyclerview.widget.RecyclerView
 class LobbyFragment : Fragment(R.layout.fragment_lobby) {
 
     private lateinit var levelAdapter: GameLevelAdapter
+    private lateinit var userManager: UserManager
+    private lateinit var tvCurrency: TextView
     private var selectedLevel: GameLevel? = null
     
     // 게임 레벨 데이터
@@ -28,6 +32,15 @@ class LobbyFragment : Fragment(R.layout.fragment_lobby) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
+        // UserManager 초기화
+        userManager = UserManager.getInstance(requireContext())
+        
+        // 코인 정보 표시 텍스트뷰 초기화
+        tvCurrency = view.findViewById(R.id.tvCurrency)
+        
+        // 코인 정보 업데이트
+        updateCoinUI()
+        
         // RecyclerView 설정
         val rvLevels = view.findViewById<RecyclerView>(R.id.rvLevels)
         rvLevels.layoutManager = LinearLayoutManager(requireContext())
@@ -40,6 +53,11 @@ class LobbyFragment : Fragment(R.layout.fragment_lobby) {
         
         // 기본적으로 첫 번째 레벨 선택
         selectedLevel = gameLevels.firstOrNull()
+        
+        // 상단바 뒤로가기 버튼 설정
+        view.findViewById<ImageButton>(R.id.btnBack).setOnClickListener {
+            findNavController().popBackStack()
+        }
         
         // 게임 시작 버튼
         val btnStartGame = view.findViewById<Button>(R.id.btnStartGame)
@@ -60,5 +78,16 @@ class LobbyFragment : Fragment(R.layout.fragment_lobby) {
         btnBackToMain.setOnClickListener {
             findNavController().popBackStack()
         }
+    }
+    
+    // 코인 정보 업데이트
+    private fun updateCoinUI() {
+        tvCurrency.text = "보유 코인: ${userManager.getCoin()}"
+    }
+    
+    override fun onResume() {
+        super.onResume()
+        // 화면이 다시 보일 때마다 코인 정보 갱신
+        updateCoinUI()
     }
 } 

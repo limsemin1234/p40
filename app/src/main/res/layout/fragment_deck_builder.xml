@@ -6,17 +6,42 @@
     android:background="#111111"
     android:padding="8dp">
 
-    <!-- 타이틀 -->
-    <TextView
-        android:id="@+id/tvDeckBuilderTitle"
-        android:layout_width="wrap_content"
+    <!-- 상단 바 영역 -->
+    <LinearLayout
+        android:id="@+id/topBar"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="덱 구성"
-        android:textColor="#FFFFFF"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@null"
+            android:src="@android:drawable/ic_menu_revert"
+            android:tint="#FFFFFF" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="덱 구성"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:gravity="center" />
+
+        <TextView
+            android:id="@+id/tvCurrency"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="보유 코인: 0"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#FFEB3B" />
+    </LinearLayout>
 
     <!-- 덱 카드 수량 표시 -->
     <TextView
@@ -26,8 +51,9 @@
         android:text="덱 구성: 0장/53장"
         android:textColor="#CCCCCC"
         android:textSize="16sp"
+        android:layout_marginTop="16dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/topBar" />
 
     <!-- 상단 섹션 타이틀: 현재 덱 -->
     <TextView
@@ -39,7 +65,7 @@
         android:textSize="18sp"
         android:layout_marginTop="16dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvDeckBuilderTitle" />
+        app:layout_constraintTop_toBottomOf="@id/topBar" />
 
     <!-- 경계선 -->
     <View
@@ -128,25 +154,13 @@
         android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent">
 
-        <!-- 뒤로가기 버튼 -->
-        <Button
-            android:id="@+id/btnBack"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="뒤로가기"
-            android:textSize="16sp"
-            android:layout_marginEnd="4dp" />
-
         <!-- 저장 버튼 -->
         <Button
             android:id="@+id/btnSaveDeck"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:text="덱 저장하기" 
-            android:textSize="16sp"
-            android:layout_marginStart="4dp" />
+            android:textSize="16sp"/>
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout> 

@@ -13,9 +13,9 @@
         android:id="@+id/tvMainMenuCoin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="코인: 0"
-        android:textColor="#FFD700"
-        android:textSize="18sp"
+        android:text="보유 코인: 0"
+        android:textColor="#FFEB3B"
+        android:textSize="16sp"
         android:textStyle="bold"
         android:gravity="end"
         android:drawableStart="@drawable/ic_coin"
@@ -30,24 +30,17 @@
         android:orientation="vertical"
         android:gravity="center">
 
-        <ImageView
-            android:id="@+id/imageViewLogo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@mipmap/ic_launcher"
-            android:layout_marginBottom="50dp" />
-
         <Button
             android:id="@+id/btnLobby"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="게임 로비" />
+            android:text="게임 입장" />
 
         <Button
             android:id="@+id/btnBuyCards"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="카드 구매"
+            android:text="카드 상점"
             android:layout_marginTop="16dp" />
 
         <Button
@@ -61,7 +54,7 @@
             android:id="@+id/btnExit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="게임 종료"
+            android:text="게임 나가기"
             android:layout_marginTop="16dp" />
     </LinearLayout>
 </LinearLayout>
