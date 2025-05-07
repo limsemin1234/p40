@@ -72,12 +72,6 @@ class LobbyFragment : Fragment(R.layout.fragment_lobby) {
                 findNavController().navigate(R.id.action_lobbyFragment_to_gameFragment, bundle)
             }
         }
-        
-        // 메인 메뉴로 돌아가기 버튼
-        val btnBackToMain = view.findViewById<Button>(R.id.btnBackToMain)
-        btnBackToMain.setOnClickListener {
-            findNavController().popBackStack()
-        }
     }
     
     // 코인 정보 업데이트
