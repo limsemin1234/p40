@@ -290,7 +290,12 @@
                     android:text="체력: 100/100"
                     android:textColor="#FFFFFF"
                     android:textSize="12sp"
-                    android:gravity="center" />
+                    android:gravity="center"
+                    app:autoSizeTextType="uniform"
+                    app:autoSizeMinTextSize="8sp"
+                    app:autoSizeMaxTextSize="12sp"
+                    app:autoSizeStepGranularity="1sp"
+                    android:maxLines="1" />
 
                 <TextView
                     android:id="@+id/unitAttackText"
@@ -300,17 +305,27 @@
                     android:text="공격력: 50"
                     android:textColor="#FFFFFF"
                     android:textSize="12sp"
-                    android:gravity="center" />
+                    android:gravity="center"
+                    app:autoSizeTextType="uniform"
+                    app:autoSizeMinTextSize="8sp"
+                    app:autoSizeMaxTextSize="12sp"
+                    app:autoSizeStepGranularity="1sp"
+                    android:maxLines="1" />
 
                 <TextView
                     android:id="@+id/unitAttackSpeedText"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="공격속도: 1.0"
+                    android:text="공속: 1.00"
                     android:textColor="#FFFFFF"
                     android:textSize="12sp"
-                    android:gravity="center" />
+                    android:gravity="center"
+                    app:autoSizeTextType="uniform"
+                    app:autoSizeMinTextSize="8sp"
+                    app:autoSizeMaxTextSize="12sp"
+                    app:autoSizeStepGranularity="1sp"
+                    android:maxLines="1" />
 
                 <TextView
                     android:id="@+id/unitRangeText"
@@ -320,7 +335,12 @@
                     android:text="사거리: 500"
                     android:textColor="#FFFFFF"
                     android:textSize="12sp"
-                    android:gravity="center" />
+                    android:gravity="center"
+                    app:autoSizeTextType="uniform"
+                    app:autoSizeMinTextSize="8sp"
+                    app:autoSizeMaxTextSize="12sp"
+                    app:autoSizeStepGranularity="1sp"
+                    android:maxLines="1" />
             </LinearLayout>
 
             <!-- 적 유닛 스탯 정보 -->
@@ -340,7 +360,12 @@
                     android:text="체력: 50"
                     android:textColor="#FFFFFF"
                     android:textSize="12sp"
-                    android:gravity="center" />
+                    android:gravity="center"
+                    app:autoSizeTextType="uniform"
+                    app:autoSizeMinTextSize="8sp"
+                    app:autoSizeMaxTextSize="12sp"
+                    app:autoSizeStepGranularity="1sp"
+                    android:maxLines="1" />
 
                 <TextView
                     android:id="@+id/enemyAttackText"
@@ -350,7 +375,12 @@
                     android:text="공격력: 5"
                     android:textColor="#FFFFFF"
                     android:textSize="12sp"
-                    android:gravity="center" />
+                    android:gravity="center"
+                    app:autoSizeTextType="uniform"
+                    app:autoSizeMinTextSize="8sp"
+                    app:autoSizeMaxTextSize="12sp"
+                    app:autoSizeStepGranularity="1sp"
+                    android:maxLines="1" />
 
                 <TextView
                     android:id="@+id/enemySpeedText"
@@ -360,7 +390,12 @@
                     android:text="이동속도: 1.0"
                     android:textColor="#FFFFFF"
                     android:textSize="12sp"
-                    android:gravity="center" />
+                    android:gravity="center"
+                    app:autoSizeTextType="uniform"
+                    app:autoSizeMinTextSize="8sp"
+                    app:autoSizeMaxTextSize="12sp"
+                    app:autoSizeStepGranularity="1sp"
+                    android:maxLines="1" />
             </LinearLayout>
 
             <!-- 보스 유닛 스탯 정보 -->
@@ -380,7 +415,12 @@
                     android:text="체력: 200"
                     android:textColor="#FFFFFF"
                     android:textSize="12sp"
-                    android:gravity="center" />
+                    android:gravity="center"
+                    app:autoSizeTextType="uniform"
+                    app:autoSizeMinTextSize="8sp"
+                    app:autoSizeMaxTextSize="12sp"
+                    app:autoSizeStepGranularity="1sp"
+                    android:maxLines="1" />
 
                 <TextView
                     android:id="@+id/bossAttackText"
@@ -390,7 +430,12 @@
                     android:text="공격력: 12"
                     android:textColor="#FFFFFF"
                     android:textSize="12sp"
-                    android:gravity="center" />
+                    android:gravity="center"
+                    app:autoSizeTextType="uniform"
+                    app:autoSizeMinTextSize="8sp"
+                    app:autoSizeMaxTextSize="12sp"
+                    app:autoSizeStepGranularity="1sp"
+                    android:maxLines="1" />
 
                 <TextView
                     android:id="@+id/bossSpeedText"
@@ -400,7 +445,12 @@
                     android:text="이동속도: 0.8"
                     android:textColor="#FFFFFF"
                     android:textSize="12sp"
-                    android:gravity="center" />
+                    android:gravity="center"
+                    app:autoSizeTextType="uniform"
+                    app:autoSizeMinTextSize="8sp"
+                    app:autoSizeMaxTextSize="12sp"
+                    app:autoSizeStepGranularity="1sp"
+                    android:maxLines="1" />
             </LinearLayout>
         </FrameLayout>
 
@@ -497,7 +547,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="#333333"
+        android:background="#80333333"
         android:visibility="gone"
         android:elevation="15dp"
         app:layout_constraintBottom_toTopOf="@id/bottomBar">
@@ -572,7 +622,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="#333333"
+        android:background="#80333333"
         android:visibility="gone"
         android:elevation="15dp"
         app:layout_constraintBottom_toTopOf="@id/bottomBar">
@@ -647,7 +697,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="#AA333333"
+        android:background="#80333333"
         android:visibility="gone"
         android:paddingBottom="12dp"
         android:elevation="15dp"

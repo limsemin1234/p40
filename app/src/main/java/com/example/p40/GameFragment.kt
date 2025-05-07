@@ -388,8 +388,8 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         
         // 공격속도 정보 업데이트
         val attacksPerSecond = 1000.0 / attackSpeed
-        val formattedAttackSpeed = String.format("%.2f", attacksPerSecond)
-        view?.findViewById<TextView>(R.id.unitAttackSpeedText)?.text = "공격속도: ${formattedAttackSpeed}/초"
+        val formattedAttackSpeed = String.format("%.2f", attacksPerSecond) // 소수점 두자리로 변경
+        view?.findViewById<TextView>(R.id.unitAttackSpeedText)?.text = "공속: ${formattedAttackSpeed}/초"
         
         // 사거리 정보 업데이트
         view?.findViewById<TextView>(R.id.unitRangeText)?.text = "사거리: ${attackRange.toInt()}"
@@ -506,7 +506,13 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
     
     private fun openPanel(panel: LinearLayout) {
         panel.visibility = View.VISIBLE
-        panel.translationY = panel.height.toFloat()
+        
+        // 화면 높이의 일정 부분을 시작점으로 사용 (5%로 변경하여 더 위에서 시작)
+        val displayMetrics = requireContext().resources.displayMetrics
+        val screenHeight = displayMetrics.heightPixels
+        val startPosition = screenHeight * 0.05f  // 화면 높이의 5%만큼 아래에서 시작
+        
+        panel.translationY = startPosition
         
         val animator = ObjectAnimator.ofFloat(panel, "translationY", 0f)
         animator.duration = 300
@@ -517,7 +523,12 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
     }
     
     private fun closePanel(panel: LinearLayout) {
-        val animator = ObjectAnimator.ofFloat(panel, "translationY", panel.height.toFloat())
+        // 화면 높이의 일정 부분을 종료점으로 사용 (5%로 변경)
+        val displayMetrics = requireContext().resources.displayMetrics
+        val screenHeight = displayMetrics.heightPixels
+        val endPosition = screenHeight * 0.05f  // 화면 높이의 5%만큼 아래로 이동
+        
+        val animator = ObjectAnimator.ofFloat(panel, "translationY", endPosition)
         animator.duration = 300
         animator.interpolator = AccelerateDecelerateInterpolator()
         animator.start()
