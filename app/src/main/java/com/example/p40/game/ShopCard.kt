@@ -9,7 +9,7 @@ data class ShopCard(
     val name: String,          // 카드 이름
     val description: String,   // 카드 설명
     val price: Int,            // 카드 가격
-    val isNew: Boolean = true, // 신규 카드 여부
+    val isNew: Boolean = false, // 신규 카드 여부 (false로 변경)
     var isPurchased: Boolean = false // 구매 여부
 ) {
     // 카드 문양 심볼 반환 - CardUtils 활용
@@ -42,7 +42,8 @@ data class ShopCard(
                     suit = CardSuit.JOKER,
                     name = "별 조커",
                     description = "모든 카드로 변환 가능한 특수 카드",
-                    price = 500
+                    price = 500,
+                    isNew = false
                 )
             )
         }
