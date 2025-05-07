@@ -33,7 +33,7 @@ class MainMenuFragment : Fragment(R.layout.fragment_main_menu) {
         
         // UserManager에서 코인 정보 불러오기
         updateCoinUI(view)
-
+        
         // 게임 로비 버튼 클릭 시 로비 화면으로 이동
         val cardLobby = view.findViewById<CardView>(R.id.cardLobby)
         cardLobby.setOnClickListener {

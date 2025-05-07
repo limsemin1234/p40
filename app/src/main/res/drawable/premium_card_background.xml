@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 외부 황금색 테두리 -->
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="20dp" />
+            <gradient
+                android:type="linear"
+                android:angle="45"
+                android:startColor="#FFD700"
+                android:centerColor="#FFC107"
+                android:endColor="#F9A825" />
+        </shape>
+    </item>
+    
+    <!-- 내부 약간 들어간 영역 -->
+    <item android:left="3dp" android:top="3dp" android:right="3dp" android:bottom="3dp">
+        <shape android:shape="rectangle">
+            <corners android:radius="18dp" />
+            <gradient
+                android:type="radial"
+                android:gradientRadius="250%"
+                android:startColor="#FFFFFF"
+                android:centerColor="#F8F8F8"
+                android:endColor="#EEEEEE" />
+        </shape>
+    </item>
+    
+    <!-- 내부 미묘한 테두리 효과 -->
+    <item android:left="6dp" android:top="6dp" android:right="6dp" android:bottom="6dp">
+        <shape android:shape="rectangle">
+            <corners android:radius="16dp" />
+            <stroke android:color="#E6E6E6" android:width="1dp" />
+            <solid android:color="#00FFFFFF" />
+        </shape>
+    </item>
+    
+    <!-- 오른쪽 상단 모서리에 반짝임 효과 -->
+    <item android:right="100dp" android:bottom="200dp">
+        <rotate android:fromDegrees="45">
+            <shape android:shape="rectangle">
+                <gradient
+                    android:type="linear"
+                    android:angle="0"
+                    android:startColor="#33FFFFFF"
+                    android:centerColor="#11FFFFFF"
+                    android:endColor="#00FFFFFF" />
+                <size android:width="60dp" android:height="20dp" />
+            </shape>
+        </rotate>
+    </item>
+    
+    <!-- 왼쪽 하단 모서리에 반짝임 효과 -->
+    <item android:left="100dp" android:top="200dp">
+        <rotate android:fromDegrees="45">
+            <shape android:shape="rectangle">
+                <gradient
+                    android:type="linear"
+                    android:angle="180"
+                    android:startColor="#22FFFFFF"
+                    android:centerColor="#11FFFFFF"
+                    android:endColor="#00FFFFFF" />
+                <size android:width="40dp" android:height="15dp" />
+            </shape>
+        </rotate>
+    </item>
+</layer-list> 

@@ -44,18 +44,110 @@
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent" />
             
-        <!-- 게임 로고 -->
-        <ImageView
+        <!-- 스페이드 A 카드 로고 -->
+        <androidx.cardview.widget.CardView
             android:id="@+id/gameLogo"
             android:layout_width="0dp"
-            android:layout_height="120dp"
+            android:layout_height="0dp"
             android:layout_marginTop="24dp"
-            android:src="@drawable/menu_logo"
-            android:elevation="4dp"
-            app:layout_constraintWidth_percent="0.8"
+            app:layout_constraintWidth_percent="0.4"
+            app:layout_constraintDimensionRatio="3:4"
             app:layout_constraintTop_toBottomOf="@id/topBar"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:cardCornerRadius="20dp"
+            app:cardBackgroundColor="@android:color/transparent"
+            app:cardElevation="12dp">
+            
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/premium_card_background">
+                
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="♠"
+                        android:textSize="80sp"
+                        android:textStyle="bold"
+                        android:textColor="#000000"
+                        android:shadowColor="#80000000"
+                        android:shadowDx="1"
+                        android:shadowDy="1"
+                        android:shadowRadius="2"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="A"
+                        android:textSize="60sp"
+                        android:textStyle="bold"
+                        android:textColor="#000000"
+                        android:shadowColor="#80000000"
+                        android:shadowDx="1"
+                        android:shadowDy="1"
+                        android:shadowRadius="2"
+                        android:layout_marginTop="8dp"/>
+                </LinearLayout>
+                
+                <!-- 카드 왼쪽 상단 작은 표시 -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_margin="12dp"
+                    android:gravity="center">
+                    
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="A"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="#000000" />
+                        
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="♠"
+                        android:textSize="16sp"
+                        android:textColor="#000000" />
+                </LinearLayout>
+                
+                <!-- 카드 오른쪽 하단 작은 표시 (뒤집힘) -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_margin="12dp"
+                    android:layout_gravity="bottom|right"
+                    android:gravity="center"
+                    android:rotation="180">
+                    
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="A"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="#000000" />
+                        
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="♠"
+                        android:textSize="16sp"
+                        android:textColor="#000000" />
+                </LinearLayout>
+            </FrameLayout>
+        </androidx.cardview.widget.CardView>
 
         <!-- 타이틀 영역 -->
         <TextView

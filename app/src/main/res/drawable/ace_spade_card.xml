@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 카드 기본 모양 - 흰색 배경과 테두리 -->
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="16dp" />
+            <solid android:color="#FFFFFF" />
+            <stroke android:color="#1A237E" android:width="3dp" />
+        </shape>
+    </item>
+    
+    <!-- 카드 내부 안쪽 테두리 효과 -->
+    <item android:left="6dp" android:top="6dp" android:right="6dp" android:bottom="6dp">
+        <shape android:shape="rectangle">
+            <corners android:radius="12dp" />
+            <stroke android:color="#DDDDDD" android:width="1dp" />
+            <solid android:color="#00FFFFFF" />
+        </shape>
+    </item>
+    
+    <!-- 왼쪽 상단 스페이드 마크 -->
+    <item android:left="10dp" android:top="10dp" android:width="30dp" android:height="40dp">
+        <!-- 스페이드 모양 -->
+        <shape android:shape="oval">
+            <solid android:color="#1A237E" />
+            <size android:width="20dp" android:height="20dp" />
+        </shape>
+    </item>
+    
+    <!-- 왼쪽 상단 스페이드 하단부 -->
+    <item android:left="15dp" android:top="20dp" android:width="20dp" android:height="15dp">
+        <rotate android:fromDegrees="45">
+            <shape android:shape="rectangle">
+                <solid android:color="#1A237E" />
+                <size android:width="14dp" android:height="14dp" />
+            </shape>
+        </rotate>
+    </item>
+    
+    <!-- 왼쪽 상단 스페이드 대 -->
+    <item android:left="20dp" android:top="30dp" android:width="10dp" android:height="15dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#1A237E" />
+            <size android:width="5dp" android:height="10dp" />
+        </shape>
+    </item>
+    
+    <!-- 왼쪽 상단 스페이드 밑부분 -->
+    <item android:left="15dp" android:top="40dp" android:width="20dp" android:height="5dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#1A237E" />
+            <corners android:radius="2dp" />
+            <size android:width="20dp" android:height="3dp" />
+        </shape>
+    </item>
+    
+    <!-- 오른쪽 하단 스페이드 마크 -->
+    <item android:right="10dp" android:bottom="10dp" android:width="30dp" android:height="40dp" android:gravity="bottom|right">
+        <!-- 스페이드 모양 -->
+        <shape android:shape="oval">
+            <solid android:color="#1A237E" />
+            <size android:width="20dp" android:height="20dp" />
+        </shape>
+    </item>
+    
+    <!-- 오른쪽 하단 스페이드 하단부 -->
+    <item android:right="15dp" android:bottom="20dp" android:width="20dp" android:height="15dp" android:gravity="bottom|right">
+        <rotate android:fromDegrees="45">
+            <shape android:shape="rectangle">
+                <solid android:color="#1A237E" />
+                <size android:width="14dp" android:height="14dp" />
+            </shape>
+        </rotate>
+    </item>
+    
+    <!-- 오른쪽 하단 스페이드 대 -->
+    <item android:right="20dp" android:bottom="30dp" android:width="10dp" android:height="15dp" android:gravity="bottom|right">
+        <shape android:shape="rectangle">
+            <solid android:color="#1A237E" />
+            <size android:width="5dp" android:height="10dp" />
+        </shape>
+    </item>
+    
+    <!-- 오른쪽 하단 스페이드 밑부분 -->
+    <item android:right="15dp" android:bottom="40dp" android:width="20dp" android:height="5dp" android:gravity="bottom|right">
+        <shape android:shape="rectangle">
+            <solid android:color="#1A237E" />
+            <corners android:radius="2dp" />
+            <size android:width="20dp" android:height="3dp" />
+        </shape>
+    </item>
+    
+    <!-- 중앙 큰 스페이드 -->
+    <item android:gravity="center" android:width="120dp" android:height="120dp">
+        <!-- 큰 원 부분 -->
+        <layer-list>
+            <!-- 원 부분 -->
+            <item android:gravity="center" android:top="-30dp">
+                <shape android:shape="oval">
+                    <solid android:color="#1A237E" />
+                    <size android:width="80dp" android:height="80dp" />
+                </shape>
+            </item>
+            
+            <!-- 하단부 삼각형 효과 -->
+            <item android:gravity="center" android:top="10dp">
+                <rotate android:fromDegrees="45">
+                    <shape android:shape="rectangle">
+                        <solid android:color="#1A237E" />
+                        <size android:width="56dp" android:height="56dp" />
+                    </shape>
+                </rotate>
+            </item>
+            
+            <!-- 대 부분 -->
+            <item android:gravity="center" android:top="70dp">
+                <shape android:shape="rectangle">
+                    <solid android:color="#1A237E" />
+                    <size android:width="16dp" android:height="35dp" />
+                </shape>
+            </item>
+            
+            <!-- 밑 부분 -->
+            <item android:gravity="center" android:top="100dp">
+                <shape android:shape="rectangle">
+                    <solid android:color="#1A237E" />
+                    <corners android:radius="4dp" />
+                    <size android:width="50dp" android:height="10dp" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+    
+    <!-- 카드 표면에 약간의 그라데이션 효과 추가 -->
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="16dp" />
+            <gradient
+                android:startColor="#10FFFFFF"
+                android:endColor="#30000000"
+                android:angle="315" />
+        </shape>
+    </item>
+    
+    <!-- 빛 반사 효과 -->
+    <item android:left="0dp" android:top="0dp" android:right="120dp" android:bottom="160dp">
+        <shape android:shape="rectangle">
+            <corners android:topLeftRadius="16dp" />
+            <gradient
+                android:startColor="#50FFFFFF"
+                android:endColor="#00FFFFFF"
+                android:angle="45" />
+        </shape>
+    </item>
+</layer-list> 

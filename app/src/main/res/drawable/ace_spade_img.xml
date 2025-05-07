@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="240dp"
+    android:height="320dp"
+    android:viewportWidth="240"
+    android:viewportHeight="320">
+
+    <!-- 카드 바탕 -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M16,0L224,0A16,16 0,0 1,240 16L240,304A16,16 0,0 1,224 320L16,320A16,16 0,0 1,0 304L0,16A16,16 0,0 1,16 0z" />
+    
+    <!-- 카드 테두리 -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#1A237E"
+        android:strokeWidth="6"
+        android:pathData="M16,0L224,0A16,16 0,0 1,240 16L240,304A16,16 0,0 1,224 320L16,320A16,16 0,0 1,0 304L0,16A16,16 0,0 1,16 0z" />
+    
+    <!-- 왼쪽 상단 A -->
+    <path
+        android:fillColor="#1A237E"
+        android:pathData="M30,30L35,50L25,50L30,30M23,55L37,55L37,60L23,60L23,55z" />
+    
+    <!-- 왼쪽 상단 스페이드 -->
+    <path
+        android:fillColor="#1A237E"
+        android:pathData="M30,70A10,10 0,0 1,40 80A10,10 0,0 1,30 90A10,10 0,0 1,20 80A10,10 0,0 1,30 70zM20,80L40,80L30,100zM25,100L35,100L35,105L25,105L25,100z" />
+    
+    <!-- 오른쪽 하단 A (뒤집힘) -->
+    <path
+        android:fillColor="#1A237E"
+        android:pathData="M210,290L205,270L215,270L210,290M217,265L203,265L203,260L217,260L217,265z" />
+    
+    <!-- 오른쪽 하단 스페이드 (뒤집힘) -->
+    <path
+        android:fillColor="#1A237E"
+        android:pathData="M210,250A10,10 0,0 0,200 240A10,10 0,0 0,210 230A10,10 0,0 0,220 240A10,10 0,0 0,210 250zM220,240L200,240L210,220zM215,220L205,220L205,215L215,215L215,220z" />
+    
+    <!-- 중앙 큰 스페이드 -->
+    <path
+        android:fillColor="#1A237E"
+        android:pathData="M120,120A40,40 0,0 1,160 160A40,40 0,0 1,120 200A40,40 0,0 1,80 160A40,40 0,0 1,120 120zM80,160L160,160L120,220zM100,220L140,220L140,230L100,230L100,220z" />
+    
+    <!-- 내부 장식선 -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#DDDDDD"
+        android:strokeWidth="2"
+        android:pathData="M20,20L220,20A8,8 0,0 1,228 28L228,292A8,8 0,0 1,220 300L20,300A8,8 0,0 1,12 292L12,28A8,8 0,0 1,20 20z" />
+        
+    <!-- 빛 반사 효과 (옵션) -->
+    <path
+        android:fillColor="#20FFFFFF"
+        android:pathData="M0,0L120,0L120,160L0,160z" />
+</vector> 
