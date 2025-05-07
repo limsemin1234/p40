@@ -232,6 +232,22 @@ class PokerCardManager(
         isGameActive = false
     }
     
+    /**
+     * 진행 중인 카드 작업 취소 (게임 종료 시 사용)
+     */
+    fun cancelPendingOperations() {
+        // 카드 관련 상태 초기화
+        cards.clear()
+        selectedCardIndexes.clear()
+        isGameActive = false
+        
+        // UI 초기화
+        cardUIManager.resetUI()
+        
+        // CardSelectionManager 상태 초기화
+        cardSelectionManager.clearSelections()
+    }
+    
     // 카드 선택 토글
     private fun toggleCardSelection(index: Int) {
         // 6장 이상인 경우 교체 횟수와 관계없이 선택 가능

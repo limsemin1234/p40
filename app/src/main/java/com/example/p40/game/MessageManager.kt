@@ -408,4 +408,23 @@ class MessageManager private constructor() {
         val density = context?.resources?.displayMetrics?.density ?: containerView?.context?.resources?.displayMetrics?.density ?: 2.0f
         return (dp * density).toInt()
     }
+
+    /**
+     * 모든 메시지 제거 및 대기 중인 작업 취소 (게임 종료 시 사용)
+     */
+    fun clear() {
+        // 메시지 큐 비우기
+        messageQueue.clear()
+        
+        // 핸들러의 모든 콜백 제거
+        handler.removeCallbacksAndMessages(null)
+        
+        // 현재 표시 중인 모든 메시지 제거
+        containerView?.let { container ->
+            container.removeAllViews()
+        }
+        
+        // 카운터 초기화
+        currentMessageCount = 0
+    }
 } 

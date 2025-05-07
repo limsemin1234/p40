@@ -220,4 +220,21 @@ class FlushSkillManager(
         // 활성화된 스킬이 없으므로 컨테이너 숨김
         skillButtonContainer.visibility = View.GONE
     }
+    
+    /**
+     * 모든 스킬을 초기화하고 핸들러 작업 취소 (게임 종료 시 사용)
+     */
+    fun resetAllSkills() {
+        // 진행 중인 모든 지연 작업 취소
+        handler.removeCallbacksAndMessages(null)
+        
+        // 클로버 플러시 효과(시간 멈춤) 해제
+        gameView.freezeAllEnemies(false)
+        
+        // 다이아몬드 플러시 효과(무적) 해제
+        gameView.setInvincible(false)
+        
+        // 모든 스킬 비활성화
+        deactivateAllSkills()
+    }
 } 

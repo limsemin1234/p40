@@ -41,9 +41,9 @@ class CardSelectionManager private constructor() {
     }
     
     /**
-     * 선택 초기화
+     * 선택 상태 초기화
      */
-    fun clearSelection() {
+    fun clearSelections() {
         selectedCards.clear()
     }
     

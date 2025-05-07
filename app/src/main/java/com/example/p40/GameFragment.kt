@@ -19,6 +19,7 @@ import android.widget.LinearLayout
 import android.widget.NumberPicker
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.p40.game.Buff
@@ -803,10 +804,8 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         // 2. 메인화면으로 버튼
         val btnMainMenu = dialog.findViewById<Button>(R.id.btnMainMenu)
         btnMainMenu.setOnClickListener {
-            dialog.dismiss()
-            
-            // 메인화면으로 이동
-            findNavController().navigate(R.id.action_gameFragment_to_mainMenuFragment)
+            // 경고 대화상자 표시
+            showExitConfirmationDialog(dialog)
         }
         
         // 3. 게임 종료 버튼
@@ -820,6 +819,80 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         
         // 다이얼로그 표시
         dialog.show()
+    }
+
+    // 나가기 확인 대화상자
+    private fun showExitConfirmationDialog(pauseDialog: Dialog) {
+        val builder = AlertDialog.Builder(requireContext(), R.style.AlertDialogTheme)
+        
+        // 커스텀 타이틀 뷰 생성
+        val titleView = TextView(requireContext()).apply {
+            text = "게임 종료"
+            setTextColor(Color.WHITE)
+            textSize = 18f
+            setPadding(30, 30, 30, 30)
+            setBackgroundColor(Color.parseColor("#e74c3c")) // 빨간색 배경
+            gravity = android.view.Gravity.CENTER
+        }
+        
+        builder.setCustomTitle(titleView)
+            .setMessage("메인화면으로 나가면 현재 진행중인 게임내용은 저장되지 않습니다.\n정말 나가시겠습니까?")
+            .setPositiveButton("나가기") { _, _ ->
+                // 일시정지 다이얼로그 닫기
+                pauseDialog.dismiss()
+                
+                // 게임 리소스 정리
+                cleanupGameResources()
+                
+                // 코인 저장
+                saveCoins()
+                
+                // 메인화면으로 이동
+                findNavController().navigate(R.id.action_gameFragment_to_mainMenuFragment)
+            }
+            .setNegativeButton("취소") { dialog, _ ->
+                // 경고창만 닫고 일시정지 상태 유지
+                dialog.dismiss()
+            }
+            .setCancelable(false)
+        
+        // 대화상자 표시
+        val dialog = builder.create()
+        
+        // 대화상자가 표시된 후 버튼 색상 변경
+        dialog.setOnShowListener {
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.parseColor("#e74c3c"))
+            dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.parseColor("#3498db"))
+        }
+        
+        dialog.show()
+    }
+    
+    // 게임 리소스 정리 메서드
+    private fun cleanupGameResources() {
+        // 게임 일시정지
+        gameView.pause()
+        
+        // UI 업데이트 중지
+        handler.removeCallbacks(uiUpdateRunnable)
+        
+        // 포커 카드 매니저 정리
+        if (::pokerCardManager.isInitialized) {
+            pokerCardManager.cancelPendingOperations()
+        }
+        
+        // 플러시 스킬 매니저 정리
+        if (::flushSkillManager.isInitialized) {
+            flushSkillManager.resetAllSkills()
+        }
+        
+        // 메시지 매니저 정리
+        if (::messageManager.isInitialized) {
+            messageManager.clear()
+        }
+        
+        // GameView 내부적으로 추가 정리 (GameView 클래스에 해당 메서드 구현 필요)
+        // gameView.cleanup()
     }
 
     // UI 업데이트 시작하는 함수
