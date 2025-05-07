@@ -14,7 +14,7 @@
         android:id="@+id/topBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#202020"
+        android:background="#5f1e1e"
         android:paddingHorizontal="12dp"
         android:paddingVertical="8dp"
         android:elevation="4dp"
@@ -52,14 +52,17 @@
                 android:layout_columnWeight="1"
                 android:orientation="horizontal"
                 android:gravity="end|center_vertical"
+                android:background="#451616"
+                android:paddingVertical="6dp"
+                android:paddingHorizontal="10dp"
                 android:layout_row="0"
                 android:layout_column="1">
                 
                 <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
                     android:src="@drawable/ic_coin"
-                    android:layout_marginEnd="4dp" />
+                    android:layout_marginEnd="6dp" />
                 
                 <TextView
                     android:id="@+id/tvCoinInfo"
