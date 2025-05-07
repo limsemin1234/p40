@@ -46,20 +46,30 @@
                 android:layout_column="0" />
             
             <!-- 코인 정보 -->
-            <TextView
-                android:id="@+id/tvCoinInfo"
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
-                android:text="보유 코인: 0"
-                android:textColor="#FFEB3B"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:drawableStart="@drawable/ic_coin"
-                android:drawablePadding="4dp"
-                android:gravity="end"
+                android:orientation="horizontal"
+                android:gravity="end|center_vertical"
                 android:layout_row="0"
-                android:layout_column="1" />
+                android:layout_column="1">
+                
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_coin"
+                    android:layout_marginEnd="4dp" />
+                
+                <TextView
+                    android:id="@+id/tvCoinInfo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="코인: 0"
+                    android:textColor="#FFEB3B"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
                 
             <!-- 웨이브 정보 -->
             <TextView

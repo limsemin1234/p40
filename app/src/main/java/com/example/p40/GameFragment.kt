@@ -878,7 +878,7 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
 
     // 코인 UI 업데이트
     private fun updateCoinUI() {
-        view?.findViewById<TextView>(R.id.tvCoinInfo)?.text = "보유 코인: ${userManager.getCoin()}"
+        view?.findViewById<TextView>(R.id.tvCoinInfo)?.text = "코인: ${userManager.getCoin()}"
     }
 
     // 코인 획득

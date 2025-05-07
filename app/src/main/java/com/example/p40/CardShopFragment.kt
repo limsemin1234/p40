@@ -105,6 +105,6 @@ class CardShopFragment : Fragment(R.layout.fragment_card_shop) {
     
     // 코인 표시 UI 업데이트
     private fun updateCurrencyUI() {
-        tvCurrency.text = "보유 코인: ${userManager.getCoin()}"
+        tvCurrency.text = "코인: ${userManager.getCoin()}"
     }
 } 

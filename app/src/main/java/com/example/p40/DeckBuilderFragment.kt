@@ -572,7 +572,7 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
     
     // 코인 정보 업데이트
     private fun updateCoinUI() {
-        tvCurrency.text = "보유 코인: ${userManager.getCoin()}"
+        tvCurrency.text = "코인: ${userManager.getCoin()}"
     }
     
     override fun onResume() {
