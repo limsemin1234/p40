@@ -381,4 +381,25 @@ class GameView @JvmOverloads constructor(
     fun getBuffManager(): BuffManager {
         return gameStats.getBuffManager()
     }
+    
+    /**
+     * StatsManager에서 가져온 유닛 스탯을 설정하는 메서드
+     * @param health 체력
+     * @param attack 공격력
+     * @param attackSpeed 공격 속도 (밀리초 단위의 쿨다운)
+     * @param range 공격 범위
+     */
+    fun setUnitStats(health: Int, attack: Int, attackSpeed: Long, range: Float) {
+        gameStats.setUnitHealth(health)
+        gameStats.setUnitMaxHealth(health)
+        gameStats.setUnitAttackPower(attack)
+        gameStats.setUnitAttackSpeed(attackSpeed)
+        gameStats.setUnitAttackRange(range)
+        
+        // 이미 초기화된 경우 디펜스 유닛에도 적용
+        if (::gameLogic.isInitialized) {
+            gameLogic.getDefenseUnit().setAttackRange(range)
+            gameLogic.getDefenseUnit().setAttackCooldown(attackSpeed)
+        }
+    }
 } 

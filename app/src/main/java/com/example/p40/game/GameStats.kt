@@ -292,7 +292,9 @@ class GameStats(
         } ?: "없음"
     }
     
-    fun getBuffManager(): BuffManager = buffManager
+    fun getBuffManager(): BuffManager {
+        return buffManager
+    }
     
     fun getActiveBuffs(): List<Buff> = buffManager.getAllBuffs()
     fun getDefenseBuffs(): List<Buff> = buffManager.getDefenseBuffs()
@@ -376,5 +378,42 @@ class GameStats(
      */
     fun getDefenseUpgradeInfo(): UpgradeInfo {
         return UpgradeInfo(level = defenseLevel, cost = defenseCost)
+    }
+    
+    // 스탯 직접 설정 메서드들 (StatsManager 연동용)
+    
+    /**
+     * 유닛 체력 설정
+     */
+    fun setUnitHealth(health: Int) {
+        this.unitHealth = health
+    }
+    
+    /**
+     * 유닛 최대 체력 설정
+     */
+    fun setUnitMaxHealth(maxHealth: Int) {
+        this.unitMaxHealth = maxHealth
+    }
+    
+    /**
+     * 유닛 공격력 설정
+     */
+    fun setUnitAttackPower(attackPower: Int) {
+        this.unitAttackPower = attackPower
+    }
+    
+    /**
+     * 유닛 공격 속도 설정
+     */
+    fun setUnitAttackSpeed(attackSpeed: Long) {
+        this.unitAttackSpeed = attackSpeed
+    }
+    
+    /**
+     * 유닛 공격 범위 설정
+     */
+    fun setUnitAttackRange(attackRange: Float) {
+        this.unitAttackRange = attackRange
     }
 } 

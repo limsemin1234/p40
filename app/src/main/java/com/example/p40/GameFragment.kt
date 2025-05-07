@@ -39,6 +39,7 @@ import com.example.p40.game.PokerCardManager
 import com.example.p40.game.BuffType
 import com.example.p40.game.MessageManager
 import com.example.p40.game.FlushSkillManager
+import com.example.p40.StatsManager
 import kotlin.random.Random
 
 class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCardManager.PokerCardListener {
@@ -81,6 +82,9 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
     // 플러시 스킬 매니저 추가
     private lateinit var flushSkillManager: FlushSkillManager
 
+    // StatsManager 추가
+    private lateinit var statsManager: StatsManager
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -89,6 +93,9 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         
         // 메시지 관리자 초기화는 onStart로 이동
         messageManager = MessageManager.getInstance()
+        
+        // StatsManager 초기화
+        statsManager = StatsManager.getInstance(requireContext())
         
         // 게임 레벨 정보 가져오기
         arguments?.let { args ->
@@ -180,6 +187,9 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         
         // 플러시 스킬 버튼 컨테이너 초기 설정
         flushSkillButtonContainer.visibility = View.GONE
+
+        // 게임 뷰에 StatsManager의 스탯 적용
+        applyStatsToGame()
     }
     
     override fun onStart() {
@@ -912,6 +922,35 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
             // 일시정지 메뉴 보여주기
             showPauseDialog()
         }
+    }
+
+    /**
+     * StatsManager의 스탯을 게임에 적용하는 메서드
+     */
+    private fun applyStatsToGame() {
+        // 디펜스 유닛 기본 스탯을 StatsManager의 값으로 설정
+        val health = statsManager.getHealth()
+        val attack = statsManager.getAttack()
+        val attackSpeed = statsManager.getAttackSpeed()
+        val range = statsManager.getRange()
+        
+        // 스탯 적용
+        gameView.setUnitStats(
+            health = health,
+            attack = attack,
+            attackSpeed = (1000 / attackSpeed).toLong(), // 공격속도는 쿨다운 값으로 변환 (초당 공격 횟수 -> 밀리초)
+            range = range.toFloat()
+        )
+    }
+
+    override fun onResume() {
+        super.onResume()
+        gameView.resume()
+    }
+    
+    override fun onPause() {
+        super.onPause()
+        gameView.pause()
     }
 }
 
