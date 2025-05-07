@@ -440,12 +440,15 @@ class GameLogic(
                 // 디버그 로그 제거
                 
                 if (isBossKilled && enemy.isDead()) {
+                    // 현재 웨이브 저장 (다음 웨이브로 넘어가기 전)
+                    val currentWave = gameStats.getWaveCount()
+                    
                     // 보스 처치 이벤트 발생
                     // 디버그 로그 제거
-                    bossKillListener?.onBossKilled()
+                    bossKillListener?.onBossKilled(currentWave)
                     
                     // 보스 처치 시 다음 웨이브로 이동
-                    if (gameStats.getWaveCount() < gameConfig.getTotalWaves()) {
+                    if (currentWave < gameConfig.getTotalWaves()) {
                         startNextWave()
                     }
                 }

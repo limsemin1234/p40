@@ -47,19 +47,6 @@
                 android:textColor="#FFFFFF"/>
             
             <Button
-                android:id="@+id/btnMainMenu"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="메인화면으로"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:padding="12dp"
-                android:layout_marginBottom="12dp"
-                android:background="@drawable/main_button_selector"
-                android:backgroundTint="@null"
-                android:textColor="#FFFFFF"/>
-            
-            <Button
                 android:id="@+id/btnExitGame"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

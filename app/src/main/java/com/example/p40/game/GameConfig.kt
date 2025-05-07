@@ -97,6 +97,10 @@ object GameConfig {
     const val SCORE_PER_NORMAL_ENEMY = 1000  // 일반 적 처치 시 얻는 점수(자원) - 주석과 일치하도록 수정
     const val SCORE_PER_BOSS = 200  // 보스 처치 시 얻는 점수(자원)
     
+    // 코인 보상 설정
+    const val BOSS_KILL_COIN_REWARD_BASE = 100  // 1웨이브 보스 처치 시 획득 기본 코인 보상
+    const val BOSS_KILL_COIN_REWARD_INCREMENT = 50  // 웨이브당 증가하는 코인 보상량
+    
     // 게임 오버 조건
     const val CENTER_REACHED_DAMAGE = 1000  // 중앙 도달 시 입히는 데미지
     
@@ -291,5 +295,15 @@ object GameConfig {
      */
     fun setTotalWaves(waves: Int) {
         currentTotalWaves = waves
+    }
+    
+    /**
+     * 웨이브에 따른 보스 처치 코인 보상 계산
+     * @param wave 현재 웨이브
+     * @return 보스 처치 시 획득하는 코인
+     */
+    fun getBossKillCoinReward(wave: Int): Int {
+        // 1웨이브: 기본값 150, 이후 매 웨이브마다 50씩 증가
+        return BOSS_KILL_COIN_REWARD_BASE + (wave - 1) * BOSS_KILL_COIN_REWARD_INCREMENT
     }
 } 

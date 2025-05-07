@@ -6,6 +6,7 @@ package com.example.p40.game
 interface BossKillListener {
     /**
      * 보스가 처치되었을 때 호출됩니다.
+     * @param wave 보스가 처치된 웨이브 번호
      */
-    fun onBossKilled()
+    fun onBossKilled(wave: Int)
 } 
