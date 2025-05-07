@@ -160,12 +160,7 @@ object GameConfig {
     const val MESSAGE_DURATION = 3000L // 메시지 표시 시간 (ms)
     const val MESSAGE_MAX_COUNT = 5 // 최대 메시지 수
     const val MESSAGE_TEXT_SIZE = 15f // 메시지 텍스트 크기 (sp)
-    
-    // 디버그 정보 설정
-    const val DEBUG_TEXT_SIZE = 30f // 디버그 텍스트 크기
-    const val DEBUG_TEXT_COLOR = Color.GREEN // 디버그 텍스트 색상
-    const val DEBUG_TEXT_MARGIN_X = 10f // 디버그 텍스트 X축 마진
-    const val DEBUG_TEXT_SPACING = 30f // 디버그 텍스트 줄 간격
+
     
     // 게임 로직 설정
     const val FAR_OFFSCREEN_MARGIN = 1500f // 적이 제거되는 화면 외부 거리
