@@ -117,12 +117,6 @@
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:paddingVertical="2dp">
-                    
-                    <ImageView
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:src="@drawable/back1"
-                        android:layout_marginEnd="16dp" />
                         
                     <TextView
                         android:id="@+id/btnLobby"
@@ -160,12 +154,6 @@
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:paddingVertical="2dp">
-                    
-                    <ImageView
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:src="@drawable/back2"
-                        android:layout_marginEnd="16dp" />
                         
                     <TextView
                         android:id="@+id/btnBuyCards"
@@ -203,12 +191,6 @@
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:paddingVertical="2dp">
-                    
-                    <ImageView
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:src="@drawable/back3"
-                        android:layout_marginEnd="16dp" />
                         
                     <TextView
                         android:id="@+id/btnStatsUpgrade"
@@ -246,12 +228,6 @@
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:paddingVertical="2dp">
-                    
-                    <ImageView
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:src="@drawable/back4"
-                        android:layout_marginEnd="16dp" />
                         
                     <TextView
                         android:id="@+id/btnDeckBuilder"
@@ -289,12 +265,6 @@
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:paddingVertical="2dp">
-                    
-                    <ImageView
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:src="@drawable/back5"
-                        android:layout_marginEnd="16dp" />
                         
                     <TextView
                         android:id="@+id/btnExit"
