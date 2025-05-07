@@ -31,7 +31,6 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="16dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -96,6 +95,8 @@
             android:orientation="vertical"
             android:gravity="center"
             android:layout_marginTop="24dp"
+            android:paddingHorizontal="24dp"
+            android:paddingBottom="16dp"
             app:layout_constraintTop_toBottomOf="@id/subtitleText"
             app:layout_constraintBottom_toBottomOf="parent">
 
@@ -107,14 +108,15 @@
                 android:foreground="?android:attr/selectableItemBackground"
                 app:cardBackgroundColor="#FFFFFF"
                 app:cardCornerRadius="12dp"
-                app:cardElevation="4dp"
-                app:contentPadding="12dp">
+                app:cardElevation="6dp"
+                app:contentPadding="16dp">
                 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:gravity="center_vertical">
+                    android:gravity="center_vertical"
+                    android:paddingVertical="2dp">
                     
                     <ImageView
                         android:layout_width="36dp"
@@ -145,18 +147,19 @@
                 android:id="@+id/cardShop"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="20dp"
                 android:foreground="?android:attr/selectableItemBackground"
                 app:cardBackgroundColor="#FFFFFF"
                 app:cardCornerRadius="12dp"
-                app:cardElevation="4dp"
-                app:contentPadding="12dp">
+                app:cardElevation="6dp"
+                app:contentPadding="16dp">
                 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:gravity="center_vertical">
+                    android:gravity="center_vertical"
+                    android:paddingVertical="2dp">
                     
                     <ImageView
                         android:layout_width="36dp"
@@ -187,18 +190,19 @@
                 android:id="@+id/cardStatsUpgrade"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="20dp"
                 android:foreground="?android:attr/selectableItemBackground"
                 app:cardBackgroundColor="#FFFFFF"
                 app:cardCornerRadius="12dp"
-                app:cardElevation="4dp"
-                app:contentPadding="12dp">
+                app:cardElevation="6dp"
+                app:contentPadding="16dp">
                 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:gravity="center_vertical">
+                    android:gravity="center_vertical"
+                    android:paddingVertical="2dp">
                     
                     <ImageView
                         android:layout_width="36dp"
@@ -229,18 +233,19 @@
                 android:id="@+id/cardDeckBuilder"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="20dp"
                 android:foreground="?android:attr/selectableItemBackground"
                 app:cardBackgroundColor="#FFFFFF"
                 app:cardCornerRadius="12dp"
-                app:cardElevation="4dp"
-                app:contentPadding="12dp">
+                app:cardElevation="6dp"
+                app:contentPadding="16dp">
                 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:gravity="center_vertical">
+                    android:gravity="center_vertical"
+                    android:paddingVertical="2dp">
                     
                     <ImageView
                         android:layout_width="36dp"
@@ -271,18 +276,19 @@
                 android:id="@+id/cardExit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="20dp"
                 android:foreground="?android:attr/selectableItemBackground"
                 app:cardBackgroundColor="#EEEEEE"
                 app:cardCornerRadius="12dp"
-                app:cardElevation="4dp"
-                app:contentPadding="12dp">
+                app:cardElevation="6dp"
+                app:contentPadding="16dp">
                 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:gravity="center_vertical">
+                    android:gravity="center_vertical"
+                    android:paddingVertical="2dp">
                     
                     <ImageView
                         android:layout_width="36dp"
