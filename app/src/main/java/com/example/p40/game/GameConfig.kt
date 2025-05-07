@@ -13,6 +13,9 @@ object GameConfig {
     const val ENEMIES_PER_WAVE = 50  // 웨이브 당 적 수
     const val WAVE_MESSAGE_DURATION = 2000L  // 웨이브 메시지 표시 시간 (밀리초)
     
+    // 유저 관련 설정
+    const val INITIAL_COIN = 500  // 게임 시작 시 주어지는 초기 코인 량
+    
     // 디버그 모드 설정
     const val DEBUG_MODE = false // 디버그 정보 표시 여부
     
@@ -92,7 +95,7 @@ object GameConfig {
     
     // 점수 설정
     const val SCORE_PER_NORMAL_ENEMY = 1000  // 일반 적 처치 시 얻는 점수(자원) - 주석과 일치하도록 수정
-    const val SCORE_PER_BOSS = 120  // 보스 처치 시 얻는 점수(자원)
+    const val SCORE_PER_BOSS = 200  // 보스 처치 시 얻는 점수(자원)
     
     // 게임 오버 조건
     const val CENTER_REACHED_DAMAGE = 1000  // 중앙 도달 시 입히는 데미지
@@ -172,28 +175,25 @@ object GameConfig {
     // --------- 스탯 강화 관련 설정 ----------
     
     // 체력 강화 관련 설정
-    const val STATS_HEALTH_UPGRADE_AMOUNT = 20    // 체력 증가량
+    const val STATS_HEALTH_UPGRADE_AMOUNT = 10    // 체력 증가량
     const val STATS_HEALTH_BASE_COST = 100        // 체력 강화 기본 비용
-    const val STATS_HEALTH_COST_INCREASE_RATE = 1.25f // 체력 강화 비용 증가율
+    const val STATS_HEALTH_COST_INCREASE = 100    // 체력 강화 비용 증가량
     
     // 공격력 강화 관련 설정
     const val STATS_ATTACK_UPGRADE_AMOUNT = 5     // 공격력 증가량
-    const val STATS_ATTACK_BASE_COST = 150        // 공격력 강화 기본 비용
-    const val STATS_ATTACK_COST_INCREASE_RATE = 1.35f // 공격력 강화 비용 증가율
+    const val STATS_ATTACK_BASE_COST = 100        // 공격력 강화 기본 비용
+    const val STATS_ATTACK_COST_INCREASE = 100    // 공격력 강화 비용 증가량
     
     // 공격 속도 강화 관련 설정
-    const val STATS_ATTACK_SPEED_UPGRADE_AMOUNT = 0.1f  // 공격 속도 증가량
-    const val STATS_ATTACK_SPEED_BASE_COST = 200        // 공격 속도 강화 기본 비용
-    const val STATS_ATTACK_SPEED_COST_INCREASE_RATE = 1.5f // 공격 속도 강화 비용 증가율
+    const val STATS_ATTACK_SPEED_UPGRADE_AMOUNT = 0.05f  // 공격 속도 증가량
+    const val STATS_ATTACK_SPEED_BASE_COST = 100        // 공격 속도 강화 기본 비용
+    const val STATS_ATTACK_SPEED_COST_INCREASE = 100    // 공격 속도 강화 비용 증가량
     
     // 사거리 강화 관련 설정
-    const val STATS_RANGE_UPGRADE_AMOUNT = 25     // 사거리 증가량
-    const val STATS_RANGE_BASE_COST = 120         // 사거리 강화 기본 비용
-    const val STATS_RANGE_COST_INCREASE_RATE = 1.3f // 사거리 강화 비용 증가율
-    
-    // 스탯 비용 증가율 (기본값 - 하위 호환성 유지용)
-    @Deprecated("각 스탯별 개별 증가율을 사용하세요")
-    const val STATS_COST_INCREASE_RATE = 1.5f     // 레벨당 비용 증가율
+    const val STATS_RANGE_UPGRADE_AMOUNT = 5     // 사거리 증가량
+    const val STATS_RANGE_BASE_COST = 100        // 사거리 강화 기본 비용
+    const val STATS_RANGE_COST_INCREASE = 100     // 사거리 강화 비용 증가량
+
     
     // --------- 포커 카드 관련 설정 ----------
     

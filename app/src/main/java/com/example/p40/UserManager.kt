@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import com.example.p40.game.Card
 import com.example.p40.game.CardRank
 import com.example.p40.game.CardSuit
+import com.example.p40.game.GameConfig
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
@@ -120,7 +121,7 @@ class UserManager private constructor(private val context: Context) {
         private const val PREFS_NAME = "user_data"
         private const val KEY_COIN = "user_coin"
         private const val KEY_PURCHASED_CARDS = "user_purchased_cards"
-        private const val DEFAULT_COIN = 5000 // 기본 코인
+        private val DEFAULT_COIN = GameConfig.INITIAL_COIN // GameConfig에서 초기 코인 값 가져오기
         
         @Volatile
         private var instance: UserManager? = null

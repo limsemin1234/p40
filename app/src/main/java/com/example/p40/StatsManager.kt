@@ -130,32 +130,24 @@ class StatsManager private constructor(context: Context) {
     
     // 강화 비용 계산 메서드를 스탯별로 개별화
     
-    // 체력 강화 비용 계산
+    // 체력 강화 비용 계산 - 선형 증가 방식으로 변경
     fun getHealthUpgradeCost(): Int {
-        return (GameConfig.STATS_HEALTH_BASE_COST * 
-                Math.pow(GameConfig.STATS_HEALTH_COST_INCREASE_RATE.toDouble(), 
-                        getHealthLevel().toDouble())).toInt()
+        return GameConfig.STATS_HEALTH_BASE_COST + (getHealthLevel() * GameConfig.STATS_HEALTH_COST_INCREASE.toInt())
     }
     
-    // 공격력 강화 비용 계산
+    // 공격력 강화 비용 계산 - 선형 증가 방식으로 변경
     fun getAttackUpgradeCost(): Int {
-        return (GameConfig.STATS_ATTACK_BASE_COST * 
-                Math.pow(GameConfig.STATS_ATTACK_COST_INCREASE_RATE.toDouble(), 
-                        getAttackLevel().toDouble())).toInt()
+        return GameConfig.STATS_ATTACK_BASE_COST + (getAttackLevel() * GameConfig.STATS_ATTACK_COST_INCREASE.toInt())
     }
     
-    // 공격 속도 강화 비용 계산
+    // 공격 속도 강화 비용 계산 - 선형 증가 방식으로 변경
     fun getAttackSpeedUpgradeCost(): Int {
-        return (GameConfig.STATS_ATTACK_SPEED_BASE_COST * 
-                Math.pow(GameConfig.STATS_ATTACK_SPEED_COST_INCREASE_RATE.toDouble(), 
-                        getAttackSpeedLevel().toDouble())).toInt()
+        return GameConfig.STATS_ATTACK_SPEED_BASE_COST + (getAttackSpeedLevel() * GameConfig.STATS_ATTACK_SPEED_COST_INCREASE.toInt())
     }
     
-    // 사거리 강화 비용 계산
+    // 사거리 강화 비용 계산 - 선형 증가 방식으로 변경
     fun getRangeUpgradeCost(): Int {
-        return (GameConfig.STATS_RANGE_BASE_COST * 
-                Math.pow(GameConfig.STATS_RANGE_COST_INCREASE_RATE.toDouble(), 
-                        getRangeLevel().toDouble())).toInt()
+        return GameConfig.STATS_RANGE_BASE_COST + (getRangeLevel() * GameConfig.STATS_RANGE_COST_INCREASE.toInt())
     }
     
     // 모든 스탯 초기화 (개발 테스트용)
