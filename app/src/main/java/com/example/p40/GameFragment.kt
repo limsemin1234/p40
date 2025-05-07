@@ -566,6 +566,7 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
             val cost = gameView.getDamageCost()
             if (gameView.upgradeDamage()) {
                 // 업그레이드 성공
+                messageManager.showSuccess("데미지가 강화되었습니다!")
                 updateGameInfoUI() // 자원 정보 갱신
                 updateUnitStatsUI() // 스탯 정보 갱신
                 updateUpgradeButtonsText() // 모든 버튼 텍스트 갱신
@@ -580,6 +581,7 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
             val cost = gameView.getAttackSpeedCost()
             if (gameView.upgradeAttackSpeed()) {
                 // 업그레이드 성공
+                messageManager.showSuccess("공격 속도가 강화되었습니다!")
                 updateGameInfoUI() // 자원 정보 갱신
                 updateUnitStatsUI() // 스탯 정보 갱신
                 updateUpgradeButtonsText() // 모든 버튼 텍스트 갱신
@@ -594,6 +596,7 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
             val cost = gameView.getAttackRangeCost()
             if (gameView.upgradeAttackRange()) {
                 // 업그레이드 성공
+                messageManager.showSuccess("공격 범위가 강화되었습니다!")
                 updateGameInfoUI() // 자원 정보 갱신
                 updateUnitStatsUI() // 스탯 정보 갱신
                 updateUpgradeButtonsText() // 모든 버튼 텍스트 갱신
@@ -613,6 +616,7 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
             val cost = gameView.getDefenseCost()
             if (gameView.upgradeDefense()) {
                 // 업그레이드 성공
+                messageManager.showSuccess("체력이 강화되었습니다!")
                 updateGameInfoUI() // 자원 정보 갱신
                 updateUnitStatsUI() // 스탯 정보 갱신
                 updateUpgradeButtonsText() // 모든 버튼 텍스트 갱신
@@ -625,10 +629,12 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         // 다른 버튼들은 아직 구현하지 않음
         defenseUpgrade2.setOnClickListener {
             // 준비 중인 기능
+            messageManager.showInfo("준비 중인 기능입니다.")
         }
         
         defenseUpgrade3.setOnClickListener {
             // 준비 중인 기능
+            messageManager.showInfo("준비 중인 기능입니다.")
         }
     }
     

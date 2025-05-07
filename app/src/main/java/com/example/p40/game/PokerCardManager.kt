@@ -14,6 +14,16 @@ import com.example.p40.DeckBuilderFragment
 import com.example.p40.R
 import com.example.p40.game.MessageManager
 import kotlin.random.Random
+import com.example.p40.game.HighCard
+import com.example.p40.game.OnePair
+import com.example.p40.game.TwoPair
+import com.example.p40.game.ThreeOfAKind
+import com.example.p40.game.Straight
+import com.example.p40.game.Flush
+import com.example.p40.game.FullHouse
+import com.example.p40.game.FourOfAKind
+import com.example.p40.game.StraightFlush
+import com.example.p40.game.RoyalFlush
 
 /**
  * 포커 카드 관리 클래스
@@ -347,6 +357,10 @@ class PokerCardManager(
     
     // 카드 선택 확정
     private fun confirmSelection() {
+        // 변수 선언
+        val pokerDeck = PokerDeck()
+        var pokerHand: PokerHand
+        
         // 6장 이상인 경우 5장 선택 여부 확인
         if (cards.size > 5) {
             // 5장 선택 검증
@@ -361,26 +375,46 @@ class PokerCardManager(
             CardSelectionManager.instance.setSelectedCards(selectedFiveCards)
             
             // 현재 패 평가
-            val pokerDeck = PokerDeck()
             pokerDeck.playerHand = selectedFiveCards.toMutableList()
             
             // 현재 패 평가 결과 전달
-            val pokerHand = pokerDeck.evaluateHand()
-            listener.applyPokerHandEffect(pokerHand)
+            pokerHand = pokerDeck.evaluateHand()
         } else {
             // 5장 이하인 경우 모든 카드 사용
             CardSelectionManager.instance.setSelectedCards(cards)
             
             // 현재 패 평가
-            val pokerDeck = PokerDeck()
             pokerDeck.playerHand = cards.toMutableList()
             
             // 현재 패 평가 결과 전달
-            val pokerHand = pokerDeck.evaluateHand()
-            listener.applyPokerHandEffect(pokerHand)
+            pokerHand = pokerDeck.evaluateHand()
         }
+        
+        // 포커 패 효과 적용
+        listener.applyPokerHandEffect(pokerHand)
+        
+        // 성공 메시지 표시
+        val handName = getPokerHandKoreanName(pokerHand)
+        MessageManager.getInstance().showSuccess("$handName 패 효과가 적용되었습니다!")
         
         // 패널 초기 상태로 복귀
         resetPanel()
+    }
+    
+    // 포커 패 한글 이름 반환
+    private fun getPokerHandKoreanName(hand: PokerHand): String {
+        return when (hand) {
+            is HighCard -> "하이카드"
+            is OnePair -> "원페어"
+            is TwoPair -> "투페어"
+            is ThreeOfAKind -> "트리플"
+            is Straight -> "스트레이트"
+            is Flush -> "플러시"
+            is FullHouse -> "풀하우스"
+            is FourOfAKind -> "포카드"
+            is StraightFlush -> "스트레이트 플러시"
+            is RoyalFlush -> "로열 플러시"
+            else -> "알 수 없는 패"
+        }
     }
 } 

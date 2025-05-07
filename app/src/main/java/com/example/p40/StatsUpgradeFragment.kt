@@ -2,18 +2,20 @@ package com.example.p40
 
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.p40.game.GameConfig
+import com.example.p40.game.MessageManager
 
 class StatsUpgradeFragment : Fragment(R.layout.fragment_stats_upgrade) {
 
     private lateinit var userManager: UserManager
     private lateinit var statsManager: StatsManager
+    private lateinit var messageManager: MessageManager
     private lateinit var tvCurrency: TextView
     
     // 현재 스탯 표시 텍스트뷰
@@ -40,6 +42,8 @@ class StatsUpgradeFragment : Fragment(R.layout.fragment_stats_upgrade) {
         // UserManager와 StatsManager 초기화
         userManager = UserManager.getInstance(requireContext())
         statsManager = StatsManager.getInstance(requireContext())
+        messageManager = MessageManager.getInstance()
+        messageManager.init(view.findViewById(android.R.id.content) ?: view as ViewGroup)
         
         // UI 요소 초기화
         initViews(view)
@@ -152,9 +156,9 @@ class StatsUpgradeFragment : Fragment(R.layout.fragment_stats_upgrade) {
             updateStatsUI()
             updateCoinUI()
             
-            Toast.makeText(requireContext(), "체력이 강화되었습니다!", Toast.LENGTH_SHORT).show()
+            messageManager.showSuccess("체력이 강화되었습니다!")
         } else {
-            Toast.makeText(requireContext(), "코인이 부족합니다!", Toast.LENGTH_SHORT).show()
+            messageManager.showWarning("코인이 부족합니다!")
         }
     }
     
@@ -173,9 +177,9 @@ class StatsUpgradeFragment : Fragment(R.layout.fragment_stats_upgrade) {
             updateStatsUI()
             updateCoinUI()
             
-            Toast.makeText(requireContext(), "공격력이 강화되었습니다!", Toast.LENGTH_SHORT).show()
+            messageManager.showSuccess("공격력이 강화되었습니다!")
         } else {
-            Toast.makeText(requireContext(), "코인이 부족합니다!", Toast.LENGTH_SHORT).show()
+            messageManager.showWarning("코인이 부족합니다!")
         }
     }
     
@@ -194,9 +198,9 @@ class StatsUpgradeFragment : Fragment(R.layout.fragment_stats_upgrade) {
             updateStatsUI()
             updateCoinUI()
             
-            Toast.makeText(requireContext(), "공격 속도가 강화되었습니다!", Toast.LENGTH_SHORT).show()
+            messageManager.showSuccess("공격 속도가 강화되었습니다!")
         } else {
-            Toast.makeText(requireContext(), "코인이 부족합니다!", Toast.LENGTH_SHORT).show()
+            messageManager.showWarning("코인이 부족합니다!")
         }
     }
     
@@ -215,9 +219,9 @@ class StatsUpgradeFragment : Fragment(R.layout.fragment_stats_upgrade) {
             updateStatsUI()
             updateCoinUI()
             
-            Toast.makeText(requireContext(), "사거리가 강화되었습니다!", Toast.LENGTH_SHORT).show()
+            messageManager.showSuccess("사거리가 강화되었습니다!")
         } else {
-            Toast.makeText(requireContext(), "코인이 부족합니다!", Toast.LENGTH_SHORT).show()
+            messageManager.showWarning("코인이 부족합니다!")
         }
     }
     

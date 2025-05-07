@@ -4,27 +4,31 @@ import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
 import android.view.Window
 import android.widget.Button
 import android.widget.NumberPicker
 import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.p40.game.Card
 import com.example.p40.game.CardRank
 import com.example.p40.game.CardSuit
+import com.example.p40.game.MessageManager
 
 class MainMenuFragment : Fragment(R.layout.fragment_main_menu) {
 
     // UserManager 추가
     private lateinit var userManager: UserManager
+    private lateinit var messageManager: MessageManager
     
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
         // UserManager 초기화
         userManager = UserManager.getInstance(requireContext())
+        messageManager = MessageManager.getInstance()
+        messageManager.init(view.findViewById(android.R.id.content) ?: view as ViewGroup)
         
         // UserManager에서 코인 정보 불러오기
         updateCoinUI(view)
@@ -123,13 +127,13 @@ class MainMenuFragment : Fragment(R.layout.fragment_main_menu) {
             val diamondJoker = createJokerCard(CardSuit.DIAMOND, getCardRankByValue(diamondRankPicker.value))
             val clubJoker = createJokerCard(CardSuit.CLUB, getCardRankByValue(clubRankPicker.value))
             
-            // 생성된 카드를 덱에 추가 (여기서는 간단한 토스트 메시지로 확인)
+            // 생성된 카드를 덱에 추가
             val message = "하트 조커(${heartJoker.rank.getName()}), " +
                         "스페이드 조커(${spadeJoker.rank.getName()}), " +
                         "다이아 조커(${diamondJoker.rank.getName()}), " +
                         "클로버 조커(${clubJoker.rank.getName()}) 구매 완료!"
             
-            Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+            messageManager.showSuccess(message)
             
             // 실제 구현에서는 여기서 덱에 추가하거나 인벤토리에 저장 필요
             dialog.dismiss()
