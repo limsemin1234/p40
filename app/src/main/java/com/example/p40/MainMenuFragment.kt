@@ -1,11 +1,14 @@
 package com.example.p40
 
+import android.animation.AnimatorInflater
+import android.animation.AnimatorSet
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import android.view.animation.AnimationUtils
 import android.widget.Button
 import android.widget.NumberPicker
 import android.widget.TextView
@@ -33,6 +36,9 @@ class MainMenuFragment : Fragment(R.layout.fragment_main_menu) {
         
         // UserManager에서 코인 정보 불러오기
         updateCoinUI(view)
+        
+        // 로고 카드에 애니메이션 적용
+        startLogoCardAnimation(view)
         
         // 게임 로비 버튼 클릭 시 로비 화면으로 이동
         val cardLobby = view.findViewById<CardView>(R.id.cardLobby)
@@ -65,10 +71,28 @@ class MainMenuFragment : Fragment(R.layout.fragment_main_menu) {
         }
     }
     
+    // 로고 카드 애니메이션 시작 함수
+    private fun startLogoCardAnimation(view: View) {
+        val gameLogo = view.findViewById<CardView>(R.id.gameLogo)
+        
+        // 방법 1: 뷰 애니메이션 사용
+        val rotationAnimation = AnimationUtils.loadAnimation(requireContext(), R.anim.card_rotation)
+        gameLogo.startAnimation(rotationAnimation)
+        
+        // 방법 2: 속성 애니메이션 사용
+        // val flipAnimator = AnimatorInflater.loadAnimator(requireContext(), R.animator.card_flip_animation) as AnimatorSet
+        // flipAnimator.setTarget(gameLogo)
+        // flipAnimator.start()
+    }
+    
     override fun onResume() {
         super.onResume()
         // 화면이 다시 보일 때마다 UserManager에서 코인 정보 갱신
-        view?.let { updateCoinUI(it) }
+        view?.let { 
+            updateCoinUI(it)
+            // 화면이 다시 보일 때 애니메이션 재시작
+            startLogoCardAnimation(it)
+        }
     }
     
     // 코인 UI 업데이트 (UserManager 사용)

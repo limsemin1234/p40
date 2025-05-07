@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set xmlns:android="http://schemas.android.com/apk/res/android">
+    <objectAnimator
+        android:propertyName="rotationY"
+        android:duration="3000"
+        android:valueFrom="0"
+        android:valueTo="360"
+        android:valueType="floatType"
+        android:repeatCount="infinite"
+        android:repeatMode="restart"
+        android:interpolator="@android:interpolator/accelerate_decelerate" />
+    
+    <!-- 약간의 부드러운 크기 변화 -->
+    <objectAnimator
+        android:propertyName="scaleX"
+        android:duration="1500"
+        android:valueFrom="0.95"
+        android:valueTo="1.05"
+        android:valueType="floatType"
+        android:repeatCount="infinite"
+        android:repeatMode="reverse"
+        android:interpolator="@android:interpolator/accelerate_decelerate" />
+    
+    <objectAnimator
+        android:propertyName="scaleY"
+        android:duration="1500"
+        android:valueFrom="0.95"
+        android:valueTo="1.05"
+        android:valueType="floatType"
+        android:repeatCount="infinite"
+        android:repeatMode="reverse"
+        android:interpolator="@android:interpolator/accelerate_decelerate" />
+</set> 
