@@ -169,6 +169,32 @@ object GameConfig {
     // 게임 레벨 설정
     private var currentTotalWaves: Int = 10       // 기본 총 웨이브 수
     
+    // --------- 스탯 강화 관련 설정 ----------
+    
+    // 체력 강화 관련 설정
+    const val STATS_HEALTH_UPGRADE_AMOUNT = 20    // 체력 증가량
+    const val STATS_HEALTH_BASE_COST = 100        // 체력 강화 기본 비용
+    const val STATS_HEALTH_COST_INCREASE_RATE = 1.25f // 체력 강화 비용 증가율
+    
+    // 공격력 강화 관련 설정
+    const val STATS_ATTACK_UPGRADE_AMOUNT = 5     // 공격력 증가량
+    const val STATS_ATTACK_BASE_COST = 150        // 공격력 강화 기본 비용
+    const val STATS_ATTACK_COST_INCREASE_RATE = 1.35f // 공격력 강화 비용 증가율
+    
+    // 공격 속도 강화 관련 설정
+    const val STATS_ATTACK_SPEED_UPGRADE_AMOUNT = 0.1f  // 공격 속도 증가량
+    const val STATS_ATTACK_SPEED_BASE_COST = 200        // 공격 속도 강화 기본 비용
+    const val STATS_ATTACK_SPEED_COST_INCREASE_RATE = 1.5f // 공격 속도 강화 비용 증가율
+    
+    // 사거리 강화 관련 설정
+    const val STATS_RANGE_UPGRADE_AMOUNT = 25     // 사거리 증가량
+    const val STATS_RANGE_BASE_COST = 120         // 사거리 강화 기본 비용
+    const val STATS_RANGE_COST_INCREASE_RATE = 1.3f // 사거리 강화 비용 증가율
+    
+    // 스탯 비용 증가율 (기본값 - 하위 호환성 유지용)
+    @Deprecated("각 스탯별 개별 증가율을 사용하세요")
+    const val STATS_COST_INCREASE_RATE = 1.5f     // 레벨당 비용 증가율
+    
     // --------- 포커 카드 관련 설정 ----------
     
     // 포커 카드 뽑기 비용

@@ -2,6 +2,7 @@ package com.example.p40
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.example.p40.game.GameConfig
 
 class StatsManager private constructor(context: Context) {
     
@@ -20,11 +21,11 @@ class StatsManager private constructor(context: Context) {
         private const val KEY_ATTACK_SPEED_LEVEL = "attack_speed_level"
         private const val KEY_RANGE_LEVEL = "range_level"
         
-        // 기본 스탯 값
-        private const val DEFAULT_HEALTH = 100
-        private const val DEFAULT_ATTACK = 50
-        private const val DEFAULT_ATTACK_SPEED = 1.0f
-        private const val DEFAULT_RANGE = 500
+        // 기본 스탯 값 - GameConfig에서 가져오기
+        private val DEFAULT_HEALTH = GameConfig.DEFENSE_UNIT_INITIAL_HEALTH
+        private val DEFAULT_ATTACK = GameConfig.MISSILE_DAMAGE
+        private val DEFAULT_ATTACK_SPEED = 1.0f
+        private val DEFAULT_RANGE = GameConfig.DEFENSE_UNIT_ATTACK_RANGE.toInt()
         
         // 싱글톤 인스턴스
         @Volatile
@@ -56,7 +57,7 @@ class StatsManager private constructor(context: Context) {
         return prefs.getInt(KEY_HEALTH_LEVEL, 0)
     }
     
-    fun upgradeHealth(amount: Int) {
+    fun upgradeHealth(amount: Int = GameConfig.STATS_HEALTH_UPGRADE_AMOUNT) {
         val currentHealth = getHealth()
         val currentLevel = getHealthLevel()
         
@@ -77,7 +78,7 @@ class StatsManager private constructor(context: Context) {
         return prefs.getInt(KEY_ATTACK_LEVEL, 0)
     }
     
-    fun upgradeAttack(amount: Int) {
+    fun upgradeAttack(amount: Int = GameConfig.STATS_ATTACK_UPGRADE_AMOUNT) {
         val currentAttack = getAttack()
         val currentLevel = getAttackLevel()
         
@@ -98,7 +99,7 @@ class StatsManager private constructor(context: Context) {
         return prefs.getInt(KEY_ATTACK_SPEED_LEVEL, 0)
     }
     
-    fun upgradeAttackSpeed(amount: Float) {
+    fun upgradeAttackSpeed(amount: Float = GameConfig.STATS_ATTACK_SPEED_UPGRADE_AMOUNT) {
         val currentAttackSpeed = getAttackSpeed()
         val currentLevel = getAttackSpeedLevel()
         
@@ -119,12 +120,42 @@ class StatsManager private constructor(context: Context) {
         return prefs.getInt(KEY_RANGE_LEVEL, 0)
     }
     
-    fun upgradeRange(amount: Int) {
+    fun upgradeRange(amount: Int = GameConfig.STATS_RANGE_UPGRADE_AMOUNT) {
         val currentRange = getRange()
         val currentLevel = getRangeLevel()
         
         setRange(currentRange + amount)
         prefs.edit().putInt(KEY_RANGE_LEVEL, currentLevel + 1).apply()
+    }
+    
+    // 강화 비용 계산 메서드를 스탯별로 개별화
+    
+    // 체력 강화 비용 계산
+    fun getHealthUpgradeCost(): Int {
+        return (GameConfig.STATS_HEALTH_BASE_COST * 
+                Math.pow(GameConfig.STATS_HEALTH_COST_INCREASE_RATE.toDouble(), 
+                        getHealthLevel().toDouble())).toInt()
+    }
+    
+    // 공격력 강화 비용 계산
+    fun getAttackUpgradeCost(): Int {
+        return (GameConfig.STATS_ATTACK_BASE_COST * 
+                Math.pow(GameConfig.STATS_ATTACK_COST_INCREASE_RATE.toDouble(), 
+                        getAttackLevel().toDouble())).toInt()
+    }
+    
+    // 공격 속도 강화 비용 계산
+    fun getAttackSpeedUpgradeCost(): Int {
+        return (GameConfig.STATS_ATTACK_SPEED_BASE_COST * 
+                Math.pow(GameConfig.STATS_ATTACK_SPEED_COST_INCREASE_RATE.toDouble(), 
+                        getAttackSpeedLevel().toDouble())).toInt()
+    }
+    
+    // 사거리 강화 비용 계산
+    fun getRangeUpgradeCost(): Int {
+        return (GameConfig.STATS_RANGE_BASE_COST * 
+                Math.pow(GameConfig.STATS_RANGE_COST_INCREASE_RATE.toDouble(), 
+                        getRangeLevel().toDouble())).toInt()
     }
     
     // 모든 스탯 초기화 (개발 테스트용)

@@ -8,6 +8,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.example.p40.game.GameConfig
 
 class StatsUpgradeFragment : Fragment(R.layout.fragment_stats_upgrade) {
 
@@ -33,21 +34,6 @@ class StatsUpgradeFragment : Fragment(R.layout.fragment_stats_upgrade) {
     private lateinit var tvAttackSpeedUpgradeCost: TextView
     private lateinit var tvRangeUpgradeCost: TextView
     
-    // 기본 스탯 강화 단위
-    private val HEALTH_UPGRADE_AMOUNT = 20
-    private val ATTACK_UPGRADE_AMOUNT = 5
-    private val ATTACK_SPEED_UPGRADE_AMOUNT = 0.1f
-    private val RANGE_UPGRADE_AMOUNT = 25
-    
-    // 기본 스탯 강화 비용
-    private val BASE_HEALTH_UPGRADE_COST = 100
-    private val BASE_ATTACK_UPGRADE_COST = 150
-    private val BASE_ATTACK_SPEED_UPGRADE_COST = 200
-    private val BASE_RANGE_UPGRADE_COST = 120
-    
-    // 스탯 강화 레벨에 따른 비용 증가율
-    private val COST_INCREASE_RATE = 1.5f
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
@@ -129,16 +115,16 @@ class StatsUpgradeFragment : Fragment(R.layout.fragment_stats_upgrade) {
         tvCurrentRange.text = statsManager.getRange().toString()
         
         // 강화 정보 표시
-        tvHealthUpgradeInfo.text = "체력 +$HEALTH_UPGRADE_AMOUNT"
-        tvAttackUpgradeInfo.text = "공격력 +$ATTACK_UPGRADE_AMOUNT"
-        tvAttackSpeedUpgradeInfo.text = "공격 속도 +$ATTACK_SPEED_UPGRADE_AMOUNT"
-        tvRangeUpgradeInfo.text = "사거리 +$RANGE_UPGRADE_AMOUNT"
+        tvHealthUpgradeInfo.text = "체력 +${GameConfig.STATS_HEALTH_UPGRADE_AMOUNT}"
+        tvAttackUpgradeInfo.text = "공격력 +${GameConfig.STATS_ATTACK_UPGRADE_AMOUNT}"
+        tvAttackSpeedUpgradeInfo.text = "공격 속도 +${GameConfig.STATS_ATTACK_SPEED_UPGRADE_AMOUNT}"
+        tvRangeUpgradeInfo.text = "사거리 +${GameConfig.STATS_RANGE_UPGRADE_AMOUNT}"
         
         // 강화 비용 표시
-        val healthCost = calculateUpgradeCost(BASE_HEALTH_UPGRADE_COST, statsManager.getHealthLevel())
-        val attackCost = calculateUpgradeCost(BASE_ATTACK_UPGRADE_COST, statsManager.getAttackLevel())
-        val attackSpeedCost = calculateUpgradeCost(BASE_ATTACK_SPEED_UPGRADE_COST, statsManager.getAttackSpeedLevel())
-        val rangeCost = calculateUpgradeCost(BASE_RANGE_UPGRADE_COST, statsManager.getRangeLevel())
+        val healthCost = statsManager.getHealthUpgradeCost()
+        val attackCost = statsManager.getAttackUpgradeCost()
+        val attackSpeedCost = statsManager.getAttackSpeedUpgradeCost()
+        val rangeCost = statsManager.getRangeUpgradeCost()
         
         tvHealthUpgradeCost.text = "코인: $healthCost"
         tvAttackUpgradeCost.text = "코인: $attackCost"
@@ -153,14 +139,14 @@ class StatsUpgradeFragment : Fragment(R.layout.fragment_stats_upgrade) {
     
     // 체력 강화
     private fun upgradeHealth() {
-        val cost = calculateUpgradeCost(BASE_HEALTH_UPGRADE_COST, statsManager.getHealthLevel())
+        val cost = statsManager.getHealthUpgradeCost()
         
         if (userManager.getCoin() >= cost) {
             // 코인 차감
             userManager.decreaseCoin(cost)
             
             // 체력 증가
-            statsManager.upgradeHealth(HEALTH_UPGRADE_AMOUNT)
+            statsManager.upgradeHealth()
             
             // UI 업데이트
             updateStatsUI()
@@ -174,14 +160,14 @@ class StatsUpgradeFragment : Fragment(R.layout.fragment_stats_upgrade) {
     
     // 공격력 강화
     private fun upgradeAttack() {
-        val cost = calculateUpgradeCost(BASE_ATTACK_UPGRADE_COST, statsManager.getAttackLevel())
+        val cost = statsManager.getAttackUpgradeCost()
         
         if (userManager.getCoin() >= cost) {
             // 코인 차감
             userManager.decreaseCoin(cost)
             
             // 공격력 증가
-            statsManager.upgradeAttack(ATTACK_UPGRADE_AMOUNT)
+            statsManager.upgradeAttack()
             
             // UI 업데이트
             updateStatsUI()
@@ -195,14 +181,14 @@ class StatsUpgradeFragment : Fragment(R.layout.fragment_stats_upgrade) {
     
     // 공격 속도 강화
     private fun upgradeAttackSpeed() {
-        val cost = calculateUpgradeCost(BASE_ATTACK_SPEED_UPGRADE_COST, statsManager.getAttackSpeedLevel())
+        val cost = statsManager.getAttackSpeedUpgradeCost()
         
         if (userManager.getCoin() >= cost) {
             // 코인 차감
             userManager.decreaseCoin(cost)
             
             // 공격 속도 증가
-            statsManager.upgradeAttackSpeed(ATTACK_SPEED_UPGRADE_AMOUNT)
+            statsManager.upgradeAttackSpeed()
             
             // UI 업데이트
             updateStatsUI()
@@ -216,14 +202,14 @@ class StatsUpgradeFragment : Fragment(R.layout.fragment_stats_upgrade) {
     
     // 사거리 강화
     private fun upgradeRange() {
-        val cost = calculateUpgradeCost(BASE_RANGE_UPGRADE_COST, statsManager.getRangeLevel())
+        val cost = statsManager.getRangeUpgradeCost()
         
         if (userManager.getCoin() >= cost) {
             // 코인 차감
             userManager.decreaseCoin(cost)
             
             // 사거리 증가
-            statsManager.upgradeRange(RANGE_UPGRADE_AMOUNT)
+            statsManager.upgradeRange()
             
             // UI 업데이트
             updateStatsUI()
@@ -233,11 +219,6 @@ class StatsUpgradeFragment : Fragment(R.layout.fragment_stats_upgrade) {
         } else {
             Toast.makeText(requireContext(), "코인이 부족합니다!", Toast.LENGTH_SHORT).show()
         }
-    }
-    
-    // 강화 비용 계산
-    private fun calculateUpgradeCost(baseCost: Int, level: Int): Int {
-        return (baseCost * Math.pow(COST_INCREASE_RATE.toDouble(), level.toDouble())).toInt()
     }
     
     override fun onResume() {
