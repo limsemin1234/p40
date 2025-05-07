@@ -31,16 +31,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
 
-    <!-- 장식용 카드 아이콘 -->
-    <ImageView
-        android:id="@+id/decorativeCardIcon"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:src="@drawable/back2"
-        app:layout_constraintStart_toEndOf="@id/btnBack"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
-
     <!-- 코인 컨테이너 -->
     <LinearLayout
         android:id="@+id/coinContainer"
@@ -73,13 +63,4 @@
             android:shadowDy="1"
             android:shadowRadius="2" />
     </LinearLayout>
-    
-    <!-- 중앙 - 작은 카드 모양 장식들 -->
-    <ImageView
-        android:layout_width="16dp"
-        android:layout_height="16dp"
-        android:src="@drawable/back3"
-        app:layout_constraintEnd_toStartOf="@id/coinContainer"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout> 
