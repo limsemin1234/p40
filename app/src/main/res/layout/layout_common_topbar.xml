@@ -5,7 +5,9 @@
     android:id="@+id/commonTopBar"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:elevation="6dp">
+    android:elevation="6dp"
+    android:paddingVertical="8dp"
+    android:paddingHorizontal="12dp">
 
     <!-- 상단바 배경 -->
     <View
@@ -21,12 +23,13 @@
     <!-- 뒤로가기 버튼 -->
     <ImageButton
         android:id="@+id/btnBack"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
         android:src="@android:drawable/ic_menu_revert"
         android:tint="#FFFFFF"
         android:background="@drawable/back_button_ripple"
         android:contentDescription="뒤로가기"
+        android:padding="6dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
@@ -39,6 +42,8 @@
         android:orientation="horizontal"
         android:background="@drawable/coin_container_background"
         android:gravity="center_vertical"
+        android:paddingVertical="4dp"
+        android:paddingHorizontal="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent">
@@ -61,6 +66,7 @@
             android:shadowColor="#000000"
             android:shadowDx="1"
             android:shadowDy="1"
-            android:shadowRadius="2" />
+            android:shadowRadius="2"
+            android:layout_marginStart="4dp" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout> 
