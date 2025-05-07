@@ -26,6 +26,13 @@ class UserManager private constructor(private val context: Context) {
         prefs.edit().putInt(KEY_COIN, currentCoin + amount).apply()
     }
     
+    // 코인 감소
+    fun decreaseCoin(amount: Int) {
+        val currentCoin = getCoin()
+        val newAmount = if (currentCoin >= amount) currentCoin - amount else 0
+        prefs.edit().putInt(KEY_COIN, newAmount).apply()
+    }
+    
     // 코인 사용
     fun useCoin(amount: Int): Boolean {
         val currentCoin = getCoin()

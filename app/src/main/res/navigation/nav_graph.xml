@@ -52,6 +52,11 @@
         <action
             android:id="@+id/action_mainMenu_to_cardShop"
             app:destination="@id/cardShopFragment" />
+            
+        <!-- 스탯 강화 버튼 클릭 시 스탯 강화 화면으로 이동 -->
+        <action
+            android:id="@+id/action_mainMenu_to_statsUpgrade"
+            app:destination="@id/statsUpgradeFragment" />
     </fragment>
 
     <!-- 게임 화면 -->
@@ -91,6 +96,20 @@
         
         <action
             android:id="@+id/action_cardShop_to_mainMenu"
+            app:destination="@id/mainMenuFragment"
+            app:popUpTo="@id/mainMenuFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+    
+    <!-- 스탯 강화 화면 -->
+    <fragment
+        android:id="@+id/statsUpgradeFragment"
+        android:name="com.example.p40.StatsUpgradeFragment"
+        android:label="스탯 강화"
+        tools:layout="@layout/fragment_stats_upgrade">
+        
+        <action
+            android:id="@+id/action_statsUpgrade_to_mainMenu"
             app:destination="@id/mainMenuFragment"
             app:popUpTo="@id/mainMenuFragment"
             app:popUpToInclusive="true" />

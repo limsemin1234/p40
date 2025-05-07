@@ -40,6 +40,12 @@ class MainMenuFragment : Fragment(R.layout.fragment_main_menu) {
         btnBuyCards.setOnClickListener {
             findNavController().navigate(R.id.action_mainMenu_to_cardShop)
         }
+        
+        // 스탯 강화 버튼 클릭 시 스탯 강화 화면으로 이동
+        val btnStatsUpgrade = view.findViewById<Button>(R.id.btnStatsUpgrade)
+        btnStatsUpgrade.setOnClickListener {
+            findNavController().navigate(R.id.action_mainMenu_to_statsUpgrade)
+        }
 
         // 덱 구성 버튼 클릭 시 덱 구성 화면으로 이동
         val btnDeckBuilder = view.findViewById<Button>(R.id.btnDeckBuilder)

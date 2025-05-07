@@ -97,6 +97,13 @@
             android:layout_marginTop="16dp" />
 
         <Button
+            android:id="@+id/btnStatsUpgrade"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="스탯 강화"
+            android:layout_marginTop="16dp" />
+
+        <Button
             android:id="@+id/btnDeckBuilder"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
