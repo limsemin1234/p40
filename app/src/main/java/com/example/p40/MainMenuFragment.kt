@@ -9,6 +9,7 @@ import android.view.Window
 import android.widget.Button
 import android.widget.NumberPicker
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.p40.game.Card
@@ -34,32 +35,32 @@ class MainMenuFragment : Fragment(R.layout.fragment_main_menu) {
         updateCoinUI(view)
 
         // 게임 로비 버튼 클릭 시 로비 화면으로 이동
-        val btnLobby = view.findViewById<Button>(R.id.btnLobby)
-        btnLobby.setOnClickListener {
+        val cardLobby = view.findViewById<CardView>(R.id.cardLobby)
+        cardLobby.setOnClickListener {
             findNavController().navigate(R.id.action_mainMenu_to_game)
         }
 
         // 카드 구매 버튼 클릭 시
-        val btnBuyCards = view.findViewById<Button>(R.id.btnBuyCards)
-        btnBuyCards.setOnClickListener {
+        val cardShop = view.findViewById<CardView>(R.id.cardShop)
+        cardShop.setOnClickListener {
             findNavController().navigate(R.id.action_mainMenu_to_cardShop)
         }
         
         // 스탯 강화 버튼 클릭 시 스탯 강화 화면으로 이동
-        val btnStatsUpgrade = view.findViewById<Button>(R.id.btnStatsUpgrade)
-        btnStatsUpgrade.setOnClickListener {
+        val cardStatsUpgrade = view.findViewById<CardView>(R.id.cardStatsUpgrade)
+        cardStatsUpgrade.setOnClickListener {
             findNavController().navigate(R.id.action_mainMenu_to_statsUpgrade)
         }
 
         // 덱 구성 버튼 클릭 시 덱 구성 화면으로 이동
-        val btnDeckBuilder = view.findViewById<Button>(R.id.btnDeckBuilder)
-        btnDeckBuilder.setOnClickListener {
+        val cardDeckBuilder = view.findViewById<CardView>(R.id.cardDeckBuilder)
+        cardDeckBuilder.setOnClickListener {
             findNavController().navigate(R.id.action_mainMenu_to_deckBuilder)
         }
 
         // 게임 종료 버튼 클릭 시 앱 종료
-        val btnExit = view.findViewById<Button>(R.id.btnExit)
-        btnExit.setOnClickListener {
+        val cardExit = view.findViewById<CardView>(R.id.cardExit)
+        cardExit.setOnClickListener {
             activity?.finish()
         }
     }
