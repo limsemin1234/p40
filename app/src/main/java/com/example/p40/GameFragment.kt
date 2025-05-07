@@ -803,13 +803,18 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
             showExitConfirmationDialog(dialog)
         }
         
-        // 3. 게임 종료 버튼
+        // 3. 끝내기 버튼 (게임 오버로 처리)
         val btnExitGame = dialog.findViewById<Button>(R.id.btnExitGame)
         btnExitGame.setOnClickListener {
             dialog.dismiss()
             
-            // 앱 종료
-            requireActivity().finish()
+            // 게임 리소스 정리
+            cleanupGameResources()
+            
+            // 현재 웨이브와 자원 정보를 활용하여 게임 오버 처리
+            val currentResource = gameView.getResource()
+            val currentWave = gameView.getWaveCount()
+            onGameOver(currentResource, currentWave)
         }
         
         // 다이얼로그 표시
