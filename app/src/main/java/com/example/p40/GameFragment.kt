@@ -763,7 +763,7 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         
         // 코인 관련 텍스트뷰 - 획득한 코인 표시
         val tvGameOverCoins = dialog.findViewById<TextView>(R.id.tvGameOverCoins)
-        tvGameOverCoins.text = "획득한 코인: 💰 $earnedCoins"
+        tvGameOverCoins.text = "획득한 코인: $earnedCoins"
         
         // 종료 버튼 - 앱 종료
         val btnExit = dialog.findViewById<Button>(R.id.btnExit)
@@ -776,6 +776,7 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         val btnMainMenu = dialog.findViewById<Button>(R.id.btnMainMenu)
         btnMainMenu.setOnClickListener {
             dialog.dismiss()
+            cleanupGameResources()
             findNavController().navigate(R.id.action_gameFragment_to_mainMenuFragment)
         }
         
@@ -858,8 +859,10 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
             messageManager.clear()
         }
         
-        // GameView 내부적으로 추가 정리 (GameView 클래스에 해당 메서드 구현 필요)
-        // gameView.cleanup()
+        // 게임뷰 정리
+        if (::gameView.isInitialized) {
+            gameView.cleanup()
+        }
     }
 
     // UI 업데이트 시작하는 함수
@@ -932,6 +935,26 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
     override fun onPause() {
         super.onPause()
         gameView.pause()
+    }
+    
+    override fun onDestroy() {
+        super.onDestroy()
+        // 프래그먼트 파괴 시 모든 리소스 정리
+        cleanupGameResources()
+        
+        // 남아있는 모든 메시지 제거
+        if (::messageManager.isInitialized) {
+            messageManager.clear()
+        }
+        
+        // 열려있는 패널이 있다면 닫기
+        if (currentOpenPanel != null) {
+            currentOpenPanel?.visibility = View.GONE
+            currentOpenPanel = null
+        }
+        
+        // 남아있는 애니메이션 제거
+        view?.clearAnimation()
     }
 }
 

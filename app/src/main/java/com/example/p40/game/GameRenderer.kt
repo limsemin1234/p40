@@ -39,9 +39,6 @@ class GameRenderer(
         textAlign = Paint.Align.CENTER
     }
     
-    // 렌더링 최적화를 위한 FPS 추적
-    private var currentFPS: Long = 0
-    
     /**
      * 게임 화면 렌더링
      */
@@ -98,11 +95,6 @@ class GameRenderer(
         // 게임 오버 상태 표시
         if (isGameOver) {
             drawGameOver(canvas, screenWidth, screenHeight)
-        }
-        
-        // 디버그 정보 표시
-        if (gameConfig.DEBUG_MODE) {
-            drawDebugInfo(canvas, enemies.size, missiles.size)
         }
     }
     
@@ -178,26 +170,10 @@ class GameRenderer(
     }
     
     /**
-     * 디버그 정보 표시
+     * 모든 리소스 정리
      */
-    private fun drawDebugInfo(canvas: Canvas, enemyCount: Int, missileCount: Int) {
-        val debugPaint = Paint().apply {
-            color = gameConfig.DEBUG_TEXT_COLOR
-            textSize = gameConfig.DEBUG_TEXT_SIZE
-            textAlign = Paint.Align.LEFT
-        }
-        
-        // 디버그 정보 표시
-        canvas.drawText("FPS: $currentFPS", gameConfig.DEBUG_TEXT_MARGIN_X, gameConfig.DEBUG_TEXT_SPACING, debugPaint)
-        canvas.drawText("적: $enemyCount/${gameConfig.MAX_ENEMIES}", gameConfig.DEBUG_TEXT_MARGIN_X, gameConfig.DEBUG_TEXT_SPACING * 2, debugPaint)
-        canvas.drawText("미사일: $missileCount/${gameConfig.MAX_MISSILES}", gameConfig.DEBUG_TEXT_MARGIN_X, gameConfig.DEBUG_TEXT_SPACING * 3, debugPaint)
-        canvas.drawText("Wave: ${gameStats.getWaveCount()}", gameConfig.DEBUG_TEXT_MARGIN_X, gameConfig.DEBUG_TEXT_SPACING * 4, debugPaint)
-    }
-    
-    /**
-     * FPS 업데이트
-     */
-    fun updateFPS(fps: Long) {
-        currentFPS = fps
+    fun clearResources() {
+        // 비트맵 리소스가 있다면 정리
+        // 메모리에 로드된 이미지 등 해제
     }
 } 

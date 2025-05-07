@@ -162,16 +162,9 @@ class GameView @JvmOverloads constructor(
                     }
                 }
                 
-                // 디버그 모드에서 FPS 계산
+                // lastFrameTime 업데이트
                 val currentTime = System.currentTimeMillis()
-                val elapsedFrameTime = currentTime - lastFrameTime
                 lastFrameTime = currentTime
-                
-                // 디버그 모드에서 FPS 저장
-                if (gameConfig.DEBUG_MODE && elapsedFrameTime > 0) {
-                    val currentFPS = 1000 / elapsedFrameTime
-                    gameRenderer.updateFPS(currentFPS)
-                }
             }
         }
     }
@@ -203,6 +196,44 @@ class GameView @JvmOverloads constructor(
         if (initializeIfNeeded()) {
             gameLogic.resume()
         }
+    }
+    
+    /**
+     * 게임 리소스 완전 정리
+     * 게임 종료 또는 Fragment가 파괴될 때 호출
+     */
+    fun cleanup() {
+        // 게임 중지
+        isRunning = false
+        paused = true
+        
+        // 게임 스레드가 실행 중이면 종료 대기
+        gameThread?.let { thread ->
+            var retry = true
+            while (retry) {
+                try {
+                    thread.join(1000) // 1초 대기 후 강제 종료
+                    retry = false
+                } catch (e: InterruptedException) {
+                    // 무시
+                }
+            }
+        }
+        gameThread = null
+        
+        // 게임 렌더러 정리
+        if (::gameRenderer.isInitialized) {
+            gameRenderer.clearResources()
+        }
+        
+        // 게임 로직이 초기화된 경우 정리
+        if (::gameLogic.isInitialized) {
+            // 현재 게임 상태를 UserManager에 저장하는 코드가 있다면 여기서 호출
+        }
+        
+        // 콜백 참조 제거
+        gameOverListener = null
+        bossKillListener = null
     }
     
     /**
