@@ -7,12 +7,10 @@
     android:padding="16dp">
 
     <!-- 상단 바 영역 -->
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/topBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
         android:background="#1e5f2b"
         android:padding="12dp"
         android:elevation="4dp"
@@ -25,26 +23,31 @@
             android:background="@null"
             android:src="@android:drawable/ic_menu_revert"
             android:tint="#2ecc71"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
             android:layout_marginStart="8dp" />
 
         <TextView
-            android:layout_width="0dp"
+            android:id="@+id/titleText"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:text="덱 구성"
             android:textSize="22sp"
             android:textStyle="bold"
             android:textColor="#FFFFFF"
-            android:gravity="center" />
+            android:layout_centerInParent="true" />
 
         <LinearLayout
+            android:id="@+id/coinContainer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:background="#16451e"
             android:paddingVertical="6dp"
             android:paddingHorizontal="10dp"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true">
             
             <ImageView
                 android:layout_width="18dp"
@@ -61,7 +64,7 @@
                 android:textStyle="bold"
                 android:textColor="#FFEB3B" />
         </LinearLayout>
-    </LinearLayout>
+    </RelativeLayout>
 
     <!-- 덱 카드 수량 표시 -->
     <TextView

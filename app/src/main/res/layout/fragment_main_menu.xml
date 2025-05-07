@@ -9,21 +9,22 @@
     android:padding="16dp">
 
     <!-- 상단 바 영역 -->
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/topBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
         android:background="#1e3a5f"
         android:padding="12dp"
         android:elevation="4dp"
         app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
+            android:id="@+id/leftContainer"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:gravity="center_vertical"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
             android:layout_marginStart="8dp">
             
             <ImageView
@@ -34,23 +35,26 @@
         </LinearLayout>
 
         <TextView
-            android:layout_width="0dp"
+            android:id="@+id/titleText"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:text="메인화면"
             android:textSize="22sp"
             android:textStyle="bold"
             android:textColor="#FFFFFF"
-            android:gravity="center" />
+            android:layout_centerInParent="true" />
 
         <LinearLayout
+            android:id="@+id/coinContainer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:background="#15283f"
             android:paddingVertical="6dp"
             android:paddingHorizontal="10dp"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true">
             
             <ImageView
                 android:layout_width="18dp"
@@ -67,7 +71,7 @@
                 android:textStyle="bold"
                 android:textColor="#FFEB3B" />
         </LinearLayout>
-    </LinearLayout>
+    </RelativeLayout>
 
     <!-- 버튼 영역 -->
     <LinearLayout
