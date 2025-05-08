@@ -418,11 +418,17 @@ class GameLogic(
         
         // 기본 1방향 발사
         val missileDamageMultiplier = gameStats.getBuffManager().getMissileDamageMultiplier()
+        
+        // 업그레이드된 공격력 값 전달
+        val baseDamage = gameStats.getUnitAttackPower()
+        
         val newMissile = defenseUnit.attack(
             aliveEnemies, 
             currentTime, 
             attackCooldown,
-            missileDamageMultiplier
+            missileDamageMultiplier,
+            0.0,  // 기본 각도 오프셋
+            baseDamage  // 업그레이드된 공격력 전달
         )
         
         if (newMissile != null) {

@@ -131,11 +131,11 @@ class Enemy(
      */
     fun getDamage(): Int {
         return if (isBoss) {
-            // 보스는 더 강한 데미지
-            GameConfig.BOSS_DAMAGE * (1 + 0.1f * wave).toInt()
+            // 보스 공격력: 기본 보스 공격력 + (웨이브 - 1) * 웨이브당 보스 공격력 증가량
+            GameConfig.BOSS_DAMAGE + ((wave - 1) * GameConfig.BOSS_DAMAGE_INCREASE_PER_WAVE)
         } else {
-            // 일반 적 데미지 (웨이브에 따라 증가)
-            GameConfig.NORMAL_ENEMY_DAMAGE * (1 + 0.05f * wave).toInt()
+            // 일반 적 공격력: 기본 적 공격력 + (웨이브 - 1) * 웨이브당 적 공격력 증가량
+            GameConfig.NORMAL_ENEMY_DAMAGE + ((wave - 1) * GameConfig.ENEMY_DAMAGE_PER_WAVE)
         }
     }
     

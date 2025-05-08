@@ -207,7 +207,8 @@ class DefenseUnit(
         currentTime: Long,
         adjustedCooldown: Long = attackCooldown,
         damageMultiplier: Float = 1.0f,
-        angleOffset: Double = 0.0
+        angleOffset: Double = 0.0,
+        baseDamage: Int = GameConfig.MISSILE_DAMAGE  // 기본 데미지 값 추가 (업그레이드된 값이 전달됨)
     ): Missile? {
         // 쿨다운 체크 (speedMultiplier 적용)
         val effectiveCooldown = (adjustedCooldown / speedMultiplier).toLong()
@@ -241,8 +242,8 @@ class DefenseUnit(
         cacheAngleCalculation(angle)
         
         val missileSpeed = GameConfig.MISSILE_SPEED
-        // 공격력에 현재 문양의 데미지 배율 적용
-        val damage = (GameConfig.MISSILE_DAMAGE * damageMultiplier * this.damageMultiplier).toInt()
+        // 공격력에 현재 문양의 데미지 배율 적용 - 기본 데미지로 GameConfig.MISSILE_DAMAGE 대신 baseDamage 사용
+        val damage = (baseDamage * damageMultiplier * this.damageMultiplier).toInt()
         val missileSize = GameConfig.MISSILE_SIZE
         
         // 미사일 시작 위치 계산 (캐싱된 결과 활용)
