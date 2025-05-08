@@ -110,15 +110,28 @@ class MainMenuFragment : Fragment(R.layout.fragment_main_menu) {
                 // 강제로 가시성 설정
                 gameLogo.visibility = View.VISIBLE
                 
-                // 처음에는 애니메이션 비활성화 상태로 시작 (변경)
+                // 처음에는 애니메이션 비활성화 상태로 시작
                 isAnimationPlaying = false
                 
                 // 애니메이션 참조 및 상태 설정
                 gameLogo.setAnimationActive(false)
                 gameLogo.setCardAnimation(rotationAnimation)
-                // 처음에는 애니메이션 시작하지 않음 (제거)
                 
-                Log.d(TAG, "Logo card animation successfully configured but not started")
+                // 로그 카드에 추가 설정 - 더 명확한 로그 및 강화된 클릭 처리
+                gameLogo.setOnClickListener { 
+                    Log.d(TAG, "Logo card clicked directly from MainMenuFragment OnClickListener")
+                    isAnimationPlaying = !isAnimationPlaying
+                    gameLogo.toggleAnimation()
+                }
+                
+                // 카드가 클릭 가능하도록 명시적 설정
+                gameLogo.isClickable = true
+                gameLogo.isFocusable = true
+                
+                // 클릭 시 피드백 추가
+                gameLogo.isHapticFeedbackEnabled = true
+                
+                Log.d(TAG, "Logo card animation configured with enhanced click handling")
             } else {
                 if (gameLogo == null) {
                     Log.e(TAG, "Failed to find gameLogo view")

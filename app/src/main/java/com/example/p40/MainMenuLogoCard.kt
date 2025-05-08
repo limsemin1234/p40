@@ -56,6 +56,9 @@ class MainMenuLogoCard @JvmOverloads constructor(
     private var currentAnimation: Animation? = null
     private var isAnimationPlaying = false
     
+    // ObjectAnimator 참조 - 회전 애니메이션을 위해 추가
+    private var rotationAnimator: ObjectAnimator? = null
+    
     // 드래그 관련 변수
     private var isDragging = false
     private var initialX = 0f
@@ -81,7 +84,20 @@ class MainMenuLogoCard @JvmOverloads constructor(
         isClickable = true
         isFocusable = true
         
-        Log.d(TAG, "MainMenuLogoCard initialized")
+        // 클릭 리스너 직접 설정 - 강화된 처리
+        setOnClickListener {
+            Log.d(TAG, "Direct onClick called on MainMenuLogoCard")
+            // 명시적 클릭 처리 - 모든 애니메이션 상태를 확인하고 강제 토글
+            if (!isCardFlinging && !isDragging) {
+                Log.d(TAG, "Processing click - toggling animation with force")
+                // 현재 애니메이션 상태와 관계없이 강제로 토글
+                forceToggleAnimation()
+            } else {
+                Log.d(TAG, "Ignoring click - card is flinging or dragging")
+            }
+        }
+        
+        Log.d(TAG, "MainMenuLogoCard initialized with enhanced click listener")
     }
     
     /**
@@ -165,11 +181,12 @@ class MainMenuLogoCard @JvmOverloads constructor(
                 return false
             }
             
-            // 일반 탭 감지 - 이것만으로 충분함
+            // 일반 탭 감지 - 이것도 forceToggleAnimation으로 처리
             override fun onSingleTapUp(e: MotionEvent): Boolean {
                 if (!isDragging && !isCardFlinging) {
-                    Log.d(TAG, "Single tap up detected, toggling animation")
-                    toggleAnimation()
+                    Log.d(TAG, "Single tap up detected via GestureDetector")
+                    // 명시적으로 forceToggleAnimation 호출
+                    forceToggleAnimation()
                     return true
                 }
                 return false
@@ -188,7 +205,7 @@ class MainMenuLogoCard @JvmOverloads constructor(
             }
         })
         
-        Log.d(TAG, "Gesture detector set up")
+        Log.d(TAG, "Gesture detector set up with enhanced tap handling")
     }
     
     private fun showToast(message: String) {
@@ -219,7 +236,7 @@ class MainMenuLogoCard @JvmOverloads constructor(
                 // 드래그 시작
                 isDragging = true
                 if (isAnimationPlaying) {
-                    stopAnimation() // 드래그 시 애니메이션 중지
+                    forceStopAllAnimations() // 드래그 시 애니메이션 중지 - 개선된 메서드 사용
                 }
                 
                 // 드래그 시작 위치 기록
@@ -231,15 +248,21 @@ class MainMenuLogoCard @JvmOverloads constructor(
             }
             MotionEvent.ACTION_MOVE -> {
                 if (isDragging) {
-                    // 카드 위치 업데이트
+                    // 이동 거리 계산
                     val newX = event.rawX - dX
                     val newY = event.rawY - dY
-                    
-                    // 이동 제한 (너무 멀리 가지 않도록)
-                    val maxDistance = width / 1.5f
                     val distanceX = newX - initialX
                     val distanceY = newY - initialY
                     val distance = Math.sqrt((distanceX * distanceX + distanceY * distanceY).toDouble()).toFloat()
+                    
+                    // 매우 작은 움직임은 무시하고 드래그로 처리하지 않음
+                    if (distance < 5) {
+                        return true
+                    }
+                    
+                    // 카드 위치 업데이트
+                    // 이동 제한 (너무 멀리 가지 않도록)
+                    val maxDistance = width / 1.5f
                     
                     if (distance <= maxDistance) {
                         cardView.x = newX
@@ -259,14 +282,23 @@ class MainMenuLogoCard @JvmOverloads constructor(
                 }
             }
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                if (isDragging) {
-                    isDragging = false
-                    
-                    // 카드를 놓았을 때의 위치
-                    val distanceX = cardView.x - initialX
-                    val distanceY = cardView.y - initialY
-                    val distance = Math.sqrt((distanceX * distanceX + distanceY * distanceY).toDouble()).toFloat()
-                    
+                val wasDragging = isDragging
+                isDragging = false
+                
+                // 카드를 놓았을 때의 위치
+                val distanceX = cardView.x - initialX
+                val distanceY = cardView.y - initialY
+                val distance = Math.sqrt((distanceX * distanceX + distanceY * distanceY).toDouble()).toFloat()
+                
+                // 작은 움직임은 클릭으로 처리 - 향상된 역치값 사용
+                if (distance < 10) {
+                    Log.d(TAG, "Small movement detected as click in ACTION_UP, distance: $distance")
+                    // 명시적으로 강화된 애니메이션 토글 호출
+                    forceToggleAnimation()
+                    return true
+                }
+                
+                if (wasDragging) {
                     // 일정 거리 이상 드래그하고 수직 방향 드래그가 충분한 경우만 카드 날리기
                     if (distance > width / 6) { // 화면 너비의 1/6 이상 드래그
                         // 작은 움직임이었다면 제스처 감지기에게 이벤트 전달
@@ -294,6 +326,10 @@ class MainMenuLogoCard @JvmOverloads constructor(
      */
     private fun flingCardAway(distanceX: Float, distanceY: Float) {
         isCardFlinging = true
+        
+        // 실행 중인 모든 애니메이션 중지 (상태는 유지)
+        val wasAnimating = isAnimationPlaying
+        forceStopAllAnimations()
         
         // 이동 방향 결정 (현재 방향의 연장선)
         val screenWidth = resources.displayMetrics.widthPixels.toFloat()
@@ -369,9 +405,10 @@ class MainMenuLogoCard @JvmOverloads constructor(
                     override fun onAnimationEnd(animation: Animator) {
                         isCardFlinging = false
                         
-                        // 회전 애니메이션 다시 시작 (설정되어 있는 경우)
-                        if (isAnimationPlaying && currentAnimation != null) {
-                            startCardAnimation(currentAnimation!!)
+                        // 이전에 애니메이션이 재생 중이었다면 다시 시작
+                        if (wasAnimating) {
+                            Log.d(TAG, "Restarting animation after flinging")
+                            forceStartAnimation()
                         }
                     }
                 })
@@ -387,6 +424,12 @@ class MainMenuLogoCard @JvmOverloads constructor(
      * 카드를 원래 위치로 돌려놓는 애니메이션
      */
     private fun returnCardToOriginalPosition() {
+        // 현재 애니메이션 상태 저장
+        val wasAnimating = isAnimationPlaying
+        
+        // 현재 실행 중인 애니메이션 중지 (상태는 유지)
+        forceStopAllAnimations()
+        
         val returnAnim = ObjectAnimator.ofPropertyValuesHolder(
             cardView,
             PropertyValuesHolder.ofFloat(View.X, cardView.x, initialX),
@@ -400,8 +443,9 @@ class MainMenuLogoCard @JvmOverloads constructor(
         returnAnim.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator) {
                 // 원래 애니메이션이 재생 중이었다면 다시 시작
-                if (isAnimationPlaying && currentAnimation != null) {
-                    startCardAnimation(currentAnimation!!)
+                if (wasAnimating) {
+                    Log.d(TAG, "Restarting animation after returning to original position")
+                    forceStartAnimation()
                 }
             }
         })
@@ -414,7 +458,10 @@ class MainMenuLogoCard @JvmOverloads constructor(
      */
     override fun performClick(): Boolean {
         Log.d(TAG, "performClick called")
-        // 클릭은 GestureDetector에서 이미 처리하므로 여기서는 애니메이션 토글하지 않음
+        // 다른 클릭 처리 방식과 일관되게 forceToggleAnimation 사용
+        if (!isCardFlinging && !isDragging) {
+            forceToggleAnimation()
+        }
         return super.performClick()
     }
     
@@ -488,8 +535,11 @@ class MainMenuLogoCard @JvmOverloads constructor(
      */
     fun startCardAnimation(animation: Animation) {
         try {
+            Log.d(TAG, "Start card animation called, animation: ${animation}, isFlinging: ${isCardFlinging}")
+            
             // 카드가 날아가는 중이면 애니메이션 시작하지 않음
             if (isCardFlinging) {
+                Log.d(TAG, "Skip animation start - card is flinging")
                 return
             }
             
@@ -515,6 +565,7 @@ class MainMenuLogoCard @JvmOverloads constructor(
             Log.d(TAG, "Card animation started successfully")
         } catch (e: Exception) {
             Log.e(TAG, "Error starting animation: ${e.message}")
+            e.printStackTrace()
         }
     }
     
@@ -523,12 +574,175 @@ class MainMenuLogoCard @JvmOverloads constructor(
      */
     fun stopAnimation() {
         try {
+            Log.d(TAG, "Stop animation called")
+            
+            // Animation 중지
             cardView.clearAnimation()
+            
+            // ObjectAnimator도 중지 
+            cardView.animate().cancel()
+            
+            // rotationAnimator가 있으면 명시적으로 중지
+            rotationAnimator?.let {
+                Log.d(TAG, "Cancelling rotation animator")
+                it.cancel()
+                it.removeAllListeners()
+                rotationAnimator = null
+            }
+            
+            // View의 모든 애니메이션 및 애니메이터 중지
+            cardView.clearAnimation()
+            cardView.animation?.cancel()
+            
+            // 추가로 자식 뷰들의 애니메이션도 중지
+            if (cardView is ViewGroup) {
+                for (i in 0 until cardView.childCount) {
+                    cardView.getChildAt(i).clearAnimation()
+                }
+            }
+            
+            // 회전 초기화
+            cardView.rotation = 0f
+            cardView.rotationY = 0f
+            cardView.rotationX = 0f
+            
+            // 모든 애니메이션 객체 정리
+            cardView.animate().cancel()
+            cardView.clearAnimation()
+            
+            // 애니메이션 상태 초기화
             isAnimationPlaying = false
             
-            Log.d(TAG, "Card animation stopped")
+            Log.d(TAG, "Card animation stopped completely")
         } catch (e: Exception) {
             Log.e(TAG, "Error stopping animation: ${e.message}")
+            e.printStackTrace()
+        }
+    }
+    
+    /**
+     * 강제 애니메이션 토글 - 상태에 관계 없이 명확하게 전환
+     */
+    private fun forceToggleAnimation() {
+        Log.d(TAG, "Force toggle animation called, current state: $isAnimationPlaying")
+        
+        try {
+            // 현재 애니메이션이 돌고 있는지 실제로 확인
+            val isActuallyAnimating = (cardView.animation != null) || (rotationAnimator?.isRunning == true)
+            Log.d(TAG, "Actual animation state: $isActuallyAnimating, tracked state: $isAnimationPlaying")
+            
+            if (isActuallyAnimating || isAnimationPlaying) {
+                // 애니메이션이 실제로 재생 중이거나 상태가 재생 중으로 표시된 경우
+                Log.d(TAG, "Force stopping all animations")
+                forceStopAllAnimations()
+            } else {
+                // 애니메이션이 실제로 재생 중이 아닌 경우
+                Log.d(TAG, "Force starting animation")
+                forceStartAnimation()
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error in forceToggleAnimation: ${e.message}")
+            e.printStackTrace()
+            
+            // 오류가 발생하면 모든 애니메이션 초기화
+            forceStopAllAnimations()
+        }
+    }
+    
+    /**
+     * 모든 애니메이션 강제 중지
+     */
+    private fun forceStopAllAnimations() {
+        try {
+            Log.d(TAG, "Force stopping all animations")
+            
+            // 1. 기존 Animation 객체 중지
+            cardView.clearAnimation()
+            if (cardView.animation != null) {
+                cardView.animation.cancel()
+            }
+            
+            // 2. 모든 ObjectAnimator 취소
+            rotationAnimator?.cancel()
+            rotationAnimator?.removeAllListeners()
+            rotationAnimator = null
+            
+            // 3. View의 animate() 메서드로 생성된 애니메이션 취소
+            cardView.animate().cancel()
+            
+            // 4. 모든 자식 뷰의 애니메이션 취소
+            if (cardView is ViewGroup) {
+                for (i in 0 until cardView.childCount) {
+                    val child = cardView.getChildAt(i)
+                    child.clearAnimation()
+                    child.animate().cancel()
+                }
+            }
+            
+            // 5. 모든 회전 값 초기화
+            cardView.rotation = 0f
+            cardView.rotationY = 0f
+            cardView.rotationX = 0f
+            
+            // 6. 확실하게 상태 업데이트
+            isAnimationPlaying = false
+            
+            Log.d(TAG, "All animations forcibly stopped")
+        } catch (e: Exception) {
+            Log.e(TAG, "Error in forceStopAllAnimations: ${e.message}")
+            e.printStackTrace()
+            // 상태만이라도 업데이트
+            isAnimationPlaying = false
+        }
+    }
+    
+    /**
+     * 애니메이션 강제 시작
+     */
+    private fun forceStartAnimation() {
+        try {
+            Log.d(TAG, "Force starting animation")
+            
+            // 먼저 모든 애니메이션 중지하고 상태 초기화
+            forceStopAllAnimations()
+            
+            // 새 회전 애니메이션 생성
+            val rotation = ObjectAnimator.ofFloat(cardView, View.ROTATION_Y, 0f, 360f)
+            rotation.duration = 3000
+            rotation.repeatCount = ObjectAnimator.INFINITE
+            rotation.interpolator = DecelerateInterpolator()
+            
+            // 멤버 변수에 설정
+            rotationAnimator = rotation
+            
+            // 명확한 상태 설정
+            isAnimationPlaying = true
+            
+            // 리스너 추가
+            rotation.addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationCancel(animation: Animator) {
+                    super.onAnimationCancel(animation)
+                    Log.d(TAG, "Rotation animation was cancelled")
+                    isAnimationPlaying = false
+                }
+                
+                override fun onAnimationEnd(animation: Animator) {
+                    super.onAnimationEnd(animation)
+                    Log.d(TAG, "Rotation animation ended")
+                    if (!isCardFlinging) {
+                        isAnimationPlaying = false
+                    }
+                }
+            })
+            
+            // 애니메이션 시작
+            rotation.start()
+            
+            Log.d(TAG, "Animation forcibly started with new ObjectAnimator")
+        } catch (e: Exception) {
+            Log.e(TAG, "Error in forceStartAnimation: ${e.message}")
+            e.printStackTrace()
+            isAnimationPlaying = false
         }
     }
     
@@ -536,15 +750,18 @@ class MainMenuLogoCard @JvmOverloads constructor(
      * 애니메이션 토글
      */
     fun toggleAnimation() {
-        if (isAnimationPlaying) {
-            stopAnimation()
-        } else {
-            currentAnimation?.let {
-                startCardAnimation(it)
-            } ?: run {
-                Log.w(TAG, "No animation set to toggle")
-            }
-        }
+        // 기존 로직을 forceToggleAnimation으로 위임
+        forceToggleAnimation()
+    }
+    
+    /**
+     * 카드 애니메이션 테스트 - 문제 해결용
+     * 외부에서 직접 호출하여 애니메이션 강제 시작
+     */
+    fun testCardAnimation() {
+        Log.d(TAG, "Test card animation called")
+        forceStopAllAnimations() // 기존 애니메이션 정지
+        forceStartAnimation()
     }
     
     /**
