@@ -59,10 +59,12 @@ class GameRenderer(
         // 디펜스 유닛 공격 범위 표시
         defenseUnit.drawAttackRange(canvas)
         
-        // 중앙에 방어 타워 그리기
+        // 중앙에 방어 타워 그리기 - 카드 형태로 변경
         val centerX = screenWidth / 2
         val centerY = screenHeight / 2
-        canvas.drawCircle(centerX, centerY, gameConfig.DEFENSE_UNIT_SIZE, unitPaint)
+        
+        // 새로운 코드: 카드 형태로 유닛 그리기
+        drawDefenseUnitAsCard(canvas, centerX, centerY, gameStats.getUnitHealth(), gameStats.getUnitMaxHealth())
         
         // 적 그리기 - 화면 내 적만 그리기
         for (enemy in enemies) {
@@ -99,22 +101,75 @@ class GameRenderer(
     }
     
     /**
-     * 디펜스 유닛 그리기
+     * 디펜스 유닛을 카드 형태로 그리기
      */
-    fun drawDefenseUnit(canvas: Canvas, width: Float, height: Float, unitHealth: Int, unitMaxHealth: Int) {
-        val centerX = width / 2f
-        val centerY = height / 2f
+    private fun drawDefenseUnitAsCard(canvas: Canvas, centerX: Float, centerY: Float, unitHealth: Int, unitMaxHealth: Int) {
+        // 카드 크기 설정
+        val cardWidth = gameConfig.DEFENSE_UNIT_SIZE * 2f
+        val cardHeight = gameConfig.DEFENSE_UNIT_SIZE * 2.5f
         
-        // 디펜스 유닛 그리기
-        val unitPaint = Paint().apply {
-            color = gameConfig.DEFENSE_UNIT_COLOR
+        // 카드 배경 그리기 (투명하게 변경)
+        val cardBgPaint = Paint().apply {
+            color = Color.TRANSPARENT
             style = Paint.Style.FILL
         }
-        canvas.drawCircle(centerX, centerY, gameConfig.DEFENSE_UNIT_SIZE, unitPaint)
+        val cardRect = android.graphics.RectF(
+            centerX - cardWidth / 2,
+            centerY - cardHeight / 2,
+            centerX + cardWidth / 2,
+            centerY + cardHeight / 2
+        )
+        canvas.drawRoundRect(cardRect, 8f, 8f, cardBgPaint)
         
-        // 디펜스 유닛 체력바 그리기
-        val healthBarWidth = gameConfig.DEFENSE_UNIT_SIZE * 3
-        val healthBarHeight = 10f
+        // 카드 테두리 그리기
+        val cardBorderPaint = Paint().apply {
+            color = Color.rgb(255, 215, 0) // 골드 색상
+            style = Paint.Style.STROKE
+            strokeWidth = 3f
+        }
+        canvas.drawRoundRect(cardRect, 8f, 8f, cardBorderPaint)
+        
+        // 카드 내부 빛나는 효과
+        val glowPaint = Paint().apply {
+            color = Color.argb(50, 255, 215, 0)
+            style = Paint.Style.FILL
+        }
+        val glowRadius = cardWidth * 0.4f
+        val radialGradient = android.graphics.RadialGradient(
+            centerX,
+            centerY,
+            glowRadius,
+            intArrayOf(Color.argb(100, 255, 215, 0), Color.argb(0, 255, 215, 0)),
+            floatArrayOf(0f, 1f),
+            android.graphics.Shader.TileMode.CLAMP
+        )
+        glowPaint.shader = radialGradient
+        canvas.drawCircle(centerX, centerY, glowRadius, glowPaint)
+        
+        // 스페이드 심볼 그리기 (하얀색 테두리 추가)
+        // 먼저 테두리를 그리기 위한 흰색 심볼
+        val spadeSymbolBorderPaint = Paint().apply {
+            color = Color.WHITE
+            style = Paint.Style.FILL
+            textSize = cardWidth * 0.55f // 약간 더 크게 설정하여 테두리 효과
+            textAlign = Paint.Align.CENTER
+        }
+        canvas.drawText("♠", centerX, centerY + cardWidth * 0.15f, spadeSymbolBorderPaint)
+        
+        // 그 위에 검은색 심볼 그리기
+        val spadeSymbolPaint = Paint().apply {
+            color = Color.BLACK
+            style = Paint.Style.FILL
+            textSize = cardWidth * 0.5f
+            textAlign = Paint.Align.CENTER
+        }
+        canvas.drawText("♠", centerX, centerY + cardWidth * 0.15f, spadeSymbolPaint)
+        
+        // "A" 심볼 그리기 부분 제거 (좌상단, 우하단 A 제거)
+        
+        // 체력바 그리기
+        val healthBarWidth = cardWidth * 1.2f
+        val healthBarHeight = 8f
         val healthRatio = unitHealth.toFloat() / unitMaxHealth
         
         // 체력바 배경
@@ -130,7 +185,7 @@ class GameRenderer(
         }
         
         // 체력바 위치
-        val healthBarTop = centerY + gameConfig.DEFENSE_UNIT_SIZE + 10f
+        val healthBarTop = centerY + cardHeight / 2 + 10f
         val healthBarLeft = centerX - healthBarWidth / 2
         
         // 체력바 배경 그리기
@@ -175,5 +230,16 @@ class GameRenderer(
     fun clearResources() {
         // 비트맵 리소스가 있다면 정리
         // 메모리에 로드된 이미지 등 해제
+    }
+    
+    /**
+     * 디펜스 유닛 그리기 (호환성 유지를 위한 메서드)
+     */
+    fun drawDefenseUnit(canvas: Canvas, width: Float, height: Float, unitHealth: Int, unitMaxHealth: Int) {
+        val centerX = width / 2f
+        val centerY = height / 2f
+        
+        // 새로운 카드 형태 디펜스 유닛 그리기
+        drawDefenseUnitAsCard(canvas, centerX, centerY, unitHealth, unitMaxHealth)
     }
 } 

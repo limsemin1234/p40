@@ -138,6 +138,9 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
             }
         })
         
+        // 파티클 효과를 위한 애니메이션 설정
+        setupDefenseUnitAnimation(view)
+        
         // 버프 UI 초기화
         initBuffUI(view)
         
@@ -925,6 +928,21 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
             attackSpeed = (1000 / attackSpeed).toLong(), // 공격속도는 쿨다운 값으로 변환 (초당 공격 횟수 -> 밀리초)
             range = range.toFloat()
         )
+    }
+
+    /**
+     * 디펜스 유닛 애니메이션 설정
+     */
+    private fun setupDefenseUnitAnimation(view: View) {
+        // 애니메이션은 GameRenderer 내부에서 처리되기 때문에
+        // 여기서는 초기 애니메이션 설정만 수행합니다.
+        
+        // 나중에 필요한 경우 여기에 추가 애니메이션 초기화 코드를 추가할 수 있습니다.
+        // 예: 회전 애니메이션 속도 조절, 특수 효과 설정 등
+        
+        // GameView에 디펜스 유닛의 애니메이션 스타일 설정
+        // 실제 구현에서는 GameView에 해당 메서드를 추가해야 합니다.
+        // gameView.setDefenseUnitAnimationStyle(GameView.ANIMATION_STYLE_CARD)
     }
 
     override fun onResume() {

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 안쪽 빛나는 원 -->
+    <item>
+        <shape android:shape="oval">
+            <gradient
+                android:type="radial"
+                android:gradientRadius="70%p"
+                android:startColor="#80FFFFFF"
+                android:endColor="#00FFFFFF"
+                android:centerX="0.5"
+                android:centerY="0.5" />
+            <size
+                android:width="48dp"
+                android:height="48dp" />
+        </shape>
+    </item>
+    
+    <!-- 입자 효과 1 - 작은 점들 -->
+    <item>
+        <rotate
+            android:fromDegrees="0"
+            android:toDegrees="360"
+            android:pivotX="50%"
+            android:pivotY="50%">
+            <shape android:shape="ring"
+                android:innerRadiusRatio="3"
+                android:thicknessRatio="12"
+                android:useLevel="false">
+                <gradient
+                    android:type="sweep"
+                    android:startColor="#10FFFFFF"
+                    android:centerColor="#60FFD700"
+                    android:endColor="#10FFFFFF"
+                    android:useLevel="false" />
+            </shape>
+        </rotate>
+    </item>
+    
+    <!-- 입자 효과 2 - 큰 점들 -->
+    <item>
+        <rotate
+            android:fromDegrees="120"
+            android:toDegrees="480"
+            android:pivotX="50%"
+            android:pivotY="50%">
+            <shape android:shape="ring"
+                android:innerRadiusRatio="2.5"
+                android:thicknessRatio="15"
+                android:useLevel="false">
+                <gradient
+                    android:type="sweep"
+                    android:startColor="#20FFFFFF"
+                    android:centerColor="#40FFD700"
+                    android:endColor="#20FFFFFF"
+                    android:useLevel="false" />
+            </shape>
+        </rotate>
+    </item>
+</layer-list> 
