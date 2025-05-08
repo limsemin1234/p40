@@ -299,13 +299,8 @@ class MainMenuLogoCard @JvmOverloads constructor(
         val screenWidth = resources.displayMetrics.widthPixels.toFloat()
         val screenHeight = resources.displayMetrics.heightPixels.toFloat()
         
-        // 수직 드래그인지 보다 확실하게 판단
-        // 1. Y 방향 거리가 X 방향보다 커야 함
-        // 2. Y 방향 거리가 최소한 일정 픽셀 이상이어야 함
-        val isVerticalDrag = abs(distanceY) > abs(distanceX) && abs(distanceY) > 50f
-        
-        // 다음 문양을 미리 계산 (수직 드래그일 때만 사용)
-        val nextSymbol = if (isVerticalDrag) currentSymbol.next() else currentSymbol
+        // 어느 방향으로든 카드가 날아가면 다음 문양으로 변경
+        val nextSymbol = currentSymbol.next()
         
         // 화면 밖으로 충분히 나가도록 목표 위치 계산
         val ratio = if (abs(distanceX) > abs(distanceY)) {
@@ -359,7 +354,7 @@ class MainMenuLogoCard @JvmOverloads constructor(
                 updateCardSymbol()
                 
                 // 로그 출력으로 디버깅
-                Log.d(TAG, "Card flinging ended, vertical drag: $isVerticalDrag, symbol changed: ${isVerticalDrag}, new symbol: ${currentSymbol.name}")
+                Log.d(TAG, "Card flinging ended, new symbol: ${currentSymbol.name}")
                 
                 // 새 카드가 들어오는 애니메이션
                 val newCardAnim = ObjectAnimator.ofPropertyValuesHolder(
