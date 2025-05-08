@@ -327,8 +327,7 @@ class MainMenuLogoCard @JvmOverloads constructor(
     private fun flingCardAway(distanceX: Float, distanceY: Float) {
         isCardFlinging = true
         
-        // 실행 중인 모든 애니메이션 중지 (상태는 유지)
-        val wasAnimating = isAnimationPlaying
+        // 실행 중인 모든 애니메이션 중지
         forceStopAllAnimations()
         
         // 이동 방향 결정 (현재 방향의 연장선)
@@ -405,11 +404,9 @@ class MainMenuLogoCard @JvmOverloads constructor(
                     override fun onAnimationEnd(animation: Animator) {
                         isCardFlinging = false
                         
-                        // 이전에 애니메이션이 재생 중이었다면 다시 시작
-                        if (wasAnimating) {
-                            Log.d(TAG, "Restarting animation after flinging")
-                            forceStartAnimation()
-                        }
+                        // 카드 날아간 후에는 새로운 문양으로 멈춰있는 상태 유지
+                        // 필요하면 여기서 새로 애니메이션 시작 가능
+                        Log.d(TAG, "Card returned with new symbol - ready for interaction")
                     }
                 })
                 
@@ -424,9 +421,6 @@ class MainMenuLogoCard @JvmOverloads constructor(
      * 카드를 원래 위치로 돌려놓는 애니메이션
      */
     private fun returnCardToOriginalPosition() {
-        // 현재 애니메이션 상태 저장
-        val wasAnimating = isAnimationPlaying
-        
         // 현재 실행 중인 애니메이션 중지 (상태는 유지)
         forceStopAllAnimations()
         
@@ -442,11 +436,9 @@ class MainMenuLogoCard @JvmOverloads constructor(
         
         returnAnim.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator) {
-                // 원래 애니메이션이 재생 중이었다면 다시 시작
-                if (wasAnimating) {
-                    Log.d(TAG, "Restarting animation after returning to original position")
-                    forceStartAnimation()
-                }
+                // 카드가 원래 위치로 돌아온 후 상태 갱신
+                Log.d(TAG, "Card returned to original position")
+                // 카드가 원래 위치로 돌아온 후에는 애니메이션 없이 정지 상태로 유지
             }
         })
         
@@ -636,8 +628,8 @@ class MainMenuLogoCard @JvmOverloads constructor(
                 Log.d(TAG, "Force stopping all animations")
                 forceStopAllAnimations()
             } else {
-                // 애니메이션이 실제로 재생 중이 아닌 경우
-                Log.d(TAG, "Force starting animation")
+                // 카드가 정지 상태일 때는 2바퀴 회전 애니메이션 시작
+                Log.d(TAG, "Force starting 2-rotation animation")
                 forceStartAnimation()
             }
         } catch (e: Exception) {
@@ -697,19 +689,19 @@ class MainMenuLogoCard @JvmOverloads constructor(
     }
     
     /**
-     * 애니메이션 강제 시작
+     * 애니메이션 강제 시작 - 2바퀴만 회전하고 멈춤
      */
     private fun forceStartAnimation() {
         try {
-            Log.d(TAG, "Force starting animation")
+            Log.d(TAG, "Force starting animation (2 rotations)")
             
             // 먼저 모든 애니메이션 중지하고 상태 초기화
             forceStopAllAnimations()
             
             // 새 회전 애니메이션 생성
-            val rotation = ObjectAnimator.ofFloat(cardView, View.ROTATION_Y, 0f, 360f)
-            rotation.duration = 3000
-            rotation.repeatCount = ObjectAnimator.INFINITE
+            val rotation = ObjectAnimator.ofFloat(cardView, View.ROTATION_Y, 0f, 720f) // 720도 = 2바퀴
+            rotation.duration = 3000 // 3초 동안 2바퀴 회전
+            rotation.repeatCount = 0 // 반복 없음 - 한 번만 실행
             rotation.interpolator = DecelerateInterpolator()
             
             // 멤버 변수에 설정
@@ -728,17 +720,18 @@ class MainMenuLogoCard @JvmOverloads constructor(
                 
                 override fun onAnimationEnd(animation: Animator) {
                     super.onAnimationEnd(animation)
-                    Log.d(TAG, "Rotation animation ended")
-                    if (!isCardFlinging) {
-                        isAnimationPlaying = false
-                    }
+                    Log.d(TAG, "2 rotations completed, animation ended")
+                    // 애니메이션이 끝나면 상태 업데이트
+                    isAnimationPlaying = false
+                    // 회전 초기화
+                    cardView.rotationY = 0f
                 }
             })
             
             // 애니메이션 시작
             rotation.start()
             
-            Log.d(TAG, "Animation forcibly started with new ObjectAnimator")
+            Log.d(TAG, "Animation started: 2 rotations (720 degrees)")
         } catch (e: Exception) {
             Log.e(TAG, "Error in forceStartAnimation: ${e.message}")
             e.printStackTrace()
