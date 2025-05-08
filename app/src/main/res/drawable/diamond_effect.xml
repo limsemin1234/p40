@@ -5,7 +5,44 @@
     android:viewportWidth="24"
     android:viewportHeight="24">
     
+    <!-- 다이아몬드 윤곽선 -->
     <path
-        android:fillColor="#FF4444FF"
-        android:pathData="M12,2L4,12l8,10l8,-10L12,2z" />
+        android:fillColor="#00FFFFFF"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="0.3"
+        android:pathData="M12,2L4,12L12,22L20,12L12,2Z" />
+    
+    <!-- 다이아몬드 윗면 (밝은 하늘색) -->
+    <path
+        android:fillColor="#80ADEFFF"
+        android:pathData="M12,2L4,12L12,12L20,12L12,2Z" />
+    
+    <!-- 다이아몬드 왼쪽면 (약간 어두운 하늘색) -->
+    <path
+        android:fillColor="#8087CEEF"
+        android:pathData="M4,12L12,22L12,12L4,12Z" />
+    
+    <!-- 다이아몬드 오른쪽면 (중간톤 하늘색) -->
+    <path
+        android:fillColor="#8098DEF6"
+        android:pathData="M12,12L12,22L20,12L12,12Z" />
+    
+    <!-- 다이아몬드 내부 십자가 (빛나는 부분) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M11,3L13,3L12.5,12L13,21L11,21L11.5,12L11,3Z" />
+    
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M5,11L5,13L12,12.5L19,13L19,11L12,11.5L5,11Z" />
+    
+    <!-- 반사광 효과 (왼쪽 위) -->
+    <path
+        android:fillColor="#80FFFFFF"
+        android:pathData="M8,7L7.5,7.5L12,11L12.5,10.5L8,7Z" />
+    
+    <!-- 반사광 효과 (오른쪽 위) -->
+    <path
+        android:fillColor="#80FFFFFF"
+        android:pathData="M16,7L16.5,7.5L12,11L11.5,10.5L16,7Z" />
 </vector> 

@@ -221,7 +221,7 @@ object GameConfig {
     const val CLUB_FLUSH_DURATION = 5000L    // 시간 정지 지속 시간 (밀리초)
     
     // 다이아몬드 플러시 스킬: 무적 관련 설정
-    const val DIAMOND_FLUSH_DURATION = 5000L // 무적 지속 시간 (밀리초)
+    const val DIAMOND_FLUSH_DURATION = 10000L // 무적 지속 시간 (밀리초)
     
     /**
      * 웨이브별 적 체력 계산 (ENEMY_BASE_HEALTH에 배율을 곱함)

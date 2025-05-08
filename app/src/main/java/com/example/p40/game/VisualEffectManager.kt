@@ -186,47 +186,78 @@ class VisualEffectManager(
         // 오버레이 제거 (기존에 있는 경우)
         clearEffects()
         
-        // 다이아몬드 아이콘 추가
-        val diamondIcon = createEffectIcon(R.drawable.diamond_effect)
+        // 다이아몬드 아이콘 추가 - 크기 키우기
+        val diamondIcon = ImageView(context).apply {
+            layoutParams = FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                width = 350  // 더 큰 크기로 변경 (300에서 350으로)
+                height = 350
+                gravity = android.view.Gravity.CENTER
+            }
+            setImageResource(R.drawable.diamond_effect)
+            alpha = 0.6f  // 시작 투명도 설정
+        }
         
-        // 방패 아이콘 추가 (무적 효과를 더 확실히 표현) - 황금색 방패
-        val shieldIcon = createShieldIcon(200) // 크기 설정
+        gameContainer.addView(diamondIcon)
+        effectIcon = diamondIcon
         
-        // 다이아몬드 아이콘 회전 효과
-        val rotateAnimator = ObjectAnimator.ofFloat(diamondIcon, "rotation", 0f, 360f).apply {
-            duration = 6000
+        // 3D 효과를 위한 초기 설정
+        diamondIcon.cameraDistance = 12000f  // 3D 효과를 위한 카메라 거리 설정 증가
+        
+        // X축 회전 애니메이션 (3D 효과)
+        val rotateXAnimator = ObjectAnimator.ofFloat(diamondIcon, "rotationX", 0f, 360f).apply {
+            duration = 5000  // 더 느린 회전
             repeatCount = ValueAnimator.INFINITE
             start()
         }
         
-        // 방패 아이콘 크기 변화 애니메이션 (작아졌다 커졌다 반복)
-        val shieldScaleXAnimator = ObjectAnimator.ofFloat(shieldIcon, "scaleX", 0.8f, 1.2f).apply {
-            duration = 1000
+        // Y축 회전 애니메이션 (3D 효과)
+        val rotateYAnimator = ObjectAnimator.ofFloat(diamondIcon, "rotationY", 0f, 360f).apply {
+            duration = 7000  // 더 느린 회전
+            repeatCount = ValueAnimator.INFINITE
+            start()
+        }
+        
+        // Z축 회전 애니메이션 (약간의 기울임 효과)
+        val rotateZAnimator = ObjectAnimator.ofFloat(diamondIcon, "rotation", -5f, 5f).apply {
+            duration = 3000
             repeatCount = ValueAnimator.INFINITE
             repeatMode = ValueAnimator.REVERSE
             start()
         }
         
-        val shieldScaleYAnimator = ObjectAnimator.ofFloat(shieldIcon, "scaleY", 0.8f, 1.2f).apply {
-            duration = 1000
+        // 크기 변화 애니메이션 (약간 커졌다가 작아지는 효과)
+        val scaleXAnimator = ObjectAnimator.ofFloat(diamondIcon, "scaleX", 0.85f, 1.15f).apply {
+            duration = 2000
             repeatCount = ValueAnimator.INFINITE
             repeatMode = ValueAnimator.REVERSE
             start()
         }
         
-        // 방패 아이콘 맥동 효과 (투명도 변화)
-        val shieldPulseAnimator = ObjectAnimator.ofFloat(shieldIcon, "alpha", 0.6f, 1.0f).apply {
-            duration = 1000
+        val scaleYAnimator = ObjectAnimator.ofFloat(diamondIcon, "scaleY", 0.85f, 1.15f).apply {
+            duration = 2000
+            repeatCount = ValueAnimator.INFINITE
+            repeatMode = ValueAnimator.REVERSE
+            start()
+        }
+        
+        // 투명도 변화 애니메이션 (0.4에서 0.8로 변화)
+        val alphaAnimator = ObjectAnimator.ofFloat(diamondIcon, "alpha", 0.4f, 0.8f).apply {
+            duration = 1500
             repeatCount = ValueAnimator.INFINITE
             repeatMode = ValueAnimator.REVERSE
             start()
         }
         
         // 추적을 위해 저장
-        currentAnimators.add(rotateAnimator)
-        currentAnimators.add(shieldScaleXAnimator)
-        currentAnimators.add(shieldScaleYAnimator)
-        currentAnimators.add(shieldPulseAnimator)
+        currentAnimators.add(rotateXAnimator)
+        currentAnimators.add(rotateYAnimator)
+        currentAnimators.add(rotateZAnimator)
+        currentAnimators.add(scaleXAnimator)
+        currentAnimators.add(scaleYAnimator)
+        currentAnimators.add(alphaAnimator)
         
         // 지정된 시간 후 효과 제거
         handler.postDelayed({
@@ -276,9 +307,11 @@ class VisualEffectManager(
     }
     
     /**
-     * 방패 아이콘 생성 (무적 효과용)
+     * 방패 아이콘 생성 (무적 효과용) - 더 이상 사용하지 않음
      * @param size 아이콘 크기 (기본값 200)
      */
+    // 더 이상 사용하지 않는 메서드지만 호환성을 위해 주석으로 유지
+    /*
     private fun createShieldIcon(size: Int = 200): ImageView {
         val shield = ImageView(context).apply {
             layoutParams = FrameLayout.LayoutParams(
@@ -296,6 +329,7 @@ class VisualEffectManager(
         gameContainer.addView(shield)
         return shield
     }
+    */
     
     /**
      * 모든 효과 제거

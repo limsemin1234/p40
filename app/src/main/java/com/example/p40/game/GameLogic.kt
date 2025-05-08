@@ -703,12 +703,31 @@ class GameLogic(
     fun removeAllEnemiesExceptBoss(): Int {
         var killCount = 0
         
-        // 보스가 아닌 모든 적을 제거 (동시 수정 오류를 방지하기 위해 복사본 생성)
-        val enemiesToRemove = enemies.filter { !it.isBoss() }
+        // 디펜스 유닛의 위치와 공격 범위 가져오기
+        val centerX = defenseUnit.getPosition().x
+        val centerY = defenseUnit.getPosition().y
+        val attackRange = defenseUnit.getAttackRange()
+        
+        // 보스가 아니고 공격 범위 내에 있는 적만 제거
+        val enemiesToRemove = enemies.filter { enemy -> 
+            if (enemy.isBoss()) return@filter false
+            
+            // 적과 방어 유닛 사이의 거리 계산
+            val enemyPos = enemy.getPosition()
+            val dx = enemyPos.x - centerX
+            val dy = enemyPos.y - centerY
+            val distanceSquared = dx * dx + dy * dy
+            
+            // 공격 범위 내에 있는지 확인
+            distanceSquared <= (attackRange * attackRange)
+        }
+        
         killCount = enemiesToRemove.size
         
-        // 적 제거 및 자원 추가 없이 단순히 제거만 함
+        // 적 제거
         for (enemy in enemiesToRemove) {
+            // GameConfig에 정의된 스페이드 플러시 데미지를 적용
+            enemy.takeDamage(gameConfig.SPADE_FLUSH_DAMAGE)
             enemies.remove(enemy)
             // 적 객체를 풀에 반환
             enemyPool.recycle(enemy)
