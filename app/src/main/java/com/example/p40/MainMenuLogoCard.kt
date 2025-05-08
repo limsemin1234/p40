@@ -1,5 +1,9 @@
 package com.example.p40
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.ObjectAnimator
+import android.animation.PropertyValuesHolder
 import android.content.Context
 import android.graphics.Color
 import android.util.AttributeSet
@@ -9,7 +13,9 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AccelerateInterpolator
 import android.view.animation.Animation
+import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -17,6 +23,8 @@ import android.widget.Toast
 import androidx.cardview.widget.CardView
 import com.example.p40.game.CardSymbolType
 import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * 메인 메뉴의 로고 카드 관리 클래스
@@ -47,6 +55,16 @@ class MainMenuLogoCard @JvmOverloads constructor(
     // 애니메이션 참조
     private var currentAnimation: Animation? = null
     private var isAnimationPlaying = false
+    
+    // 드래그 관련 변수
+    private var isDragging = false
+    private var initialX = 0f
+    private var initialY = 0f
+    private var dX = 0f
+    private var dY = 0f
+    
+    // 카드 플링 상태
+    private var isCardFlinging = false
     
     // 초기화
     init {
@@ -145,14 +163,24 @@ class MainMenuLogoCard @JvmOverloads constructor(
             
             // 일반 탭 감지 - 이것만으로 충분함
             override fun onSingleTapUp(e: MotionEvent): Boolean {
-                Log.d(TAG, "Single tap up detected, toggling animation")
-                toggleAnimation()
-                return true
+                if (!isDragging && !isCardFlinging) {
+                    Log.d(TAG, "Single tap up detected, toggling animation")
+                    toggleAnimation()
+                    return true
+                }
+                return false
             }
             
-            // 일반 탭 감지 (싱글 탭보다 먼저 호출됨)
+            // 드래그 시작 감지
             override fun onDown(e: MotionEvent): Boolean {
-                return true // 이벤트 소비, 다른 이벤트 호출 허용
+                if (!isCardFlinging) {
+                    // 드래그 시작 위치 저장
+                    initialX = cardView.x
+                    initialY = cardView.y
+                    dX = 0f
+                    dY = 0f
+                }
+                return true
             }
         })
         
@@ -174,12 +202,185 @@ class MainMenuLogoCard @JvmOverloads constructor(
      * 터치 이벤트 처리
      */
     override fun onTouchEvent(event: MotionEvent): Boolean {
+        // 카드가 날아가는 중이면 이벤트 무시
+        if (isCardFlinging) {
+            return true
+        }
+        
         // 제스처 감지기에 이벤트 전달
         val gestureResult = gestureDetector.onTouchEvent(event)
         
-        // 대부분의 제스처는 GestureDetector에서 처리
-        // 여기서는 추가 처리하지 않고 제스처 결과만 반환
+        when (event.action) {
+            MotionEvent.ACTION_DOWN -> {
+                // 드래그 시작
+                isDragging = true
+                if (isAnimationPlaying) {
+                    stopAnimation() // 드래그 시 애니메이션 중지
+                }
+                
+                // 드래그 시작 위치 기록
+                initialX = cardView.x
+                initialY = cardView.y
+                dX = event.rawX - cardView.x
+                dY = event.rawY - cardView.y
+                return true
+            }
+            MotionEvent.ACTION_MOVE -> {
+                if (isDragging) {
+                    // 카드 위치 업데이트
+                    val newX = event.rawX - dX
+                    val newY = event.rawY - dY
+                    
+                    // 이동 제한 (너무 멀리 가지 않도록)
+                    val maxDistance = width / 1.5f
+                    val distanceX = newX - initialX
+                    val distanceY = newY - initialY
+                    val distance = Math.sqrt((distanceX * distanceX + distanceY * distanceY).toDouble()).toFloat()
+                    
+                    if (distance <= maxDistance) {
+                        cardView.x = newX
+                        cardView.y = newY
+                    } else {
+                        // 최대 거리로 제한
+                        val ratio = maxDistance / distance
+                        cardView.x = initialX + distanceX * ratio
+                        cardView.y = initialY + distanceY * ratio
+                    }
+                    
+                    // 드래그에 따라 회전 효과 추가 (기울기)
+                    val rotationFactor = 15f // 최대 회전 각도
+                    cardView.rotation = (cardView.x - initialX) / width * rotationFactor
+                    
+                    return true
+                }
+            }
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                if (isDragging) {
+                    isDragging = false
+                    
+                    // 카드를 놓았을 때의 위치
+                    val distanceX = cardView.x - initialX
+                    val distanceY = cardView.y - initialY
+                    val distance = Math.sqrt((distanceX * distanceX + distanceY * distanceY).toDouble()).toFloat()
+                    
+                    // 일정 거리 이상 드래그한 경우 카드를 날려보냄
+                    if (distance > width / 6) { // 화면 너비의 1/6 이상 드래그
+                        flingCardAway(distanceX, distanceY)
+                    } else {
+                        // 충분히 드래그하지 않은 경우 원래 위치로 복귀
+                        returnCardToOriginalPosition()
+                    }
+                    return true
+                }
+            }
+        }
+        
+        // 제스처나 특별한 처리가 없을 경우 기본 이벤트 처리
         return gestureResult || super.onTouchEvent(event)
+    }
+    
+    /**
+     * 카드를 날려보내는 애니메이션
+     */
+    private fun flingCardAway(distanceX: Float, distanceY: Float) {
+        isCardFlinging = true
+        
+        // 이동 방향 결정 (현재 방향의 연장선)
+        val screenWidth = resources.displayMetrics.widthPixels.toFloat()
+        val screenHeight = resources.displayMetrics.heightPixels.toFloat()
+        
+        // 화면 밖으로 충분히 나가도록 목표 위치 계산
+        val ratio = if (abs(distanceX) > abs(distanceY)) {
+            // 수평 방향 이동이 더 큰 경우
+            (if (distanceX > 0) screenWidth * 2 else -screenWidth) / distanceX
+        } else {
+            // 수직 방향 이동이 더 큰 경우
+            (if (distanceY > 0) screenHeight * 2 else -screenHeight) / distanceY
+        }
+        
+        val targetX = initialX + distanceX * ratio
+        val targetY = initialY + distanceY * ratio
+        
+        // 날아가는 애니메이션
+        val animDuration = 300L // 빠르게 날아가도록 300ms로 설정
+        
+        // 크기, 회전, 위치 변화를 동시에 적용
+        val scaleDown = PropertyValuesHolder.ofFloat(View.SCALE_X, 1f, 0.5f)
+        val scaleDown2 = PropertyValuesHolder.ofFloat(View.SCALE_Y, 1f, 0.5f)
+        val moveX = PropertyValuesHolder.ofFloat(View.X, cardView.x, targetX)
+        val moveY = PropertyValuesHolder.ofFloat(View.Y, cardView.y, targetY)
+        val rotate = PropertyValuesHolder.ofFloat(View.ROTATION, cardView.rotation, 
+                                                cardView.rotation + if (distanceX > 0) 180f else -180f)
+        
+        val animator = ObjectAnimator.ofPropertyValuesHolder(
+            cardView, scaleDown, scaleDown2, moveX, moveY, rotate)
+        
+        animator.duration = animDuration
+        animator.interpolator = AccelerateInterpolator()
+        
+        animator.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator) {
+                // 카드가 날아간 후 다음 문양으로 변경
+                changeToNextSymbol()
+                
+                // 카드를 원래 위치로 되돌림 (크기 및 회전 초기화)
+                cardView.x = initialX
+                cardView.y = initialY
+                cardView.rotation = 0f
+                cardView.scaleX = 0.1f
+                cardView.scaleY = 0.1f
+                
+                // 새 카드가 들어오는 애니메이션
+                val newCardAnim = ObjectAnimator.ofPropertyValuesHolder(
+                    cardView,
+                    PropertyValuesHolder.ofFloat(View.SCALE_X, 0.1f, 1f),
+                    PropertyValuesHolder.ofFloat(View.SCALE_Y, 0.1f, 1f)
+                )
+                newCardAnim.duration = 300L
+                newCardAnim.interpolator = DecelerateInterpolator()
+                
+                newCardAnim.addListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator) {
+                        isCardFlinging = false
+                        
+                        // 회전 애니메이션 다시 시작 (설정되어 있는 경우)
+                        if (isAnimationPlaying && currentAnimation != null) {
+                            startCardAnimation(currentAnimation!!)
+                        }
+                    }
+                })
+                
+                newCardAnim.start()
+            }
+        })
+        
+        animator.start()
+    }
+    
+    /**
+     * 카드를 원래 위치로 돌려놓는 애니메이션
+     */
+    private fun returnCardToOriginalPosition() {
+        val returnAnim = ObjectAnimator.ofPropertyValuesHolder(
+            cardView,
+            PropertyValuesHolder.ofFloat(View.X, cardView.x, initialX),
+            PropertyValuesHolder.ofFloat(View.Y, cardView.y, initialY),
+            PropertyValuesHolder.ofFloat(View.ROTATION, cardView.rotation, 0f)
+        )
+        
+        returnAnim.duration = 200
+        returnAnim.interpolator = DecelerateInterpolator()
+        
+        returnAnim.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator) {
+                // 원래 애니메이션이 재생 중이었다면 다시 시작
+                if (isAnimationPlaying && currentAnimation != null) {
+                    startCardAnimation(currentAnimation!!)
+                }
+            }
+        })
+        
+        returnAnim.start()
     }
     
     /**
@@ -261,6 +462,11 @@ class MainMenuLogoCard @JvmOverloads constructor(
      */
     fun startCardAnimation(animation: Animation) {
         try {
+            // 카드가 날아가는 중이면 애니메이션 시작하지 않음
+            if (isCardFlinging) {
+                return
+            }
+            
             // 기존 애니메이션이 있으면 제거
             cardView.clearAnimation()
             
