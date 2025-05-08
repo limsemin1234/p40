@@ -27,6 +27,7 @@ class GameLogic(
     private var waveMessageStartTime = 0L
     private var waveMessageDuration = gameConfig.WAVE_MESSAGE_DURATION
     private var timeFrozen = false  // 시간 멈춤 상태 변수 추가
+    private var rangeBasedTimeFrozen = false  // 범위 기반 시간 멈춤 상태 변수
     
     // 게임 요소
     private lateinit var defenseUnit: DefenseUnit
@@ -44,6 +45,9 @@ class GameLogic(
     // 타이밍 관련
     private var lastEnemySpawnTime = 0L
     private var gameStartTime = 0L
+    
+    // 무적 상태 변수 추가
+    private var isInvincible = false
     
     /**
      * 보스 소환 조건 체크
@@ -88,6 +92,51 @@ class GameLogic(
      */
     fun setTimeFrozen(frozen: Boolean) {
         this.timeFrozen = frozen
+        
+        // 범위 기반 시간 멈춤이 설정될 때 기존 전체 시간 멈춤은 비활성화
+        if (!frozen) {
+            this.rangeBasedTimeFrozen = false
+        }
+    }
+    
+    /**
+     * 범위 기반 시간 멈춤 상태 설정 (클로버 플러시 스킬용)
+     */
+    fun setRangeBasedTimeFrozen(frozen: Boolean) {
+        this.rangeBasedTimeFrozen = frozen
+        
+        // 범위 기반 시간 멈춤이 켜지면 전체 시간 멈춤은 끄기
+        if (frozen) {
+            this.timeFrozen = false
+        }
+    }
+    
+    /**
+     * 적이 시간 멈춤 범위 내에 있는지 확인
+     */
+    private fun isEnemyInTimeFrozenRange(enemy: Enemy): Boolean {
+        if (!rangeBasedTimeFrozen) return false
+        
+        // 방어 유닛의 위치와 공격 범위 가져오기
+        val centerX = defenseUnit.getPosition().x
+        val centerY = defenseUnit.getPosition().y
+        val attackRange = defenseUnit.attackRange
+        
+        // 적과 방어 유닛 사이의 거리 계산
+        val enemyPos = enemy.getPosition()
+        val dx = enemyPos.x - centerX
+        val dy = enemyPos.y - centerY
+        val distanceSquared = dx * dx + dy * dy
+        
+        // 공격 범위 내에 있는지 확인
+        return distanceSquared <= (attackRange * attackRange)
+    }
+    
+    /**
+     * 무적 상태 설정 (다이아몬드 플러시 스킬용)
+     */
+    fun setInvincible(invincible: Boolean) {
+        this.isInvincible = invincible
     }
     
     /**
@@ -185,11 +234,22 @@ class GameLogic(
             
             // 화면 안쪽이나 가장자리에 있는 적만 업데이트
             if (screenRect.contains(enemyPos.x, enemyPos.y)) {
-                // 버프에 의한 적 이동 속도 조정 적용
-                enemy.update(enemySpeedMultiplier)
+                // 범위 기반 시간 멈춤 체크 - 범위 내에 있으면 이동하지 않음
+                val isFrozen = rangeBasedTimeFrozen && isEnemyInTimeFrozenRange(enemy)
                 
-                // 적 위치가 변경되었으므로 디펜스 유닛의 캐시 업데이트
-                defenseUnit.updateEnemyPosition(enemy)
+                if (!isFrozen) {
+                    // 버프에 의한 적 이동 속도 조정 적용
+                    enemy.update(enemySpeedMultiplier)
+                    
+                    // 적 위치가 변경되었으므로 디펜스 유닛의 캐시 업데이트
+                    defenseUnit.updateEnemyPosition(enemy)
+                    
+                    // 적이 이동한 후 범위 안으로 들어왔는지 체크
+                    if (rangeBasedTimeFrozen && isEnemyInTimeFrozenRange(enemy)) {
+                        // 범위 안으로 들어온 적은 움직임 멈춤
+                        // 이미 이번 프레임에서 이동했지만 다음 프레임부터 멈춤
+                    }
+                }
                 
                 // 중앙에 도달했는지 확인
                 val dx = enemyPos.x - centerX
@@ -206,7 +266,13 @@ class GameLogic(
                             // 보스의 경우 다르게 처리 (죽이지는 않음)
                             // 플레이어에게 데미지를 주고 약간 밀어내기
                             val enemyDamage = enemy.getDamage()
-                            val isUnitDead = gameStats.applyDamageToUnit(enemyDamage)
+                            
+                            // 무적 상태가 아닐 때만 데미지 적용
+                            val isUnitDead = if (!isInvincible) {
+                                gameStats.applyDamageToUnit(enemyDamage)
+                            } else {
+                                false // 무적 상태일 때는 데미지를 입지 않음
+                            }
                             
                             // 보스를 약간 밀어내기 (중앙에서 같은 방향으로 조금 더 멀어지게)
                             val pushDistance = gameConfig.DEFENSE_UNIT_SIZE * 1.5f
@@ -239,16 +305,18 @@ class GameLogic(
                             // 일반 적은 기존 방식대로 처리
                             enemy.takeDamage(gameConfig.CENTER_REACHED_DAMAGE) // 중앙에 도달하면 죽음
                             
-                            // 적의 공격력에 따라 디펜스 유닛 체력 감소
-                            val enemyDamage = enemy.getDamage()
-                            val isUnitDead = gameStats.applyDamageToUnit(enemyDamage)
-                            
-                            // 체력이 0 이하일 때만 게임오버 처리
-                            if (isUnitDead && !isGameOver) {
-                                isGameOver = true
-                                // 게임 오버 처리 - UI 스레드에서 실행
-                                Handler(Looper.getMainLooper()).post {
-                                    gameOverListener?.onGameOver(gameStats.getResource(), gameStats.getWaveCount())
+                            // 적의 공격력에 따라 디펜스 유닛 체력 감소 (무적 상태가 아닐 때만)
+                            if (!isInvincible) {
+                                val enemyDamage = enemy.getDamage()
+                                val isUnitDead = gameStats.applyDamageToUnit(enemyDamage)
+                                
+                                // 체력이 0 이하일 때만 게임오버 처리
+                                if (isUnitDead && !isGameOver) {
+                                    isGameOver = true
+                                    // 게임 오버 처리 - UI 스레드에서 실행
+                                    Handler(Looper.getMainLooper()).post {
+                                        gameOverListener?.onGameOver(gameStats.getResource(), gameStats.getWaveCount())
+                                    }
                                 }
                             }
                         }
@@ -706,7 +774,7 @@ class GameLogic(
         // 디펜스 유닛의 위치와 공격 범위 가져오기
         val centerX = defenseUnit.getPosition().x
         val centerY = defenseUnit.getPosition().y
-        val attackRange = defenseUnit.getAttackRange()
+        val attackRange = defenseUnit.attackRange
         
         // 보스가 아니고 공격 범위 내에 있는 적만 제거
         val enemiesToRemove = enemies.filter { enemy -> 

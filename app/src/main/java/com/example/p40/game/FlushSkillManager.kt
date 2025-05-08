@@ -186,20 +186,22 @@ class FlushSkillManager(
             }
             
             CardSuit.CLUB -> {
-                // 클로버 플러시: 시간 멈춤 (설정된 시간 동안 모든 적 멈춤)
+                // 클로버 플러시: 시간 멈춤 (설정된 시간 동안 공격 범위 내 적만 멈춤)
                 val duration = GameConfig.CLUB_FLUSH_DURATION
-                gameView.freezeAllEnemies(true)
+                
+                // 기존 전체 멈춤에서 범위 기반 멈춤으로 변경
+                gameView.freezeEnemiesInRange(true)
                 
                 // 클로버 이펙트 보여주기 (모래시계 효과)
                 visualEffectManager?.showClubFlushEffect(duration)
                 
                 // 메시지 표시 (초 단위로 변환)
                 val durationInSeconds = duration / 1000
-                messageManager.showInfo("클로버 플러시 스킬: ${durationInSeconds}초간 시간 정지!")
+                messageManager.showInfo("클로버 플러시 스킬: ${durationInSeconds}초간 공격 범위 내 시간 정지!")
                 
                 // 설정된 시간 후 효과 해제
                 handler.postDelayed({
-                    gameView.freezeAllEnemies(false)
+                    gameView.freezeEnemiesInRange(false)
                     // 효과가 확실히 제거될 수 있도록 명시적 호출 추가
                     visualEffectManager?.clearEffects()
                     messageManager.showInfo("클로버 플러시 스킬 종료")
@@ -279,6 +281,7 @@ class FlushSkillManager(
         
         // 클로버 플러시 효과(시간 멈춤) 해제
         gameView.freezeAllEnemies(false)
+        gameView.freezeEnemiesInRange(false) // 범위 기반 시간 멈춤도 해제
         
         // 다이아몬드 플러시 효과(무적) 해제
         gameView.setInvincible(false)

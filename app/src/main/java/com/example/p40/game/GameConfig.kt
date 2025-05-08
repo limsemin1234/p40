@@ -97,7 +97,7 @@ object GameConfig {
     const val ENEMY_DAMAGE_PER_WAVE = 5  // 웨이브당 적 데미지 증가량
     
     // 점수 설정
-    const val SCORE_PER_NORMAL_ENEMY = 1000  // 일반 적 처치 시 얻는 점수(자원) - 주석과 일치하도록 수정
+    const val SCORE_PER_NORMAL_ENEMY = 10  // 일반 적 처치 시 얻는 점수(자원) - 주석과 일치하도록 수정
     const val SCORE_PER_BOSS = 200  // 보스 처치 시 얻는 점수(자원)
     
     // 코인 보상 설정

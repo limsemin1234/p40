@@ -413,6 +413,7 @@ class GameView @JvmOverloads constructor(
     
     // 클로버 플러시 스킬: 시간 멈춤 (모든 적 멈춤)
     private var timeFrozen = false
+    private var rangeBasedTimeFrozen = false
     
     fun freezeAllEnemies(freeze: Boolean) {
         timeFrozen = freeze
@@ -423,11 +424,26 @@ class GameView @JvmOverloads constructor(
         }
     }
     
+    // 클로버 플러시 스킬: 공격 범위 내 적 시간 멈춤
+    fun freezeEnemiesInRange(freeze: Boolean) {
+        rangeBasedTimeFrozen = freeze
+        
+        // GameLogic에 범위 기반 시간 정지 상태 전달
+        if (initializeIfNeeded()) {
+            gameLogic.setRangeBasedTimeFrozen(freeze)
+        }
+    }
+    
     // 다이아 플러시 스킬: 무적
     private var isInvincible = false
     
     fun setInvincible(invincible: Boolean) {
         isInvincible = invincible
+        
+        // GameLogic에도 무적 상태 전달
+        if (initializeIfNeeded()) {
+            gameLogic.setInvincible(invincible)
+        }
     }
     
     // 데미지 메서드 수정 (무적 상태 체크 추가)
