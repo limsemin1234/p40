@@ -23,6 +23,8 @@
         android:textSize="24sp"
         android:textStyle="bold"
         android:textColor="#FFFFFF"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginTop="16dp"
         app:layout_constraintTop_toBottomOf="@id/topBar"
         app:layout_constraintStart_toStartOf="parent"
@@ -36,6 +38,8 @@
         android:text="덱 구성: 0장/53장"
         android:textColor="#CCCCCC"
         android:textSize="16sp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginTop="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/titleText" />
@@ -48,6 +52,8 @@
         android:text="현재 덱 (선택하여 카드 제거)"
         android:textColor="#FFFFFF"
         android:textSize="18sp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginTop="8dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/titleText" />
@@ -58,6 +64,8 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="#444444"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginTop="4dp"
         app:layout_constraintTop_toBottomOf="@id/tvCurrentDeckTitle" />
 
@@ -70,6 +78,8 @@
         android:background="#222222"
         android:padding="4dp"
         android:clipToPadding="false"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         app:layout_constraintTop_toBottomOf="@id/divider1"
         app:layout_constraintBottom_toTopOf="@id/btnRemoveSelected"
         app:layout_constraintHeight_percent="0.30" />
@@ -80,6 +90,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="선택한 카드 제거"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:textSize="16sp"
         android:layout_marginTop="4dp"
         android:paddingHorizontal="24dp"
@@ -94,6 +106,8 @@
         android:text="보유한 카드 (선택하여 덱에 추가)"
         android:textColor="#FFFFFF"
         android:textSize="18sp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginTop="8dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btnRemoveSelected" />
@@ -104,6 +118,8 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="#444444"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginTop="4dp"
         app:layout_constraintTop_toBottomOf="@id/tvCollectionTitle" />
 
@@ -115,6 +131,8 @@
         android:layout_marginTop="8dp"
         android:background="#222222"
         android:padding="4dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:clipToPadding="false"
         app:layout_constraintBottom_toTopOf="@id/btnAddSelected"
         app:layout_constraintTop_toBottomOf="@id/divider2" />
@@ -127,6 +145,8 @@
         android:text="선택한 카드 추가"
         android:textSize="16sp"
         android:layout_marginTop="4dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         app:layout_constraintTop_toBottomOf="@id/rvCollection"
         app:layout_constraintBottom_toTopOf="@id/buttonContainer" />
 
@@ -138,6 +158,8 @@
         android:orientation="horizontal"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <!-- 저장 버튼 -->
