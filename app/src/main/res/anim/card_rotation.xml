@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <set xmlns:android="http://schemas.android.com/apk/res/android"
-    android:interpolator="@android:anim/accelerate_decelerate_interpolator">
+    android:interpolator="@android:anim/accelerate_decelerate_interpolator"
+    android:repeatMode="restart"
+    android:repeatCount="infinite"
+    android:fillAfter="true"
+    android:fillBefore="true"
+    android:fillEnabled="true">
     
     <!-- 0도에서 360도로 Y축 회전 -->
     <rotate

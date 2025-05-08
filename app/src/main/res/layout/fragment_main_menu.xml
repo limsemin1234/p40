@@ -45,97 +45,21 @@
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent" />
             
-        <!-- 스페이드 A 카드 로고 - 크기 감소 -->
-        <androidx.cardview.widget.CardView
+        <!-- 스페이드 A 카드 로고 - 커스텀 뷰로 변경 -->
+        <com.example.p40.MainMenuLogoCard
             android:id="@+id/gameLogo"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginTop="24dp"
-            app:layout_constraintWidth_percent="0.32"
+            android:clickable="true"
+            android:focusable="true"
+            android:visibility="visible"
+            android:elevation="8dp"
+            app:layout_constraintWidth_percent="0.30"
             app:layout_constraintDimensionRatio="3:4"
             app:layout_constraintTop_toBottomOf="@id/topBar"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:cardCornerRadius="16dp"
-            app:cardBackgroundColor="@android:color/transparent"
-            app:cardElevation="10dp">
-            
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@drawable/premium_card_background">
-                
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:gravity="center"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="♠"
-                        android:textSize="64sp"
-                        android:textStyle="bold"
-                        android:textColor="#000000"
-                        android:shadowColor="#80000000"
-                        android:shadowDx="1"
-                        android:shadowDy="1"
-                        android:shadowRadius="2"/>
-                </LinearLayout>
-                
-                <!-- 카드 왼쪽 상단 작은 표시 -->
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_margin="12dp"
-                    android:gravity="center">
-                    
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="A"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="#000000" />
-                        
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="♠"
-                        android:textSize="16sp"
-                        android:textColor="#000000" />
-                </LinearLayout>
-                
-                <!-- 카드 오른쪽 하단 작은 표시 (뒤집힘) -->
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_margin="12dp"
-                    android:layout_gravity="bottom|right"
-                    android:gravity="center"
-                    android:rotation="180">
-                    
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="A"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="#000000" />
-                        
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="♠"
-                        android:textSize="16sp"
-                        android:textColor="#000000" />
-                </LinearLayout>
-            </FrameLayout>
-        </androidx.cardview.widget.CardView>
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <!-- 타이틀 영역 -->
         <TextView

@@ -120,25 +120,25 @@ object GameConfig {
     const val DAMAGE_UPGRADE_INITIAL_COST = 10  // 초기 비용
     const val DAMAGE_UPGRADE_COST_INCREASE = 5  // 레벨당 비용 증가량
     const val DAMAGE_UPGRADE_VALUE = 1  // 업그레이드당 데미지 증가량
-    const val DAMAGE_UPGRADE_MAX_LEVEL = 100  // 최대 업그레이드 레벨
+    const val DAMAGE_UPGRADE_MAX_LEVEL = 500  // 최대 업그레이드 레벨
     
     // 공격속도 업그레이드 설정
     const val ATTACK_SPEED_UPGRADE_INITIAL_COST = 10  // 초기 비용
     const val ATTACK_SPEED_UPGRADE_COST_INCREASE = 5  // 레벨당 비용 증가량
     const val ATTACK_SPEED_UPGRADE_PERCENT = 0.02f  // 업그레이드당 속도 증가율 0.02%
-    const val ATTACK_SPEED_UPGRADE_MAX_LEVEL = 100  // 최대 업그레이드 레벨
+    const val ATTACK_SPEED_UPGRADE_MAX_LEVEL = 200  // 최대 업그레이드 레벨
     
     // 공격범위 업그레이드 설정
     const val ATTACK_RANGE_UPGRADE_INITIAL_COST = 10  // 초기 비용
     const val ATTACK_RANGE_UPGRADE_COST_INCREASE = 5  // 레벨당 비용 증가량
     const val ATTACK_RANGE_UPGRADE_VALUE = 5f  // 업그레이드당 범위 증가량
-    const val ATTACK_RANGE_UPGRADE_MAX_LEVEL = 60  // 최대 업그레이드 레벨
+    const val ATTACK_RANGE_UPGRADE_MAX_LEVEL = 100  // 최대 업그레이드 레벨
     
     // 체력 업그레이드 설정
     const val DEFENSE_UPGRADE_INITIAL_COST = 10  // 초기 비용
     const val DEFENSE_UPGRADE_COST_INCREASE = 5  // 레벨당 비용 증가량
     const val DEFENSE_UPGRADE_VALUE = 20  // 업그레이드당 최대 체력 증가량
-    const val DEFENSE_UPGRADE_MAX_LEVEL = 100  // 최대 업그레이드 레벨
+    const val DEFENSE_UPGRADE_MAX_LEVEL = 500  // 최대 업그레이드 레벨
 
     
     // --------- 렌더링 관련 설정 ----------
