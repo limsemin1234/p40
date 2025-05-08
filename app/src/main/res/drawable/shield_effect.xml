@@ -5,9 +5,17 @@
     android:viewportWidth="24"
     android:viewportHeight="24">
     
+    <!-- 방패 테두리 - 황금색으로 변경 -->
     <path
-        android:fillColor="#80FFFFFF"
-        android:strokeColor="#FFFFFF"
-        android:strokeWidth="1"
-        android:pathData="M12,1L3,5v6c0,5.55 3.84,10.74 9,12c5.16,-1.26 9,-6.45 9,-12V5L12,1L12,1z" />
+        android:fillColor="#FFD700"
+        android:strokeColor="#E6C200"
+        android:strokeWidth="0.5"
+        android:pathData="M12,2L4,5v6c0,5.55 3.84,10.74 8,12 4.16,-1.26 8,-6.45 8,-12V5L12,2z" />
+    
+    <!-- 방패 내부 - 약간 더 밝은 황금색 -->
+    <path
+        android:fillColor="#FFEF80"
+        android:strokeColor="#E6C200"
+        android:strokeWidth="0.3"
+        android:pathData="M12,3.8L5.8,6.2v4.8c0,4.44 3.07,8.59 6.2,9.6 3.13,-1.01 6.2,-5.16 6.2,-9.6V6.2L12,3.8z" />
 </vector> 

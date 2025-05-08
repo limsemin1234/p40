@@ -159,14 +159,19 @@ class FlushSkillManager(
         
         when (suit) {
             CardSuit.HEART -> {
-                // 하트 플러시: 체력 전체 회복
-                gameView.restoreFullHealth()
+                // 하트 플러시: 체력 회복
+                if (GameConfig.HEART_FLUSH_HEAL_AMOUNT < 0) {
+                    // -1은 전체 회복
+                    gameView.restoreFullHealth()
+                    messageManager.showInfo("하트 플러시 스킬: 체력 전체 회복!")
+                } else {
+                    // 특정 수치만큼 회복
+                    gameView.healUnit(GameConfig.HEART_FLUSH_HEAL_AMOUNT)
+                    messageManager.showInfo("하트 플러시 스킬: 체력 ${GameConfig.HEART_FLUSH_HEAL_AMOUNT} 회복!")
+                }
                 
                 // 하트 이펙트 보여주기
                 visualEffectManager?.showHeartFlushEffect()
-                
-                // 메시지 표시
-                messageManager.showInfo("하트 플러시 스킬: 체력 전체 회복!")
             }
             
             CardSuit.SPADE -> {
@@ -181,41 +186,45 @@ class FlushSkillManager(
             }
             
             CardSuit.CLUB -> {
-                // 클로버 플러시: 시간 멈춤 (5초 동안 모든 적 멈춤)
+                // 클로버 플러시: 시간 멈춤 (설정된 시간 동안 모든 적 멈춤)
+                val duration = GameConfig.CLUB_FLUSH_DURATION
                 gameView.freezeAllEnemies(true)
                 
-                // 클로버 이펙트 보여주기 (모래시계 효과로 변경됨)
-                visualEffectManager?.showClubFlushEffect(5000)
+                // 클로버 이펙트 보여주기 (모래시계 효과)
+                visualEffectManager?.showClubFlushEffect(duration)
                 
-                // 메시지 표시
-                messageManager.showInfo("클로버 플러시 스킬: 5초간 시간 정지!")
+                // 메시지 표시 (초 단위로 변환)
+                val durationInSeconds = duration / 1000
+                messageManager.showInfo("클로버 플러시 스킬: ${durationInSeconds}초간 시간 정지!")
                 
-                // 5초 후 효과 해제
+                // 설정된 시간 후 효과 해제
                 handler.postDelayed({
                     gameView.freezeAllEnemies(false)
                     // 효과가 확실히 제거될 수 있도록 명시적 호출 추가
                     visualEffectManager?.clearEffects()
                     messageManager.showInfo("클로버 플러시 스킬 종료")
-                }, 5000)
+                }, duration)
             }
             
             CardSuit.DIAMOND -> {
-                // 다이아 플러시: 무적 (5초)
+                // 다이아 플러시: 무적 (설정된 시간 동안)
+                val duration = GameConfig.DIAMOND_FLUSH_DURATION
                 gameView.setInvincible(true)
                 
                 // 다이아 이펙트 보여주기
-                visualEffectManager?.showDiamondFlushEffect(5000)
+                visualEffectManager?.showDiamondFlushEffect(duration)
                 
-                // 메시지 표시
-                messageManager.showInfo("다이아 플러시 스킬: 5초간 무적!")
+                // 메시지 표시 (초 단위로 변환)
+                val durationInSeconds = duration / 1000
+                messageManager.showInfo("다이아 플러시 스킬: ${durationInSeconds}초간 무적!")
                 
-                // 5초 후 효과 해제
+                // 설정된 시간 후 효과 해제
                 handler.postDelayed({
                     gameView.setInvincible(false)
                     // 효과가 확실히 제거될 수 있도록 명시적 호출 추가
                     visualEffectManager?.clearEffects()
                     messageManager.showInfo("다이아 플러시 스킬 종료")
-                }, 5000)
+                }, duration)
             }
             
             else -> return // 조커 등 다른 슈트는 처리 안함

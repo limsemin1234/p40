@@ -135,7 +135,7 @@ class VisualEffectManager(
     /**
      * 클로버 플러시 스킬 효과 (시간 멈춤)
      */
-    fun showClubFlushEffect(durationMs: Long = 5000) {
+    fun showClubFlushEffect(durationMs: Long = GameConfig.CLUB_FLUSH_DURATION) {
         // 오버레이 제거 (기존에 있는 경우)
         clearEffects()
         
@@ -145,8 +145,8 @@ class VisualEffectManager(
         
         // 모래시계 아이콘 생성
         val hourglassIcon = ImageView(context).apply {
-            layoutParams = FrameLayout.LayoutParams(150, 250).apply {
-                leftMargin = (unitX - 75).toInt()
+            layoutParams = FrameLayout.LayoutParams(180, 300).apply {
+                leftMargin = (unitX - 90).toInt()
                 topMargin = (unitY - 185).toInt()
             }
             setImageResource(R.drawable.hourglass_effect)
@@ -154,6 +154,7 @@ class VisualEffectManager(
         }
         
         gameContainer.addView(hourglassIcon)
+        effectIcon = hourglassIcon // 효과 아이콘으로 저장하여 확실히 제거되도록 함
         
         // 모래시계 흘러내리는 애니메이션
         val sandAnimator = ObjectAnimator.ofFloat(hourglassIcon, "translationY", 0f, 100f).apply {
@@ -167,43 +168,6 @@ class VisualEffectManager(
             start()
         }
         
-        // 주변 시간 정지 입자 효과 (작은 모래시계들)
-        for (i in 0 until 5) {
-            val particleSize = (40 + (Math.random() * 30)).toInt()
-            val randomX = (unitX - 150) + (Math.random() * 300)
-            val randomY = (unitY - 150) + (Math.random() * 300)
-            
-            val particleIcon = ImageView(context).apply {
-                layoutParams = FrameLayout.LayoutParams(particleSize, particleSize).apply {
-                    leftMargin = randomX.toInt()
-                    topMargin = randomY.toInt()
-                }
-                setImageResource(R.drawable.hourglass_effect)
-                alpha = 0.5f
-                rotation = (Math.random() * 360).toFloat()
-            }
-            
-            gameContainer.addView(particleIcon)
-            
-            // 입자 회전 애니메이션
-            val particleRotate = ObjectAnimator.ofFloat(particleIcon, "rotation", 
-                particleIcon.rotation, particleIcon.rotation + 180f).apply {
-                duration = durationMs
-                start()
-            }
-            
-            // 입자 이동 애니메이션
-            val particleMove = ObjectAnimator.ofFloat(particleIcon, "translationY", 
-                0f, (50 + Math.random() * 100).toFloat()).apply {
-                duration = durationMs
-                start()
-            }
-            
-            // 애니메이션 추적
-            currentAnimators.add(particleRotate)
-            currentAnimators.add(particleMove)
-        }
-        
         // 애니메이션 추적
         currentAnimators.add(sandAnimator)
         currentAnimators.add(rotateAnimator)
@@ -212,33 +176,21 @@ class VisualEffectManager(
         handler.postDelayed({
             // 모든 애니메이션 종료 및 효과 제거
             clearEffects()
-            
-            // 종료 애니메이션 표시
-            val fadeOutAnimator = ObjectAnimator.ofFloat(hourglassIcon, "alpha", 0.9f, 0f).apply {
-                duration = 500
-                doOnEnd { 
-                    gameContainer.removeView(hourglassIcon)
-                }
-                start()
-            }
-            
-            currentAnimators.add(fadeOutAnimator)
-            
         }, durationMs)
     }
     
     /**
      * 다이아몬드 플러시 스킬 효과 (무적)
      */
-    fun showDiamondFlushEffect(durationMs: Long = 5000) {
+    fun showDiamondFlushEffect(durationMs: Long = GameConfig.DIAMOND_FLUSH_DURATION) {
         // 오버레이 제거 (기존에 있는 경우)
         clearEffects()
         
         // 다이아몬드 아이콘 추가
         val diamondIcon = createEffectIcon(R.drawable.diamond_effect)
         
-        // 방패 아이콘 추가 (무적 효과를 더 확실히 표현) - 크기 축소
-        val shieldIcon = createShieldIcon(200) // 크기를 300에서 200으로 줄임
+        // 방패 아이콘 추가 (무적 효과를 더 확실히 표현) - 황금색 방패
+        val shieldIcon = createShieldIcon(200) // 크기 설정
         
         // 다이아몬드 아이콘 회전 효과
         val rotateAnimator = ObjectAnimator.ofFloat(diamondIcon, "rotation", 0f, 360f).apply {
@@ -247,8 +199,23 @@ class VisualEffectManager(
             start()
         }
         
-        // 방패 아이콘 맥동 효과
-        val shieldPulseAnimator = ObjectAnimator.ofFloat(shieldIcon, "alpha", 0.5f, 0.9f).apply {
+        // 방패 아이콘 크기 변화 애니메이션 (작아졌다 커졌다 반복)
+        val shieldScaleXAnimator = ObjectAnimator.ofFloat(shieldIcon, "scaleX", 0.8f, 1.2f).apply {
+            duration = 1000
+            repeatCount = ValueAnimator.INFINITE
+            repeatMode = ValueAnimator.REVERSE
+            start()
+        }
+        
+        val shieldScaleYAnimator = ObjectAnimator.ofFloat(shieldIcon, "scaleY", 0.8f, 1.2f).apply {
+            duration = 1000
+            repeatCount = ValueAnimator.INFINITE
+            repeatMode = ValueAnimator.REVERSE
+            start()
+        }
+        
+        // 방패 아이콘 맥동 효과 (투명도 변화)
+        val shieldPulseAnimator = ObjectAnimator.ofFloat(shieldIcon, "alpha", 0.6f, 1.0f).apply {
             duration = 1000
             repeatCount = ValueAnimator.INFINITE
             repeatMode = ValueAnimator.REVERSE
@@ -257,25 +224,14 @@ class VisualEffectManager(
         
         // 추적을 위해 저장
         currentAnimators.add(rotateAnimator)
+        currentAnimators.add(shieldScaleXAnimator)
+        currentAnimators.add(shieldScaleYAnimator)
         currentAnimators.add(shieldPulseAnimator)
         
         // 지정된 시간 후 효과 제거
         handler.postDelayed({
             // 모든 애니메이션 종료 및 효과 제거
             clearEffects()
-            
-            // 종료 애니메이션 표시
-            val fadeOutAnimator = ObjectAnimator.ofFloat(diamondIcon, "alpha", 1f, 0f).apply {
-                duration = 500
-                doOnEnd { 
-                    gameContainer.removeView(diamondIcon)
-                    gameContainer.removeView(shieldIcon)
-                }
-                start()
-            }
-            
-            currentAnimators.add(fadeOutAnimator)
-            
         }, durationMs)
     }
     

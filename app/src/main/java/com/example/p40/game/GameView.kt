@@ -397,6 +397,11 @@ class GameView @JvmOverloads constructor(
         gameStats.restoreFullHealth()
     }
     
+    // 하트 플러시 스킬: 특정 수치만큼 체력 회복
+    fun healUnit(amount: Int) {
+        gameStats.healUnit(amount)
+    }
+    
     // 스페이드 플러시 스킬: 화면 내 모든 적 제거 (보스 제외)
     fun removeAllEnemiesExceptBoss(): Int {
         return if (initializeIfNeeded()) {
