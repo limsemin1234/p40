@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
+import android.widget.FrameLayout
 import com.example.p40.R
 import com.example.p40.game.CardSuit
 
@@ -30,6 +31,9 @@ class FlushSkillManager(
     // 시간 멈춤 관련 핸들러
     private val handler = Handler(Looper.getMainLooper())
     
+    // 시각적 효과 관리자
+    private var visualEffectManager: VisualEffectManager? = null
+    
     // 버튼 크기 상수
     private val BUTTON_WIDTH = 80 // dp 단위로 설정 (100dp에서 60dp로 줄임)
     private val BUTTON_HEIGHT = ViewGroup.LayoutParams.WRAP_CONTENT
@@ -46,6 +50,12 @@ class FlushSkillManager(
         // 버튼 컨테이너의 orientation과 gravity만 설정하고, 레이아웃 파라미터는 건드리지 않음
         skillButtonContainer.orientation = LinearLayout.HORIZONTAL
         skillButtonContainer.gravity = Gravity.START
+        
+        // 부모 뷰 (게임 컨테이너) 찾기
+        val parent = skillButtonContainer.parent
+        if (parent is FrameLayout) {
+            visualEffectManager = VisualEffectManager(context, parent)
+        }
     }
     
     /**
@@ -151,20 +161,41 @@ class FlushSkillManager(
             CardSuit.HEART -> {
                 // 하트 플러시: 체력 전체 회복
                 gameView.restoreFullHealth()
+                
+                // 하트 이펙트 보여주기
+                visualEffectManager?.showHeartFlushEffect()
+                
+                // 메시지 표시
+                messageManager.showInfo("하트 플러시 스킬: 체력 전체 회복!")
             }
             
             CardSuit.SPADE -> {
                 // 스페이드 플러시: 화면 내 모든 적 제거 (보스 제외)
                 val killedEnemies = gameView.removeAllEnemiesExceptBoss()
+                
+                // 스페이드 이펙트 보여주기
+                visualEffectManager?.showSpadeFlushEffect()
+                
+                // 메시지 표시
+                messageManager.showInfo("스페이드 플러시 스킬: ${killedEnemies}마리 적 제거!")
             }
             
             CardSuit.CLUB -> {
                 // 클로버 플러시: 시간 멈춤 (5초 동안 모든 적 멈춤)
                 gameView.freezeAllEnemies(true)
                 
+                // 클로버 이펙트 보여주기 (모래시계 효과로 변경됨)
+                visualEffectManager?.showClubFlushEffect(5000)
+                
+                // 메시지 표시
+                messageManager.showInfo("클로버 플러시 스킬: 5초간 시간 정지!")
+                
                 // 5초 후 효과 해제
                 handler.postDelayed({
                     gameView.freezeAllEnemies(false)
+                    // 효과가 확실히 제거될 수 있도록 명시적 호출 추가
+                    visualEffectManager?.clearEffects()
+                    messageManager.showInfo("클로버 플러시 스킬 종료")
                 }, 5000)
             }
             
@@ -172,9 +203,18 @@ class FlushSkillManager(
                 // 다이아 플러시: 무적 (5초)
                 gameView.setInvincible(true)
                 
+                // 다이아 이펙트 보여주기
+                visualEffectManager?.showDiamondFlushEffect(5000)
+                
+                // 메시지 표시
+                messageManager.showInfo("다이아 플러시 스킬: 5초간 무적!")
+                
                 // 5초 후 효과 해제
                 handler.postDelayed({
                     gameView.setInvincible(false)
+                    // 효과가 확실히 제거될 수 있도록 명시적 호출 추가
+                    visualEffectManager?.clearEffects()
+                    messageManager.showInfo("다이아 플러시 스킬 종료")
                 }, 5000)
             }
             
@@ -234,7 +274,19 @@ class FlushSkillManager(
         // 다이아몬드 플러시 효과(무적) 해제
         gameView.setInvincible(false)
         
+        // 모든 시각적 효과 제거
+        visualEffectManager?.clearEffects()
+        
         // 모든 스킬 비활성화
         deactivateAllSkills()
+    }
+    
+    /**
+     * 리소스 정리
+     */
+    fun cleanup() {
+        resetAllSkills()
+        visualEffectManager?.cleanup()
+        visualEffectManager = null
     }
 } 

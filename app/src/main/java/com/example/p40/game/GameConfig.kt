@@ -19,6 +19,9 @@ object GameConfig {
     // 디버그 모드 설정
     const val DEBUG_MODE = false // 디버그 정보 표시 여부
     
+    // 테스트 모드 설정
+    const val TEST_ENABLE_ALL_SKILLS = true // 웨이브 시작 시 모든 스킬 활성화 여부
+    
     // 성능 및 제한 설정
     const val FRAME_LIMIT = 60 // 최대 FPS
     const val MAX_ENEMIES = 100 // 화면에 표시되는 최대 적 수

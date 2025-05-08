@@ -161,36 +161,41 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- 중앙 게임 영역 -->
-    <com.example.p40.game.GameView
-        android:id="@+id/gameView"
+    <!-- 중앙 게임 영역 - FrameLayout으로 감싸서 이펙트 표시 가능하도록 함 -->
+    <FrameLayout
+        android:id="@+id/gameContainer"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintTop_toBottomOf="@id/topBar"
         app:layout_constraintBottom_toTopOf="@id/bottomBar"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <!-- 플러시 스킬 버튼 컨테이너 -->
-    <LinearLayout
-        android:id="@+id/flushSkillButtonContainer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginStart="16dp"
-        android:layout_marginBottom="8dp"
-        android:paddingVertical="4dp"
-        android:paddingHorizontal="4dp"
-        android:background="@android:color/transparent"
-        android:gravity="center"
-        android:visibility="gone"
-        android:elevation="5dp"
-        app:layout_constraintBottom_toTopOf="@id/bottomBar"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintEnd_toEndOf="parent">
         
-        <!-- 스킬 버튼들이 여기에 동적으로 추가됩니다 -->
-        
-    </LinearLayout>
+        <com.example.p40.game.GameView
+            android:id="@+id/gameView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+            
+        <!-- 플러시 스킬 버튼 컨테이너 -->
+        <LinearLayout
+            android:id="@+id/flushSkillButtonContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="8dp"
+            android:paddingVertical="4dp"
+            android:paddingHorizontal="4dp"
+            android:background="@android:color/transparent"
+            android:gravity="center"
+            android:visibility="gone"
+            android:elevation="5dp"
+            android:layout_gravity="bottom|start">
+            
+            <!-- 스킬 버튼들이 여기에 동적으로 추가됩니다 -->
+            
+        </LinearLayout>
+    </FrameLayout>
 
     <!-- 하단바 -->
     <androidx.constraintlayout.widget.ConstraintLayout

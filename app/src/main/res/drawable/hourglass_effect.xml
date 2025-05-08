@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    
+    <!-- 모래시계 외부 테두리 -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:strokeColor="#888888"
+        android:strokeWidth="0.5"
+        android:pathData="M16,2H8C7.45,2 7,2.45 7,3V5C7,5.55 7.45,6 8,6H16C16.55,6 17,5.55 17,5V3C17,2.45 16.55,2 16,2Z" />
+    
+    <!-- 모래시계 아래 부분 -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:strokeColor="#888888"
+        android:strokeWidth="0.5"
+        android:pathData="M16,18H8C7.45,18 7,18.45 7,19V21C7,21.55 7.45,22 8,22H16C16.55,22 17,21.55 17,21V19C17,18.45 16.55,18 16,18Z" />
+    
+    <!-- 모래시계 연결부 -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#888888"
+        android:strokeWidth="0.5"
+        android:pathData="M7,3L10,10L7,17L7,19M17,3L14,10L17,17L17,19" />
+    
+    <!-- 모래시계 위쪽 모래 -->
+    <path
+        android:fillColor="#DDDDDD"
+        android:pathData="M9,4H15V6.5L12,10L9,6.5V4Z" />
+    
+    <!-- 모래시계 아래쪽 모래 (절반 정도 차있음) -->
+    <path
+        android:fillColor="#DDDDDD"
+        android:pathData="M9,20H15V17L12,14L9,17V20Z" />
+    
+    <!-- 흐르는 모래 입자들 -->
+    <path
+        android:fillColor="#DDDDDD"
+        android:pathData="M12,10L11.7,10.5L12,11L12.3,10.5L12,10Z" />
+    
+    <path
+        android:fillColor="#DDDDDD"
+        android:pathData="M12,12L11.5,12.5L12,13L12.5,12.5L12,12Z" />
+    
+    <path
+        android:fillColor="#DDDDDD"
+        android:pathData="M11.5,13.5L11,14L12,14.5L13,14L11.5,13.5Z" />
+</vector> 

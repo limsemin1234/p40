@@ -480,11 +480,49 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
     
     // 웨이브 완료 리스너 설정
     private fun setupWaveCompletionListener() {
-        // 테스트용 코드 제거
-        // 실제 구현 시에는 GameView 클래스에 웨이브 완료 콜백 추가 필요
-        // gameView.setOnWaveCompletedListener { waveNumber -> 
-        //     onWaveCompleted(waveNumber)
-        // }
+        // 이전 웨이브 정보 저장 변수
+        var previousWave = 0
+        
+        // 주기적으로 웨이브 변경 감지
+        handler.postDelayed(object : Runnable {
+            override fun run() {
+                if (!isAdded) return
+                
+                // 현재 웨이브 확인
+                val currentWave = gameView.getWaveCount()
+                
+                // 웨이브가 변경되었고 테스트 모드가 활성화된 경우
+                if (currentWave > previousWave && GameConfig.TEST_ENABLE_ALL_SKILLS) {
+                    // 웨이브 시작 시 모든 스킬 활성화 (테스트용)
+                    activateAllSkillsForTesting()
+                    
+                    // 메시지 표시
+                    if (currentWave > 1) { // 게임 시작 시 첫 웨이브는 제외
+                        messageManager.showInfo("웨이브 ${currentWave} 시작! 테스트 모드: 모든 스킬 활성화")
+                    }
+                }
+                
+                // 현재 웨이브 정보 저장
+                previousWave = currentWave
+                
+                // 다음 확인 예약 (500ms 후)
+                if (isAdded) {
+                    handler.postDelayed(this, 500)
+                }
+            }
+        }, 500)
+    }
+    
+    // 테스트를 위해 모든 스킬 활성화
+    private fun activateAllSkillsForTesting() {
+        // 먼저 기존 스킬 모두 비활성화
+        flushSkillManager.deactivateAllSkills()
+        
+        // 모든 스킬 활성화
+        flushSkillManager.activateFlushSkill(CardSuit.HEART)
+        flushSkillManager.activateFlushSkill(CardSuit.SPADE)
+        flushSkillManager.activateFlushSkill(CardSuit.CLUB)
+        flushSkillManager.activateFlushSkill(CardSuit.DIAMOND)
     }
     
     // 웨이브 완료 시 처리
@@ -985,24 +1023,24 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         gameView.pause()
     }
     
+    override fun onStop() {
+        super.onStop()
+        // 게임 일시정지
+        if (::gameView.isInitialized) {
+            gameView.pause()
+        }
+        
+        // UI 업데이트 중지
+        handler.removeCallbacks(uiUpdateRunnable)
+    }
+    
     override fun onDestroy() {
         super.onDestroy()
-        // 프래그먼트 파괴 시 모든 리소스 정리
+        // 모든 핸들러 콜백 제거
+        handler.removeCallbacksAndMessages(null)
+        
+        // 게임 리소스 정리
         cleanupGameResources()
-        
-        // 남아있는 모든 메시지 제거
-        if (::messageManager.isInitialized) {
-            messageManager.clear()
-        }
-        
-        // 열려있는 패널이 있다면 닫기
-        if (currentOpenPanel != null) {
-            currentOpenPanel?.visibility = View.GONE
-            currentOpenPanel = null
-        }
-        
-        // 남아있는 애니메이션 제거
-        view?.clearAnimation()
     }
 }
 

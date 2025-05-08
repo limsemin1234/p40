@@ -411,6 +411,11 @@ class GameView @JvmOverloads constructor(
     
     fun freezeAllEnemies(freeze: Boolean) {
         timeFrozen = freeze
+        
+        // GameLogic에 시간 정지 상태 전달
+        if (initializeIfNeeded()) {
+            gameLogic.setTimeFrozen(freeze)
+        }
     }
     
     // 다이아 플러시 스킬: 무적
