@@ -313,32 +313,21 @@ class GameStats(
     }
     
     fun getActiveBuffs(): List<Buff> = buffManager.getAllBuffs()
-    fun getDefenseBuffs(): List<Buff> = buffManager.getDefenseBuffs()
-    fun getEnemyNerfs(): List<Buff> = buffManager.getEnemyNerfs()
+    
+    // 데미지 버프만 반환하도록 수정
+    fun getDefenseBuffs(): List<Buff> = buffManager.getAllBuffs().filter { it.type == BuffType.MISSILE_DAMAGE }
+    
+    // 플러시 스킬 버프만 반환하도록 수정
+    fun getEnemyNerfs(): List<Buff> = buffManager.getAllBuffs().filter { 
+        it.type == BuffType.HEART_FLUSH_SKILL || 
+        it.type == BuffType.SPADE_FLUSH_SKILL || 
+        it.type == BuffType.CLUB_FLUSH_SKILL || 
+        it.type == BuffType.DIAMOND_FLUSH_SKILL 
+    }
     
     // 특수 계산 메서드들
     fun getEffectiveAttackPower(): Int {
         return (unitAttackPower * buffManager.getMissileDamageMultiplier()).toInt()
-    }
-    
-    fun getEffectiveAttackSpeed(): Float {
-        return unitAttackSpeed * buffManager.getAttackSpeedMultiplier()
-    }
-    
-    fun getEnemySpeedMultiplier(): Float {
-        return buffManager.getEnemySpeedMultiplier()
-    }
-    
-    fun getMissileSpeedMultiplier(): Float {
-        return buffManager.getMissileSpeedMultiplier()
-    }
-    
-    fun getMultiDirectionCount(): Int {
-        return buffManager.getMultiDirectionCount()
-    }
-    
-    fun getMissilePierceCount(): Int {
-        return buffManager.getMissilePierceCount()
     }
     
     /**
@@ -349,7 +338,7 @@ class GameStats(
             health = unitHealth,
             maxHealth = unitMaxHealth,
             attackPower = getEffectiveAttackPower(),
-            attackSpeed = getEffectiveAttackSpeed(),
+            attackSpeed = unitAttackSpeed.toFloat(),
             attackRange = unitAttackRange
         )
     }

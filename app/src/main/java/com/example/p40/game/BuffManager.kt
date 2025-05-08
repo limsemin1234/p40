@@ -41,14 +41,6 @@ data class Buff(
     fun getDisplayText(): String {
         val effectText = when (type) {
             BuffType.MISSILE_DAMAGE -> "데미지 +${(value * 100).toInt()}%"
-            BuffType.ATTACK_SPEED -> "공격속도 +${(value * 100).toInt()}%"
-            BuffType.MISSILE_SPEED -> "미사일 속도 +${(value * 100).toInt()}%"
-            BuffType.MULTI_DIRECTION -> "${level + 1}방향 발사"
-            BuffType.MISSILE_PIERCE -> "관통 ${level}회"
-            BuffType.ENEMY_SLOW -> "적 이동속도 -${(value * 100).toInt()}%"
-            BuffType.DOT_DAMAGE -> "초당 ${(value * 100).toInt()}데미지"
-            BuffType.MASS_DAMAGE -> "5초마다 ${(value * 100).toInt()}데미지"
-            BuffType.RESOURCE_GAIN -> "자원 획득 +${(value * 100).toInt()}%"
             BuffType.HEART_FLUSH_SKILL -> "하트 플러시 스킬"
             BuffType.SPADE_FLUSH_SKILL -> "스페이드 플러시 스킬"
             BuffType.CLUB_FLUSH_SKILL -> "클로버 플러시 스킬"
@@ -62,14 +54,6 @@ data class Buff(
     fun getShortDisplayText(): String {
         val effectText = when (type) {
             BuffType.MISSILE_DAMAGE -> "데미지 +${(value * 100).toInt()}%"
-            BuffType.ATTACK_SPEED -> "공격속도 +${(value * 100).toInt()}%"
-            BuffType.MISSILE_SPEED -> "미사일 속도 +${(value * 100).toInt()}%"
-            BuffType.MULTI_DIRECTION -> "${level + 1}방향 발사"
-            BuffType.MISSILE_PIERCE -> "관통 ${level}회"
-            BuffType.ENEMY_SLOW -> "이동속도 -${(value * 100).toInt()}%"
-            BuffType.DOT_DAMAGE -> "DoT ${(value * 100).toInt()}/초"
-            BuffType.MASS_DAMAGE -> "5초마다 ${(value * 100).toInt()}"
-            BuffType.RESOURCE_GAIN -> "자원 +${(value * 100).toInt()}%"
             BuffType.HEART_FLUSH_SKILL -> "하트 플러시 스킬"
             BuffType.SPADE_FLUSH_SKILL -> "스페이드 플러시 스킬"
             BuffType.CLUB_FLUSH_SKILL -> "클로버 플러시 스킬"
@@ -86,13 +70,8 @@ data class Buff(
 class BuffManager(private val context: Context) {
     private val buffs = ConcurrentHashMap<BuffType, Buff>()
     
-    // 효과 계산 결과 캐싱을 위한 변수들
+    // 캐싱된 값들
     private var cachedMissileDamageMultiplier: Float = 1.0f
-    private var cachedAttackSpeedMultiplier: Float = 1.0f
-    private var cachedMissileSpeedMultiplier: Float = 1.0f
-    private var cachedEnemySpeedMultiplier: Float = 1.0f
-    private var cachedMultiDirectionCount: Int = 1
-    private var cachedMissilePierceCount: Int = 0
     
     // 캐시 유효성 플래그
     private var isBuffCacheValid: Boolean = false
@@ -119,37 +98,19 @@ class BuffManager(private val context: Context) {
     }
     
     // 캐시 무효화
-    private fun invalidateCache() {
+    fun invalidateCache() {
         isBuffCacheValid = false
     }
     
-    // 캐시 재계산
-    private fun recalculateCache() {
+    /**
+     * 버프 캐시 업데이트 - 계산 최적화를 위함
+     */
+    private fun updateBuffCache() {
         if (isBuffCacheValid) return
         
-        // 미사일 데미지 배율 계산 - 이제 level 대신 value 사용
+        // 데미지 배율 계산
         val damageBuff = buffs[BuffType.MISSILE_DAMAGE]
         cachedMissileDamageMultiplier = 1f + (damageBuff?.value ?: 0f)
-        
-        // 공격 속도 배율 계산
-        val attackSpeedBuff = buffs[BuffType.ATTACK_SPEED]
-        cachedAttackSpeedMultiplier = 1f - (attackSpeedBuff?.value ?: 0f)
-        
-        // 미사일 속도 배율 계산
-        val missileSpeedBuff = buffs[BuffType.MISSILE_SPEED]
-        cachedMissileSpeedMultiplier = 1f + (missileSpeedBuff?.value ?: 0f)
-        
-        // 적 이동속도 배율 계산
-        val enemySlowBuff = buffs[BuffType.ENEMY_SLOW]
-        cachedEnemySpeedMultiplier = 1f - (enemySlowBuff?.value ?: 0f)
-        
-        // 다방향 발사 계산
-        val multiDirectionLevel = getBuffLevel(BuffType.MULTI_DIRECTION)
-        cachedMultiDirectionCount = 1 + multiDirectionLevel
-        
-        // 미사일 관통 횟수 계산
-        val missilePierceLevel = getBuffLevel(BuffType.MISSILE_PIERCE)
-        cachedMissilePierceCount = missilePierceLevel
         
         // 캐시 유효성 표시
         isBuffCacheValid = true
@@ -242,9 +203,9 @@ class BuffManager(private val context: Context) {
                                 addBuff(Buff(
                                     type = BuffType.CLUB_FLUSH_SKILL,
                                     level = 1,
-                                    value = 0.5f,
+                                    value = 1.0f,
                                     name = "클로버 플러시 스킬",
-                                    description = "적 이동속도 50% 감소 (1회용)"
+                                    description = "시간 멈춤 (5초, 1회용)"
                                 ))
                             }
                             
@@ -252,9 +213,9 @@ class BuffManager(private val context: Context) {
                                 addBuff(Buff(
                                     type = BuffType.DIAMOND_FLUSH_SKILL,
                                     level = 1,
-                                    value = 100f,
+                                    value = 1.0f,
                                     name = "다이아 플러시 스킬",
-                                    description = "자원 100 획득 (1회용)"
+                                    description = "무적 (5초, 1회용)"
                                 ))
                             }
 
@@ -326,72 +287,10 @@ class BuffManager(private val context: Context) {
         return buffs.values.toList()
     }
     
-    // 디펜스 유닛에 적용되는 버프만 가져오기
-    fun getDefenseBuffs(): List<Buff> {
-        return buffs.values.filter { buff ->
-            buff.type in listOf(
-                BuffType.MISSILE_DAMAGE,
-                BuffType.ATTACK_SPEED,
-                BuffType.MISSILE_SPEED,
-                BuffType.MULTI_DIRECTION,
-                BuffType.MISSILE_PIERCE,
-                BuffType.RESOURCE_GAIN
-            )
-        }
-    }
-    
-    // 적에게 적용되는 너프만 가져오기
-    fun getEnemyNerfs(): List<Buff> {
-        return buffs.values.filter { buff ->
-            buff.type in listOf(
-                BuffType.ENEMY_SLOW,
-                BuffType.DOT_DAMAGE,
-                BuffType.MASS_DAMAGE
-            )
-        }
-    }
-    
-    // 미사일 데미지 배율 계산
+    // 데미지 배율 반환
     fun getMissileDamageMultiplier(): Float {
-        if (!isBuffCacheValid) recalculateCache()
+        updateBuffCache()
         return cachedMissileDamageMultiplier
-    }
-    
-    // 공격 속도 배율 계산
-    fun getAttackSpeedMultiplier(): Float {
-        if (!isBuffCacheValid) recalculateCache()
-        return cachedAttackSpeedMultiplier
-    }
-    
-    // 미사일 속도 배율 계산
-    fun getMissileSpeedMultiplier(): Float {
-        if (!isBuffCacheValid) recalculateCache()
-        return cachedMissileSpeedMultiplier
-    }
-    
-    // 적 이동속도 배율 계산
-    fun getEnemySpeedMultiplier(): Float {
-        if (!isBuffCacheValid) recalculateCache()
-        return cachedEnemySpeedMultiplier
-    }
-    
-    // 다방향 발사 수 계산
-    fun getMultiDirectionCount(): Int {
-        if (!isBuffCacheValid) recalculateCache()
-        return cachedMultiDirectionCount
-    }
-    
-    // 미사일 관통 횟수 계산
-    fun getMissilePierceCount(): Int {
-        if (!isBuffCacheValid) recalculateCache()
-        return cachedMissilePierceCount
-    }
-    
-    // 자원 획득량 배율 계산
-    fun getResourceGainMultiplier(): Float {
-        if (!isBuffCacheValid) recalculateCache()
-        val level = getBuffLevel(BuffType.RESOURCE_GAIN)
-        return 1f + (level * 0.15f)
     }
     
     // 모든 버프 제거
@@ -416,7 +315,6 @@ class BuffManager(private val context: Context) {
                 BuffType.SPADE_FLUSH_SKILL -> "♠제거"
                 BuffType.CLUB_FLUSH_SKILL -> "♣감속"
                 BuffType.DIAMOND_FLUSH_SKILL -> "♦자원"
-                else -> buff.name
             }
             
             // 스타일 설정

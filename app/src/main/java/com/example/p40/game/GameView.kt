@@ -337,12 +337,12 @@ class GameView @JvmOverloads constructor(
     // 디펜스 유닛의 문양 효과가 반영된 공격속도 반환
     fun getUnitAttackSpeed(): Float {
         if (!::gameLogic.isInitialized) {
-            return gameStats.getEffectiveAttackSpeed()
+            return gameStats.getUnitAttackSpeed().toFloat()
         }
         val defenseUnit = gameLogic.getDefenseUnit()
         val speedMultiplier = defenseUnit.getSpeedMultiplier()
         // 공격속도는 쿨다운 시간(밀리초)이므로 speedMultiplier로 나눔 (빠른 공격=작은 값)
-        return gameStats.getEffectiveAttackSpeed() / speedMultiplier
+        return gameStats.getUnitAttackSpeed().toFloat() / speedMultiplier
     }
     
     // 디펜스 유닛의 문양 효과가 반영된 공격범위 반환

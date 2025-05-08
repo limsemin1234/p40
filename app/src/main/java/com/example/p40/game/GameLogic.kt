@@ -127,9 +127,8 @@ class GameLogic(
         val maxX = screenWidth + visibleMargin
         val maxY = screenHeight + visibleMargin
         
-        // 버프에 의한 이동 속도 계산 (한 번만 계산하여 재사용)
-        val enemySpeedMultiplier = gameStats.getEnemySpeedMultiplier()
-        val missileSpeedMultiplier = gameStats.getMissileSpeedMultiplier()
+        // 이동 속도 계산 - 버프 삭제로 기본값 사용
+        val enemySpeedMultiplier = 1.0f
         
         // 1. 화면 내부 또는 가장자리에 있는 적만 업데이트 (최적화)
         val screenRect = ScreenRect(minX, minY, maxX, maxY)
@@ -141,7 +140,7 @@ class GameLogic(
         }
         
         // 2. 미사일 업데이트 최적화
-        updateMissiles(screenRect, farOffScreenMargin, missileSpeedMultiplier)
+        updateMissiles(screenRect, farOffScreenMargin)
         
         // 3. 방어 유닛 공격 로직
         updateDefenseUnitAttack(screenRect, currentTime)
@@ -282,8 +281,7 @@ class GameLogic(
      */
     private fun updateMissiles(
         screenRect: ScreenRect,
-        farOffScreenMargin: Float,
-        missileSpeedMultiplier: Float
+        farOffScreenMargin: Float
     ) {
         val deadMissiles = mutableListOf<Missile>()
         
@@ -300,30 +298,23 @@ class GameLogic(
             
             // 화면 내부 또는 가까운 범위의 미사일만 업데이트
             if (screenRect.contains(missilePos.x, missilePos.y)) {
-                missile.update(missileSpeedMultiplier)
+                missile.update(1.0f) // 미사일 속도 배율 제거, 기본 속도 사용
                 
                 // 미사일이 죽지 않았고 화면 내부에 있는 경우에만 충돌 체크
                 if (!missile.isDead()) {
-                    val pierceCount = gameStats.getMissilePierceCount()
-                    var hitCount = 0
-                    
                     // 화면 내부의 적들과만 충돌 체크 (최적화)
                     for (enemy in enemies) {
                         val enemyPos = enemy.getPosition()
                         if (screenRect.contains(enemyPos.x, enemyPos.y) && !enemy.isDead()) {
                             if (missile.checkCollision(enemy)) {
-                                hitCount++
-                                
                                 // 하트 문양 효과: 적 공격 시 체력 1 회복
                                 if (defenseUnit.isHealOnDamage()) {
                                     gameStats.healUnit(1)
                                 }
                                 
-                                // 관통 횟수를 초과하면 미사일 제거
-                                if (hitCount > pierceCount) {
-                                    deadMissiles.add(missile)
-                                    break
-                                }
+                                // 미사일이 적에게 맞으면 항상 사라지도록 수정
+                                deadMissiles.add(missile)
+                                break;
                             }
                         }
                     }
@@ -348,10 +339,8 @@ class GameLogic(
      * 디펜스 유닛 공격 처리
      */
     private fun updateDefenseUnitAttack(screenRect: ScreenRect, currentTime: Long) {
-        // 공격 쿨다운 계산 (한 번만 계산)
-        val attackSpeedMultiplier = gameStats.getBuffManager().getAttackSpeedMultiplier()
-        val adjustedAttackCooldown = (gameStats.getUnitAttackSpeed() * attackSpeedMultiplier).toLong()
-        val missileDamageMultiplier = gameStats.getBuffManager().getMissileDamageMultiplier()
+        // 공격 쿨다운 계산
+        val attackCooldown = gameStats.getUnitAttackSpeed()
         
         // 모든 적을 대상으로 공격 처리 (죽지 않은 모든 적)
         val aliveEnemies = enemies.filter { !it.isDead() }
@@ -359,37 +348,17 @@ class GameLogic(
         // 적이 없으면 처리하지 않음
         if (aliveEnemies.isEmpty()) return
         
-        // 다방향 발사 지원
-        val multiDirCount = gameStats.getMultiDirectionCount()
-        if (multiDirCount > 1) {
-            // 다방향 발사 (기본 1방향 + 추가 방향)
-            val angleStep = (2 * Math.PI) / multiDirCount
-            
-            for (i in 0 until multiDirCount) {
-                val newMissile = defenseUnit.attack(
-                    aliveEnemies, 
-                    currentTime, 
-                    adjustedAttackCooldown, 
-                    missileDamageMultiplier,
-                    i * angleStep
-                )
-                
-                if (newMissile != null) {
-                    missiles.add(newMissile)
-                }
-            }
-        } else {
-            // 기본 1방향 발사
-            val newMissile = defenseUnit.attack(
-                aliveEnemies, 
-                currentTime, 
-                adjustedAttackCooldown,
-                missileDamageMultiplier
-            )
-            
-            if (newMissile != null) {
-                missiles.add(newMissile)
-            }
+        // 기본 1방향 발사
+        val missileDamageMultiplier = gameStats.getBuffManager().getMissileDamageMultiplier()
+        val newMissile = defenseUnit.attack(
+            aliveEnemies, 
+            currentTime, 
+            attackCooldown,
+            missileDamageMultiplier
+        )
+        
+        if (newMissile != null) {
+            missiles.add(newMissile)
         }
     }
     
@@ -397,29 +366,7 @@ class GameLogic(
      * 버프 효과 처리
      */
     private fun applyBuffEffects(currentTime: Long, screenRect: ScreenRect) {
-        val buffManager = gameStats.getBuffManager()
-        val dotLevel = buffManager.getBuffLevel(BuffType.DOT_DAMAGE)
-        val massLevel = buffManager.getBuffLevel(BuffType.MASS_DAMAGE)
-        
-        // DoT 효과 (1초마다)
-        if (dotLevel > 0 && currentTime % 1000 < 20) {
-            val dotDamage = dotLevel * 2 // 레벨당 2 데미지
-            for (enemy in enemies) {
-                if (!enemy.isDead() && screenRect.contains(enemy.getPosition().x, enemy.getPosition().y)) {
-                    enemy.takeDamage(dotDamage)
-                }
-            }
-        }
-        
-        // 대량 데미지 효과 (5초마다)
-        if (massLevel > 0 && currentTime % 5000 < 20) {
-            val massDamage = massLevel * 100 // 레벨당 100 데미지
-            for (enemy in enemies) {
-                if (!enemy.isDead() && screenRect.contains(enemy.getPosition().x, enemy.getPosition().y)) {
-                    enemy.takeDamage(massDamage)
-                }
-            }
-        }
+        // 플러시 스킬 효과는 다른 곳에서 처리됨
     }
     
     /**
