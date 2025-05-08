@@ -28,7 +28,7 @@ class MainMenuFragment : Fragment(R.layout.fragment_main_menu) {
     private lateinit var messageManager: MessageManager
     
     // 애니메이션 상태 관리
-    private var isAnimationPlaying = true
+    private var isAnimationPlaying = false
     private lateinit var rotationAnimation: Animation
     
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -47,7 +47,7 @@ class MainMenuFragment : Fragment(R.layout.fragment_main_menu) {
         
         // 로고 카드에 애니메이션 적용
         val gameLogo = view.findViewById<CardView>(R.id.gameLogo)
-        startLogoCardAnimation(gameLogo)
+        // 처음에는 애니메이션 적용하지 않음
         
         // 로고 카드 클릭 시 애니메이션 토글
         gameLogo.setOnClickListener {
@@ -115,9 +115,11 @@ class MainMenuFragment : Fragment(R.layout.fragment_main_menu) {
         view?.let { 
             updateCoinUI(it)
             // 화면이 다시 보일 때 애니메이션 상태 확인 후 재시작
+            val gameLogo = it.findViewById<CardView>(R.id.gameLogo)
             if (isAnimationPlaying) {
-                val gameLogo = it.findViewById<CardView>(R.id.gameLogo)
                 startLogoCardAnimation(gameLogo)
+            } else {
+                gameLogo.clearAnimation()
             }
         }
     }
