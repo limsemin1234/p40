@@ -163,6 +163,22 @@ class GameStats(
     }
     
     /**
+     * 디펜스 유닛 체력 회복
+     * @param amount 회복할 체력량
+     */
+    fun healUnit(amount: Int) {
+        unitHealth = (unitHealth + amount).coerceAtMost(unitMaxHealth)
+    }
+    
+    /**
+     * 자원 추가
+     * @param amount 추가할 자원량
+     */
+    fun addResource(amount: Int) {
+        resource += amount
+    }
+    
+    /**
      * 포커 족보 효과 적용
      */
     fun applyPokerHandEffect(pokerHand: PokerHand) {

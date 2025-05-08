@@ -40,9 +40,11 @@ import com.example.p40.game.BuffType
 import com.example.p40.game.MessageManager
 import com.example.p40.game.FlushSkillManager
 import com.example.p40.StatsManager
+import com.example.p40.game.DefenseUnitSymbolChangeListener
+import com.example.p40.game.CardSymbolType
 import kotlin.random.Random
 
-class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCardManager.PokerCardListener {
+class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCardManager.PokerCardListener, DefenseUnitSymbolChangeListener {
 
     private lateinit var gameView: GameView
     private var isPaused = false
@@ -117,6 +119,9 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         
         // 게임 오버 리스너 설정
         gameView.setGameOverListener(this)
+        
+        // 문양 변경 리스너 설정
+        gameView.setSymbolChangeListener(this)
         
         // 보스 처치 리스너 설정
         gameView.setBossKillListener(object : BossKillListener {
@@ -943,6 +948,31 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         // GameView에 디펜스 유닛의 애니메이션 스타일 설정
         // 실제 구현에서는 GameView에 해당 메서드를 추가해야 합니다.
         // gameView.setDefenseUnitAnimationStyle(GameView.ANIMATION_STYLE_CARD)
+    }
+
+    /**
+     * DefenseUnitSymbolChangeListener 구현
+     * 문양 변경 시 호출되는 콜백 메서드
+     */
+    override fun onSymbolChanged(symbolType: CardSymbolType) {
+        // 문양 변경 후 UI 즉시 업데이트
+        updateUnitStatsUI()
+        
+        // 문양 타입에 따른 효과 메시지 표시
+        when (symbolType) {
+            CardSymbolType.SPADE -> {
+                messageManager.showInfo("스페이드 문양: 기본 상태")
+            }
+            CardSymbolType.HEART -> {
+                messageManager.showInfo("하트 문양: 공격력 50% 감소, 데미지 시 체력 회복")
+            }
+            CardSymbolType.DIAMOND -> {
+                messageManager.showInfo("다이아몬드 문양: 공격속도 2배 증가, 공격범위 50% 감소")
+            }
+            CardSymbolType.CLUB -> {
+                messageManager.showInfo("클로버 문양: 공격범위 50% 증가, 체력 50% 감소")
+            }
+        }
     }
 
     override fun onResume() {

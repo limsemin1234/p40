@@ -64,7 +64,7 @@ class GameRenderer(
         val centerY = screenHeight / 2
         
         // 새로운 코드: 카드 형태로 유닛 그리기
-        drawDefenseUnitAsCard(canvas, centerX, centerY, gameStats.getUnitHealth(), gameStats.getUnitMaxHealth())
+        drawDefenseUnitAsCard(canvas, centerX, centerY, gameStats.getUnitHealth(), gameStats.getUnitMaxHealth(), defenseUnit.getSymbolType())
         
         // 적 그리기 - 화면 내 적만 그리기
         for (enemy in enemies) {
@@ -103,7 +103,7 @@ class GameRenderer(
     /**
      * 디펜스 유닛을 카드 형태로 그리기
      */
-    private fun drawDefenseUnitAsCard(canvas: Canvas, centerX: Float, centerY: Float, unitHealth: Int, unitMaxHealth: Int) {
+    private fun drawDefenseUnitAsCard(canvas: Canvas, centerX: Float, centerY: Float, unitHealth: Int, unitMaxHealth: Int, symbolType: CardSymbolType) {
         // 카드 크기 설정
         val cardWidth = gameConfig.DEFENSE_UNIT_SIZE * 2f
         val cardHeight = gameConfig.DEFENSE_UNIT_SIZE * 2.5f
@@ -146,26 +146,13 @@ class GameRenderer(
         glowPaint.shader = radialGradient
         canvas.drawCircle(centerX, centerY, glowRadius, glowPaint)
         
-        // 스페이드 심볼 그리기 (하얀색 테두리 추가)
-        // 먼저 테두리를 그리기 위한 흰색 심볼
-        val spadeSymbolBorderPaint = Paint().apply {
-            color = Color.WHITE
-            style = Paint.Style.FILL
-            textSize = cardWidth * 0.55f // 약간 더 크게 설정하여 테두리 효과
-            textAlign = Paint.Align.CENTER
+        // 선택한 문양 타입에 따라 심볼 그리기
+        when (symbolType) {
+            CardSymbolType.SPADE -> drawSpadeSymbol(canvas, centerX, centerY, cardWidth)
+            CardSymbolType.HEART -> drawHeartSymbol(canvas, centerX, centerY, cardWidth)
+            CardSymbolType.DIAMOND -> drawDiamondSymbol(canvas, centerX, centerY, cardWidth)
+            CardSymbolType.CLUB -> drawClubSymbol(canvas, centerX, centerY, cardWidth)
         }
-        canvas.drawText("♠", centerX, centerY + cardWidth * 0.15f, spadeSymbolBorderPaint)
-        
-        // 그 위에 검은색 심볼 그리기
-        val spadeSymbolPaint = Paint().apply {
-            color = Color.BLACK
-            style = Paint.Style.FILL
-            textSize = cardWidth * 0.5f
-            textAlign = Paint.Align.CENTER
-        }
-        canvas.drawText("♠", centerX, centerY + cardWidth * 0.15f, spadeSymbolPaint)
-        
-        // "A" 심볼 그리기 부분 제거 (좌상단, 우하단 A 제거)
         
         // 체력바 그리기
         val healthBarWidth = cardWidth * 1.2f
@@ -208,6 +195,98 @@ class GameRenderer(
     }
     
     /**
+     * 스페이드 심볼 그리기
+     */
+    private fun drawSpadeSymbol(canvas: Canvas, centerX: Float, centerY: Float, cardWidth: Float) {
+        // 먼저 테두리를 그리기 위한 흰색 심볼
+        val spadeSymbolBorderPaint = Paint().apply {
+            color = Color.WHITE
+            style = Paint.Style.FILL
+            textSize = cardWidth * 0.55f
+            textAlign = Paint.Align.CENTER
+        }
+        canvas.drawText("♠", centerX, centerY + cardWidth * 0.15f, spadeSymbolBorderPaint)
+        
+        // 그 위에 검은색 심볼 그리기
+        val spadeSymbolPaint = Paint().apply {
+            color = Color.BLACK
+            style = Paint.Style.FILL
+            textSize = cardWidth * 0.5f
+            textAlign = Paint.Align.CENTER
+        }
+        canvas.drawText("♠", centerX, centerY + cardWidth * 0.15f, spadeSymbolPaint)
+    }
+    
+    /**
+     * 하트 심볼 그리기
+     */
+    private fun drawHeartSymbol(canvas: Canvas, centerX: Float, centerY: Float, cardWidth: Float) {
+        // 먼저 테두리를 그리기 위한 흰색 심볼
+        val heartSymbolBorderPaint = Paint().apply {
+            color = Color.WHITE
+            style = Paint.Style.FILL
+            textSize = cardWidth * 0.55f
+            textAlign = Paint.Align.CENTER
+        }
+        canvas.drawText("♥", centerX, centerY + cardWidth * 0.15f, heartSymbolBorderPaint)
+        
+        // 그 위에 빨간색 심볼 그리기
+        val heartSymbolPaint = Paint().apply {
+            color = Color.RED
+            style = Paint.Style.FILL
+            textSize = cardWidth * 0.5f
+            textAlign = Paint.Align.CENTER
+        }
+        canvas.drawText("♥", centerX, centerY + cardWidth * 0.15f, heartSymbolPaint)
+    }
+    
+    /**
+     * 다이아몬드 심볼 그리기
+     */
+    private fun drawDiamondSymbol(canvas: Canvas, centerX: Float, centerY: Float, cardWidth: Float) {
+        // 먼저 테두리를 그리기 위한 흰색 심볼
+        val diamondSymbolBorderPaint = Paint().apply {
+            color = Color.WHITE
+            style = Paint.Style.FILL
+            textSize = cardWidth * 0.55f
+            textAlign = Paint.Align.CENTER
+        }
+        canvas.drawText("♦", centerX, centerY + cardWidth * 0.15f, diamondSymbolBorderPaint)
+        
+        // 그 위에 빨간색 심볼 그리기
+        val diamondSymbolPaint = Paint().apply {
+            color = Color.RED
+            style = Paint.Style.FILL
+            textSize = cardWidth * 0.5f
+            textAlign = Paint.Align.CENTER
+        }
+        canvas.drawText("♦", centerX, centerY + cardWidth * 0.15f, diamondSymbolPaint)
+    }
+    
+    /**
+     * 클로버 심볼 그리기
+     */
+    private fun drawClubSymbol(canvas: Canvas, centerX: Float, centerY: Float, cardWidth: Float) {
+        // 먼저 테두리를 그리기 위한 흰색 심볼
+        val clubSymbolBorderPaint = Paint().apply {
+            color = Color.WHITE
+            style = Paint.Style.FILL
+            textSize = cardWidth * 0.55f
+            textAlign = Paint.Align.CENTER
+        }
+        canvas.drawText("♣", centerX, centerY + cardWidth * 0.15f, clubSymbolBorderPaint)
+        
+        // 그 위에 검은색 심볼 그리기
+        val clubSymbolPaint = Paint().apply {
+            color = Color.BLACK
+            style = Paint.Style.FILL
+            textSize = cardWidth * 0.5f
+            textAlign = Paint.Align.CENTER
+        }
+        canvas.drawText("♣", centerX, centerY + cardWidth * 0.15f, clubSymbolPaint)
+    }
+    
+    /**
      * 게임 오버 화면 그리기
      */
     private fun drawGameOver(canvas: Canvas, width: Float, height: Float) {
@@ -235,11 +314,11 @@ class GameRenderer(
     /**
      * 디펜스 유닛 그리기 (호환성 유지를 위한 메서드)
      */
-    fun drawDefenseUnit(canvas: Canvas, width: Float, height: Float, unitHealth: Int, unitMaxHealth: Int) {
+    fun drawDefenseUnit(canvas: Canvas, width: Float, height: Float, unitHealth: Int, unitMaxHealth: Int, symbolType: CardSymbolType = CardSymbolType.SPADE) {
         val centerX = width / 2f
         val centerY = height / 2f
         
         // 새로운 카드 형태 디펜스 유닛 그리기
-        drawDefenseUnitAsCard(canvas, centerX, centerY, unitHealth, unitMaxHealth)
+        drawDefenseUnitAsCard(canvas, centerX, centerY, unitHealth, unitMaxHealth, symbolType)
     }
 } 

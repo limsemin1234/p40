@@ -7,6 +7,23 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 /**
+ * 카드 문양 타입을 정의하는 enum 클래스
+ */
+enum class CardSymbolType {
+    SPADE, HEART, DIAMOND, CLUB;
+    
+    // 다음 문양 타입으로 순환
+    fun next(): CardSymbolType {
+        return when (this) {
+            SPADE -> HEART
+            HEART -> DIAMOND
+            DIAMOND -> CLUB
+            CLUB -> SPADE
+        }
+    }
+}
+
+/**
  * 디펜스 유닛 클래스 - 벡터 계산 최적화 적용
  */
 class DefenseUnit(
@@ -14,10 +31,22 @@ class DefenseUnit(
     attackRange: Float,
     private var attackCooldown: Long
 ) {
+    // 현재 카드 문양 타입
+    private var symbolType: CardSymbolType = CardSymbolType.SPADE
+    
+    // 문양 효과에 대한 배율들
+    private var damageMultiplier: Float = 1.0f  // 공격력 배율
+    private var speedMultiplier: Float = 1.0f   // 공격속도 배율
+    private var rangeMultiplier: Float = 1.0f   // 공격범위 배율
+    
+    // 적 처치 시 체력 회복 활성화 여부
+    private var healOnDamage: Boolean = false
+    
     private var lastAttackTime: Long = 0
     
     // 내부적으로 사용할 private 필드로 변경
     private var _attackRange: Float = attackRange
+    private var originalAttackRange: Float = attackRange // 원래 공격 범위 저장
     
     // 타겟팅 최적화를 위한 캐시 설정
     private var attackRangeSquared: Float = _attackRange * _attackRange
@@ -41,6 +70,97 @@ class DefenseUnit(
         updateAttackRangeSquared()
     }
     
+    /**
+     * 카드 문양 타입 반환
+     */
+    fun getSymbolType(): CardSymbolType = symbolType
+    
+    /**
+     * 카드 문양 변경
+     */
+    fun changeSymbolType() {
+        symbolType = symbolType.next()
+        applySymbolEffects()
+    }
+    
+    /**
+     * 현재 문양에 따른 효과 적용
+     */
+    private fun applySymbolEffects() {
+        // 모든 효과 초기화
+        resetSymbolEffects()
+        
+        when (symbolType) {
+            CardSymbolType.SPADE -> {
+                // 기본 상태 - 아무 효과 없음
+            }
+            CardSymbolType.HEART -> {
+                // 하트: 적에게 데미지를 줄 때마다 체력 1 회복, 공격력 50% 감소
+                damageMultiplier = 0.5f
+                healOnDamage = true
+            }
+            CardSymbolType.DIAMOND -> {
+                // 다이아몬드: 공격속도 2배 증가, 공격범위 50% 감소
+                speedMultiplier = 2.0f
+                rangeMultiplier = 0.5f
+                _attackRange = originalAttackRange * rangeMultiplier
+                updateAttackRangeSquared()
+            }
+            CardSymbolType.CLUB -> {
+                // 클로버: 공격범위 50% 증가, 체력 감소는 GameView에서 처리
+                rangeMultiplier = 1.5f
+                _attackRange = originalAttackRange * rangeMultiplier
+                updateAttackRangeSquared()
+            }
+        }
+        
+        // 문양 효과 적용 시 벡터 캐시 초기화
+        // 새 범위/효과로 적 타겟팅이 바로 적용되도록 함
+        clearVectorCache()
+    }
+    
+    /**
+     * 문양 효과 초기화
+     */
+    private fun resetSymbolEffects() {
+        damageMultiplier = 1.0f
+        speedMultiplier = 1.0f
+        rangeMultiplier = 1.0f
+        healOnDamage = false
+        
+        // 원래 공격 범위로 복원
+        _attackRange = originalAttackRange
+        updateAttackRangeSquared()
+    }
+    
+    /**
+     * 카드 문양 설정
+     */
+    fun setSymbolType(type: CardSymbolType) {
+        symbolType = type
+        applySymbolEffects()
+    }
+    
+    /**
+     * 공격력 배율 반환
+     */
+    fun getDamageMultiplier(): Float = damageMultiplier
+    
+    /**
+     * 공격속도 배율 반환
+     */
+    fun getSpeedMultiplier(): Float = speedMultiplier
+    
+    /**
+     * 공격범위 배율 반환
+     */
+    fun getRangeMultiplier(): Float = rangeMultiplier
+    
+    /**
+     * 데미지 시 회복 여부 반환
+     */
+    fun isHealOnDamage(): Boolean = healOnDamage
+    
     // attackRange 제곱값 업데이트
     private fun updateAttackRangeSquared() {
         attackRangeSquared = _attackRange * _attackRange
@@ -48,7 +168,8 @@ class DefenseUnit(
     
     // 공격 범위 설정 시 제곱값도 함께 업데이트
     fun setAttackRange(newRange: Float) {
-        _attackRange = newRange
+        originalAttackRange = newRange
+        _attackRange = originalAttackRange * rangeMultiplier
         updateAttackRangeSquared()
         
         // 범위가 변경되면 캐시 초기화
@@ -88,8 +209,9 @@ class DefenseUnit(
         damageMultiplier: Float = 1.0f,
         angleOffset: Double = 0.0
     ): Missile? {
-        // 쿨다운 체크
-        if (currentTime - lastAttackTime < adjustedCooldown) {
+        // 쿨다운 체크 (speedMultiplier 적용)
+        val effectiveCooldown = (adjustedCooldown / speedMultiplier).toLong()
+        if (currentTime - lastAttackTime < effectiveCooldown) {
             return null
         }
         
@@ -119,7 +241,8 @@ class DefenseUnit(
         cacheAngleCalculation(angle)
         
         val missileSpeed = GameConfig.MISSILE_SPEED
-        val damage = (GameConfig.MISSILE_DAMAGE * damageMultiplier).toInt()
+        // 공격력에 현재 문양의 데미지 배율 적용
+        val damage = (GameConfig.MISSILE_DAMAGE * damageMultiplier * this.damageMultiplier).toInt()
         val missileSize = GameConfig.MISSILE_SIZE
         
         // 미사일 시작 위치 계산 (캐싱된 결과 활용)

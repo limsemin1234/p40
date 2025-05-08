@@ -5,12 +5,22 @@ import android.graphics.Canvas
 import android.util.AttributeSet
 import android.view.SurfaceHolder
 import android.view.SurfaceView
+import android.view.MotionEvent
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 /**
  * 게임 오버 콜백 인터페이스
  */
 interface GameOverListener {
     fun onGameOver(resource: Int, waveCount: Int)
+}
+
+/**
+ * 디펜스 유닛 문양 변경 콜백 인터페이스
+ */
+interface DefenseUnitSymbolChangeListener {
+    fun onSymbolChanged(symbolType: CardSymbolType)
 }
 
 /**
@@ -52,6 +62,7 @@ class GameView @JvmOverloads constructor(
     // 콜백 리스너
     private var gameOverListener: GameOverListener? = null
     private var bossKillListener: BossKillListener? = null
+    private var symbolChangeListener: DefenseUnitSymbolChangeListener? = null
     
     init {
         holder.addCallback(this)
@@ -312,8 +323,38 @@ class GameView @JvmOverloads constructor(
     fun getActivePokerHandInfo(): String = gameStats.getActivePokerHandInfo()
     fun getUnitHealth(): Int = gameStats.getUnitHealth()
     fun getUnitMaxHealth(): Int = gameStats.getUnitMaxHealth()
-    fun getUnitAttack(): Int = gameStats.getEffectiveAttackPower()
-    fun getUnitAttackSpeed(): Float = gameStats.getEffectiveAttackSpeed()
+    
+    // 디펜스 유닛의 문양 효과가 반영된 공격력 반환
+    fun getUnitAttack(): Int {
+        if (!::gameLogic.isInitialized) {
+            return gameStats.getEffectiveAttackPower()
+        }
+        val defenseUnit = gameLogic.getDefenseUnit()
+        val damageMultiplier = defenseUnit.getDamageMultiplier()
+        return (gameStats.getEffectiveAttackPower() * damageMultiplier).toInt()
+    }
+    
+    // 디펜스 유닛의 문양 효과가 반영된 공격속도 반환
+    fun getUnitAttackSpeed(): Float {
+        if (!::gameLogic.isInitialized) {
+            return gameStats.getEffectiveAttackSpeed()
+        }
+        val defenseUnit = gameLogic.getDefenseUnit()
+        val speedMultiplier = defenseUnit.getSpeedMultiplier()
+        // 공격속도는 쿨다운 시간(밀리초)이므로 speedMultiplier로 나눔 (빠른 공격=작은 값)
+        return gameStats.getEffectiveAttackSpeed() / speedMultiplier
+    }
+    
+    // 디펜스 유닛의 문양 효과가 반영된 공격범위 반환
+    fun getUnitAttackRange(): Float {
+        if (!::gameLogic.isInitialized) {
+            return gameStats.getUnitAttackRange()
+        }
+        val defenseUnit = gameLogic.getDefenseUnit()
+        // DefenseUnit 클래스의 attackRange 프로퍼티 사용 (이미 배율이 적용됨)
+        return defenseUnit.attackRange
+    }
+    
     fun getActiveBuffs(): List<Buff> = gameStats.getActiveBuffs()
     fun getDefenseBuffs(): List<Buff> = gameStats.getDefenseBuffs()
     fun getEnemyNerfs(): List<Buff> = gameStats.getEnemyNerfs()
@@ -321,7 +362,6 @@ class GameView @JvmOverloads constructor(
     fun getWaveCount(): Int = gameStats.getWaveCount()
     fun getKillCount(): Int = gameStats.getKillCount()
     fun getTotalEnemiesInWave(): Int = gameStats.getTotalEnemiesInWave()
-    fun getUnitAttackRange(): Float = gameStats.getUnitAttackRange()
     
     // 현재 업그레이드 비용 정보 반환
     fun getDamageCost(): Int = gameStats.getDamageCost()
@@ -432,5 +472,135 @@ class GameView @JvmOverloads constructor(
             gameLogic.getDefenseUnit().setAttackRange(range)
             gameLogic.getDefenseUnit().setAttackCooldown(attackSpeed)
         }
+    }
+    
+    /**
+     * 문양 변경 리스너 설정
+     */
+    fun setSymbolChangeListener(listener: DefenseUnitSymbolChangeListener) {
+        this.symbolChangeListener = listener
+    }
+    
+    /**
+     * 터치 이벤트 처리
+     * 디펜스 유닛을 터치하면 문양을 변경
+     */
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        if (event.action == MotionEvent.ACTION_DOWN) {
+            // 게임 로직이 초기화되지 않았거나 일시정지 중이면 터치 무시
+            if (!::gameLogic.isInitialized || paused) {
+                return true
+            }
+            
+            // 터치 좌표
+            val touchX = event.x
+            val touchY = event.y
+            
+            // 디펜스 유닛의 위치와 크기
+            val defenseUnit = gameLogic.getDefenseUnit()
+            val unitPos = defenseUnit.getPosition()
+            val unitSize = gameConfig.DEFENSE_UNIT_SIZE
+            
+            // 터치 지점과 디펜스 유닛 중심 사이의 거리 계산
+            val distance = sqrt((touchX - unitPos.x).pow(2) + (touchY - unitPos.y).pow(2))
+            
+            // 디펜스 유닛 영역을 터치했는지 확인 (크기의 1.5배 영역까지 인식)
+            if (distance <= unitSize * 1.5f) {
+                // 이전 문양 저장
+                val prevSymbolType = defenseUnit.getSymbolType()
+                
+                // 원래 상태의 최대 체력 저장 (스페이드 문양에서의 최대 체력)
+                val originalMaxHealth = if (prevSymbolType == CardSymbolType.CLUB) {
+                    // 이미 클로버 문양이었다면, 현재 최대 체력의 2배가 원래 체력
+                    gameStats.getUnitMaxHealth() * 2
+                } else {
+                    gameStats.getUnitMaxHealth()
+                }
+                
+                // 문양 변경
+                defenseUnit.changeSymbolType()
+                
+                // 현재 문양
+                val currentSymbolType = defenseUnit.getSymbolType()
+                
+                // 변경된 문양에 따른 특별 효과 적용
+                when (currentSymbolType) {
+                    CardSymbolType.SPADE -> {
+                        // 스페이드 문양 효과 (기본 상태)
+                        // 클로버에서 변경된 경우, 최대 체력과 현재 체력 복원
+                        if (prevSymbolType == CardSymbolType.CLUB) {
+                            // 현재 체력이 최대 체력의 몇 %인지 계산
+                            val healthPercentage = gameStats.getUnitHealth().toFloat() / gameStats.getUnitMaxHealth()
+                            
+                            // 최대 체력 복원 (2배로)
+                            gameStats.setUnitMaxHealth(originalMaxHealth)
+                            
+                            // 현재 체력도, 동일한 비율로 복원
+                            val newCurrentHealth = (originalMaxHealth * healthPercentage).toInt()
+                            gameStats.setUnitHealth(newCurrentHealth)
+                        }
+                    }
+                    CardSymbolType.HEART -> {
+                        // 하트 문양 효과 (데미지 50% 감소, 적에게 데미지 시 체력 1 회복)
+                        // - 데미지 감소는 DefenseUnit 클래스에서 처리
+                        // - 체력 회복은 GameLogic 클래스에서 처리
+                        
+                        // 클로버에서 변경된 경우, 최대 체력과 현재 체력 복원
+                        if (prevSymbolType == CardSymbolType.CLUB) {
+                            // 현재 체력이 최대 체력의 몇 %인지 계산
+                            val healthPercentage = gameStats.getUnitHealth().toFloat() / gameStats.getUnitMaxHealth()
+                            
+                            // 최대 체력 복원 (2배로)
+                            gameStats.setUnitMaxHealth(originalMaxHealth)
+                            
+                            // 현재 체력도, 동일한 비율로 복원
+                            val newCurrentHealth = (originalMaxHealth * healthPercentage).toInt()
+                            gameStats.setUnitHealth(newCurrentHealth)
+                        }
+                    }
+                    CardSymbolType.DIAMOND -> {
+                        // 다이아몬드 문양 효과 (공격속도 2배 증가, 공격범위 50% 감소)
+                        // - DefenseUnit 클래스에서 처리
+                        
+                        // 클로버에서 변경된 경우, 최대 체력과 현재 체력 복원
+                        if (prevSymbolType == CardSymbolType.CLUB) {
+                            // 현재 체력이 최대 체력의 몇 %인지 계산
+                            val healthPercentage = gameStats.getUnitHealth().toFloat() / gameStats.getUnitMaxHealth()
+                            
+                            // 최대 체력 복원 (2배로)
+                            gameStats.setUnitMaxHealth(originalMaxHealth)
+                            
+                            // 현재 체력도, 동일한 비율로 복원
+                            val newCurrentHealth = (originalMaxHealth * healthPercentage).toInt()
+                            gameStats.setUnitHealth(newCurrentHealth)
+                        }
+                    }
+                    CardSymbolType.CLUB -> {
+                        // 클로버 문양 효과 (공격범위 50% 증가, 체력 50% 감소)
+                        // - 공격범위 증가는 DefenseUnit 클래스에서 처리
+                        
+                        // 현재 체력이 최대 체력의 몇 %인지 계산
+                        val healthPercentage = gameStats.getUnitHealth().toFloat() / gameStats.getUnitMaxHealth()
+                        
+                        // 최대 체력을 50% 감소
+                        val reducedMaxHealth = (originalMaxHealth * 0.5f).toInt()
+                        gameStats.setUnitMaxHealth(reducedMaxHealth)
+                        
+                        // 현재 체력도 같은 비율로 감소 (체력 채워진 비율 유지)
+                        val reducedCurrentHealth = (reducedMaxHealth * healthPercentage).toInt()
+                        gameStats.setUnitHealth(reducedCurrentHealth)
+                    }
+                }
+                
+                // 문양 변경 리스너에 알림
+                symbolChangeListener?.onSymbolChanged(currentSymbolType)
+                
+                // 터치 이벤트 소비
+                return true
+            }
+        }
+        
+        // 상위 클래스의 터치 이벤트 처리
+        return super.onTouchEvent(event)
     }
 } 

@@ -313,6 +313,12 @@ class GameLogic(
                         if (screenRect.contains(enemyPos.x, enemyPos.y) && !enemy.isDead()) {
                             if (missile.checkCollision(enemy)) {
                                 hitCount++
+                                
+                                // 하트 문양 효과: 적 공격 시 체력 1 회복
+                                if (defenseUnit.isHealOnDamage()) {
+                                    gameStats.healUnit(1)
+                                }
+                                
                                 // 관통 횟수를 초과하면 미사일 제거
                                 if (hitCount > pierceCount) {
                                     deadMissiles.add(missile)
