@@ -78,10 +78,14 @@ class MainMenuLogoCard @JvmOverloads constructor(
             clipChildren = false
             clipToPadding = false
             
-            // 부모 뷰에도 클리핑 비활성화 설정 요청
-            (parent as? ViewGroup)?.let {
-                it.clipChildren = false
-                it.clipToPadding = false
+            // 부모 뷰에도 클리핑 비활성화 설정 요청 - 모든 상위 뷰에 적용
+            var parent = parent
+            while (parent != null) {
+                if (parent is ViewGroup) {
+                    parent.clipChildren = false
+                    parent.clipToPadding = false
+                }
+                parent = parent.parent
             }
             
             // 가시성 확인
@@ -95,7 +99,9 @@ class MainMenuLogoCard @JvmOverloads constructor(
             cardSymbolBottomRight = findViewById(R.id.tvCardSymbolBottomRight)
             cardRankBottomRight = findViewById(R.id.tvCardRankBottomRight)
             
-            // 배경 및 가시성 설정
+            // 배경 및 가시성 설정 - CardView 자체도 클리핑 비활성화
+            cardView.clipChildren = false
+            cardView.clipToPadding = false
             cardView.visibility = View.VISIBLE
             
             Log.d(TAG, "View elements initialized successfully with clipping disabled")
@@ -240,6 +246,9 @@ class MainMenuLogoCard @JvmOverloads constructor(
             // 애니메이션 설정 및 속성 지정
             animation.repeatCount = Animation.INFINITE
             animation.repeatMode = Animation.RESTART
+            animation.fillAfter = true
+            animation.fillBefore = true
+            animation.isFillEnabled = true
             currentAnimation = animation
             Log.d(TAG, "Card animation set successfully")
         } catch (e: Exception) {
@@ -259,10 +268,15 @@ class MainMenuLogoCard @JvmOverloads constructor(
             if (animation.repeatCount != Animation.INFINITE) {
                 animation.repeatCount = Animation.INFINITE
                 animation.repeatMode = Animation.RESTART
+                animation.fillAfter = true
+                animation.fillBefore = true
+                animation.isFillEnabled = true
             }
             
             // 새 애니메이션 설정 및 시작
             currentAnimation = animation
+            
+            // 애니메이션을 전체 카드 뷰에 적용
             cardView.startAnimation(animation)
             isAnimationPlaying = true
             

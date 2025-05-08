@@ -7,25 +7,29 @@
     android:fillBefore="true"
     android:fillEnabled="true">
     
-    <!-- 0도에서 360도로 Y축 회전 -->
+    <!-- 0도에서 360도로 Y축 회전 - 밀집도 조정 -->
     <rotate
         android:fromDegrees="0"
         android:toDegrees="360"
         android:pivotX="50%"
         android:pivotY="50%"
-        android:duration="3000"
+        android:duration="4000"
         android:repeatCount="infinite"
-        android:repeatMode="restart" />
+        android:repeatMode="restart"
+        android:fillAfter="true"
+        android:fillBefore="true" />
     
-    <!-- 약간의 크기 변화를 추가하여 부드러운 느낌 -->
+    <!-- 약간의 크기 변화를 추가하여 부드러운 느낌 - 크기 축소 -->
     <scale
-        android:fromXScale="0.95"
-        android:toXScale="1.05"
-        android:fromYScale="0.95"
-        android:toYScale="1.05"
+        android:fromXScale="0.85"
+        android:toXScale="0.95"
+        android:fromYScale="0.85"
+        android:toYScale="0.95"
         android:pivotX="50%"
         android:pivotY="50%"
-        android:duration="1500"
+        android:duration="2000"
         android:repeatCount="infinite"
-        android:repeatMode="reverse" />
+        android:repeatMode="reverse"
+        android:fillAfter="true"
+        android:fillBefore="true" />
 </set> 

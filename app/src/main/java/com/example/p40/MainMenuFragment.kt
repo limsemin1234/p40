@@ -54,10 +54,16 @@ class MainMenuFragment : Fragment(R.layout.fragment_main_menu) {
             mainLayout?.clipChildren = false
             mainLayout?.clipToPadding = false
             
-            // 액티비티의 콘텐츠 레이아웃도 클리핑 비활성화
-            (requireActivity().findViewById<ViewGroup>(android.R.id.content))?.apply {
+            // 모든 부모 뷰에 클리핑 비활성화를 적용
+            val parentActivty = requireActivity()
+            (parentActivty.findViewById<ViewGroup>(android.R.id.content))?.apply {
                 clipChildren = false
                 clipToPadding = false
+            }
+            
+            // 모든 내부 레이아웃도 클리핑 비활성화
+            view.findViewById<ViewGroup>(R.id.mainMenuLayout)?.let { layout ->
+                disableClippingInAllChildViews(layout)
             }
             
             Log.d(TAG, "View clipping disabled for card animation")
@@ -324,5 +330,20 @@ class MainMenuFragment : Fragment(R.layout.fragment_main_menu) {
     private fun createJokerCard(suit: CardSuit, rank: CardRank): Card {
         // 문양과 랭크를 가진 카드 생성 (별 조커로 대체)
         return Card(suit, rank, isJoker = true)
+    }
+
+    // 모든 자식 뷰에 재귀적으로 클리핑 비활성화 적용
+    private fun disableClippingInAllChildViews(viewGroup: ViewGroup) {
+        viewGroup.clipChildren = false
+        viewGroup.clipToPadding = false
+        
+        for (i in 0 until viewGroup.childCount) {
+            val child = viewGroup.getChildAt(i)
+            if (child is ViewGroup) {
+                child.clipChildren = false
+                child.clipToPadding = false
+                disableClippingInAllChildViews(child)
+            }
+        }
     }
 }
