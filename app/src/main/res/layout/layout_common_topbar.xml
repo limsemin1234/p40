@@ -5,6 +5,7 @@
     android:id="@+id/commonTopBar"
     android:layout_width="match_parent"
     android:layout_height="80dp"
+    android:minHeight="80dp"
     android:elevation="6dp"
     android:paddingVertical="16dp"
     android:paddingHorizontal="16dp">
@@ -14,6 +15,7 @@
         android:id="@+id/topBarBackground"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_margin="0dp"
         android:background="@drawable/topbar_premium_background"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
