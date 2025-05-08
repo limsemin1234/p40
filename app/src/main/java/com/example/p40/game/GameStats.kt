@@ -216,7 +216,8 @@ class GameStats(
         
         if (resource >= attackSpeedCost) {
             resource -= attackSpeedCost
-            unitAttackSpeed = (unitAttackSpeed * (1f - gameConfig.ATTACK_SPEED_UPGRADE_PERCENT)).toLong()
+            // 비율 기반 감소에서 고정값 감소로 변경
+            unitAttackSpeed = maxOf(50L, unitAttackSpeed - gameConfig.ATTACK_SPEED_FIXED_DECREASE)
             attackSpeedCost += gameConfig.ATTACK_SPEED_UPGRADE_COST_INCREASE
             attackSpeedLevel++
             return true
@@ -412,7 +413,8 @@ class GameStats(
      * 유닛 공격 속도 설정
      */
     fun setUnitAttackSpeed(attackSpeed: Long) {
-        this.unitAttackSpeed = attackSpeed
+        // 최소 공격속도를 50ms로 제한
+        this.unitAttackSpeed = maxOf(50L, attackSpeed)
     }
     
     /**
