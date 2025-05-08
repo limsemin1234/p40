@@ -142,21 +142,25 @@ class MainMenuLogoCard @JvmOverloads constructor(
             ): Boolean {
                 if (e1 == null) return false
                 
+                // 카드를 드래그 중인 경우는 flingCardAway에서 처리하므로 여기서는 무시
+                if (isDragging) {
+                    return false
+                }
+                
                 val diffX = e2.x - e1.x
                 val diffY = e2.y - e1.y
                 
-                // 수평 스와이프가 수직 스와이프보다 더 뚜렷할 때
-                if (abs(diffX) > abs(diffY)) {
-                    if (diffX > 0) {
-                        // 오른쪽으로 스와이프: 다음 문양으로
-                        Log.d(TAG, "Right swipe detected, changing to next symbol")
+                // 수직 스와이프가 수평 스와이프보다 더 뚜렷할 때만 처리
+                if (abs(diffY) > abs(diffX)) {
+                    if (diffY < 0) { // 위로 스와이프
+                        Log.d(TAG, "Up swipe detected, changing to next symbol")
                         changeToNextSymbol()
-                    } else {
-                        // 왼쪽으로 스와이프: 이전 문양으로
-                        Log.d(TAG, "Left swipe detected, changing to previous symbol")
+                        return true
+                    } else if (diffY > 0) { // 아래로 스와이프
+                        Log.d(TAG, "Down swipe detected, changing to previous symbol")
                         changeToPreviousSymbol()
+                        return true
                     }
-                    return true
                 }
                 return false
             }
@@ -263,9 +267,15 @@ class MainMenuLogoCard @JvmOverloads constructor(
                     val distanceY = cardView.y - initialY
                     val distance = Math.sqrt((distanceX * distanceX + distanceY * distanceY).toDouble()).toFloat()
                     
-                    // 일정 거리 이상 드래그한 경우 카드를 날려보냄
+                    // 일정 거리 이상 드래그하고 수직 방향 드래그가 충분한 경우만 카드 날리기
                     if (distance > width / 6) { // 화면 너비의 1/6 이상 드래그
-                        flingCardAway(distanceX, distanceY)
+                        // 작은 움직임이었다면 제스처 감지기에게 이벤트 전달
+                        if (distance < 20 && abs(distanceX) > abs(distanceY)) {
+                            // 짧은 수평 드래그는 원래 위치로 복귀
+                            returnCardToOriginalPosition()
+                        } else {
+                            flingCardAway(distanceX, distanceY)
+                        }
                     } else {
                         // 충분히 드래그하지 않은 경우 원래 위치로 복귀
                         returnCardToOriginalPosition()
@@ -289,6 +299,14 @@ class MainMenuLogoCard @JvmOverloads constructor(
         val screenWidth = resources.displayMetrics.widthPixels.toFloat()
         val screenHeight = resources.displayMetrics.heightPixels.toFloat()
         
+        // 수직 드래그인지 보다 확실하게 판단
+        // 1. Y 방향 거리가 X 방향보다 커야 함
+        // 2. Y 방향 거리가 최소한 일정 픽셀 이상이어야 함
+        val isVerticalDrag = abs(distanceY) > abs(distanceX) && abs(distanceY) > 50f
+        
+        // 다음 문양을 미리 계산 (수직 드래그일 때만 사용)
+        val nextSymbol = if (isVerticalDrag) currentSymbol.next() else currentSymbol
+        
         // 화면 밖으로 충분히 나가도록 목표 위치 계산
         val ratio = if (abs(distanceX) > abs(distanceY)) {
             // 수평 방향 이동이 더 큰 경우
@@ -309,8 +327,15 @@ class MainMenuLogoCard @JvmOverloads constructor(
         val scaleDown2 = PropertyValuesHolder.ofFloat(View.SCALE_Y, 1f, 0.5f)
         val moveX = PropertyValuesHolder.ofFloat(View.X, cardView.x, targetX)
         val moveY = PropertyValuesHolder.ofFloat(View.Y, cardView.y, targetY)
-        val rotate = PropertyValuesHolder.ofFloat(View.ROTATION, cardView.rotation, 
-                                                cardView.rotation + if (distanceX > 0) 180f else -180f)
+        
+        // 회전 방향도 드래그 방향에 맞게 조정
+        val rotateAngle = if (abs(distanceX) > abs(distanceY)) {
+            if (distanceX > 0) 180f else -180f // 수평 드래그
+        } else {
+            if (distanceY > 0) 180f else -180f // 수직 드래그
+        }
+        
+        val rotate = PropertyValuesHolder.ofFloat(View.ROTATION, cardView.rotation, cardView.rotation + rotateAngle)
         
         val animator = ObjectAnimator.ofPropertyValuesHolder(
             cardView, scaleDown, scaleDown2, moveX, moveY, rotate)
@@ -320,15 +345,21 @@ class MainMenuLogoCard @JvmOverloads constructor(
         
         animator.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator) {
-                // 카드가 날아간 후 다음 문양으로 변경
-                changeToNextSymbol()
+                // 카드가 날아간 후 문양 직접 설정
+                currentSymbol = nextSymbol
                 
-                // 카드를 원래 위치로 되돌림 (크기 및 회전 초기화)
+                // 카드를 원래 위치로, 새 문양으로 되돌림
                 cardView.x = initialX
                 cardView.y = initialY
                 cardView.rotation = 0f
                 cardView.scaleX = 0.1f
                 cardView.scaleY = 0.1f
+                
+                // 문양 업데이트
+                updateCardSymbol()
+                
+                // 로그 출력으로 디버깅
+                Log.d(TAG, "Card flinging ended, vertical drag: $isVerticalDrag, symbol changed: ${isVerticalDrag}, new symbol: ${currentSymbol.name}")
                 
                 // 새 카드가 들어오는 애니메이션
                 val newCardAnim = ObjectAnimator.ofPropertyValuesHolder(
