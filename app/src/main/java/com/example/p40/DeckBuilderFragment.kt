@@ -221,6 +221,9 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
             }
         }
         
+        // 카드 정렬
+        sortDeckCards()
+        
         // UI 갱신
         deckAdapter.notifyDataSetChanged()
         updateDeckCount()
@@ -230,9 +233,9 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
      * 컬렉션에서 덱으로 카드 추가
      */
     private fun addCardToDeck(card: Card) {
-        // 덱 최대 크기 체크 (52장 + 조커)
-        if (deckCards.size >= 53) {
-            MessageManager.getInstance().showInfo(requireContext(), "덱에 최대 53장까지만 넣을 수 있습니다.")
+        // 덱 최대 크기 체크 (55장)
+        if (deckCards.size >= 55) {
+            MessageManager.getInstance().showInfo(requireContext(), "덱에 최대 55장까지만 넣을 수 있습니다.")
             return
         }
         
@@ -244,13 +247,23 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
         
         // 덱에 카드 추가
         deckCards.add(card)
-        deckAdapter.notifyItemInserted(deckCards.size - 1)
+        
+        // 카드 정렬
+        sortDeckCards()
+        
+        // 덱 UI 갱신 (전체 갱신)
+        deckAdapter.notifyDataSetChanged()
         
         // 컬렉션에서 카드 제거
         val index = collectionCards.indexOfFirst { it.suit == card.suit && it.rank == card.rank }
         if (index != -1) {
             collectionCards.removeAt(index)
-            collectionAdapter.notifyItemRemoved(index)
+            
+            // 컬렉션 정렬
+            sortCollectionCards()
+            
+            // 컬렉션 UI 갱신 (전체 갱신)
+            collectionAdapter.notifyDataSetChanged()
         }
         
         // 카드 수량 업데이트
@@ -268,11 +281,21 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
         val index = deckCards.indexOfFirst { it.suit == card.suit && it.rank == card.rank }
         if (index != -1) {
             deckCards.removeAt(index)
-            deckAdapter.notifyItemRemoved(index)
+            
+            // 덱 정렬
+            sortDeckCards()
+            
+            // 덱 UI 갱신
+            deckAdapter.notifyDataSetChanged()
             
             // 컬렉션에 카드 추가
             collectionCards.add(card)
-            collectionAdapter.notifyItemInserted(collectionCards.size - 1)
+            
+            // 컬렉션 정렬
+            sortCollectionCards()
+            
+            // 컬렉션 UI 갱신
+            collectionAdapter.notifyDataSetChanged()
             
             // 카드 수량 업데이트
             updateDeckCount()
@@ -283,10 +306,40 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
     }
     
     /**
+     * 덱 카드 정렬 함수: 무늬(스페이드, 하트, 다이아, 클로버) 순으로 정렬하고, 같은 무늬 내에서는 숫자 순으로 정렬
+     */
+    private fun sortDeckCards() {
+        deckCards.sortWith(compareBy<Card> { 
+            when (it.suit) {
+                CardSuit.SPADE -> 0
+                CardSuit.HEART -> 1
+                CardSuit.DIAMOND -> 2
+                CardSuit.CLUB -> 3
+                CardSuit.JOKER -> 4
+            }
+        }.thenBy { it.rank.value })
+    }
+    
+    /**
+     * 컬렉션 카드 정렬 함수: 무늬(스페이드, 하트, 다이아, 클로버) 순으로 정렬하고, 같은 무늬 내에서는 숫자 순으로 정렬
+     */
+    private fun sortCollectionCards() {
+        collectionCards.sortWith(compareBy<Card> { 
+            when (it.suit) {
+                CardSuit.SPADE -> 0
+                CardSuit.HEART -> 1
+                CardSuit.DIAMOND -> 2
+                CardSuit.CLUB -> 3
+                CardSuit.JOKER -> 4
+            }
+        }.thenBy { it.rank.value })
+    }
+    
+    /**
      * 덱 카드 수량 업데이트
      */
     private fun updateDeckCount() {
-        tvDeckCount.text = "덱 구성: ${deckCards.size}장/53장"
+        tvDeckCount.text = "덱 구성: ${deckCards.size}장/55장"
     }
     
     /**
@@ -308,6 +361,9 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
                 deckCards.add(Card(suit, rank))
             }
             
+            // 덱 카드 정렬
+            sortDeckCards()
+            
             // 저장된 컬렉션 카드도 불러오기
             val collectionJson = sharedPrefs.getString(COLLECTION_KEY, null)
             collectionCards.clear() // 컬렉션 초기화
@@ -320,6 +376,9 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
                     val rank = CardRank.valueOf(cardData.rank)
                     collectionCards.add(Card(suit, rank))
                 }
+                
+                // 컬렉션 카드 정렬
+                sortCollectionCards()
             }
             
             // 기본 게임 시작 시 조커 카드는 더 이상 자동 추가되지 않음
@@ -340,8 +399,14 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
      */
     private fun saveDeck() {
         // 최소 덱 크기 체크
-        if (deckCards.size < 25) {
-            MessageManager.getInstance().showInfo(requireContext(), "최소 25장 이상의 카드로 덱을 구성해야 합니다.")
+        if (deckCards.size < 40) {
+            MessageManager.getInstance().showInfo(requireContext(), "최소 40장 이상의 카드로 덱을 구성해야 합니다.")
+            return
+        }
+        
+        // 최대 덱 크기 체크
+        if (deckCards.size > 55) {
+            MessageManager.getInstance().showInfo(requireContext(), "최대 55장까지의 카드로 덱을 구성해야 합니다.")
             return
         }
         
@@ -368,6 +433,9 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
                 collectionCards.add(card)
             }
         }
+        
+        // 컬렉션 정렬
+        sortCollectionCards()
         
         // 컬렉션 어댑터 갱신
         collectionAdapter.notifyDataSetChanged()
@@ -435,14 +503,24 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
             val index = deckCards.indexOf(card)
             if (index != -1) {
                 deckCards[index] = newCard
-                deckAdapter.notifyItemChanged(index)
+                
+                // 덱 정렬
+                sortDeckCards()
+                
+                // UI 갱신
+                deckAdapter.notifyDataSetChanged()
             }
         } else {
             // 컬렉션에서 카드 교체
             val index = collectionCards.indexOf(card)
             if (index != -1) {
                 collectionCards[index] = newCard
-                collectionAdapter.notifyItemChanged(index)
+                
+                // 컬렉션 정렬
+                sortCollectionCards()
+                
+                // UI 갱신
+                collectionAdapter.notifyDataSetChanged()
             }
         }
         
@@ -464,8 +542,8 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
         var addedCount = 0
         
         // 덱 최대 크기 체크
-        if (deckCards.size + selectedCards.size > 53) {
-            MessageManager.getInstance().showInfo(requireContext(), "덱에 최대 53장까지만 넣을 수 있습니다.")
+        if (deckCards.size + selectedCards.size > 55) {
+            MessageManager.getInstance().showInfo(requireContext(), "덱에 최대 55장까지만 넣을 수 있습니다.")
             return
         }
         
@@ -490,6 +568,10 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
                 addedCount++
             }
         }
+        
+        // 카드 정렬
+        sortDeckCards()
+        sortCollectionCards()
         
         // UI 갱신
         deckAdapter.notifyDataSetChanged()
@@ -547,6 +629,10 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
                 removedCount++
             }
         }
+        
+        // 카드 정렬
+        sortDeckCards()
+        sortCollectionCards()
         
         // UI 갱신
         deckAdapter.notifyDataSetChanged()
