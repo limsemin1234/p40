@@ -42,7 +42,7 @@ object GameConfig {
     const val MISSILE_COLOR = Color.YELLOW  // 미사일 색상
 
 
-    ////////////////////////////////적 설정////////////////////////////////////////////
+    // --------- 적유닛 관련 설정 ----------
 
 
     // 일반 적 설정
@@ -106,6 +106,10 @@ object GameConfig {
     // 웨이브별 적 데미지 증가량
     const val ENEMY_DAMAGE_PER_WAVE = 5  // 웨이브당 적 데미지 증가량
 
+
+    // --------- 자원,코인 관련 설정 ----------
+
+
     // 점수(자원) 설정
     const val SCORE_PER_NORMAL_ENEMY = 1000  // 일반 적 처치 시 얻는 점수(자원) - 주석과 일치하도록 수정
     const val SCORE_PER_BOSS = 200  // 보스 처치 시 얻는 점수(자원)
@@ -123,8 +127,10 @@ object GameConfig {
     const val TEXT_SIZE_PAUSE = 72f  // 일시정지 텍스트 크기
     const val TEXT_COLOR = Color.WHITE  // 텍스트 색상
     const val WAVE_TEXT_COLOR = Color.YELLOW  // 웨이브 텍스트 색상
+
     
     // --------- 업그레이드 관련 설정 ----------
+
     
     // 데미지 업그레이드 설정
     const val DAMAGE_UPGRADE_INITIAL_COST = 10  // 초기 비용
