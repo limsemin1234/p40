@@ -6,6 +6,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import java.util.concurrent.ConcurrentHashMap
 import com.example.p40.R
+import android.view.Gravity
 
 /**
  * 버프 카테고리 정의
@@ -321,11 +322,15 @@ class BuffManager(private val context: Context) {
             setBackgroundResource(R.drawable.buff_item_bg)
             textSize = 12f
             setTextColor(Color.WHITE)
+            gravity = Gravity.CENTER
+            
+            // 패딩 설정
+            setPadding(8, 2, 8, 2)
             
             // 마진 설정
             val params = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
+                LinearLayout.LayoutParams.MATCH_PARENT
             ).apply {
                 marginStart = 4
                 marginEnd = 4

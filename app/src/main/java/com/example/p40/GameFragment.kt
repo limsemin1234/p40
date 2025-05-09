@@ -353,6 +353,15 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
             // 새로운 방식: BuffManager를 통해 생성된 버프 뷰 추가
             displayBuffs.forEach { buff ->
                 val buffView = gameView.getBuffManager().createBuffView(buff)
+                
+                // 레이아웃 파라미터 확인 및 조정
+                val params = buffView.layoutParams as? LinearLayout.LayoutParams
+                    ?: LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.MATCH_PARENT
+                    )
+                
+                buffView.layoutParams = params
                 buffContainer?.addView(buffView)
             }
             
@@ -365,6 +374,9 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
             tvBuffList?.visibility = View.VISIBLE
             buffContainer?.visibility = View.GONE
         }
+        
+        // 레이아웃 강제 갱신하지 않도록 변경
+        buffContainer?.parent?.requestLayout()
     }
     
     // 플러시 스킬 감지 및 활성화
@@ -755,10 +767,10 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         if (btnUpgradeDamage != null) {
             val damageLevel = gameView.getDamageLevel()
             if (damageLevel >= GameConfig.DAMAGE_UPGRADE_MAX_LEVEL) {
-                btnUpgradeDamage.text = "데미지\n최대 레벨"
+                btnUpgradeDamage.text = "데미지\n최대 레벨\n(Lv.${damageLevel}/${GameConfig.DAMAGE_UPGRADE_MAX_LEVEL})"
                 btnUpgradeDamage.isEnabled = false
             } else {
-                btnUpgradeDamage.text = "데미지 +${GameConfig.DAMAGE_UPGRADE_VALUE}\n💰 ${gameView.getDamageCost()} 자원"
+                btnUpgradeDamage.text = "데미지 +${GameConfig.DAMAGE_UPGRADE_VALUE}\n💰 ${gameView.getDamageCost()} 자원\n(Lv.${damageLevel}/${GameConfig.DAMAGE_UPGRADE_MAX_LEVEL})"
                 btnUpgradeDamage.isEnabled = true // 모든 문양에서 업그레이드 가능
             }
         }
@@ -768,7 +780,7 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         if (btnUpgradeAttackSpeed != null) {
             val attackSpeedLevel = gameView.getAttackSpeedLevel()
             if (attackSpeedLevel >= GameConfig.ATTACK_SPEED_UPGRADE_MAX_LEVEL) {
-                btnUpgradeAttackSpeed.text = "공격속도\n최대 레벨"
+                btnUpgradeAttackSpeed.text = "공격속도\n최대 레벨\n(Lv.${attackSpeedLevel}/${GameConfig.ATTACK_SPEED_UPGRADE_MAX_LEVEL})"
                 btnUpgradeAttackSpeed.isEnabled = false
             } else {
                 // 현재 공격속도에 따라 다른 감소량 표시
@@ -780,7 +792,7 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
                     else -> 0L
                 }
                 
-                btnUpgradeAttackSpeed.text = "공격속도 -${decreaseAmount}ms\n💰 ${gameView.getAttackSpeedCost()} 자원"
+                btnUpgradeAttackSpeed.text = "공격속도 -${decreaseAmount}ms\n💰 ${gameView.getAttackSpeedCost()} 자원\n(Lv.${attackSpeedLevel}/${GameConfig.ATTACK_SPEED_UPGRADE_MAX_LEVEL})"
                 btnUpgradeAttackSpeed.isEnabled = true // 모든 문양에서 업그레이드 가능
             }
         }
@@ -790,10 +802,10 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         if (btnUpgradeAttackRange != null) {
             val attackRangeLevel = gameView.getAttackRangeLevel()
             if (attackRangeLevel >= GameConfig.ATTACK_RANGE_UPGRADE_MAX_LEVEL) {
-                btnUpgradeAttackRange.text = "공격범위\n최대 레벨"
+                btnUpgradeAttackRange.text = "공격범위\n최대 레벨\n(Lv.${attackRangeLevel}/${GameConfig.ATTACK_RANGE_UPGRADE_MAX_LEVEL})"
                 btnUpgradeAttackRange.isEnabled = false
             } else {
-                btnUpgradeAttackRange.text = "공격범위 +${GameConfig.ATTACK_RANGE_UPGRADE_VALUE.toInt()}\n💰 ${gameView.getAttackRangeCost()} 자원"
+                btnUpgradeAttackRange.text = "공격범위 +${GameConfig.ATTACK_RANGE_UPGRADE_VALUE.toInt()}\n💰 ${gameView.getAttackRangeCost()} 자원\n(Lv.${attackRangeLevel}/${GameConfig.ATTACK_RANGE_UPGRADE_MAX_LEVEL})"
                 btnUpgradeAttackRange.isEnabled = true // 모든 문양에서 업그레이드 가능
             }
         }
@@ -803,13 +815,20 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         if (defenseUpgrade1 != null) {
             val defenseLevel = gameView.getDefenseLevel()
             if (defenseLevel >= GameConfig.DEFENSE_UPGRADE_MAX_LEVEL) {
-                defenseUpgrade1.text = "체력\n최대 레벨"
+                defenseUpgrade1.text = "체력\n최대 레벨\n(Lv.${defenseLevel}/${GameConfig.DEFENSE_UPGRADE_MAX_LEVEL})"
                 defenseUpgrade1.isEnabled = false
             } else {
-                defenseUpgrade1.text = "체력 +${GameConfig.DEFENSE_UPGRADE_VALUE}\n💰 ${gameView.getDefenseCost()} 자원"
+                defenseUpgrade1.text = "체력 +${GameConfig.DEFENSE_UPGRADE_VALUE}\n💰 ${gameView.getDefenseCost()} 자원\n(Lv.${defenseLevel}/${GameConfig.DEFENSE_UPGRADE_MAX_LEVEL})"
                 defenseUpgrade1.isEnabled = true // 모든 문양에서 업그레이드 가능
             }
         }
+        
+        // 준비 중인 기능 버튼 텍스트 업데이트
+        val defenseUpgrade2 = view?.findViewById<Button>(R.id.defenseUpgrade2)
+        defenseUpgrade2?.text = "방어력\n(v2.0 추가 예정)"
+        
+        val defenseUpgrade3 = view?.findViewById<Button>(R.id.defenseUpgrade3)
+        defenseUpgrade3?.text = "쿨타임\n(v2.0 추가 예정)"
     }
     
     // 게임 종료 처리
@@ -887,7 +906,6 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         // 레이아웃 설정
         dialog.setContentView(R.layout.dialog_pause_menu)
         dialog.setCancelable(false)
-        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         
         // 버튼 설정
         // 1. 게임 계속하기 버튼
