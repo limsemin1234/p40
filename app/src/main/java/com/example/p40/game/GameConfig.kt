@@ -56,8 +56,10 @@ object GameConfig {
     const val FLYING_ENEMY_HOVER_AMPLITUDE = 3.0  // 공중 적 호버링 진폭
     const val FLYING_ENEMY_HOVER_PERIOD = 300.0  // 공중 적 호버링 주기 (밀리초)
     const val FLYING_ENEMY_DAMAGE = 20  // 공중 적의 기본 공격력
-
     const val FLYING_ENEMY_DAMAGE_INCREASE_PER_WAVE = 10  // 웨이브당 공중 적 공격력 증가량
+    const val FLYING_ENEMY_BASE_HEALTH = 60  // 공중 적의 기본 체력
+    const val FLYING_ENEMY_HEALTH_INCREASE_PER_WAVE = 10  // 웨이브당 공중 적 체력 증가량
+    const val FLYING_ENEMY_SPEED_INCREASE_PER_WAVE = 0.5f  // 웨이브당 공중 적 속도 증가량
     
     // 적 생성 및 이동 속도 기본 설정
     const val BASE_ENEMY_SPAWN_INTERVAL = 2000L  // 기본 적 생성 간격 (2초)
@@ -261,12 +263,18 @@ object GameConfig {
      * 웨이브별 적 체력 계산 (ENEMY_BASE_HEALTH에 배율을 곱함)
      * @param wave 현재 웨이브
      * @param isBoss 보스 여부
+     * @param isFlying 공중적 여부
      * @return 적 체력
      */
-    fun getEnemyHealthForWave(wave: Int, isBoss: Boolean = false): Int {
+    fun getEnemyHealthForWave(wave: Int, isBoss: Boolean = false, isFlying: Boolean = false): Int {
         if (isBoss) {
             // 보스는 기본 체력 + 웨이브당 증가량
             return BOSS_BASE_HEALTH + ((wave - 1) * BOSS_HEALTH_INCREASE_PER_WAVE)
+        } else if (isFlying) {
+            // 공중적은 기본 체력 + 웨이브당 증가량
+            val flyingWave = wave - FLYING_ENEMY_WAVE_THRESHOLD + 1
+            val waveIncrease = if (flyingWave > 0) flyingWave - 1 else 0
+            return FLYING_ENEMY_BASE_HEALTH + (waveIncrease * FLYING_ENEMY_HEALTH_INCREASE_PER_WAVE)
         } else {
             // 일반 적은 기존 방식대로 계산
             val multiplier = when(wave) {
@@ -325,12 +333,18 @@ object GameConfig {
      * 웨이브에 따른 적 이동 속도 계산
      * @param wave 현재 웨이브
      * @param isBoss 보스 여부
+     * @param isFlying 공중적 여부
      * @return 적 이동 속도
      */
-    fun getEnemySpeedForWave(wave: Int, isBoss: Boolean = false): Float {
+    fun getEnemySpeedForWave(wave: Int, isBoss: Boolean = false, isFlying: Boolean = false): Float {
         if (isBoss) {
             // 보스는 기본 속도 + 웨이브당 증가량
             return BOSS_BASE_SPEED + ((wave - 1) * BOSS_SPEED_INCREASE_PER_WAVE)
+        } else if (isFlying) {
+            // 공중적은 기본 속도에 계수를 곱하고 웨이브당 증가량 적용
+            val flyingWave = wave - FLYING_ENEMY_WAVE_THRESHOLD + 1
+            val waveIncrease = if (flyingWave > 0) flyingWave - 1 else 0
+            return (BASE_ENEMY_SPEED * FLYING_ENEMY_SPEED_MULTIPLIER) + (waveIncrease * FLYING_ENEMY_SPEED_INCREASE_PER_WAVE)
         } else {
             // 일반 적은 기존 방식대로 계산
             val increase = 1 + ((wave - 1) * ENEMY_SPEED_INCREASE_PER_WAVE)

@@ -141,7 +141,6 @@ class FlyingEnemyBehavior : EnemyBehaviorStrategy {
         
         // GameConfig에서 웨이브에 따른 공중적 속도 가져오기
         val baseSpeed = GameConfig.getEnemySpeedForWave(wave, false, true)
-        // 기존의 FLYING_ENEMY_SPEED_MULTIPLIER는 이미 getEnemySpeedForWave에 포함되어 있으므로 제거
         val speed = baseSpeed * speedMultiplier
         
         // 호버링 효과 (상하로 움직임 추가) (GameConfig 값 사용)
