@@ -34,6 +34,9 @@ class GameLogic(
     private val enemies = CopyOnWriteArrayList<Enemy>()
     private val missiles = CopyOnWriteArrayList<Missile>()
     
+    // 동기화를 위한 락 객체
+    private val missilesLock = Any()
+    
     // 객체 풀 인스턴스
     private val enemyPool = EnemyPool.getInstance()
     private val missilePool = MissilePool.getInstance()
@@ -188,11 +191,11 @@ class GameLogic(
             updateEnemies(screenRect, farOffScreenMargin, centerX, centerY, enemySpeedMultiplier, deadEnemies)
         }
         
-        // 2. 미사일 업데이트 최적화
-        updateMissiles(screenRect, farOffScreenMargin)
-        
-        // 3. 방어 유닛 공격 로직
+        // 2. 디펜스 유닛 공격 로직 (미사일 발사)
         updateDefenseUnitAttack(screenRect, currentTime)
+        
+        // 3. 미사일 업데이트 최적화
+        updateMissiles(screenRect, farOffScreenMargin)
         
         // 4. 버프 효과 처리
         applyBuffEffects(currentTime, screenRect)
@@ -351,10 +354,30 @@ class GameLogic(
         screenRect: ScreenRect,
         farOffScreenMargin: Float
     ) {
+        // 현재 미사일 상태의 스냅샷을 만들어 작업 (CopyOnWriteArrayList를 안전하게 활용)
         val deadMissiles = mutableListOf<Missile>()
+        val currentMissiles: List<Missile>
         
-        for (missile in missiles) {
+        // 미사일 목록의 스냅샷 생성 (스레드 안전하게)
+        synchronized(missilesLock) {
+            currentMissiles = ArrayList(missiles) // 완전히 새로운 리스트로 복사
+        }
+        
+        // 디버깅을 위한 미사일 카운터
+        val initialCount = currentMissiles.size
+        var processedCount = 0
+        var collidedCount = 0
+        
+        for (missile in currentMissiles) {
+            processedCount++
             val missilePos = missile.getPosition()
+            val missileId = missile.getId()
+            
+            // 이미 제거된 미사일은 건너뛰기
+            if (missile.isDead()) {
+                deadMissiles.add(missile)
+                continue
+            }
             
             // 화면 밖으로 완전히 벗어난 미사일은 즉시 제거 표시
             if (missilePos.x < -farOffScreenMargin || missilePos.x > screenWidth + farOffScreenMargin ||
@@ -366,26 +389,37 @@ class GameLogic(
             
             // 화면 내부 또는 가까운 범위의 미사일만 업데이트
             if (screenRect.contains(missilePos.x, missilePos.y)) {
-                missile.update(1.0f) // 미사일 속도 배율 제거, 기본 속도 사용
+                // 항상 원래의 속도로 이동 (웨이브에 관계없이 동일한 속도)
+                missile.update(1.0f)
                 
                 // 미사일이 죽지 않았고 화면 내부에 있는 경우에만 충돌 체크
                 if (!missile.isDead()) {
+                    var hasCollided = false
+                    
                     // 화면 내부의 적들과만 충돌 체크 (최적화)
                     for (enemy in enemies) {
+                        // 죽은 적과는 충돌 체크하지 않음
+                        if (enemy.isDead()) continue
+                        
                         val enemyPos = enemy.getPosition()
-                        if (screenRect.contains(enemyPos.x, enemyPos.y) && !enemy.isDead()) {
+                        if (screenRect.contains(enemyPos.x, enemyPos.y)) {
                             if (missile.checkCollision(enemy)) {
                                 // 하트 문양 효과: 적 공격 시 체력 1 회복
                                 if (defenseUnit.isHealOnDamage()) {
                                     gameStats.healUnit(1)
                                 }
                                 
-                                // 미사일이 적에게 맞으면 항상 사라지도록 수정
+                                // 충돌 발생
+                                hasCollided = true
+                                collidedCount++
                                 deadMissiles.add(missile)
-                                break;
+                                break
                             }
                         }
                     }
+                    
+                    // 충돌이 발생했으면 다음 미사일로 넘어감
+                    if (hasCollided) continue
                 }
             }
             
@@ -395,11 +429,18 @@ class GameLogic(
             }
         }
         
-        // 미사일 제거 및 풀로 반환
+        // 미사일 제거 및 풀로 반환 (중복 제거 해결)
         if (deadMissiles.isNotEmpty()) {
-            missiles.removeAll(deadMissiles)
+            // 제거할 미사일이 있는 경우에만 처리
+            val uniqueDeadMissiles = deadMissiles.distinctBy { it.getId() }.toSet()
+            
+            // 스레드 안전하게 미사일 제거
+            synchronized(missilesLock) {
+                missiles.removeAll(uniqueDeadMissiles)
+            }
+            
             // 미사일 객체 풀에 반환
-            deadMissiles.forEach { missilePool.recycle(it) }
+            uniqueDeadMissiles.forEach { missilePool.recycle(it) }
         }
     }
     
@@ -431,8 +472,22 @@ class GameLogic(
             baseDamage  // 업그레이드된 공격력 전달
         )
         
+        // 새 미사일 추가 - 스레드 안전하게
         if (newMissile != null) {
-            missiles.add(newMissile)
+            synchronized(missilesLock) {
+                // 추가하기 전에 기존 미사일이 있는지 확인
+                val beforeCount = missiles.size
+                
+                // 새 미사일 추가
+                missiles.add(newMissile)
+                
+                // 정말 추가되었는지 확인
+                val afterCount = missiles.size
+                if (afterCount <= beforeCount) {
+                    // 미사일이 추가되지 않은 경우 (드문 경우지만 확인)
+                    missilePool.recycle(newMissile) // 미사일 반환
+                }
+            }
         }
     }
     

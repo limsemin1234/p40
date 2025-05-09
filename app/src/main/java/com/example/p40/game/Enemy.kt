@@ -20,9 +20,13 @@ class Enemy(
     private var isBoss: Boolean = false,
     private var wave: Int = 1
 ) {
+    // 고유 ID 생성
+    private val id = nextId()
+    
     private var dead = false
     private var maxHealth = health
     private var enraged = false
+    private var deathReason: String? = null // 디버깅용 사망 이유
     
     // 페인트 객체 (색상)
     private val paint = Paint().apply {
@@ -42,6 +46,14 @@ class Enemy(
         isBoss -> BossEnemyBehavior()
         wave >= GameConfig.FLYING_ENEMY_WAVE_THRESHOLD && Math.random() < GameConfig.FLYING_ENEMY_SPAWN_CHANCE -> FlyingEnemyBehavior() // GameConfig에서 설정한 웨이브와 확률로 공중 적 생성
         else -> BasicEnemyBehavior()
+    }
+    
+    companion object {
+        // 적 ID 생성기
+        private var idCounter = 0
+        private fun nextId(): Int {
+            return ++idCounter
+        }
     }
     
     /**
@@ -66,6 +78,7 @@ class Enemy(
         wave = newWave
         dead = false
         enraged = false
+        deathReason = null
         
         // 페인트 색상 재설정
         paint.color = if (isBoss) GameConfig.BOSS_COLOR else GameConfig.ENEMY_COLOR
@@ -122,7 +135,13 @@ class Enemy(
         if (dead) return true
         
         // 전략 패턴: 데미지 처리 로직을 전략에 위임
-        return behaviorStrategy.onDamage(this, damage)
+        val isDead = behaviorStrategy.onDamage(this, damage)
+        
+        if (isDead) {
+            deathReason = "미사일로 인한 체력 손실"
+        }
+        
+        return isDead
     }
     
     /**
@@ -165,9 +184,16 @@ class Enemy(
     fun isBoss(): Boolean = isBoss
     fun getPaint(): Paint = paint
     fun getStrokePaint(): Paint = strokePaint
+    fun getId(): Int = id
     
     // 설정자 메서드들
-    fun setDead(value: Boolean) { dead = value }
+    fun setDead(value: Boolean) { 
+        dead = value 
+        if (value) {
+            deathReason = deathReason ?: "명시적 setDead() 호출"
+        }
+    }
+    
     fun setHealth(value: Int) { health = value }
     fun setEnraged(value: Boolean) {
         enraged = value
@@ -191,5 +217,12 @@ class Enemy(
      */
     fun setBehaviorStrategy(strategy: EnemyBehaviorStrategy) {
         behaviorStrategy = strategy
+    }
+    
+    /**
+     * 디버깅 정보 반환
+     */
+    override fun toString(): String {
+        return "Enemy(id=$id, wave=$wave, boss=$isBoss, isDead=$dead, reason=$deathReason, health=$health/$maxHealth, pos=$position)"
     }
 } 

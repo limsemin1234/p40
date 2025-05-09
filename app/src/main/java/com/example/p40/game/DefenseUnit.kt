@@ -107,8 +107,9 @@ class DefenseUnit(
                 updateAttackRangeSquared()
             }
             CardSymbolType.CLUB -> {
-                // 클로버: 공격범위 50% 증가, 체력 감소는 GameView에서 처리
+                // 클로버: 공격범위 50% 증가, 공격속도 50% 감소
                 rangeMultiplier = 1.5f
+                speedMultiplier = 0.5f
                 _attackRange = originalAttackRange * rangeMultiplier
                 updateAttackRangeSquared()
             }

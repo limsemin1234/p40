@@ -1008,7 +1008,7 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
                 messageManager.showInfo("다이아몬드 문양: 공격속도 2배 증가, 공격범위 50% 감소")
             }
             CardSymbolType.CLUB -> {
-                messageManager.showInfo("클로버 문양: 공격범위 50% 증가, 체력 50% 감소")
+                messageManager.showInfo("클로버 문양: 공격범위 50% 증가, 공격속도 50% 감소")
             }
         }
     }

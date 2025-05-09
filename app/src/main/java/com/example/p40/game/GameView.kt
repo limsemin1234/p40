@@ -535,14 +535,6 @@ class GameView @JvmOverloads constructor(
                 // 이전 문양 저장
                 val prevSymbolType = defenseUnit.getSymbolType()
                 
-                // 원래 상태의 최대 체력 저장 (스페이드 문양에서의 최대 체력)
-                val originalMaxHealth = if (prevSymbolType == CardSymbolType.CLUB) {
-                    // 이미 클로버 문양이었다면, 현재 최대 체력의 2배가 원래 체력
-                    gameStats.getUnitMaxHealth() * 2
-                } else {
-                    gameStats.getUnitMaxHealth()
-                }
-                
                 // 문양 변경
                 defenseUnit.changeSymbolType()
                 
@@ -553,68 +545,19 @@ class GameView @JvmOverloads constructor(
                 when (currentSymbolType) {
                     CardSymbolType.SPADE -> {
                         // 스페이드 문양 효과 (기본 상태)
-                        // 클로버에서 변경된 경우, 최대 체력과 현재 체력 복원
-                        if (prevSymbolType == CardSymbolType.CLUB) {
-                            // 현재 체력이 최대 체력의 몇 %인지 계산
-                            val healthPercentage = gameStats.getUnitHealth().toFloat() / gameStats.getUnitMaxHealth()
-                            
-                            // 최대 체력 복원 (2배로)
-                            gameStats.setUnitMaxHealth(originalMaxHealth)
-                            
-                            // 현재 체력도, 동일한 비율로 복원
-                            val newCurrentHealth = (originalMaxHealth * healthPercentage).toInt()
-                            gameStats.setUnitHealth(newCurrentHealth)
-                        }
                     }
                     CardSymbolType.HEART -> {
                         // 하트 문양 효과 (데미지 50% 감소, 적에게 데미지 시 체력 1 회복)
                         // - 데미지 감소는 DefenseUnit 클래스에서 처리
                         // - 체력 회복은 GameLogic 클래스에서 처리
-                        
-                        // 클로버에서 변경된 경우, 최대 체력과 현재 체력 복원
-                        if (prevSymbolType == CardSymbolType.CLUB) {
-                            // 현재 체력이 최대 체력의 몇 %인지 계산
-                            val healthPercentage = gameStats.getUnitHealth().toFloat() / gameStats.getUnitMaxHealth()
-                            
-                            // 최대 체력 복원 (2배로)
-                            gameStats.setUnitMaxHealth(originalMaxHealth)
-                            
-                            // 현재 체력도, 동일한 비율로 복원
-                            val newCurrentHealth = (originalMaxHealth * healthPercentage).toInt()
-                            gameStats.setUnitHealth(newCurrentHealth)
-                        }
                     }
                     CardSymbolType.DIAMOND -> {
                         // 다이아몬드 문양 효과 (공격속도 2배 증가, 공격범위 50% 감소)
                         // - DefenseUnit 클래스에서 처리
-                        
-                        // 클로버에서 변경된 경우, 최대 체력과 현재 체력 복원
-                        if (prevSymbolType == CardSymbolType.CLUB) {
-                            // 현재 체력이 최대 체력의 몇 %인지 계산
-                            val healthPercentage = gameStats.getUnitHealth().toFloat() / gameStats.getUnitMaxHealth()
-                            
-                            // 최대 체력 복원 (2배로)
-                            gameStats.setUnitMaxHealth(originalMaxHealth)
-                            
-                            // 현재 체력도, 동일한 비율로 복원
-                            val newCurrentHealth = (originalMaxHealth * healthPercentage).toInt()
-                            gameStats.setUnitHealth(newCurrentHealth)
-                        }
                     }
                     CardSymbolType.CLUB -> {
-                        // 클로버 문양 효과 (공격범위 50% 증가, 체력 50% 감소)
-                        // - 공격범위 증가는 DefenseUnit 클래스에서 처리
-                        
-                        // 현재 체력이 최대 체력의 몇 %인지 계산
-                        val healthPercentage = gameStats.getUnitHealth().toFloat() / gameStats.getUnitMaxHealth()
-                        
-                        // 최대 체력을 50% 감소
-                        val reducedMaxHealth = (originalMaxHealth * 0.5f).toInt()
-                        gameStats.setUnitMaxHealth(reducedMaxHealth)
-                        
-                        // 현재 체력도 같은 비율로 감소 (체력 채워진 비율 유지)
-                        val reducedCurrentHealth = (reducedMaxHealth * healthPercentage).toInt()
-                        gameStats.setUnitHealth(reducedCurrentHealth)
+                        // 클로버 문양 효과 (공격범위 50% 증가, 공격속도 50% 감소)
+                        // - 공격범위 증가와 공격속도 감소는 DefenseUnit 클래스에서 처리
                     }
                 }
                 

@@ -17,15 +17,26 @@ class Missile(
     private var damage: Int,
     private var target: Enemy?
 ) {
+    // 고유 ID 및 생성 시간
+    private val id = nextId()
+    private val creationTime = System.currentTimeMillis()
+    
     // 페인트 객체를 정적으로 공유하여 객체 생성 최소화
     companion object {
         private val MISSILE_PAINT = Paint().apply {
             color = GameConfig.MISSILE_COLOR
             style = Paint.Style.FILL
         }
+        
+        // 미사일 ID 생성기
+        private var idCounter = 0
+        private fun nextId(): Int {
+            return ++idCounter
+        }
     }
     
     private var isDead = false
+    private var deathReason: String? = null // 디버깅용 사망 이유
     
     // 충돌 범위 제곱값을 미리 계산 (제곱근 연산 최소화)
     private var collisionRadiusSquared = size * size
@@ -48,6 +59,7 @@ class Missile(
         damage = newDamage
         target = newTarget
         isDead = false
+        deathReason = null
         
         // 충돌 범위 제곱값 재계산
         collisionRadiusSquared = newSize * newSize
@@ -60,7 +72,7 @@ class Missile(
         // 이미 죽은 미사일이면 업데이트 하지 않음
         if (isDead) return
         
-        // 각도 기반 직선 이동
+        // 각도 기반 직선 이동 (타겟과 상관없이 초기 방향으로 계속 이동)
         val adjustedSpeed = speed * speedMultiplier
         position.x += cos(angle).toFloat() * adjustedSpeed
         position.y += sin(angle).toFloat() * adjustedSpeed
@@ -98,6 +110,7 @@ class Missile(
         if (distanceSquared < totalRadiusSquared) {
             enemy.takeDamage(damage)
             isDead = true
+            deathReason = "적과 충돌 (ID: ${enemy.hashCode()})"
             return true
         }
         
@@ -119,5 +132,23 @@ class Missile(
      */
     fun setOutOfBounds() {
         isDead = true
+        deathReason = "화면 밖으로 나감"
+    }
+    
+    /**
+     * 타겟 정보 반환
+     */
+    fun getTarget(): Enemy? = target
+    
+    /**
+     * 미사일 ID 반환
+     */
+    fun getId(): Int = id
+    
+    /**
+     * 디버깅 정보 반환
+     */
+    override fun toString(): String {
+        return "Missile(id=$id, isDead=$isDead, reason=$deathReason, pos=$position, angle=$angle, target=${target?.hashCode()})"
     }
 } 
