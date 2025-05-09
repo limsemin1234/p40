@@ -16,6 +16,7 @@ import com.example.p40.game.CardRank
 import com.example.p40.game.CardSuit
 import com.example.p40.game.PokerHand
 import com.example.p40.game.PokerHandEvaluator
+import com.example.p40.game.HighCard
 import kotlin.random.Random
 
 /**
@@ -273,10 +274,17 @@ class PokerCardsDialog(
         
         // 현재 패 평가 및 표시
         val currentHand = PokerHandEvaluator.evaluate(cards)
-        pokerHandText.text = "현재 족보: ${currentHand.handName}"
         
-        // 족보 설명 업데이트
-        findViewById<TextView>(R.id.tvHandDescription).text = "효과: ${currentHand.getDescription()}"
+        // UI 업데이트
+        if (currentHand is HighCard) {
+            // 하이카드(족보 없음)일 경우
+            pokerHandText.text = "현재 족보: 족보 없음"
+            findViewById<TextView>(R.id.tvHandDescription).text = "효과: 없음"
+        } else {
+            // 족보가 있는 경우
+            pokerHandText.text = "현재 족보: ${currentHand.handName}"
+            findViewById<TextView>(R.id.tvHandDescription).text = "효과: ${currentHand.getDescription()}"
+        }
     }
     
     private fun toggleCardSelection(index: Int) {

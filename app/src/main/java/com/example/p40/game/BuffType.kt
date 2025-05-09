@@ -5,6 +5,9 @@ package com.example.p40.game
  */
 enum class BuffType {
     MISSILE_DAMAGE,     // 미사일 데미지
+    ATTACK_SPEED,       // 공격 속도
+    ATTACK_RANGE,       // 사거리
+    HEALTH,             // 체력
     
     // 플러시 스킬 관련
     HEART_FLUSH_SKILL,    // 하트 플러시 스킬 (체력 회복)

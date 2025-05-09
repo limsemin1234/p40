@@ -218,6 +218,67 @@ object GameConfig {
     const val STATS_RANGE_BASE_COST = 100        // 사거리 강화 기본 비용
     const val STATS_RANGE_COST_INCREASE = 100     // 사거리 강화 비용 증가량
 
+    // --------- 포커 족보별 스탯 증가 설정 ----------
+    
+    // 하이카드 (효과 없음)
+    const val HIGH_CARD_DAMAGE_INCREASE = 0.0f        // 데미지 증가량 (%)
+    const val HIGH_CARD_ATTACK_SPEED_INCREASE = 0.0f  // 공격속도 증가량 (%)
+    const val HIGH_CARD_RANGE_INCREASE = 0.0f         // 사거리 증가량 (%)
+    const val HIGH_CARD_HEALTH_INCREASE = 0.0f        // 체력 증가량 (%)
+
+    // 원페어
+    const val ONE_PAIR_DAMAGE_INCREASE = 0.1f         // 데미지 10% 증가
+    const val ONE_PAIR_ATTACK_SPEED_INCREASE = 0.0f   // 공격속도 증가량 (%)
+    const val ONE_PAIR_RANGE_INCREASE = 0.0f          // 사거리 증가량 (%)
+    const val ONE_PAIR_HEALTH_INCREASE = 0.0f         // 체력 증가량 (%)
+
+    // 투페어
+    const val TWO_PAIR_DAMAGE_INCREASE = 0.2f         // 데미지 20% 증가
+    const val TWO_PAIR_ATTACK_SPEED_INCREASE = 0.0f   // 공격속도 증가량 (%)
+    const val TWO_PAIR_RANGE_INCREASE = 0.0f          // 사거리 증가량 (%)
+    const val TWO_PAIR_HEALTH_INCREASE = 0.0f         // 체력 증가량 (%)
+
+    // 트리플
+    const val THREE_OF_A_KIND_DAMAGE_INCREASE = 0.3f        // 데미지 30% 증가
+    const val THREE_OF_A_KIND_ATTACK_SPEED_INCREASE = 0.0f  // 공격속도 증가량 (%)
+    const val THREE_OF_A_KIND_RANGE_INCREASE = 0.0f         // 사거리 증가량 (%)
+    const val THREE_OF_A_KIND_HEALTH_INCREASE = 0.0f        // 체력 증가량 (%)
+
+    // 스트레이트
+    const val STRAIGHT_DAMAGE_INCREASE = 0.4f         // 데미지 40% 증가
+    const val STRAIGHT_ATTACK_SPEED_INCREASE = 0.0f   // 공격속도 증가량 (%)
+    const val STRAIGHT_RANGE_INCREASE = 0.0f          // 사거리 증가량 (%)
+    const val STRAIGHT_HEALTH_INCREASE = 0.0f         // 체력 증가량 (%)
+
+    // 플러시 (스킬 활성화만 있으므로 기본 데미지 증가 없음)
+    const val FLUSH_DAMAGE_INCREASE = 0.0f            // 데미지 증가량 (%)
+    const val FLUSH_ATTACK_SPEED_INCREASE = 0.0f      // 공격속도 증가량 (%)
+    const val FLUSH_RANGE_INCREASE = 0.0f             // 사거리 증가량 (%)
+    const val FLUSH_HEALTH_INCREASE = 0.0f            // 체력 증가량 (%)
+
+    // 풀하우스
+    const val FULL_HOUSE_DAMAGE_INCREASE = 0.6f       // 데미지 60% 증가
+    const val FULL_HOUSE_ATTACK_SPEED_INCREASE = 0.0f // 공격속도 증가량 (%)
+    const val FULL_HOUSE_RANGE_INCREASE = 0.0f        // 사거리 증가량 (%)
+    const val FULL_HOUSE_HEALTH_INCREASE = 0.0f       // 체력 증가량 (%)
+
+    // 포카드
+    const val FOUR_OF_A_KIND_DAMAGE_INCREASE = 0.7f        // 데미지 70% 증가
+    const val FOUR_OF_A_KIND_ATTACK_SPEED_INCREASE = 0.0f  // 공격속도 증가량 (%)
+    const val FOUR_OF_A_KIND_RANGE_INCREASE = 0.0f         // 사거리 증가량 (%)
+    const val FOUR_OF_A_KIND_HEALTH_INCREASE = 0.0f        // 체력 증가량 (%)
+
+    // 스트레이트 플러시
+    const val STRAIGHT_FLUSH_DAMAGE_INCREASE = 0.8f        // 데미지 80% 증가
+    const val STRAIGHT_FLUSH_ATTACK_SPEED_INCREASE = 0.0f  // 공격속도 증가량 (%)
+    const val STRAIGHT_FLUSH_RANGE_INCREASE = 0.0f         // 사거리 증가량 (%)
+    const val STRAIGHT_FLUSH_HEALTH_INCREASE = 0.0f        // 체력 증가량 (%)
+
+    // 로열 플러시
+    const val ROYAL_FLUSH_DAMAGE_INCREASE = 0.9f           // 데미지 90% 증가
+    const val ROYAL_FLUSH_ATTACK_SPEED_INCREASE = 0.0f     // 공격속도 증가량 (%)
+    const val ROYAL_FLUSH_RANGE_INCREASE = 0.0f            // 사거리 증가량 (%)
+    const val ROYAL_FLUSH_HEALTH_INCREASE = 0.0f           // 체력 증가량 (%)
     
     // --------- 포커 카드 및 스킬 관련 설정 ----------
     

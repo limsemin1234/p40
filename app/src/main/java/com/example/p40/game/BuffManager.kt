@@ -42,6 +42,9 @@ data class Buff(
     fun getDisplayText(): String {
         val effectText = when (type) {
             BuffType.MISSILE_DAMAGE -> "데미지 +${(value * 100).toInt()}%"
+            BuffType.ATTACK_SPEED -> "공격속도 +${(value * 100).toInt()}%"
+            BuffType.ATTACK_RANGE -> "사거리 +${(value * 100).toInt()}%"
+            BuffType.HEALTH -> "체력 +${(value * 100).toInt()}%"
             BuffType.HEART_FLUSH_SKILL -> "하트 플러시 스킬"
             BuffType.SPADE_FLUSH_SKILL -> "스페이드 플러시 스킬"
             BuffType.CLUB_FLUSH_SKILL -> "클로버 플러시 스킬"
@@ -55,6 +58,9 @@ data class Buff(
     fun getShortDisplayText(): String {
         val effectText = when (type) {
             BuffType.MISSILE_DAMAGE -> "데미지 +${(value * 100).toInt()}%"
+            BuffType.ATTACK_SPEED -> "공속 +${(value * 100).toInt()}%"
+            BuffType.ATTACK_RANGE -> "사거리 +${(value * 100).toInt()}%"
+            BuffType.HEALTH -> "체력 +${(value * 100).toInt()}%"
             BuffType.HEART_FLUSH_SKILL -> "하트 플러시 스킬"
             BuffType.SPADE_FLUSH_SKILL -> "스페이드 플러시 스킬"
             BuffType.CLUB_FLUSH_SKILL -> "클로버 플러시 스킬"
@@ -73,6 +79,9 @@ class BuffManager(private val context: Context) {
     
     // 캐싱된 값들
     private var cachedMissileDamageMultiplier: Float = 1.0f
+    private var cachedAttackSpeedMultiplier: Float = 1.0f
+    private var cachedAttackRangeMultiplier: Float = 1.0f
+    private var cachedHealthMultiplier: Float = 1.0f
     
     // 캐시 유효성 플래그
     private var isBuffCacheValid: Boolean = false
@@ -113,6 +122,18 @@ class BuffManager(private val context: Context) {
         val damageBuff = buffs[BuffType.MISSILE_DAMAGE]
         cachedMissileDamageMultiplier = 1f + (damageBuff?.value ?: 0f)
         
+        // 공격 속도 배율 계산
+        val attackSpeedBuff = buffs[BuffType.ATTACK_SPEED]
+        cachedAttackSpeedMultiplier = 1f + (attackSpeedBuff?.value ?: 0f)
+        
+        // 사거리 배율 계산
+        val rangeBuff = buffs[BuffType.ATTACK_RANGE]
+        cachedAttackRangeMultiplier = 1f + (rangeBuff?.value ?: 0f)
+        
+        // 체력 배율 계산
+        val healthBuff = buffs[BuffType.HEALTH]
+        cachedHealthMultiplier = 1f + (healthBuff?.value ?: 0f)
+        
         // 캐시 유효성 표시
         isBuffCacheValid = true
     }
@@ -123,54 +144,79 @@ class BuffManager(private val context: Context) {
             is HighCard -> {
                 // 하이카드는 버프 없음 (아무 작업도 하지 않음)
                 // 메시지는 PokerHand 클래스에서 "족보 없음"으로 표시됨
+                if (GameConfig.HIGH_CARD_DAMAGE_INCREASE > 0) {
+                    addBuff(Buff(
+                        type = BuffType.MISSILE_DAMAGE,
+                        level = 1,
+                        value = GameConfig.HIGH_CARD_DAMAGE_INCREASE,
+                        name = "하이카드",
+                        description = "데미지 ${(GameConfig.HIGH_CARD_DAMAGE_INCREASE * 100).toInt()}% 증가"
+                    ))
+                }
+                // 공격 속도, 사거리, 체력 버프는 기본적으로 0이므로 추가하지 않음
             }
             
             is OnePair -> {
-                // 원페어 (데미지 10% 증가)
+                // 원페어 (데미지 증가)
                 addBuff(Buff(
                     type = BuffType.MISSILE_DAMAGE,
                     level = 1,
-                    value = 0.1f,
+                    value = GameConfig.ONE_PAIR_DAMAGE_INCREASE,
                     name = "원페어",
-                    description = "데미지 10% 증가"
+                    description = "데미지 ${(GameConfig.ONE_PAIR_DAMAGE_INCREASE * 100).toInt()}% 증가"
                 ))
+                // 공격 속도, 사거리, 체력 버프는 기본적으로 0이므로 추가하지 않음
             }
             
             is TwoPair -> {
-                // 투 페어 (데미지 20% 증가)
+                // 투 페어 (데미지 증가)
                 addBuff(Buff(
                     type = BuffType.MISSILE_DAMAGE,
                     level = 1,
-                    value = 0.2f,
+                    value = GameConfig.TWO_PAIR_DAMAGE_INCREASE,
                     name = "투 페어",
-                    description = "데미지 20% 증가"
+                    description = "데미지 ${(GameConfig.TWO_PAIR_DAMAGE_INCREASE * 100).toInt()}% 증가"
                 ))
+                // 공격 속도, 사거리, 체력 버프는 기본적으로 0이므로 추가하지 않음
             }
             
             is ThreeOfAKind -> {
-                // 트리플 (데미지 30% 증가)
+                // 트리플 (데미지 증가)
                 addBuff(Buff(
                     type = BuffType.MISSILE_DAMAGE,
                     level = 1,
-                    value = 0.3f,
+                    value = GameConfig.THREE_OF_A_KIND_DAMAGE_INCREASE,
                     name = "트리플",
-                    description = "데미지 30% 증가"
+                    description = "데미지 ${(GameConfig.THREE_OF_A_KIND_DAMAGE_INCREASE * 100).toInt()}% 증가"
                 ))
+                // 공격 속도, 사거리, 체력 버프는 기본적으로 0이므로 추가하지 않음
             }
             
             is Straight -> {
-                // 스트레이트 (데미지 40% 증가)
+                // 스트레이트 (데미지 증가)
                 addBuff(Buff(
                     type = BuffType.MISSILE_DAMAGE,
                     level = 1,
-                    value = 0.4f,
+                    value = GameConfig.STRAIGHT_DAMAGE_INCREASE,
                     name = "스트레이트",
-                    description = "데미지 40% 증가"
+                    description = "데미지 ${(GameConfig.STRAIGHT_DAMAGE_INCREASE * 100).toInt()}% 증가"
                 ))
+                // 공격 속도, 사거리, 체력 버프는 기본적으로 0이므로 추가하지 않음
             }
             
             is Flush -> {
                 // 플러시 - 문양에 따른 특수 스킬만 활성화 (데미지 증가 없음)
+                // 기본 데미지 증가가 설정되어 있으면 추가
+                if (GameConfig.FLUSH_DAMAGE_INCREASE > 0) {
+                    addBuff(Buff(
+                        type = BuffType.MISSILE_DAMAGE,
+                        level = 1,
+                        value = GameConfig.FLUSH_DAMAGE_INCREASE,
+                        name = "플러시",
+                        description = "데미지 ${(GameConfig.FLUSH_DAMAGE_INCREASE * 100).toInt()}% 증가"
+                    ))
+                }
+                
                 val cards = CardSelectionManager.instance.getSelectedCards()
                 if (cards.size >= 5) {
                     // 모든 카드가 같은 무늬인지 확인 (조커는 변환된 문양으로 취급)
@@ -230,47 +276,51 @@ class BuffManager(private val context: Context) {
             }
             
             is FullHouse -> {
-                // 풀하우스 (데미지 60% 증가)
+                // 풀하우스 (데미지 증가)
                 addBuff(Buff(
                     type = BuffType.MISSILE_DAMAGE,
                     level = 1,
-                    value = 0.6f,
+                    value = GameConfig.FULL_HOUSE_DAMAGE_INCREASE,
                     name = "풀하우스",
-                    description = "데미지 60% 증가"
+                    description = "데미지 ${(GameConfig.FULL_HOUSE_DAMAGE_INCREASE * 100).toInt()}% 증가"
                 ))
+                // 공격 속도, 사거리, 체력 버프는 기본적으로 0이므로 추가하지 않음
             }
             
             is FourOfAKind -> {
-                // 포카드 (데미지 70% 증가)
+                // 포카드 (데미지 증가)
                 addBuff(Buff(
                     type = BuffType.MISSILE_DAMAGE,
                     level = 1,
-                    value = 0.7f,
+                    value = GameConfig.FOUR_OF_A_KIND_DAMAGE_INCREASE,
                     name = "포카드",
-                    description = "데미지 70% 증가"
+                    description = "데미지 ${(GameConfig.FOUR_OF_A_KIND_DAMAGE_INCREASE * 100).toInt()}% 증가"
                 ))
+                // 공격 속도, 사거리, 체력 버프는 기본적으로 0이므로 추가하지 않음
             }
             
             is StraightFlush -> {
-                // 스트레이트 플러시 (데미지 80% 증가)
+                // 스트레이트 플러시 (데미지 증가)
                 addBuff(Buff(
                     type = BuffType.MISSILE_DAMAGE,
                     level = 1,
-                    value = 0.8f,
+                    value = GameConfig.STRAIGHT_FLUSH_DAMAGE_INCREASE,
                     name = "스트레이트 플러시",
-                    description = "데미지 80% 증가"
+                    description = "데미지 ${(GameConfig.STRAIGHT_FLUSH_DAMAGE_INCREASE * 100).toInt()}% 증가"
                 ))
+                // 공격 속도, 사거리, 체력 버프는 기본적으로 0이므로 추가하지 않음
             }
             
             is RoyalFlush -> {
-                // 로열 플러시 (데미지 90% 증가)
+                // 로열 플러시 (데미지 증가)
                 addBuff(Buff(
                     type = BuffType.MISSILE_DAMAGE,
                     level = 1,
-                    value = 0.9f,
+                    value = GameConfig.ROYAL_FLUSH_DAMAGE_INCREASE,
                     name = "로열 플러시",
-                    description = "데미지 90% 증가"
+                    description = "데미지 ${(GameConfig.ROYAL_FLUSH_DAMAGE_INCREASE * 100).toInt()}% 증가"
                 ))
+                // 공격 속도, 사거리, 체력 버프는 기본적으로 0이므로 추가하지 않음
             }
         }
         
@@ -294,6 +344,24 @@ class BuffManager(private val context: Context) {
         return cachedMissileDamageMultiplier
     }
     
+    // 공격 속도 배율 반환
+    fun getAttackSpeedMultiplier(): Float {
+        updateBuffCache()
+        return cachedAttackSpeedMultiplier
+    }
+    
+    // 사거리 배율 반환
+    fun getAttackRangeMultiplier(): Float {
+        updateBuffCache()
+        return cachedAttackRangeMultiplier
+    }
+    
+    // 체력 배율 반환
+    fun getHealthMultiplier(): Float {
+        updateBuffCache()
+        return cachedHealthMultiplier
+    }
+    
     // 모든 버프 제거
     fun clearAllBuffs() {
         buffs.clear()
@@ -312,6 +380,9 @@ class BuffManager(private val context: Context) {
             // 버프 텍스트 설정
             text = when (buff.type) {
                 BuffType.MISSILE_DAMAGE -> "데미지${(buff.value * 100).toInt()}%"
+                BuffType.ATTACK_SPEED -> "공속${(buff.value * 100).toInt()}%"
+                BuffType.ATTACK_RANGE -> "사거리${(buff.value * 100).toInt()}%"
+                BuffType.HEALTH -> "체력${(buff.value * 100).toInt()}%"
                 BuffType.HEART_FLUSH_SKILL -> "♥회복"
                 BuffType.SPADE_FLUSH_SKILL -> "♠제거"
                 BuffType.CLUB_FLUSH_SKILL -> "♣감속"

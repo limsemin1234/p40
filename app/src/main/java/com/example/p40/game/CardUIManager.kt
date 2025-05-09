@@ -133,8 +133,13 @@ class CardUIManager(
             val pokerHand = tempDeck.evaluateHand()
             
             // 족보 텍스트 업데이트
-            currentHandText.text = "현재 족보: ${pokerHand.handName}"
-            handDescriptionText.text = "효과: ${pokerHand.getDescription()}"
+            if (pokerHand is HighCard) {
+                currentHandText.text = "현재 족보: 족보 없음"
+                handDescriptionText.text = "효과: 없음"
+            } else {
+                currentHandText.text = "현재 족보: ${pokerHand.handName}"
+                handDescriptionText.text = "효과: ${pokerHand.getDescription()}"
+            }
         } else {
             // 5장 이하인 경우 일반 족보 평가
             val pokerDeck = PokerDeck()
@@ -142,8 +147,13 @@ class CardUIManager(
             val pokerHand = pokerDeck.evaluateHand()
             
             // 족보 텍스트 업데이트
-            currentHandText.text = "현재 족보: ${pokerHand.handName}"
-            handDescriptionText.text = "효과: ${pokerHand.getDescription()}"
+            if (pokerHand is HighCard) {
+                currentHandText.text = "현재 족보: 족보 없음"
+                handDescriptionText.text = "효과: 없음"
+            } else {
+                currentHandText.text = "현재 족보: ${pokerHand.handName}"
+                handDescriptionText.text = "효과: ${pokerHand.getDescription()}"
+            }
         }
         
         // 교체 버튼 활성화/비활성화 (교체 횟수가 0이면 항상 비활성화)

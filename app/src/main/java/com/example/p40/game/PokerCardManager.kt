@@ -394,8 +394,15 @@ class PokerCardManager(
         listener.applyPokerHandEffect(pokerHand)
         
         // 성공 메시지 표시
-        val handName = getPokerHandKoreanName(pokerHand)
-        MessageManager.getInstance().showSuccess("$handName 패 효과가 적용되었습니다!")
+        if (pokerHand is HighCard) {
+            // 하이카드(족보 없음)일 경우
+            MessageManager.getInstance().showInfo("족보가 없습니다.")
+        } else {
+            // 다른 족보일 경우 (족보 이름과 효과를 함께 표시)
+            val handName = getPokerHandKoreanName(pokerHand)
+            val effectDescription = getEffectDescription(pokerHand)
+            MessageManager.getInstance().showSuccess("$handName($effectDescription) 버프가 적용되었습니다!")
+        }
         
         // 패널 초기 상태로 복귀
         resetPanel()
@@ -404,7 +411,7 @@ class PokerCardManager(
     // 포커 패 한글 이름 반환
     private fun getPokerHandKoreanName(hand: PokerHand): String {
         return when (hand) {
-            is HighCard -> "하이카드"
+            is HighCard -> "족보 없음"
             is OnePair -> "원페어"
             is TwoPair -> "투페어"
             is ThreeOfAKind -> "트리플"
@@ -415,6 +422,22 @@ class PokerCardManager(
             is StraightFlush -> "스트레이트 플러시"
             is RoyalFlush -> "로열 플러시"
             else -> "알 수 없는 패"
+        }
+    }
+    
+    // 포커 패 효과 설명 반환
+    private fun getEffectDescription(hand: PokerHand): String {
+        return when (hand) {
+            is OnePair -> "데미지 ${(GameConfig.ONE_PAIR_DAMAGE_INCREASE * 100).toInt()}%"
+            is TwoPair -> "데미지 ${(GameConfig.TWO_PAIR_DAMAGE_INCREASE * 100).toInt()}%"
+            is ThreeOfAKind -> "데미지 ${(GameConfig.THREE_OF_A_KIND_DAMAGE_INCREASE * 100).toInt()}%"
+            is Straight -> "데미지 ${(GameConfig.STRAIGHT_DAMAGE_INCREASE * 100).toInt()}%"
+            is Flush -> "문양 스킬 활성화"
+            is FullHouse -> "데미지 ${(GameConfig.FULL_HOUSE_DAMAGE_INCREASE * 100).toInt()}%"
+            is FourOfAKind -> "데미지 ${(GameConfig.FOUR_OF_A_KIND_DAMAGE_INCREASE * 100).toInt()}%"
+            is StraightFlush -> "데미지 ${(GameConfig.STRAIGHT_FLUSH_DAMAGE_INCREASE * 100).toInt()}%"
+            is RoyalFlush -> "데미지 ${(GameConfig.ROYAL_FLUSH_DAMAGE_INCREASE * 100).toInt()}%"
+            else -> ""
         }
     }
 } 
