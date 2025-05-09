@@ -162,11 +162,23 @@
         android:layout_marginEnd="16dp"
         app:layout_constraintBottom_toBottomOf="parent">
 
+        <!-- 카드 삭제 버튼 -->
+        <Button
+            android:id="@+id/btnDeleteCard"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="카드 삭제"
+            android:textSize="16sp"
+            android:layout_marginEnd="8dp"
+            android:backgroundTint="#FF5252" />
+
         <!-- 저장 버튼 -->
         <Button
             android:id="@+id/btnSaveDeck"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="덱 저장하기" 
             android:textSize="16sp"/>
     </LinearLayout>

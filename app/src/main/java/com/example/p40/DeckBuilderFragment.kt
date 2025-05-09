@@ -11,6 +11,7 @@ import android.widget.NumberPicker
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
@@ -122,6 +123,11 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
         view?.findViewById<Button>(R.id.btnRemoveSelected)?.setOnClickListener {
             removeSelectedCards()
         }
+        
+        // 카드 삭제 버튼 설정
+        view?.findViewById<Button>(R.id.btnDeleteCard)?.setOnClickListener {
+            showDeleteCardDialog()
+        }
     }
     
     private fun navigateBack() {
@@ -165,13 +171,8 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
                 removeCardFromDeck(card)
             },
             onCardLongClick = { card ->
-                // 덱에서 카드 롱클릭 - 별 조커인 경우만 처리
-                if (CardUtils.isStarJoker(card)) {
-                    showJokerSelectionDialog(card, true)
-                    true
-                } else {
-                    false
-                }
+                // 롱클릭 기능 비활성화
+                false
             }
         )
         
@@ -185,13 +186,8 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
             showNewLabel = true,
             deckBuilderFragment = this,
             onCardLongClick = { card ->
-                // 컬렉션에서 카드 롱클릭 - 별 조커인 경우만 처리
-                if (CardUtils.isStarJoker(card)) {
-                    showJokerSelectionDialog(card, false)
-                    true
-                } else {
-                    false
-                }
+                // 롱클릭 기능 비활성화
+                false
             }
         )
         
@@ -471,64 +467,6 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
     }
     
     /**
-     * 별 조커 카드 선택 다이얼로그 표시
-     */
-    private fun showJokerSelectionDialog(card: Card, isInDeck: Boolean) {
-        // 조커 선택 다이얼로그 생성 및 표시
-        val jokerDialog = com.example.p40.game.JokerSelectionDialog(requireContext()) { selectedCard ->
-            // 선택된 카드로 조커 카드 대체
-            replaceJokerCard(card, selectedCard.suit, selectedCard.rank, isInDeck)
-            
-            // 토스트 메시지
-            MessageManager.getInstance().showInfo(requireContext(), "조커 카드가 ${selectedCard.suit.getName()} ${selectedCard.rank.getName()}(으)로 변환되었습니다.")
-        }
-        
-        jokerDialog.show()
-    }
-    
-    /**
-     * 조커 카드 변환 처리
-     */
-    private fun replaceJokerCard(card: Card, newSuit: CardSuit, newRank: CardRank, isInDeck: Boolean) {
-        // 새 카드 생성
-        val newCard = Card(
-            suit = newSuit,
-            rank = newRank,
-            isSelected = false,
-            isJoker = true
-        )
-        
-        if (isInDeck) {
-            // 덱에서 카드 교체
-            val index = deckCards.indexOf(card)
-            if (index != -1) {
-                deckCards[index] = newCard
-                
-                // 덱 정렬
-                sortDeckCards()
-                
-                // UI 갱신
-                deckAdapter.notifyDataSetChanged()
-            }
-        } else {
-            // 컬렉션에서 카드 교체
-            val index = collectionCards.indexOf(card)
-            if (index != -1) {
-                collectionCards[index] = newCard
-                
-                // 컬렉션 정렬
-                sortCollectionCards()
-                
-                // UI 갱신
-                collectionAdapter.notifyDataSetChanged()
-            }
-        }
-        
-        // 변경사항 저장
-        autoSaveDeckAndCollection()
-    }
-    
-    /**
      * 선택한 카드들을 덱에 추가
      */
     private fun addSelectedCards() {
@@ -651,6 +589,112 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
         } else {
             MessageManager.getInstance().showInfo(requireContext(), "제거할 수 있는 카드가 없습니다.")
         }
+    }
+    
+    /**
+     * 카드 삭제 다이얼로그 표시
+     */
+    private fun showDeleteCardDialog() {
+        // 선택된 카드 가져오기
+        val selectedDeckCards = deckAdapter.getSelectedCards()
+        val selectedCollectionCards = collectionAdapter.getSelectedCards()
+        
+        // 선택된 카드가 없는 경우
+        if (selectedDeckCards.isEmpty() && selectedCollectionCards.isEmpty()) {
+            MessageManager.getInstance().showInfo(requireContext(), "삭제할 카드를 선택해주세요")
+            return
+        }
+        
+        // 선택된 카드 총 개수
+        val totalSelectedCards = selectedDeckCards.size + selectedCollectionCards.size
+        
+        // 확인 다이얼로그 생성
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle("카드 삭제")
+        builder.setMessage("선택한 ${totalSelectedCards}장의 카드를 영구적으로 삭제하시겠습니까?\n삭제된 카드는 복구할 수 없습니다.")
+        
+        // 확인 버튼
+        builder.setPositiveButton("삭제") { dialog, _ ->
+            // 덱에서 선택된 카드 삭제
+            if (selectedDeckCards.isNotEmpty()) {
+                deleteCardsFromDeck(selectedDeckCards)
+            }
+            
+            // 컬렉션에서 선택된 카드 삭제
+            if (selectedCollectionCards.isNotEmpty()) {
+                deleteCardsFromCollection(selectedCollectionCards)
+            }
+            
+            // 다이얼로그 닫기
+            dialog.dismiss()
+            
+            // 변경사항 자동 저장
+            autoSaveDeckAndCollection()
+            
+            // 카드 수량 업데이트
+            updateDeckCount()
+            
+            // 결과 안내 메시지
+            MessageManager.getInstance().showInfo(requireContext(), "${totalSelectedCards}장의 카드가 삭제되었습니다.")
+        }
+        
+        // 취소 버튼
+        builder.setNegativeButton("취소") { dialog, _ ->
+            dialog.dismiss()
+        }
+        
+        // 다이얼로그 표시
+        builder.show()
+    }
+    
+    /**
+     * 덱에서 카드 삭제
+     */
+    private fun deleteCardsFromDeck(cardsToDelete: List<Card>) {
+        // 카드 하나씩 삭제
+        for (card in cardsToDelete) {
+            // 덱에서 카드 찾기
+            val index = deckCards.indexOfFirst { 
+                it.suit == card.suit && it.rank == card.rank && it.isJoker == card.isJoker
+            }
+            
+            // 덱에서 카드 제거
+            if (index != -1) {
+                deckCards.removeAt(index)
+            }
+        }
+        
+        // 덱 정렬
+        sortDeckCards()
+        
+        // UI 갱신
+        deckAdapter.notifyDataSetChanged()
+        deckAdapter.clearSelections()
+    }
+    
+    /**
+     * 컬렉션에서 카드 삭제
+     */
+    private fun deleteCardsFromCollection(cardsToDelete: List<Card>) {
+        // 카드 하나씩 삭제
+        for (card in cardsToDelete) {
+            // 컬렉션에서 카드 찾기
+            val index = collectionCards.indexOfFirst { 
+                it.suit == card.suit && it.rank == card.rank && it.isJoker == card.isJoker
+            }
+            
+            // 컬렉션에서 카드 제거
+            if (index != -1) {
+                collectionCards.removeAt(index)
+            }
+        }
+        
+        // 컬렉션 정렬
+        sortCollectionCards()
+        
+        // UI 갱신
+        collectionAdapter.notifyDataSetChanged()
+        collectionAdapter.clearSelections()
     }
     
     // 카드 데이터 직렬화를 위한 클래스
