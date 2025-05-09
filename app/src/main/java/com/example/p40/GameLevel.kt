@@ -9,5 +9,6 @@ data class GameLevel(
     val title: String,       // 레벨 제목
     val description: String, // 레벨 설명
     val totalWaves: Int,     // 총 웨이브 수
-    val difficulty: Float    // 난이도 배율 (적 체력, 데미지 등에 곱해짐)
+    val difficulty: Float,   // 난이도 배율 (적 체력, 데미지 등에 곱해짐)
+    val isLocked: Boolean = false // 잠금 여부
 ) 

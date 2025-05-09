@@ -65,7 +65,7 @@ object GameConfig {
     const val MESSAGE_PADDING_HORIZONTAL = 16 // 메시지 가로 패딩 (dp)
     const val MESSAGE_PADDING_VERTICAL = 10 // 메시지 세로 패딩 (dp)
     const val MESSAGE_CORNER_RADIUS = 8 // 메시지 모서리 둥글기 (dp)
-    const val MESSAGE_DURATION = 3000L // 메시지 표시 시간 (ms)
+    const val MESSAGE_DURATION = 2000L // 메시지 표시 시간 (ms)
     const val MESSAGE_MAX_COUNT = 5 // 최대 메시지 수
     const val MESSAGE_TEXT_SIZE = 15f // 메시지 텍스트 크기 (sp)
     
