@@ -434,14 +434,23 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         
         // GameConfig를 통해 웨이브별 적 스탯 정보 계산
         val health = GameConfig.getEnemyHealthForWave(wave)
-        val damage = GameConfig.getEnemyDamageForWave(wave, false)
+        val normalDamage = GameConfig.getEnemyDamageForWave(wave, false)
+        val flyingDamage = if (wave >= GameConfig.FLYING_ENEMY_WAVE_THRESHOLD) {
+            GameConfig.getEnemyDamageForWave(wave, false, true)
+        } else {
+            0 // 공중적이 등장하지 않는 웨이브에서는 0으로 표시
+        }
         val speed = GameConfig.getEnemySpeedForWave(wave)
         
         // 체력 정보 업데이트
         view?.findViewById<TextView>(R.id.enemyHealthText)?.text = "체력: $health"
         
-        // 공격력 정보 업데이트
-        view?.findViewById<TextView>(R.id.enemyAttackText)?.text = "공격력: $damage"
+        // 공격력 정보 업데이트 - 일반 적과 공중적 구분하여 표시
+        if (wave >= GameConfig.FLYING_ENEMY_WAVE_THRESHOLD) {
+            view?.findViewById<TextView>(R.id.enemyAttackText)?.text = "공격력: $normalDamage\n공중적: $flyingDamage"
+        } else {
+            view?.findViewById<TextView>(R.id.enemyAttackText)?.text = "공격력: $normalDamage"
+        }
         
         // 이동속도 정보 업데이트
         val formattedSpeed = String.format("%.2f", speed)

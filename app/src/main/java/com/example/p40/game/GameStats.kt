@@ -216,8 +216,18 @@ class GameStats(
         
         if (resource >= attackSpeedCost) {
             resource -= attackSpeedCost
-            // 비율 기반 감소에서 고정값 감소로 변경
-            unitAttackSpeed = maxOf(50L, unitAttackSpeed - gameConfig.ATTACK_SPEED_FIXED_DECREASE)
+            
+            // 현재 공격 속도에 따라 다른 감소량 적용
+            val decreaseAmount = when {
+                unitAttackSpeed > gameConfig.ATTACK_SPEED_TIER1_THRESHOLD -> gameConfig.ATTACK_SPEED_DECREASE_TIER1
+                unitAttackSpeed > gameConfig.ATTACK_SPEED_TIER2_THRESHOLD -> gameConfig.ATTACK_SPEED_DECREASE_TIER2
+                unitAttackSpeed > gameConfig.ATTACK_SPEED_TIER3_THRESHOLD -> gameConfig.ATTACK_SPEED_DECREASE_TIER3
+                else -> 0L // 최소 임계값 도달 시 더 이상 감소하지 않음
+            }
+            
+            // 최소값 50ms 이하로는 내려가지 않도록 설정
+            unitAttackSpeed = maxOf(50L, unitAttackSpeed - decreaseAmount)
+            
             attackSpeedCost += gameConfig.ATTACK_SPEED_UPGRADE_COST_INCREASE
             attackSpeedLevel++
             return true

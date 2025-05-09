@@ -49,11 +49,13 @@ object GameConfig {
     
     // 공중 적(Flying Enemy) 설정
     const val FLYING_ENEMY_WAVE_THRESHOLD = 6  // 공중 적이 등장하기 시작하는 웨이브
-    const val FLYING_ENEMY_SPAWN_CHANCE = 0.3f  // 공중 적 등장 확률 (0~1)
+    const val FLYING_ENEMY_SPAWN_CHANCE = 0.3f  // 공중 적 등장 확률 30% (0~1)
     const val FLYING_ENEMY_SPEED_MULTIPLIER = 1.2f  // 공중 적 이동 속도 계수
     const val FLYING_ENEMY_DAMAGE_MULTIPLIER = 1.2f  // 공중 적이 받는 데미지 계수 (취약함)
     const val FLYING_ENEMY_HOVER_AMPLITUDE = 3.0  // 공중 적 호버링 진폭
     const val FLYING_ENEMY_HOVER_PERIOD = 300.0  // 공중 적 호버링 주기 (밀리초)
+    const val FLYING_ENEMY_DAMAGE = 20  // 공중 적의 기본 공격력
+    const val FLYING_ENEMY_DAMAGE_INCREASE_PER_WAVE = 10  // 웨이브당 공중 적 공격력 증가량
     
     // 적 생성 및 이동 속도 기본 설정
     const val BASE_ENEMY_SPAWN_INTERVAL = 2000L  // 기본 적 생성 간격 (2초)
@@ -125,7 +127,7 @@ object GameConfig {
     // 공격속도 업그레이드 설정
     const val ATTACK_SPEED_UPGRADE_INITIAL_COST = 10  // 초기 비용
     const val ATTACK_SPEED_UPGRADE_COST_INCREASE = 5  // 레벨당 비용 증가량
-    const val ATTACK_SPEED_UPGRADE_MAX_LEVEL = 200  // 최대 업그레이드 레벨
+    const val ATTACK_SPEED_UPGRADE_MAX_LEVEL = 100  // 최대 업그레이드 레벨
     
     // 공격속도 구간별 감소량 설정
     const val ATTACK_SPEED_DECREASE_TIER1 = 20L  // 1000ms~800ms 구간에서의 감소량 (ms)
@@ -144,8 +146,8 @@ object GameConfig {
     // 체력 업그레이드 설정
     const val DEFENSE_UPGRADE_INITIAL_COST = 10  // 초기 비용
     const val DEFENSE_UPGRADE_COST_INCREASE = 5  // 레벨당 비용 증가량
-    const val DEFENSE_UPGRADE_VALUE = 20  // 업그레이드당 최대 체력 증가량
-    const val DEFENSE_UPGRADE_MAX_LEVEL = 500  // 최대 업그레이드 레벨
+    const val DEFENSE_UPGRADE_VALUE = 10  // 업그레이드당 최대 체력 증가량
+    const val DEFENSE_UPGRADE_MAX_LEVEL = 100  // 최대 업그레이드 레벨
 
     
     // --------- 렌더링 관련 설정 ----------
@@ -286,12 +288,19 @@ object GameConfig {
      * 웨이브별 적 데미지 계산
      * @param wave 웨이브 번호
      * @param isBoss 보스 여부
+     * @param isFlying 공중적 여부
      * @return 적 데미지
      */
-    fun getEnemyDamageForWave(wave: Int, isBoss: Boolean): Int {
+    fun getEnemyDamageForWave(wave: Int, isBoss: Boolean, isFlying: Boolean = false): Int {
         if (isBoss) {
             // 보스는 기본 데미지 + 웨이브당 증가량
             return BOSS_DAMAGE + ((wave - 1) * BOSS_DAMAGE_INCREASE_PER_WAVE)
+        } else if (isFlying) {
+            // 공중적 공격력 계산
+            // 웨이브 6부터 등장하므로, 웨이브 6에서는 증가량이 0이 되어 기본 공격력만 적용됨
+            val flyingWave = wave - FLYING_ENEMY_WAVE_THRESHOLD + 1
+            val waveIncrease = if (flyingWave > 0) flyingWave - 1 else 0
+            return FLYING_ENEMY_DAMAGE + (waveIncrease * FLYING_ENEMY_DAMAGE_INCREASE_PER_WAVE)
         } else {
             // 일반 적은 기존 방식대로 계산
             return NORMAL_ENEMY_DAMAGE + ((wave - 1) * ENEMY_DAMAGE_PER_WAVE)

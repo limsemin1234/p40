@@ -153,8 +153,19 @@ class Enemy(
             // 보스 공격력: 기본 보스 공격력 + (웨이브 - 1) * 웨이브당 보스 공격력 증가량
             GameConfig.BOSS_DAMAGE + ((wave - 1) * GameConfig.BOSS_DAMAGE_INCREASE_PER_WAVE)
         } else {
-            // 일반 적 공격력: 기본 적 공격력 + (웨이브 - 1) * 웨이브당 적 공격력 증가량
-            GameConfig.NORMAL_ENEMY_DAMAGE + ((wave - 1) * GameConfig.ENEMY_DAMAGE_PER_WAVE)
+            // 공중적인지 확인
+            val isFlying = behaviorStrategy is FlyingEnemyBehavior
+            
+            if (isFlying) {
+                // 공중적 공격력: 기본 공중적 공격력 + (웨이브에서 첫 등장 웨이브를 뺀 값) * 웨이브당 공중적 공격력 증가량
+                // 웨이브 6부터 등장하므로, 웨이브 6에서는 증가량이 0이 되어 기본 공격력만 적용됨
+                val flyingWave = wave - GameConfig.FLYING_ENEMY_WAVE_THRESHOLD + 1
+                val waveIncrease = if (flyingWave > 0) flyingWave - 1 else 0
+                GameConfig.FLYING_ENEMY_DAMAGE + (waveIncrease * GameConfig.FLYING_ENEMY_DAMAGE_INCREASE_PER_WAVE)
+            } else {
+                // 일반 적 공격력: 기본 적 공격력 + (웨이브 - 1) * 웨이브당 적 공격력 증가량
+                GameConfig.NORMAL_ENEMY_DAMAGE + ((wave - 1) * GameConfig.ENEMY_DAMAGE_PER_WAVE)
+            }
         }
     }
     
