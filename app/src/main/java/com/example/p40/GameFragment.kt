@@ -420,7 +420,7 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         // 공격속도 정보 업데이트
         val attacksPerSecond = 1000.0 / attackSpeed
         val formattedAttackSpeed = String.format("%.2f", attacksPerSecond) // 소수점 두자리로 변경
-        view?.findViewById<TextView>(R.id.unitAttackSpeedText)?.text = "공속: ${formattedAttackSpeed}회/초 (${attackSpeed}ms)"
+        view?.findViewById<TextView>(R.id.unitAttackSpeedText)?.text = "공속: ${formattedAttackSpeed}회/초\n(${attackSpeed}ms)"
         
         // 사거리 정보 업데이트
         view?.findViewById<TextView>(R.id.unitRangeText)?.text = "사거리: ${attackRange.toInt()}"

@@ -125,7 +125,6 @@ object GameConfig {
     // 공격속도 업그레이드 설정
     const val ATTACK_SPEED_UPGRADE_INITIAL_COST = 10  // 초기 비용
     const val ATTACK_SPEED_UPGRADE_COST_INCREASE = 5  // 레벨당 비용 증가량
-    const val ATTACK_SPEED_UPGRADE_PERCENT = 0.02f  // 업그레이드당 속도 증가율 0.02%
     const val ATTACK_SPEED_UPGRADE_MAX_LEVEL = 200  // 최대 업그레이드 레벨
     const val ATTACK_SPEED_FIXED_DECREASE = 20L  // 공격속도 고정 감소량 (ms)
     
