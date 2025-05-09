@@ -195,6 +195,9 @@ object GameConfig {
     
     // --------- 스탯 강화 관련 설정 ----------
     
+    // 스탯 강화 최대 레벨 설정
+    const val STATS_MAX_LEVEL = 50  // 모든 스탯의 최대 강화 레벨
+    
     // 체력 강화 관련 설정
     const val STATS_HEALTH_UPGRADE_AMOUNT = 10    // 체력 증가량
     const val STATS_HEALTH_BASE_COST = 100        // 체력 강화 기본 비용
@@ -206,7 +209,7 @@ object GameConfig {
     const val STATS_ATTACK_COST_INCREASE = 100    // 공격력 강화 비용 증가량
     
     // 공격 속도 강화 관련 설정
-    const val STATS_ATTACK_SPEED_UPGRADE_AMOUNT = 0.05f  // 공격 속도 증가량
+    const val STATS_ATTACK_SPEED_UPGRADE_AMOUNT = 10  // 공격 속도 감소량 (ms)
     const val STATS_ATTACK_SPEED_BASE_COST = 100        // 공격 속도 강화 기본 비용
     const val STATS_ATTACK_SPEED_COST_INCREASE = 100    // 공격 속도 강화 비용 증가량
     
@@ -219,10 +222,10 @@ object GameConfig {
     // --------- 포커 카드 및 스킬 관련 설정 ----------
     
     // 포커 카드 뽑기 비용
-    const val POKER_CARD_DRAW_COST = 100  // 포커 카드 뽑기 기본 비용
+    const val POKER_CARD_DRAW_COST = 200  // 포커 카드 뽑기 기본 비용
     
     // 추가 카드 구매 비용
-    const val FIRST_EXTRA_CARD_COST = 500  // 첫 번째 추가 카드 비용
+    const val FIRST_EXTRA_CARD_COST = 1000  // 첫 번째 추가 카드 비용
     const val SECOND_EXTRA_CARD_COST = 2000  // 두 번째 추가 카드 비용
     
     // 카드 교체 설정
@@ -234,7 +237,7 @@ object GameConfig {
     const val HEART_FLUSH_HEAL_AMOUNT = 500   // -1은 전체 회복, 양수는 해당 수치만큼 회복
     
     // 스페이드 플러시 스킬: 적 제거 관련 설정
-    const val SPADE_FLUSH_DAMAGE = 1000     // 적에게 입히는 즉사 데미지 (매우 높은 값으로 설정)
+    const val SPADE_FLUSH_DAMAGE = 500     // 적에게 입히는 즉사 데미지 (매우 높은 값으로 설정)
     
     // 클로버 플러시 스킬: 시간 정지 관련 설정
     const val CLUB_FLUSH_DURATION = 5000L    // 시간 정지 지속 시간 (밀리초)

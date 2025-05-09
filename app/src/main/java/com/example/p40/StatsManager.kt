@@ -57,12 +57,18 @@ class StatsManager private constructor(context: Context) {
         return prefs.getInt(KEY_HEALTH_LEVEL, 0)
     }
     
-    fun upgradeHealth(amount: Int = GameConfig.STATS_HEALTH_UPGRADE_AMOUNT) {
-        val currentHealth = getHealth()
+    fun upgradeHealth(amount: Int = GameConfig.STATS_HEALTH_UPGRADE_AMOUNT): Boolean {
         val currentLevel = getHealthLevel()
         
+        // 최대 레벨 체크
+        if (currentLevel >= GameConfig.STATS_MAX_LEVEL) {
+            return false
+        }
+        
+        val currentHealth = getHealth()
         setHealth(currentHealth + amount)
         prefs.edit().putInt(KEY_HEALTH_LEVEL, currentLevel + 1).apply()
+        return true
     }
     
     // 공격력 관련
@@ -78,12 +84,18 @@ class StatsManager private constructor(context: Context) {
         return prefs.getInt(KEY_ATTACK_LEVEL, 0)
     }
     
-    fun upgradeAttack(amount: Int = GameConfig.STATS_ATTACK_UPGRADE_AMOUNT) {
-        val currentAttack = getAttack()
+    fun upgradeAttack(amount: Int = GameConfig.STATS_ATTACK_UPGRADE_AMOUNT): Boolean {
         val currentLevel = getAttackLevel()
         
+        // 최대 레벨 체크
+        if (currentLevel >= GameConfig.STATS_MAX_LEVEL) {
+            return false
+        }
+        
+        val currentAttack = getAttack()
         setAttack(currentAttack + amount)
         prefs.edit().putInt(KEY_ATTACK_LEVEL, currentLevel + 1).apply()
+        return true
     }
     
     // 공격 속도 관련
@@ -99,12 +111,28 @@ class StatsManager private constructor(context: Context) {
         return prefs.getInt(KEY_ATTACK_SPEED_LEVEL, 0)
     }
     
-    fun upgradeAttackSpeed(amount: Float = GameConfig.STATS_ATTACK_SPEED_UPGRADE_AMOUNT) {
-        val currentAttackSpeed = getAttackSpeed()
+    fun upgradeAttackSpeed(amount: Int = GameConfig.STATS_ATTACK_SPEED_UPGRADE_AMOUNT): Boolean {
         val currentLevel = getAttackSpeedLevel()
         
-        setAttackSpeed(currentAttackSpeed + amount)
+        // 최대 레벨 체크
+        if (currentLevel >= GameConfig.STATS_MAX_LEVEL) {
+            return false
+        }
+        
+        val currentAttackSpeed = getAttackSpeed()
+        
+        // 밀리초 기준으로 계산하기 위해 현재 초당 공격 횟수를 밀리초로 변환
+        val currentMs = (1000 / currentAttackSpeed).toInt()
+        
+        // amount(ms)만큼 감소시키되 최소값(250ms)보다 작아지지 않도록 함
+        val newMs = maxOf(250, currentMs - amount)
+        
+        // 다시 초당 공격 횟수로 변환하여 저장
+        val newAttackSpeed = 1000f / newMs
+        
+        setAttackSpeed(newAttackSpeed)
         prefs.edit().putInt(KEY_ATTACK_SPEED_LEVEL, currentLevel + 1).apply()
+        return true
     }
     
     // 사거리 관련
@@ -120,12 +148,18 @@ class StatsManager private constructor(context: Context) {
         return prefs.getInt(KEY_RANGE_LEVEL, 0)
     }
     
-    fun upgradeRange(amount: Int = GameConfig.STATS_RANGE_UPGRADE_AMOUNT) {
-        val currentRange = getRange()
+    fun upgradeRange(amount: Int = GameConfig.STATS_RANGE_UPGRADE_AMOUNT): Boolean {
         val currentLevel = getRangeLevel()
         
+        // 최대 레벨 체크
+        if (currentLevel >= GameConfig.STATS_MAX_LEVEL) {
+            return false
+        }
+        
+        val currentRange = getRange()
         setRange(currentRange + amount)
         prefs.edit().putInt(KEY_RANGE_LEVEL, currentLevel + 1).apply()
+        return true
     }
     
     // 강화 비용 계산 메서드를 스탯별로 개별화

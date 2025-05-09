@@ -115,14 +115,24 @@ class StatsUpgradeFragment : Fragment(R.layout.fragment_stats_upgrade) {
         // 현재 스탯 표시
         tvCurrentHealth.text = statsManager.getHealth().toString()
         tvCurrentAttack.text = statsManager.getAttack().toString()
-        tvCurrentAttackSpeed.text = String.format("%.1f", statsManager.getAttackSpeed())
+        
+        // 공격 속도를 초당 횟수가 아닌 공격 간격(ms)으로 표시
+        val attackSpeedInMs = (1000 / statsManager.getAttackSpeed()).toInt()
+        tvCurrentAttackSpeed.text = "${attackSpeedInMs}ms"
+        
         tvCurrentRange.text = statsManager.getRange().toString()
         
-        // 강화 정보 표시
-        tvHealthUpgradeInfo.text = "체력 +${GameConfig.STATS_HEALTH_UPGRADE_AMOUNT}"
-        tvAttackUpgradeInfo.text = "공격력 +${GameConfig.STATS_ATTACK_UPGRADE_AMOUNT}"
-        tvAttackSpeedUpgradeInfo.text = "공격 속도 +${GameConfig.STATS_ATTACK_SPEED_UPGRADE_AMOUNT}"
-        tvRangeUpgradeInfo.text = "사거리 +${GameConfig.STATS_RANGE_UPGRADE_AMOUNT}"
+        // 현재 레벨 정보
+        val healthLevel = statsManager.getHealthLevel()
+        val attackLevel = statsManager.getAttackLevel()
+        val attackSpeedLevel = statsManager.getAttackSpeedLevel()
+        val rangeLevel = statsManager.getRangeLevel()
+        
+        // 강화 정보 표시 (현재 레벨/최대 레벨 표시 추가)
+        tvHealthUpgradeInfo.text = "체력 +${GameConfig.STATS_HEALTH_UPGRADE_AMOUNT} (Lv.${healthLevel}/${GameConfig.STATS_MAX_LEVEL})"
+        tvAttackUpgradeInfo.text = "공격력 +${GameConfig.STATS_ATTACK_UPGRADE_AMOUNT} (Lv.${attackLevel}/${GameConfig.STATS_MAX_LEVEL})"
+        tvAttackSpeedUpgradeInfo.text = "공격 속도 -${GameConfig.STATS_ATTACK_SPEED_UPGRADE_AMOUNT}ms (Lv.${attackSpeedLevel}/${GameConfig.STATS_MAX_LEVEL})"
+        tvRangeUpgradeInfo.text = "사거리 +${GameConfig.STATS_RANGE_UPGRADE_AMOUNT} (Lv.${rangeLevel}/${GameConfig.STATS_MAX_LEVEL})"
         
         // 강화 비용 표시
         val healthCost = statsManager.getHealthUpgradeCost()
@@ -145,18 +155,28 @@ class StatsUpgradeFragment : Fragment(R.layout.fragment_stats_upgrade) {
     private fun upgradeHealth() {
         val cost = statsManager.getHealthUpgradeCost()
         
+        // 최대 레벨 체크
+        if (statsManager.getHealthLevel() >= GameConfig.STATS_MAX_LEVEL) {
+            messageManager.showWarning("이미 최대 레벨에 도달했습니다!")
+            return
+        }
+        
         if (userManager.getCoin() >= cost) {
             // 코인 차감
             userManager.decreaseCoin(cost)
             
             // 체력 증가
-            statsManager.upgradeHealth()
+            val success = statsManager.upgradeHealth()
             
             // UI 업데이트
             updateStatsUI()
             updateCoinUI()
             
-            messageManager.showSuccess("체력이 강화되었습니다!")
+            if (success) {
+                messageManager.showSuccess("체력이 강화되었습니다!")
+            } else {
+                messageManager.showWarning("최대 레벨에 도달했습니다!")
+            }
         } else {
             messageManager.showWarning("코인이 부족합니다!")
         }
@@ -166,18 +186,28 @@ class StatsUpgradeFragment : Fragment(R.layout.fragment_stats_upgrade) {
     private fun upgradeAttack() {
         val cost = statsManager.getAttackUpgradeCost()
         
+        // 최대 레벨 체크
+        if (statsManager.getAttackLevel() >= GameConfig.STATS_MAX_LEVEL) {
+            messageManager.showWarning("이미 최대 레벨에 도달했습니다!")
+            return
+        }
+        
         if (userManager.getCoin() >= cost) {
             // 코인 차감
             userManager.decreaseCoin(cost)
             
             // 공격력 증가
-            statsManager.upgradeAttack()
+            val success = statsManager.upgradeAttack()
             
             // UI 업데이트
             updateStatsUI()
             updateCoinUI()
             
-            messageManager.showSuccess("공격력이 강화되었습니다!")
+            if (success) {
+                messageManager.showSuccess("공격력이 강화되었습니다!")
+            } else {
+                messageManager.showWarning("최대 레벨에 도달했습니다!")
+            }
         } else {
             messageManager.showWarning("코인이 부족합니다!")
         }
@@ -187,18 +217,28 @@ class StatsUpgradeFragment : Fragment(R.layout.fragment_stats_upgrade) {
     private fun upgradeAttackSpeed() {
         val cost = statsManager.getAttackSpeedUpgradeCost()
         
+        // 최대 레벨 체크
+        if (statsManager.getAttackSpeedLevel() >= GameConfig.STATS_MAX_LEVEL) {
+            messageManager.showWarning("이미 최대 레벨에 도달했습니다!")
+            return
+        }
+        
         if (userManager.getCoin() >= cost) {
             // 코인 차감
             userManager.decreaseCoin(cost)
             
             // 공격 속도 증가
-            statsManager.upgradeAttackSpeed()
+            val success = statsManager.upgradeAttackSpeed()
             
             // UI 업데이트
             updateStatsUI()
             updateCoinUI()
             
-            messageManager.showSuccess("공격 속도가 강화되었습니다!")
+            if (success) {
+                messageManager.showSuccess("공격 속도가 강화되었습니다!")
+            } else {
+                messageManager.showWarning("최대 레벨에 도달했습니다!")
+            }
         } else {
             messageManager.showWarning("코인이 부족합니다!")
         }
@@ -208,18 +248,28 @@ class StatsUpgradeFragment : Fragment(R.layout.fragment_stats_upgrade) {
     private fun upgradeRange() {
         val cost = statsManager.getRangeUpgradeCost()
         
+        // 최대 레벨 체크
+        if (statsManager.getRangeLevel() >= GameConfig.STATS_MAX_LEVEL) {
+            messageManager.showWarning("이미 최대 레벨에 도달했습니다!")
+            return
+        }
+        
         if (userManager.getCoin() >= cost) {
             // 코인 차감
             userManager.decreaseCoin(cost)
             
             // 사거리 증가
-            statsManager.upgradeRange()
+            val success = statsManager.upgradeRange()
             
             // UI 업데이트
             updateStatsUI()
             updateCoinUI()
             
-            messageManager.showSuccess("사거리가 강화되었습니다!")
+            if (success) {
+                messageManager.showSuccess("사거리가 강화되었습니다!")
+            } else {
+                messageManager.showWarning("최대 레벨에 도달했습니다!")
+            }
         } else {
             messageManager.showWarning("코인이 부족합니다!")
         }
