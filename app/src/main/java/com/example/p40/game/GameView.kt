@@ -6,6 +6,7 @@ import android.util.AttributeSet
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.MotionEvent
+import com.example.p40.UserManager
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -520,7 +521,7 @@ class GameView @JvmOverloads constructor(
     
     /**
      * 터치 이벤트 처리
-     * 디펜스 유닛을 터치하면 문양을 변경
+     * 디펜스 유닛을 터치하면 문양을 변경 (구매 및 적용된 유닛만 사용 가능)
      */
     override fun onTouchEvent(event: MotionEvent): Boolean {
         if (event.action == MotionEvent.ACTION_DOWN && initializeIfNeeded()) {
@@ -540,37 +541,41 @@ class GameView @JvmOverloads constructor(
                 // 이전 문양 저장
                 val prevSymbolType = defenseUnit.getSymbolType()
                 
-                // 문양 변경
-                defenseUnit.changeSymbolType()
+                // UserManager에서 적용된 디펜스 유닛 타입 가져오기
+                val userManager = UserManager.getInstance(context)
+                val appliedUnitType = userManager.getAppliedDefenseUnit()
                 
-                // 현재 문양
-                val currentSymbolType = defenseUnit.getSymbolType()
-                
-                // 변경된 문양에 따른 특별 효과 적용
-                when (currentSymbolType) {
-                    CardSymbolType.SPADE -> {
-                        // 스페이드 문양 효과 (기본 상태)
+                // 현재 문양이 SPADE인 경우, 적용된 유닛 타입으로 직접 변경
+                if (prevSymbolType == CardSymbolType.SPADE) {
+                    // 적용된 유닛이 SPADE가 아닌 경우에만 변경
+                    if (appliedUnitType != 0) {
+                        // 문양 타입 직접 설정
+                        val newSymbolType = when (appliedUnitType) {
+                            1 -> CardSymbolType.HEART
+                            2 -> CardSymbolType.DIAMOND
+                            3 -> CardSymbolType.CLUB
+                            else -> CardSymbolType.SPADE
+                        }
+                        
+                        // 적용된 유닛 타입으로 설정
+                        defenseUnit.setSymbolType(newSymbolType)
+                        
+                        // 문양 변경 리스너에 알림
+                        symbolChangeListener?.onSymbolChanged(newSymbolType)
+                        
+                        // 터치 이벤트 소비
+                        return true
                     }
-                    CardSymbolType.HEART -> {
-                        // 하트 문양 효과 (데미지 50% 감소, 적에게 데미지 시 체력 1 회복)
-                        // - 데미지 감소는 DefenseUnit 클래스에서 처리
-                        // - 체력 회복은 GameLogic 클래스에서 처리
-                    }
-                    CardSymbolType.DIAMOND -> {
-                        // 다이아몬드 문양 효과 (공격속도 2배 증가, 공격범위 50% 감소)
-                        // - DefenseUnit 클래스에서 처리
-                    }
-                    CardSymbolType.CLUB -> {
-                        // 클로버 문양 효과 (공격범위 50% 증가, 공격속도 50% 감소)
-                        // - 공격범위 증가와 공격속도 감소는 DefenseUnit 클래스에서 처리
-                    }
+                } else {
+                    // 현재 문양이 SPADE가 아닌 경우, SPADE로 되돌림
+                    defenseUnit.setSymbolType(CardSymbolType.SPADE)
+                    
+                    // 문양 변경 리스너에 알림
+                    symbolChangeListener?.onSymbolChanged(CardSymbolType.SPADE)
+                    
+                    // 터치 이벤트 소비
+                    return true
                 }
-                
-                // 문양 변경 리스너에 알림
-                symbolChangeListener?.onSymbolChanged(currentSymbolType)
-                
-                // 터치 이벤트 소비
-                return true
             }
         }
         

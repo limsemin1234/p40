@@ -39,25 +39,46 @@ class DefenseUnitTabFragment : Fragment() {
         val recyclerView = view.findViewById<RecyclerView>(R.id.rvShopItems)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         
+        // 빈 메시지 숨기기
+        view.findViewById<TextView>(R.id.tvEmptyMessage)?.visibility = View.GONE
+        
         // 유닛 데이터 초기화
         initDefenseUnits()
         
+        // 적용된 유닛 상태 확인 및 업데이트
+        updateAppliedUnitState()
+        
         // 어댑터 설정
-        defenseUnitAdapter = DefenseUnitAdapter(defenseUnits) { unit ->
-            onUnitBuyClicked(unit)
-        }
+        defenseUnitAdapter = DefenseUnitAdapter(
+            defenseUnits = defenseUnits,
+            onBuyUnit = { unit -> onUnitBuyClicked(unit) },
+            onApplyUnit = { unit -> onUnitApplyClicked(unit) }
+        )
         recyclerView.adapter = defenseUnitAdapter
     }
     
     // 디펜스유닛 초기화
     private fun initDefenseUnits() {
-        // 디펜스유닛 목록을 비웁니다 (기존 유닛들을 추가하지 않음)
+        // 디펜스유닛 목록 가져오기
         defenseUnits.clear()
+        defenseUnits.addAll(ShopDefenseUnit.getDefaultDefenseUnits())
         
-        // 안내 메시지를 표시하기 위한 더미 아이템 추가
-        val emptyMessage = view?.findViewById<TextView>(R.id.tvEmptyMessage)
-        emptyMessage?.visibility = View.VISIBLE
-        emptyMessage?.text = "현재 구매 가능한 디펜스유닛이 없습니다."
+        // 이미 구매한 유닛 확인
+        for (unit in defenseUnits) {
+            if (userManager.hasDefenseUnit(unit.id)) {
+                unit.isPurchased = true
+            }
+        }
+    }
+    
+    // 적용된 유닛 상태 업데이트
+    private fun updateAppliedUnitState() {
+        val appliedUnitType = userManager.getAppliedDefenseUnit()
+        
+        for (unit in defenseUnits) {
+            // 문양 타입의 ordinal과 비교하여 적용 상태 설정
+            unit.isApplied = unit.symbolType.ordinal == appliedUnitType
+        }
     }
     
     // 유닛 구매 버튼 클릭 처리
@@ -79,6 +100,31 @@ class DefenseUnitTabFragment : Fragment() {
             .show()
     }
     
+    // 유닛 적용 버튼 클릭 처리
+    private fun onUnitApplyClicked(unit: ShopDefenseUnit) {
+        // 구매하지 않은 유닛인지 확인
+        if (!unit.isPurchased) {
+            MessageManager.getInstance().showInfo(requireContext(), "먼저 유닛을 구매해야 합니다.")
+            return
+        }
+        
+        // 이미 적용된 유닛인지 확인
+        if (unit.isApplied) {
+            MessageManager.getInstance().showInfo(requireContext(), "이미 적용된 유닛입니다.")
+            return
+        }
+        
+        // 유닛 적용 확인 다이얼로그
+        AlertDialog.Builder(requireContext())
+            .setTitle("디펜스유닛 적용")
+            .setMessage("${unit.name}을(를) 적용하시겠습니까?")
+            .setPositiveButton("적용") { _, _ ->
+                applyUnit(unit)
+            }
+            .setNegativeButton("취소", null)
+            .show()
+    }
+    
     // 유닛 구매 처리
     private fun purchaseUnit(unit: ShopDefenseUnit) {
         // 코인 차감
@@ -88,7 +134,7 @@ class DefenseUnitTabFragment : Fragment() {
             
             // UI 업데이트
             unit.isPurchased = true
-            defenseUnitAdapter.updateUnitPurchased(unit.id)
+            defenseUnitAdapter.notifyDataSetChanged()
             
             // 상위 프래그먼트 코인 UI 업데이트
             (parentFragment as? CardShopFragment)?.updateCurrencyUI()
@@ -98,5 +144,24 @@ class DefenseUnitTabFragment : Fragment() {
             // 코인 부족
             MessageManager.getInstance().showError(requireContext(), "코인이 부족합니다.")
         }
+    }
+    
+    // 유닛 적용 처리
+    private fun applyUnit(unit: ShopDefenseUnit) {
+        // 기존 적용된 유닛의 상태 변경
+        for (defenseUnit in defenseUnits) {
+            defenseUnit.isApplied = false
+        }
+        
+        // 새로운 유닛 적용
+        unit.isApplied = true
+        
+        // 적용된 유닛 정보 저장
+        userManager.setAppliedDefenseUnit(unit.symbolType.ordinal)
+        
+        // UI 업데이트
+        defenseUnitAdapter.notifyDataSetChanged()
+        
+        MessageManager.getInstance().showSuccess(requireContext(), "${unit.name}이(가) 적용되었습니다!")
     }
 } 

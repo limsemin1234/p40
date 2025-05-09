@@ -27,15 +27,17 @@ enum class CardSymbolType {
  * 상점에서 판매하는 디펜스유닛 정보
  */
 data class ShopDefenseUnit(
-    val id: Int,                // 유닛 고유 ID
-    val name: String,           // 유닛 이름
-    val description: String,    // 유닛 설명
-    val price: Int,             // 유닛 가격
-    val damage: Int,            // 유닛 공격력
-    val range: Int,             // 유닛 사거리
-    val attackSpeed: Float,     // 공격 속도
-    val isNew: Boolean = false, // 신규 유닛 여부
-    var isPurchased: Boolean = false // 구매 여부
+    val id: Int,                  // 유닛 고유 ID
+    val name: String,             // 유닛 이름
+    val description: String,      // 유닛 설명
+    val price: Int,               // 유닛 가격
+    val damage: Int,              // 유닛 공격력
+    val range: Int,               // 유닛 사거리
+    val attackSpeed: Float,       // 공격 속도
+    val symbolType: CardSymbolType, // 유닛 문양 타입
+    val isNew: Boolean = false,   // 신규 유닛 여부
+    var isPurchased: Boolean = false, // 구매 여부
+    var isApplied: Boolean = false   // 적용 여부
 ) {
     companion object {
         // 상점에서 판매할 기본 디펜스유닛 목록 생성
@@ -43,32 +45,35 @@ data class ShopDefenseUnit(
             return listOf(
                 ShopDefenseUnit(
                     id = 1,
-                    name = "기본 터렛",
-                    description = "기본적인 공격 유닛입니다.",
-                    price = 300,
+                    name = "하트 유닛",
+                    description = "단점: 공격력이 -50%, 장점: 타격당 1씩 체력회복",
+                    price = 500,
                     damage = 10,
                     range = 3,
                     attackSpeed = 1.0f,
+                    symbolType = CardSymbolType.HEART,
                     isNew = true
                 ),
                 ShopDefenseUnit(
                     id = 2,
-                    name = "스나이퍼 터렛",
-                    description = "먼 거리에서 강력한 공격을 가하는 유닛입니다.",
+                    name = "다이아 유닛",
+                    description = "단점: 공격범위 -50%, 장점: 공격속도 2배",
                     price = 500,
-                    damage = 25,
-                    range = 5,
-                    attackSpeed = 0.5f,
+                    damage = 8,
+                    range = 4,
+                    attackSpeed = 1.2f,
+                    symbolType = CardSymbolType.DIAMOND,
                     isNew = true
                 ),
                 ShopDefenseUnit(
                     id = 3,
-                    name = "속사포 터렛",
-                    description = "빠른 속도로 공격하는 유닛입니다.",
-                    price = 450,
-                    damage = 5,
-                    range = 2,
-                    attackSpeed = 2.0f,
+                    name = "클로버 유닛",
+                    description = "단점: 공격속도 -50%, 장점: 공격범위 +50%",
+                    price = 500,
+                    damage = 15,
+                    range = 3,
+                    attackSpeed = 0.8f,
+                    symbolType = CardSymbolType.CLUB,
                     isNew = true
                 )
             )

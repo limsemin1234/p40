@@ -135,12 +135,37 @@ class UserManager private constructor(private val context: Context) {
         return getPurchasedDefenseUnits().contains(unitId)
     }
     
+    // 적용된 디펜스유닛 설정
+    fun setAppliedDefenseUnit(symbolTypeOrdinal: Int) {
+        prefs.edit().putInt(KEY_APPLIED_DEFENSE_UNIT, symbolTypeOrdinal).apply()
+    }
+    
+    // 적용된 디펜스유닛 가져오기
+    fun getAppliedDefenseUnit(): Int {
+        // 기본값은 SPADE(0)
+        return prefs.getInt(KEY_APPLIED_DEFENSE_UNIT, 0)
+    }
+    
+    // 특정 문양 타입의 디펜스유닛 사용 가능 여부 확인
+    fun canUseDefenseUnitType(symbolTypeOrdinal: Int): Boolean {
+        // SPADE(0)는 항상 사용 가능
+        if (symbolTypeOrdinal == 0) {
+            return true
+        }
+        
+        // 다른 타입은 구매 여부에 따라 사용 가능
+        // symbolTypeOrdinal은 CardSymbolType의 순서 (HEART=1, DIAMOND=2, CLUB=3)
+        // unitId도 같은 순서로 1부터 시작하므로 그대로 사용
+        return hasDefenseUnit(symbolTypeOrdinal)
+    }
+    
     // 데이터 초기화 (테스트용)
     fun resetData() {
         prefs.edit()
             .putInt(KEY_COIN, DEFAULT_COIN)
             .putString(KEY_PURCHASED_CARDS, "[]")
             .putString(KEY_PURCHASED_DEFENSE_UNITS, "[]")
+            .putInt(KEY_APPLIED_DEFENSE_UNIT, 0) // SPADE
             .apply()
     }
     
@@ -149,6 +174,7 @@ class UserManager private constructor(private val context: Context) {
         private const val KEY_COIN = "user_coin"
         private const val KEY_PURCHASED_CARDS = "user_purchased_cards"
         private const val KEY_PURCHASED_DEFENSE_UNITS = "user_purchased_defense_units"
+        private const val KEY_APPLIED_DEFENSE_UNIT = "applied_defense_unit"
         private val DEFAULT_COIN = GameConfig.INITIAL_COIN // GameConfig에서 초기 코인 값 가져오기
         
         @Volatile
