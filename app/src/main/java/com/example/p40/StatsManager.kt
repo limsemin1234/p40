@@ -28,16 +28,31 @@ class StatsManager private constructor(context: Context) {
         private val DEFAULT_RANGE = GameConfig.DEFENSE_UNIT_ATTACK_RANGE.toInt()
         
         // 싱글톤 인스턴스
-        @Volatile
         private var instance: StatsManager? = null
         
-        // 인스턴스 가져오기
+        // 플레이 통계 키
+        const val KEY_GAMES_STARTED = "games_started"
+        const val KEY_GAMES_COMPLETED = "games_completed"
+        const val KEY_GAMES_OVER = "games_over"
+        
+        // 상태 변경 브로드캐스트 키
+        const val STATS_CHANGED_ACTION = "com.example.p40.STATS_CHANGED"
+        const val EXTRA_STAT_NAME = "stat_name"
+        const val EXTRA_STAT_VALUE = "stat_value"
+        
+        // 통계 변경 상수 - 브로드캐스트용
+        const val STAT_GAMES_STARTED = "games_started"
+        const val STAT_GAMES_COMPLETED = "games_completed"
+        const val STAT_GAMES_OVER = "games_over"
+        
+        /**
+         * 싱글톤 인스턴스 가져오기
+         */
         fun getInstance(context: Context): StatsManager {
-            return instance ?: synchronized(this) {
-                instance ?: StatsManager(context.applicationContext).also {
-                    instance = it
-                }
+            if (instance == null) {
+                instance = StatsManager(context.applicationContext)
             }
+            return instance!!
         }
     }
     
@@ -197,5 +212,33 @@ class StatsManager private constructor(context: Context) {
             putInt(KEY_ATTACK_SPEED_LEVEL, 0)
             putInt(KEY_RANGE_LEVEL, 0)
         }.apply()
+    }
+    
+    fun incrementGamesStarted() {
+        val count = prefs.getInt(KEY_GAMES_STARTED, 0) + 1
+        prefs.edit().putInt(KEY_GAMES_STARTED, count).apply()
+        broadcastStatChange(STAT_GAMES_STARTED, count)
+    }
+    
+    /**
+     * 게임 클리어 수 증가
+     */
+    fun incrementGamesCompleted() {
+        val count = prefs.getInt(KEY_GAMES_COMPLETED, 0) + 1
+        prefs.edit().putInt(KEY_GAMES_COMPLETED, count).apply()
+        broadcastStatChange(STAT_GAMES_COMPLETED, count)
+    }
+    
+    /**
+     * 게임 오버 수 증가
+     */
+    fun incrementGamesOver() {
+        val count = prefs.getInt(KEY_GAMES_OVER, 0) + 1
+        prefs.edit().putInt(KEY_GAMES_OVER, count).apply()
+        broadcastStatChange(STAT_GAMES_OVER, count)
+    }
+    
+    fun broadcastStatChange(statName: String, statValue: Int) {
+        // Implementation of broadcastStatChange method
     }
 } 

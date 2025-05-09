@@ -64,6 +64,7 @@ class GameView @JvmOverloads constructor(
     private var gameOverListener: GameOverListener? = null
     private var bossKillListener: BossKillListener? = null
     private var symbolChangeListener: DefenseUnitSymbolChangeListener? = null
+    private var levelClearListener: LevelClearListener? = null
     
     init {
         holder.addCallback(this)
@@ -75,7 +76,7 @@ class GameView @JvmOverloads constructor(
      * 필요할 때마다 호출하여 게임 로직이 초기화되도록 함
      */
     private fun initGameLogic(width: Float, height: Float) {
-        gameLogic = GameLogic(gameStats, gameConfig, gameOverListener, bossKillListener)
+        gameLogic = GameLogic(gameStats, gameConfig, gameOverListener, bossKillListener, levelClearListener)
         gameLogic.initGame(width, height)
     }
     
@@ -379,7 +380,7 @@ class GameView @JvmOverloads constructor(
     fun setGameOverListener(listener: GameOverListener) {
         this.gameOverListener = listener
         if (initializeIfNeeded()) {
-            this.gameLogic = GameLogic(gameStats, gameConfig, listener, bossKillListener)
+            this.gameLogic = GameLogic(gameStats, gameConfig, listener, bossKillListener, levelClearListener)
             gameLogic.initGame(width.toFloat(), height.toFloat())
         }
     }
@@ -387,7 +388,18 @@ class GameView @JvmOverloads constructor(
     fun setBossKillListener(listener: BossKillListener) {
         this.bossKillListener = listener
         if (initializeIfNeeded()) {
-            this.gameLogic = GameLogic(gameStats, gameConfig, gameOverListener, listener)
+            this.gameLogic = GameLogic(gameStats, gameConfig, gameOverListener, listener, levelClearListener)
+            gameLogic.initGame(width.toFloat(), height.toFloat())
+        }
+    }
+    
+    /**
+     * 레벨 클리어 리스너 설정
+     */
+    fun setLevelClearListener(listener: LevelClearListener) {
+        this.levelClearListener = listener
+        if (initializeIfNeeded()) {
+            this.gameLogic = GameLogic(gameStats, gameConfig, gameOverListener, bossKillListener, listener)
             gameLogic.initGame(width.toFloat(), height.toFloat())
         }
     }

@@ -188,6 +188,21 @@ class CardSelectionManager private constructor() {
         suitPicker.maxValue = suits.size - 1
         suitPicker.displayedValues = suitSymbols
         
+        // NumberPicker 설정 (API에서 지원하는 방식으로 설정)
+        try {
+            // 텍스트 크기 설정 시도
+            val textSizeField = NumberPicker::class.java.getDeclaredField("mTextSize")
+            textSizeField.isAccessible = true
+            textSizeField.set(suitPicker, 24f * context.resources.displayMetrics.density)
+            
+            // 텍스트 색상 설정 시도
+            val selectionDividerField = NumberPicker::class.java.getDeclaredField("mSelectionDivider")
+            selectionDividerField.isAccessible = true
+            selectionDividerField.set(suitPicker, null) // 선택 구분선 제거
+        } catch (e: Exception) {
+            // 설정 실패 시 무시 (기본 스타일 적용)
+        }
+        
         // 숫자 선택기 설정
         val rankPicker = dialog.findViewById<NumberPicker>(R.id.rankPicker)
         val rankValues = arrayOf("A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K")
@@ -200,6 +215,21 @@ class CardSelectionManager private constructor() {
         rankPicker.minValue = 0
         rankPicker.maxValue = ranks.size - 1
         rankPicker.displayedValues = rankValues
+        
+        // NumberPicker 설정 (API에서 지원하는 방식으로 설정)
+        try {
+            // 텍스트 크기 설정 시도
+            val textSizeField = NumberPicker::class.java.getDeclaredField("mTextSize")
+            textSizeField.isAccessible = true
+            textSizeField.set(rankPicker, 24f * context.resources.displayMetrics.density)
+            
+            // 텍스트 색상 설정 시도
+            val selectionDividerField = NumberPicker::class.java.getDeclaredField("mSelectionDivider")
+            selectionDividerField.isAccessible = true
+            selectionDividerField.set(rankPicker, null) // 선택 구분선 제거
+        } catch (e: Exception) {
+            // 설정 실패 시 무시 (기본 스타일 적용)
+        }
         
         // 확인 버튼 설정
         val confirmButton = dialog.findViewById<Button>(R.id.btnConfirm)

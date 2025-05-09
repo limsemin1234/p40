@@ -41,9 +41,10 @@ import com.example.p40.game.FlushSkillManager
 import com.example.p40.StatsManager
 import com.example.p40.game.DefenseUnitSymbolChangeListener
 import com.example.p40.game.CardSymbolType
+import com.example.p40.game.LevelClearListener
 import kotlin.random.Random
 
-class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCardManager.PokerCardListener, DefenseUnitSymbolChangeListener {
+class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCardManager.PokerCardListener, DefenseUnitSymbolChangeListener, LevelClearListener {
 
     private lateinit var gameView: GameView
     private var isPaused = false
@@ -141,6 +142,9 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
                 }
             }
         })
+        
+        // 레벨 클리어 리스너 설정
+        gameView.setLevelClearListener(this)
         
         // 파티클 효과를 위한 애니메이션 설정
         setupDefenseUnitAnimation(view)
@@ -1076,6 +1080,52 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
                 val rangeEffect = (GameConfig.CLUB_RANGE_MULTIPLIER * 100).toInt()
                 messageManager.showInfo("클로버 문양: 공격범위 ${rangeEffect}%, 공격속도 ${speedEffect}%")
             }
+        }
+    }
+
+    // 레벨 클리어 처리
+    override fun onLevelCleared(wave: Int, score: Int) {
+        if (!isAdded || requireActivity().isFinishing) return
+        
+        // UI 스레드에서 실행하기 위해 Handler 사용
+        Handler(Looper.getMainLooper()).post {
+            // 게임 일시 정지
+            gameView.pause()
+            
+            // 레벨 클리어 보상 (1단계 난이도 클리어 시 500 코인)
+            val levelClearReward = 500
+            
+            // 코인 보상 지급
+            userManager.addCoin(levelClearReward)
+            earnedCoins += levelClearReward
+            
+            // 레벨 클리어 다이얼로그 표시
+            val dialog = Dialog(requireContext())
+            dialog.setContentView(R.layout.dialog_level_clear)
+            dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+            
+            // 텍스트 설정
+            val tvLevelTitle = dialog.findViewById<TextView>(R.id.tvLevelTitle)
+            val tvClearedWaves = dialog.findViewById<TextView>(R.id.tvClearedWaves)
+            val tvRewardCoins = dialog.findViewById<TextView>(R.id.tvRewardCoins)
+            
+            tvLevelTitle.text = "1단계 난이도"
+            tvClearedWaves.text = "$wave 웨이브 클리어!"
+            tvRewardCoins.text = "보상: $levelClearReward 코인"
+            
+            // 메인화면으로 버튼
+            val btnToMainMenu = dialog.findViewById<Button>(R.id.btnToMainMenu)
+            btnToMainMenu.setOnClickListener {
+                dialog.dismiss()
+                cleanupGameResources()
+                findNavController().navigate(R.id.action_gameFragment_to_mainMenuFragment)
+            }
+            
+            dialog.setCancelable(false)
+            dialog.show()
+            
+            // 통계 업데이트 - 게임 클리어 횟수 증가
+            statsManager.incrementGamesCompleted()
         }
     }
 

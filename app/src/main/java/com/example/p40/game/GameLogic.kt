@@ -17,7 +17,8 @@ class GameLogic(
     private val gameStats: GameStats,
     private val gameConfig: GameConfig,
     private val gameOverListener: GameOverListener? = null,
-    private val bossKillListener: BossKillListener? = null
+    private val bossKillListener: BossKillListener? = null,
+    private val levelClearListener: LevelClearListener? = null
 ) {
     // 게임 상태
     private var isRunning = false
@@ -566,7 +567,7 @@ class GameLogic(
                     // 디버그 로그 제거
                     
                     val prevCount = enemies.size
-                    spawnEnemy()
+                    spawnEnemy(currentTime)
                     val newCount = enemies.size
                     lastEnemySpawnTime = currentTime
                     
@@ -581,7 +582,7 @@ class GameLogic(
     /**
      * 적 생성
      */
-    private fun spawnEnemy() {
+    private fun spawnEnemy(currentTime: Long) {
         try {
             // 최대 적 수 제한 확인
             if (enemies.size >= gameConfig.MAX_ENEMIES) {
@@ -667,45 +668,22 @@ class GameLogic(
      * 다음 웨이브 시작
      */
     private fun startNextWave() {
-        try {
-            // 다음 웨이브가 최대 웨이브를 초과하면 종료
-            if (gameStats.getWaveCount() >= gameConfig.getTotalWaves()) return
-            
-            // 웨이브 상태 업데이트
-            gameStats.nextWave()
-            
-            // 화면 바깥에 있는 적이나 일정 거리 이상 떨어진 적은 새 웨이브에서 제거
-            val visibleMargin = 200f
-            val enemiesInView = enemies.filter { enemy ->
-                val pos = enemy.getPosition()
-                pos.x >= -visibleMargin && pos.x <= screenWidth + visibleMargin &&
-                pos.y >= -visibleMargin && pos.y <= screenHeight + visibleMargin
-            }
-            
-            enemies.clear()
-            enemies.addAll(enemiesInView)
-            
-            // 남아있는 적들의 웨이브 번호 업데이트
-            val newWaveCount = gameStats.getWaveCount()
-            enemies.forEach { enemy ->
-                enemy.setWave(newWaveCount)
-            }
-            
-            // 웨이브 시작 메시지 표시
-            showWaveMessage = true
-            waveMessageStartTime = System.currentTimeMillis()
-            
-            // 미사일 초기화
-            missiles.clear()
-            
-            // 웨이브 시작 준비 시간 설정 (웨이브 메시지가 끝나면 즉시 적 생성 시작)
-            lastEnemySpawnTime = System.currentTimeMillis()
-            
-            // 보스 타이머 초기화
-            lastBossCheckTime = 0L
-        } catch (e: Exception) {
-            // 예외 처리만 하고 로그는 출력하지 않음
+        // 현재 웨이브가 총 웨이브 수와 같으면 게임 레벨 클리어
+        if (gameStats.getWaveCount() >= gameConfig.getTotalWaves()) {
+            // 레벨 클리어 리스너 호출
+            levelClearListener?.onLevelCleared(gameStats.getWaveCount(), gameStats.getResource())
+            return
         }
+        
+        // 다음 웨이브 시작
+        gameStats.nextWave()
+        
+        // 웨이브 시작 메시지 표시
+        showWaveMessage = true
+        waveMessageStartTime = System.currentTimeMillis()
+        
+        // 보스 소환 타이머 초기화
+        lastBossCheckTime = 0L
     }
     
     /**
