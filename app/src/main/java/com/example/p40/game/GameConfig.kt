@@ -20,7 +20,7 @@ object GameConfig {
     const val DEBUG_MODE = false // 디버그 정보 표시 여부
     
     // 테스트 모드 설정
-    const val TEST_ENABLE_ALL_SKILLS = true // 웨이브 시작 시 모든 스킬 활성화 여부
+    const val TEST_ENABLE_ALL_SKILLS = false // 웨이브 시작 시 모든 스킬 활성화 여부
     
     // 성능 및 제한 설정
     const val FRAME_LIMIT = 60 // 최대 FPS
@@ -40,6 +40,7 @@ object GameConfig {
     const val MISSILE_SPEED = 10f  // 미사일 속도
     const val MISSILE_DAMAGE = 50  // 미사일 기본 데미지
     const val MISSILE_COLOR = Color.YELLOW  // 미사일 색상
+
     
     // 일반 적 설정
     const val ENEMY_BASE_SIZE = 10f  // 기본 크기
@@ -48,13 +49,14 @@ object GameConfig {
     const val NORMAL_ENEMY_DAMAGE = 5  // 일반 적의 공격력
     
     // 공중 적(Flying Enemy) 설정
-    const val FLYING_ENEMY_WAVE_THRESHOLD = 6  // 공중 적이 등장하기 시작하는 웨이브
+    const val FLYING_ENEMY_WAVE_THRESHOLD = 1  // 공중 적이 등장하기 시작하는 웨이브
     const val FLYING_ENEMY_SPAWN_CHANCE = 0.3f  // 공중 적 등장 확률 30% (0~1)
     const val FLYING_ENEMY_SPEED_MULTIPLIER = 1.2f  // 공중 적 이동 속도 계수
     const val FLYING_ENEMY_DAMAGE_MULTIPLIER = 1.2f  // 공중 적이 받는 데미지 계수 (취약함)
     const val FLYING_ENEMY_HOVER_AMPLITUDE = 3.0  // 공중 적 호버링 진폭
     const val FLYING_ENEMY_HOVER_PERIOD = 300.0  // 공중 적 호버링 주기 (밀리초)
     const val FLYING_ENEMY_DAMAGE = 20  // 공중 적의 기본 공격력
+
     const val FLYING_ENEMY_DAMAGE_INCREASE_PER_WAVE = 10  // 웨이브당 공중 적 공격력 증가량
     
     // 적 생성 및 이동 속도 기본 설정
@@ -97,7 +99,7 @@ object GameConfig {
     
     // 웨이브별 적 데미지 증가량
     const val ENEMY_DAMAGE_PER_WAVE = 5  // 웨이브당 적 데미지 증가량
-    
+
     // 점수(자원) 설정
     const val SCORE_PER_NORMAL_ENEMY = 1000  // 일반 적 처치 시 얻는 점수(자원) - 주석과 일치하도록 수정
     const val SCORE_PER_BOSS = 200  // 보스 처치 시 얻는 점수(자원)

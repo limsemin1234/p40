@@ -137,8 +137,12 @@ class FlyingEnemyBehavior : EnemyBehaviorStrategy {
     override fun move(enemy: Enemy, speedMultiplier: Float) {
         val position = enemy.getPosition()
         val target = enemy.getTarget()
-        // 날아다니는 적은 좀 더 빠르게 설정 (GameConfig 값 사용)
-        val speed = enemy.getSpeed() * speedMultiplier * GameConfig.FLYING_ENEMY_SPEED_MULTIPLIER
+        val wave = enemy.getWave()
+        
+        // GameConfig에서 웨이브에 따른 공중적 속도 가져오기
+        val baseSpeed = GameConfig.getEnemySpeedForWave(wave, false, true)
+        // 기존의 FLYING_ENEMY_SPEED_MULTIPLIER는 이미 getEnemySpeedForWave에 포함되어 있으므로 제거
+        val speed = baseSpeed * speedMultiplier
         
         // 호버링 효과 (상하로 움직임 추가) (GameConfig 값 사용)
         val time = System.currentTimeMillis() / GameConfig.FLYING_ENEMY_HOVER_PERIOD // 호버링 주기 단위로 변화

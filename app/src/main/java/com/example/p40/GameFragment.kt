@@ -433,28 +433,44 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         val wave = gameView.getWaveCount()
         
         // GameConfig를 통해 웨이브별 적 스탯 정보 계산
-        val health = GameConfig.getEnemyHealthForWave(wave)
+        val normalHealth = GameConfig.getEnemyHealthForWave(wave)
         val normalDamage = GameConfig.getEnemyDamageForWave(wave, false)
-        val flyingDamage = if (wave >= GameConfig.FLYING_ENEMY_WAVE_THRESHOLD) {
+        val normalSpeed = GameConfig.getEnemySpeedForWave(wave)
+        
+        // 공중적 정보 (6웨이브부터 등장하는 경우만)
+        val showFlyingInfo = wave >= GameConfig.FLYING_ENEMY_WAVE_THRESHOLD
+        val flyingHealth = if (showFlyingInfo) {
+            GameConfig.getEnemyHealthForWave(wave, false, true)
+        } else 0
+        val flyingDamage = if (showFlyingInfo) {
             GameConfig.getEnemyDamageForWave(wave, false, true)
-        } else {
-            0 // 공중적이 등장하지 않는 웨이브에서는 0으로 표시
-        }
-        val speed = GameConfig.getEnemySpeedForWave(wave)
+        } else 0
+        val flyingSpeed = if (showFlyingInfo) {
+            GameConfig.getEnemySpeedForWave(wave, false, true)
+        } else 0f
         
         // 체력 정보 업데이트
-        view?.findViewById<TextView>(R.id.enemyHealthText)?.text = "체력: $health"
+        if (showFlyingInfo) {
+            view?.findViewById<TextView>(R.id.enemyHealthText)?.text = "체력: $normalHealth\n공중적: $flyingHealth"
+        } else {
+            view?.findViewById<TextView>(R.id.enemyHealthText)?.text = "체력: $normalHealth"
+        }
         
-        // 공격력 정보 업데이트 - 일반 적과 공중적 구분하여 표시
-        if (wave >= GameConfig.FLYING_ENEMY_WAVE_THRESHOLD) {
+        // 공격력 정보 업데이트
+        if (showFlyingInfo) {
             view?.findViewById<TextView>(R.id.enemyAttackText)?.text = "공격력: $normalDamage\n공중적: $flyingDamage"
         } else {
             view?.findViewById<TextView>(R.id.enemyAttackText)?.text = "공격력: $normalDamage"
         }
         
         // 이동속도 정보 업데이트
-        val formattedSpeed = String.format("%.2f", speed)
-        view?.findViewById<TextView>(R.id.enemySpeedText)?.text = "이동속도: $formattedSpeed"
+        val formattedNormalSpeed = String.format("%.2f", normalSpeed)
+        if (showFlyingInfo) {
+            val formattedFlyingSpeed = String.format("%.2f", flyingSpeed)
+            view?.findViewById<TextView>(R.id.enemySpeedText)?.text = "이동속도: $formattedNormalSpeed\n공중적: $formattedFlyingSpeed"
+        } else {
+            view?.findViewById<TextView>(R.id.enemySpeedText)?.text = "이동속도: $formattedNormalSpeed"
+        }
     }
     
     // 보스 유닛 스탯 UI 업데이트

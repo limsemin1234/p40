@@ -72,20 +72,11 @@ class Enemy(
         target = newTarget
         speed = newSpeed
         size = newSize
-        health = newHealth
-        maxHealth = newHealth
         isBoss = newIsBoss
         wave = newWave
         dead = false
         enraged = false
         deathReason = null
-        
-        // 페인트 색상 재설정
-        paint.color = if (isBoss) GameConfig.BOSS_COLOR else GameConfig.ENEMY_COLOR
-        
-        // 외곽선 페인트 재설정
-        strokePaint.color = if (isBoss) GameConfig.BOSS_BORDER_COLOR else Color.WHITE
-        strokePaint.strokeWidth = if (isBoss) GameConfig.BOSS_BORDER_WIDTH else 2f
         
         // 행동 전략 재설정
         behaviorStrategy = when {
@@ -93,6 +84,24 @@ class Enemy(
             newWave >= GameConfig.FLYING_ENEMY_WAVE_THRESHOLD && Math.random() < GameConfig.FLYING_ENEMY_SPAWN_CHANCE -> FlyingEnemyBehavior() 
             else -> BasicEnemyBehavior()
         }
+        
+        // 적 타입에 따른 체력 설정
+        val isFlying = behaviorStrategy is FlyingEnemyBehavior
+        health = if (isBoss) {
+            GameConfig.getEnemyHealthForWave(wave, true)
+        } else if (isFlying) {
+            GameConfig.getEnemyHealthForWave(wave, false, true)
+        } else {
+            newHealth // 일반 적은 기존 파라미터 사용
+        }
+        maxHealth = health
+        
+        // 페인트 색상 재설정
+        paint.color = if (isBoss) GameConfig.BOSS_COLOR else GameConfig.ENEMY_COLOR
+        
+        // 외곽선 페인트 재설정
+        strokePaint.color = if (isBoss) GameConfig.BOSS_BORDER_COLOR else Color.WHITE
+        strokePaint.strokeWidth = if (isBoss) GameConfig.BOSS_BORDER_WIDTH else 2f
     }
     
     /**
@@ -196,6 +205,7 @@ class Enemy(
     fun getPaint(): Paint = paint
     fun getStrokePaint(): Paint = strokePaint
     fun getId(): Int = id
+    fun getWave(): Int = wave
     
     // 설정자 메서드들
     fun setDead(value: Boolean) { 
