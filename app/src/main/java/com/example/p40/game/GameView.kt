@@ -330,8 +330,8 @@ class GameView @JvmOverloads constructor(
             return gameStats.getEffectiveAttackPower()
         }
         val defenseUnit = gameLogic.getDefenseUnit()
-        val damageMultiplier = defenseUnit.getDamageMultiplier()
-        return (gameStats.getEffectiveAttackPower() * damageMultiplier).toInt()
+        // 기본 업그레이드된 공격력에 문양 효과 배율 적용
+        return defenseUnit.applyDamageMultiplier(gameStats.getEffectiveAttackPower())
     }
     
     // 디펜스 유닛의 문양 효과가 반영된 공격속도 반환
@@ -340,9 +340,8 @@ class GameView @JvmOverloads constructor(
             return gameStats.getUnitAttackSpeed().toFloat()
         }
         val defenseUnit = gameLogic.getDefenseUnit()
-        val speedMultiplier = defenseUnit.getSpeedMultiplier()
-        // 공격속도는 쿨다운 시간(밀리초)이므로 speedMultiplier로 나눔 (빠른 공격=작은 값)
-        return gameStats.getUnitAttackSpeed().toFloat() / speedMultiplier
+        // 기본 업그레이드된 공격속도에 문양 효과 배율 적용
+        return defenseUnit.applySpeedMultiplier(gameStats.getUnitAttackSpeed()).toFloat()
     }
     
     // 디펜스 유닛의 문양 효과가 반영된 공격범위 반환
@@ -351,8 +350,8 @@ class GameView @JvmOverloads constructor(
             return gameStats.getUnitAttackRange()
         }
         val defenseUnit = gameLogic.getDefenseUnit()
-        // DefenseUnit 클래스의 attackRange 프로퍼티 사용 (이미 배율이 적용됨)
-        return defenseUnit.attackRange
+        // 기본 업그레이드된 공격범위에 문양 효과 배율 적용
+        return defenseUnit.applyRangeMultiplier(gameStats.getUnitAttackRange())
     }
     
     fun getActiveBuffs(): List<Buff> = gameStats.getActiveBuffs()
@@ -480,6 +479,18 @@ class GameView @JvmOverloads constructor(
     }
     
     /**
+     * DefenseUnit을 반환합니다.
+     * 디펜스 유닛의 문양 정보와 같은 상태를 조회하기 위해 사용됩니다.
+     */
+    fun getDefenseUnit(): DefenseUnit? {
+        return if (::gameLogic.isInitialized) {
+            gameLogic.getDefenseUnit()
+        } else {
+            null
+        }
+    }
+    
+    /**
      * StatsManager에서 가져온 유닛 스탯을 설정하는 메서드
      * @param health 체력
      * @param attack 공격력
@@ -512,13 +523,7 @@ class GameView @JvmOverloads constructor(
      * 디펜스 유닛을 터치하면 문양을 변경
      */
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        if (event.action == MotionEvent.ACTION_DOWN) {
-            // 게임 로직이 초기화되지 않았거나 일시정지 중이면 터치 무시
-            if (!::gameLogic.isInitialized || paused) {
-                return true
-            }
-            
-            // 터치 좌표
+        if (event.action == MotionEvent.ACTION_DOWN && initializeIfNeeded()) {
             val touchX = event.x
             val touchY = event.y
             

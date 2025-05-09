@@ -722,6 +722,9 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
     private fun updateUpgradeButtonsText() {
         if (!::gameView.isInitialized || !isAdded) return
         
+        // 업그레이드 버튼 활성화 상태를 위한 초기 설정
+        val isSpadeSymbol = gameView.getDefenseUnit()?.getSymbolType() == CardSymbolType.SPADE
+        
         // 데미지 업그레이드 버튼
         val btnUpgradeDamage = view?.findViewById<Button>(R.id.btnUpgradeDamage)
         if (btnUpgradeDamage != null) {
@@ -731,7 +734,7 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
                 btnUpgradeDamage.isEnabled = false
             } else {
                 btnUpgradeDamage.text = "데미지 +${GameConfig.DAMAGE_UPGRADE_VALUE}\n💰 ${gameView.getDamageCost()} 자원"
-                btnUpgradeDamage.isEnabled = true
+                btnUpgradeDamage.isEnabled = isSpadeSymbol
             }
         }
         
@@ -744,7 +747,7 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
                 btnUpgradeAttackSpeed.isEnabled = false
             } else {
                 btnUpgradeAttackSpeed.text = "공격속도 +20ms\n💰 ${gameView.getAttackSpeedCost()} 자원"
-                btnUpgradeAttackSpeed.isEnabled = true
+                btnUpgradeAttackSpeed.isEnabled = isSpadeSymbol
             }
         }
         
@@ -757,7 +760,7 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
                 btnUpgradeAttackRange.isEnabled = false
             } else {
                 btnUpgradeAttackRange.text = "공격범위 +${GameConfig.ATTACK_RANGE_UPGRADE_VALUE.toInt()}\n💰 ${gameView.getAttackRangeCost()} 자원"
-                btnUpgradeAttackRange.isEnabled = true
+                btnUpgradeAttackRange.isEnabled = isSpadeSymbol
             }
         }
         
@@ -770,7 +773,7 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
                 defenseUpgrade1.isEnabled = false
             } else {
                 defenseUpgrade1.text = "체력 +${GameConfig.DEFENSE_UPGRADE_VALUE}\n💰 ${gameView.getDefenseCost()} 자원"
-                defenseUpgrade1.isEnabled = true
+                defenseUpgrade1.isEnabled = isSpadeSymbol
             }
         }
     }
@@ -996,19 +999,31 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         // 문양 변경 후 UI 즉시 업데이트
         updateUnitStatsUI()
         
+        // 업그레이드 버튼 상태 업데이트
+        updateUpgradeButtonsText()
+        
         // 문양 타입에 따른 효과 메시지 표시
         when (symbolType) {
             CardSymbolType.SPADE -> {
-                messageManager.showInfo("스페이드 문양: 기본 상태")
+                // GameConfig 기반 메시지 생성
+                messageManager.showInfo("스페이드 문양: 기본 상태 (업그레이드 가능)")
             }
             CardSymbolType.HEART -> {
-                messageManager.showInfo("하트 문양: 공격력 50% 감소, 데미지 시 체력 회복")
+                // GameConfig 기반 메시지 생성
+                val damageEffect = (GameConfig.HEART_DAMAGE_MULTIPLIER * 100).toInt()
+                messageManager.showInfo("하트 문양: 공격력 ${damageEffect}% 감소, 데미지 시 체력 ${GameConfig.HEART_HEAL_ON_DAMAGE} 회복 (업그레이드 불가)")
             }
             CardSymbolType.DIAMOND -> {
-                messageManager.showInfo("다이아몬드 문양: 공격속도 2배 증가, 공격범위 50% 감소")
+                // GameConfig 기반 메시지 생성
+                val speedEffect = (GameConfig.DIAMOND_SPEED_MULTIPLIER * 100).toInt()
+                val rangeEffect = (GameConfig.DIAMOND_RANGE_MULTIPLIER * 100).toInt()
+                messageManager.showInfo("다이아몬드 문양: 공격속도 ${speedEffect}%, 공격범위 ${rangeEffect}% (업그레이드 불가)")
             }
             CardSymbolType.CLUB -> {
-                messageManager.showInfo("클로버 문양: 공격범위 50% 증가, 공격속도 50% 감소")
+                // GameConfig 기반 메시지 생성
+                val speedEffect = (GameConfig.CLUB_SPEED_MULTIPLIER * 100).toInt()
+                val rangeEffect = (GameConfig.CLUB_RANGE_MULTIPLIER * 100).toInt()
+                messageManager.showInfo("클로버 문양: 공격범위 ${rangeEffect}%, 공격속도 ${speedEffect}% (업그레이드 불가)")
             }
         }
     }

@@ -48,6 +48,9 @@ class DefenseUnit(
     private var _attackRange: Float = attackRange
     private var originalAttackRange: Float = attackRange // 원래 공격 범위 저장
     
+    // 공격 쿨다운 저장을 위한 변수 추가
+    private var originalAttackCooldown: Long = attackCooldown // 원래 공격 쿨다운 저장
+    
     // 타겟팅 최적화를 위한 캐시 설정
     private var attackRangeSquared: Float = _attackRange * _attackRange
     
@@ -92,24 +95,32 @@ class DefenseUnit(
         
         when (symbolType) {
             CardSymbolType.SPADE -> {
-                // 기본 상태 - 아무 효과 없음
+                // 기본 상태 - GameConfig의 스페이드 문양 효과 적용
+                damageMultiplier = GameConfig.SPADE_DAMAGE_MULTIPLIER
+                speedMultiplier = GameConfig.SPADE_SPEED_MULTIPLIER
+                rangeMultiplier = GameConfig.SPADE_RANGE_MULTIPLIER
+                healOnDamage = false
             }
             CardSymbolType.HEART -> {
-                // 하트: 적에게 데미지를 줄 때마다 체력 1 회복, 공격력 50% 감소
-                damageMultiplier = 0.5f
+                // 하트: GameConfig의 하트 문양 효과 적용
+                damageMultiplier = GameConfig.HEART_DAMAGE_MULTIPLIER
+                speedMultiplier = GameConfig.HEART_SPEED_MULTIPLIER
+                rangeMultiplier = GameConfig.HEART_RANGE_MULTIPLIER
                 healOnDamage = true
             }
             CardSymbolType.DIAMOND -> {
-                // 다이아몬드: 공격속도 2배 증가, 공격범위 50% 감소
-                speedMultiplier = 2.0f
-                rangeMultiplier = 0.5f
+                // 다이아몬드: GameConfig의 다이아몬드 문양 효과 적용
+                damageMultiplier = GameConfig.DIAMOND_DAMAGE_MULTIPLIER
+                speedMultiplier = GameConfig.DIAMOND_SPEED_MULTIPLIER
+                rangeMultiplier = GameConfig.DIAMOND_RANGE_MULTIPLIER
                 _attackRange = originalAttackRange * rangeMultiplier
                 updateAttackRangeSquared()
             }
             CardSymbolType.CLUB -> {
-                // 클로버: 공격범위 50% 증가, 공격속도 50% 감소
-                rangeMultiplier = 1.5f
-                speedMultiplier = 0.5f
+                // 클로버: GameConfig의 클로버 문양 효과 적용
+                damageMultiplier = GameConfig.CLUB_DAMAGE_MULTIPLIER
+                speedMultiplier = GameConfig.CLUB_SPEED_MULTIPLIER
+                rangeMultiplier = GameConfig.CLUB_RANGE_MULTIPLIER
                 _attackRange = originalAttackRange * rangeMultiplier
                 updateAttackRangeSquared()
             }
@@ -162,6 +173,33 @@ class DefenseUnit(
      */
     fun isHealOnDamage(): Boolean = healOnDamage
     
+    /**
+     * 업그레이드된 기본 공격력에 문양 효과 배율을 적용합니다.
+     * @param baseDamage 기본 업그레이드된 공격력
+     * @return 문양 효과가 적용된 최종 공격력
+     */
+    fun applyDamageMultiplier(baseDamage: Int): Int {
+        return (baseDamage * damageMultiplier).toInt()
+    }
+    
+    /**
+     * 업그레이드된 기본 공격 속도에 문양 효과 배율을 적용합니다.
+     * @param baseAttackSpeed 기본 업그레이드된 공격 속도
+     * @return 문양 효과가 적용된 최종 공격 속도
+     */
+    fun applySpeedMultiplier(baseAttackSpeed: Long): Long {
+        return (baseAttackSpeed / speedMultiplier).toLong()
+    }
+    
+    /**
+     * 업그레이드된 기본 공격 범위에 문양 효과 배율을 적용합니다.
+     * @param baseAttackRange 기본 업그레이드된 공격 범위
+     * @return 문양 효과가 적용된 최종 공격 범위
+     */
+    fun applyRangeMultiplier(baseAttackRange: Float): Float {
+        return baseAttackRange * rangeMultiplier
+    }
+    
     // attackRange 제곱값 업데이트
     private fun updateAttackRangeSquared() {
         attackRangeSquared = _attackRange * _attackRange
@@ -169,8 +207,13 @@ class DefenseUnit(
     
     // 공격 범위 설정 시 제곱값도 함께 업데이트
     fun setAttackRange(newRange: Float) {
+        // 원래 공격 범위 저장 (문양 배율 적용 전)
         originalAttackRange = newRange
+        
+        // 현재 문양 효과 배율 적용
         _attackRange = originalAttackRange * rangeMultiplier
+        
+        // 공격 범위 제곱값 업데이트
         updateAttackRangeSquared()
         
         // 범위가 변경되면 캐시 초기화
@@ -188,7 +231,16 @@ class DefenseUnit(
     
     // 공격 쿨다운 설정 메서드 추가
     fun setAttackCooldown(newCooldown: Long) {
-        attackCooldown = newCooldown
+        // 원래 공격 쿨다운 저장 (문양 배율 적용 전)
+        originalAttackCooldown = newCooldown
+        // 문양 효과를 위해 따로 처리 안 함 (attack 메서드에서 speedMultiplier 적용)
+    }
+    
+    /**
+     * 실제 공격 쿨다운 반환 (문양 효과 배율 적용)
+     */
+    fun getAttackCooldown(): Long {
+        return originalAttackCooldown
     }
     
     /**
