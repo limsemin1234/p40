@@ -109,11 +109,38 @@ class UserManager private constructor(private val context: Context) {
         return gson.fromJson(json, type)
     }
     
+    // ===== 디펜스유닛 관련 기능 =====
+    
+    // 구매한 디펜스유닛 목록 가져오기
+    fun getPurchasedDefenseUnits(): List<Int> {
+        val json = prefs.getString(KEY_PURCHASED_DEFENSE_UNITS, "[]")
+        val type = object : TypeToken<List<Int>>() {}.type
+        return gson.fromJson(json, type)
+    }
+    
+    // 디펜스유닛 구매 기록
+    fun addPurchasedDefenseUnit(unitId: Int) {
+        val currentUnits = getPurchasedDefenseUnits()
+        
+        // 이미 구매한 유닛인지 확인
+        if (!currentUnits.contains(unitId)) {
+            val updatedUnits = currentUnits + unitId
+            val json = gson.toJson(updatedUnits)
+            prefs.edit().putString(KEY_PURCHASED_DEFENSE_UNITS, json).apply()
+        }
+    }
+    
+    // 특정 디펜스유닛 구매 여부 확인
+    fun hasDefenseUnit(unitId: Int): Boolean {
+        return getPurchasedDefenseUnits().contains(unitId)
+    }
+    
     // 데이터 초기화 (테스트용)
     fun resetData() {
         prefs.edit()
             .putInt(KEY_COIN, DEFAULT_COIN)
             .putString(KEY_PURCHASED_CARDS, "[]")
+            .putString(KEY_PURCHASED_DEFENSE_UNITS, "[]")
             .apply()
     }
     
@@ -121,6 +148,7 @@ class UserManager private constructor(private val context: Context) {
         private const val PREFS_NAME = "user_data"
         private const val KEY_COIN = "user_coin"
         private const val KEY_PURCHASED_CARDS = "user_purchased_cards"
+        private const val KEY_PURCHASED_DEFENSE_UNITS = "user_purchased_defense_units"
         private val DEFAULT_COIN = GameConfig.INITIAL_COIN // GameConfig에서 초기 코인 값 가져오기
         
         @Volatile

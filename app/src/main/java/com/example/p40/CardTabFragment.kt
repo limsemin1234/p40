@@ -2,29 +2,33 @@ package com.example.p40
 
 import android.app.AlertDialog
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
-import android.widget.ImageButton
-import android.widget.TextView
-import android.widget.Toast
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.p40.game.Card
-import com.example.p40.game.ShopCard
+import com.example.p40.game.CardSuit
 import com.example.p40.game.MessageManager
-import com.google.android.material.tabs.TabLayout
-import com.google.android.material.tabs.TabLayoutMediator
-import androidx.viewpager2.widget.ViewPager2
+import com.example.p40.game.ShopCard
 
-class CardShopFragment : Fragment(R.layout.fragment_card_shop) {
+/**
+ * 상점의 카드 탭 프래그먼트
+ */
+class CardTabFragment : Fragment() {
 
     private lateinit var userManager: UserManager
     private lateinit var cardShopAdapter: CardShopAdapter
-    private lateinit var shopCards: MutableList<ShopCard>
-    private lateinit var tvCoinAmount: TextView
-    private lateinit var viewPager: ViewPager2
-    private lateinit var tabLayout: TabLayout
+    private val shopCards = mutableListOf<ShopCard>()
+    
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.fragment_shop_tab, container, false)
+    }
     
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -32,31 +36,26 @@ class CardShopFragment : Fragment(R.layout.fragment_card_shop) {
         // UserManager 초기화
         userManager = UserManager.getInstance(requireContext())
         
-        // 뷰 초기화
-        tvCoinAmount = view.findViewById(R.id.tvCoinAmount)
-        viewPager = view.findViewById(R.id.viewPager)
-        tabLayout = view.findViewById(R.id.tabLayout)
-        val btnBack = view.findViewById<ImageButton>(R.id.btnBack)
-        
-        // 뒤로가기 버튼
-        btnBack.setOnClickListener {
-            findNavController().navigateUp()
-        }
-        
-        // 현재 코인 표시
-        updateCurrencyUI()
+        // 리사이클러뷰 설정
+        val recyclerView = view.findViewById<RecyclerView>(R.id.rvShopItems)
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
         
         // 카드 데이터 초기화
         initShopCards()
         
-        // ViewPager2 설정
-        setupViewPager()
+        // 어댑터 설정
+        cardShopAdapter = CardShopAdapter(shopCards) { card ->
+            onCardBuyClicked(card)
+        }
+        recyclerView.adapter = cardShopAdapter
     }
     
-    // 상점 카드 초기화
+    // 상점 카드 초기화 - 골드 별 조커 카드 삭제
     private fun initShopCards() {
-        // 기본 상점 카드 가져오기
-        shopCards = ShopCard.getDefaultShopCards().toMutableList()
+        // 기본 상점 카드만 가져오기 (삭제하지 않음)
+        shopCards.addAll(ShopCard.getDefaultShopCards())
+        
+        // 골드 별 조커는 추가하지 않음 (삭제됨)
         
         // 이미 구매한 카드 확인
         for (card in shopCards) {
@@ -96,32 +95,14 @@ class CardShopFragment : Fragment(R.layout.fragment_card_shop) {
             // UI 업데이트
             card.isPurchased = true
             cardShopAdapter.updateCardPurchased(card.id)
-            updateCurrencyUI()
+            
+            // 상위 프래그먼트 코인 UI 업데이트
+            (parentFragment as? CardShopFragment)?.updateCurrencyUI()
             
             MessageManager.getInstance().showSuccess(requireContext(), "${card.name} 구매 완료!")
         } else {
             // 코인 부족
             MessageManager.getInstance().showError(requireContext(), "코인이 부족합니다.")
         }
-    }
-    
-    // ViewPager2와 TabLayout 설정
-    private fun setupViewPager() {
-        // 탭 어댑터 설정
-        val adapter = ShopTabAdapter(childFragmentManager, lifecycle)
-        viewPager.adapter = adapter
-        
-        // TabLayout과 ViewPager2 연결
-        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
-            when (position) {
-                0 -> tab.text = "카드"
-                1 -> tab.text = "디펜스유닛"
-            }
-        }.attach()
-    }
-    
-    // 코인 표시 UI 업데이트 - 다른 탭에서도 호출 가능하도록 public으로 변경
-    fun updateCurrencyUI() {
-        tvCoinAmount.text = "코인: ${userManager.getCoin()}"
     }
 } 

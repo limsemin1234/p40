@@ -24,6 +24,59 @@ enum class CardSymbolType {
 }
 
 /**
+ * 상점에서 판매하는 디펜스유닛 정보
+ */
+data class ShopDefenseUnit(
+    val id: Int,                // 유닛 고유 ID
+    val name: String,           // 유닛 이름
+    val description: String,    // 유닛 설명
+    val price: Int,             // 유닛 가격
+    val damage: Int,            // 유닛 공격력
+    val range: Int,             // 유닛 사거리
+    val attackSpeed: Float,     // 공격 속도
+    val isNew: Boolean = false, // 신규 유닛 여부
+    var isPurchased: Boolean = false // 구매 여부
+) {
+    companion object {
+        // 상점에서 판매할 기본 디펜스유닛 목록 생성
+        fun getDefaultDefenseUnits(): List<ShopDefenseUnit> {
+            return listOf(
+                ShopDefenseUnit(
+                    id = 1,
+                    name = "기본 터렛",
+                    description = "기본적인 공격 유닛입니다.",
+                    price = 300,
+                    damage = 10,
+                    range = 3,
+                    attackSpeed = 1.0f,
+                    isNew = true
+                ),
+                ShopDefenseUnit(
+                    id = 2,
+                    name = "스나이퍼 터렛",
+                    description = "먼 거리에서 강력한 공격을 가하는 유닛입니다.",
+                    price = 500,
+                    damage = 25,
+                    range = 5,
+                    attackSpeed = 0.5f,
+                    isNew = true
+                ),
+                ShopDefenseUnit(
+                    id = 3,
+                    name = "속사포 터렛",
+                    description = "빠른 속도로 공격하는 유닛입니다.",
+                    price = 450,
+                    damage = 5,
+                    range = 2,
+                    attackSpeed = 2.0f,
+                    isNew = true
+                )
+            )
+        }
+    }
+}
+
+/**
  * 디펜스 유닛 클래스 - 벡터 계산 최적화 적용
  */
 class DefenseUnit(
