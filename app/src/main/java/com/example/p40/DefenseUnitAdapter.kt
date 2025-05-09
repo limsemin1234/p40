@@ -43,7 +43,7 @@ class DefenseUnitAdapter(
         fun bind(unit: ShopDefenseUnit) {
             // 유닛 이름 및 설명 설정
             tvUnitName.text = unit.name
-            tvUnitDesc.text = "${unit.description}\n공격력: ${unit.damage}, 사거리: ${unit.range}, 공격속도: ${unit.attackSpeed}초"
+            tvUnitDesc.text = unit.description
             
             // 유닛 가격 설정
             tvUnitPrice.text = "가격: ${unit.price} 코인"

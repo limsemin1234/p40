@@ -4,15 +4,24 @@
     android:id="@+id/cardView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
+    android:layout_margin="6dp"
     app:cardCornerRadius="8dp"
     app:cardElevation="4dp">
+    
+    <!-- 황금색 테두리를 위한 배경 -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#DAA520" />
 
+    <!-- 실제 카드 내용 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="8dp"
+        android:layout_margin="2dp"
+        android:background="#333333">
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -23,15 +32,43 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/tvUnitSymbol"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:gravity="center"
-                    android:text="♠"
-                    android:textColor="@android:color/black"
-                    android:textSize="32sp"
-                    android:textStyle="bold" />
+                <!-- 고급스러운 심볼 디자인 -->
+                <FrameLayout
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:background="@android:color/transparent">
+                    
+                    <!-- 심볼 배경 (원형) -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@android:color/black" />
+                    
+                    <!-- 안쪽 황금색 테두리 -->
+                    <View
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_gravity="center"
+                        android:background="#DAA520" />
+                    
+                    <!-- 내부 검은색 배경 -->
+                    <View
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_gravity="center"
+                        android:background="#222222" />
+                    
+                    <!-- 심볼 텍스트 -->
+                    <TextView
+                        android:id="@+id/tvUnitSymbol"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="♠"
+                        android:textColor="#DAA520"
+                        android:textSize="24sp"
+                        android:textStyle="bold" />
+                </FrameLayout>
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -45,16 +82,19 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="유닛 이름"
-                        android:textColor="@android:color/black"
-                        android:textSize="18sp"
+                        android:textColor="#FFFFFF"
+                        android:textSize="16sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/tvUnitPrice"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="가격: 500 코인"
-                        android:textColor="@android:color/darker_gray" />
+                        android:textColor="#DAA520"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:layout_marginTop="2dp" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -64,11 +104,11 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="end|top"
                 android:background="@android:color/holo_red_light"
-                android:paddingHorizontal="8dp"
-                android:paddingVertical="2dp"
+                android:paddingHorizontal="6dp"
+                android:paddingVertical="1dp"
                 android:text="NEW"
                 android:textColor="@android:color/white"
-                android:textSize="12sp"
+                android:textSize="10sp"
                 android:textStyle="bold"
                 android:visibility="gone" />
 
@@ -78,11 +118,11 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="end|top"
                 android:background="@android:color/holo_green_light"
-                android:paddingHorizontal="8dp"
-                android:paddingVertical="2dp"
+                android:paddingHorizontal="6dp"
+                android:paddingVertical="1dp"
                 android:text="적용중"
                 android:textColor="@android:color/white"
-                android:textSize="12sp"
+                android:textSize="10sp"
                 android:textStyle="bold"
                 android:visibility="gone" />
         </FrameLayout>
@@ -91,30 +131,37 @@
             android:id="@+id/tvUnitDesc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="6dp"
             android:text="유닛 설명"
-            android:textColor="@android:color/black" />
+            android:textColor="#FFFFFF"
+            android:textSize="12sp"
+            android:background="#444444"
+            android:padding="6dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:orientation="horizontal">
 
             <Button
                 android:id="@+id/btnBuyUnit"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="36dp"
                 android:layout_weight="1"
-                android:text="구매하기" />
+                android:text="구매하기"
+                android:textSize="12sp"
+                android:backgroundTint="#DAA520" />
 
             <Button
                 android:id="@+id/btnApplyUnit"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="36dp"
                 android:layout_weight="1"
-                android:layout_marginStart="8dp"
-                android:text="적용하기" />
+                android:layout_marginStart="6dp"
+                android:text="적용하기"
+                android:textSize="12sp"
+                android:backgroundTint="#666666" />
         </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView> 

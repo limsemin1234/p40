@@ -114,15 +114,8 @@ class DefenseUnitTabFragment : Fragment() {
             return
         }
         
-        // 유닛 적용 확인 다이얼로그
-        AlertDialog.Builder(requireContext())
-            .setTitle("디펜스유닛 적용")
-            .setMessage("${unit.name}을(를) 적용하시겠습니까?")
-            .setPositiveButton("적용") { _, _ ->
-                applyUnit(unit)
-            }
-            .setNegativeButton("취소", null)
-            .show()
+        // 바로 적용 처리
+        applyUnit(unit)
     }
     
     // 유닛 구매 처리
