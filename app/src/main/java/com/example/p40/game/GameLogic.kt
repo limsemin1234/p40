@@ -305,7 +305,7 @@ class GameLogic(
                                 }
                             }
                         } else {
-                            // 일반 적은 기존 방식대로 처리
+                            // 공중적과 일반 적은 기존 방식대로 처리
                             enemy.takeDamage(gameConfig.CENTER_REACHED_DAMAGE) // 중앙에 도달하면 죽음
                             
                             // 적의 공격력에 따라 디펜스 유닛 체력 감소 (무적 상태가 아닐 때만)

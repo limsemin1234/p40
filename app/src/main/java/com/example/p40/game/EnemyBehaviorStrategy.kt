@@ -184,7 +184,13 @@ class FlyingEnemyBehavior : EnemyBehaviorStrategy {
         val health = enemy.getHealth() - actualDamage
         enemy.setHealth(health)
         
-        return health <= 0
+        // 체력이 0 이하이면 죽은 것으로 처리
+        if (health <= 0) {
+            enemy.setDead(true)
+            return true
+        }
+        
+        return false
     }
     
     override fun onReachCenter(enemy: Enemy) {

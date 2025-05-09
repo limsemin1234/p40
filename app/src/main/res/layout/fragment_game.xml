@@ -292,15 +292,16 @@
             <LinearLayout
                 android:id="@+id/myUnitStatsContainer"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="60dp"
                 android:orientation="horizontal"
-                android:paddingVertical="8dp"
+                android:paddingVertical="4dp"
+                android:gravity="center_vertical"
                 android:visibility="visible">
 
                 <TextView
                     android:id="@+id/unitHealthText"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:text="체력: 100/100"
                     android:textColor="#FFFFFF"
@@ -310,12 +311,12 @@
                     app:autoSizeMinTextSize="8sp"
                     app:autoSizeMaxTextSize="12sp"
                     app:autoSizeStepGranularity="1sp"
-                    android:maxLines="1" />
+                    android:maxLines="2" />
 
                 <TextView
                     android:id="@+id/unitAttackText"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:text="공격력: 50"
                     android:textColor="#FFFFFF"
@@ -325,27 +326,27 @@
                     app:autoSizeMinTextSize="8sp"
                     app:autoSizeMaxTextSize="12sp"
                     app:autoSizeStepGranularity="1sp"
-                    android:maxLines="1" />
+                    android:maxLines="2" />
 
                 <TextView
                     android:id="@+id/unitAttackSpeedText"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight="1.2"
-                    android:text="공속: 1.00"
+                    android:text="공속: 1.00회/초\n(1000ms)"
                     android:textColor="#FFFFFF"
-                    android:textSize="11sp"
+                    android:textSize="12sp"
                     android:gravity="center"
                     app:autoSizeTextType="uniform"
                     app:autoSizeMinTextSize="8sp"
-                    app:autoSizeMaxTextSize="11sp"
+                    app:autoSizeMaxTextSize="12sp"
                     app:autoSizeStepGranularity="1sp"
                     android:maxLines="2" />
 
                 <TextView
                     android:id="@+id/unitRangeText"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:text="사거리: 500"
                     android:textColor="#FFFFFF"
@@ -355,22 +356,23 @@
                     app:autoSizeMinTextSize="8sp"
                     app:autoSizeMaxTextSize="12sp"
                     app:autoSizeStepGranularity="1sp"
-                    android:maxLines="1" />
+                    android:maxLines="2" />
             </LinearLayout>
 
             <!-- 적 유닛 스탯 정보 -->
             <LinearLayout
                 android:id="@+id/enemyStatsContainer"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="60dp"
                 android:orientation="horizontal"
                 android:paddingVertical="4dp"
+                android:gravity="center_vertical"
                 android:visibility="gone">
 
                 <TextView
                     android:id="@+id/enemyHealthText"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:text="체력: 50"
                     android:textColor="#FFFFFF"
@@ -380,12 +382,12 @@
                     app:autoSizeMinTextSize="8sp"
                     app:autoSizeMaxTextSize="12sp"
                     app:autoSizeStepGranularity="1sp"
-                    android:maxLines="1" />
+                    android:maxLines="2" />
 
                 <TextView
                     android:id="@+id/enemyAttackText"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:text="공격력: 5"
                     android:textColor="#FFFFFF"
@@ -395,12 +397,12 @@
                     app:autoSizeMinTextSize="8sp"
                     app:autoSizeMaxTextSize="12sp"
                     app:autoSizeStepGranularity="1sp"
-                    android:maxLines="1" />
+                    android:maxLines="2" />
 
                 <TextView
                     android:id="@+id/enemySpeedText"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:text="이동속도: 1.0"
                     android:textColor="#FFFFFF"
@@ -410,22 +412,23 @@
                     app:autoSizeMinTextSize="8sp"
                     app:autoSizeMaxTextSize="12sp"
                     app:autoSizeStepGranularity="1sp"
-                    android:maxLines="1" />
+                    android:maxLines="2" />
             </LinearLayout>
 
             <!-- 보스 유닛 스탯 정보 -->
             <LinearLayout
                 android:id="@+id/bossStatsContainer"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="60dp"
                 android:orientation="horizontal"
                 android:paddingVertical="4dp"
+                android:gravity="center_vertical"
                 android:visibility="gone">
 
                 <TextView
                     android:id="@+id/bossHealthText"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:text="체력: 200"
                     android:textColor="#FFFFFF"
@@ -435,12 +438,12 @@
                     app:autoSizeMinTextSize="8sp"
                     app:autoSizeMaxTextSize="12sp"
                     app:autoSizeStepGranularity="1sp"
-                    android:maxLines="1" />
+                    android:maxLines="2" />
 
                 <TextView
                     android:id="@+id/bossAttackText"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:text="공격력: 12"
                     android:textColor="#FFFFFF"
@@ -450,12 +453,12 @@
                     app:autoSizeMinTextSize="8sp"
                     app:autoSizeMaxTextSize="12sp"
                     app:autoSizeStepGranularity="1sp"
-                    android:maxLines="1" />
+                    android:maxLines="2" />
 
                 <TextView
                     android:id="@+id/bossSpeedText"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:text="이동속도: 0.8"
                     android:textColor="#FFFFFF"
@@ -465,7 +468,7 @@
                     app:autoSizeMinTextSize="8sp"
                     app:autoSizeMaxTextSize="12sp"
                     app:autoSizeStepGranularity="1sp"
-                    android:maxLines="1" />
+                    android:maxLines="2" />
             </LinearLayout>
         </FrameLayout>
 

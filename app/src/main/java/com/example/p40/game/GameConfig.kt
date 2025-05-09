@@ -41,7 +41,10 @@ object GameConfig {
     const val MISSILE_DAMAGE = 50  // 미사일 기본 데미지
     const val MISSILE_COLOR = Color.YELLOW  // 미사일 색상
 
-    
+
+    ////////////////////////////////적 설정////////////////////////////////////////////
+
+
     // 일반 적 설정
     const val ENEMY_BASE_SIZE = 10f  // 기본 크기
     const val ENEMY_BASE_HEALTH = 50  // 기본 체력
@@ -49,15 +52,16 @@ object GameConfig {
     const val NORMAL_ENEMY_DAMAGE = 5  // 일반 적의 공격력
     
     // 공중 적(Flying Enemy) 설정
-    const val FLYING_ENEMY_WAVE_THRESHOLD = 1  // 공중 적이 등장하기 시작하는 웨이브
+    const val FLYING_ENEMY_WAVE_THRESHOLD = 6  // 공중 적이 등장하기 시작하는 웨이브
     const val FLYING_ENEMY_SPAWN_CHANCE = 0.3f  // 공중 적 등장 확률 30% (0~1)
     const val FLYING_ENEMY_SPEED_MULTIPLIER = 1.2f  // 공중 적 이동 속도 계수
     const val FLYING_ENEMY_DAMAGE_MULTIPLIER = 1.2f  // 공중 적이 받는 데미지 계수 (취약함)
     const val FLYING_ENEMY_HOVER_AMPLITUDE = 3.0  // 공중 적 호버링 진폭
     const val FLYING_ENEMY_HOVER_PERIOD = 300.0  // 공중 적 호버링 주기 (밀리초)
     const val FLYING_ENEMY_DAMAGE = 20  // 공중 적의 기본 공격력
-    const val FLYING_ENEMY_DAMAGE_INCREASE_PER_WAVE = 10  // 웨이브당 공중 적 공격력 증가량
     const val FLYING_ENEMY_BASE_HEALTH = 60  // 공중 적의 기본 체력
+
+    const val FLYING_ENEMY_DAMAGE_INCREASE_PER_WAVE = 10  // 웨이브당 공중 적 공격력 증가량
     const val FLYING_ENEMY_HEALTH_INCREASE_PER_WAVE = 10  // 웨이브당 공중 적 체력 증가량
     const val FLYING_ENEMY_SPEED_INCREASE_PER_WAVE = 0.5f  // 웨이브당 공중 적 속도 증가량
     

@@ -207,6 +207,12 @@ class Enemy(
     fun getId(): Int = id
     fun getWave(): Int = wave
     
+    /**
+     * 현재 적이 공중적인지 확인하는 메서드
+     * @return 공중적 여부
+     */
+    fun isFlying(): Boolean = behaviorStrategy is FlyingEnemyBehavior
+    
     // 설정자 메서드들
     fun setDead(value: Boolean) { 
         dead = value 
