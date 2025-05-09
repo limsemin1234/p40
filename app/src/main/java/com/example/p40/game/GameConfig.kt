@@ -126,7 +126,14 @@ object GameConfig {
     const val ATTACK_SPEED_UPGRADE_INITIAL_COST = 10  // 초기 비용
     const val ATTACK_SPEED_UPGRADE_COST_INCREASE = 5  // 레벨당 비용 증가량
     const val ATTACK_SPEED_UPGRADE_MAX_LEVEL = 200  // 최대 업그레이드 레벨
-    const val ATTACK_SPEED_FIXED_DECREASE = 20L  // 공격속도 고정 감소량 (ms)
+    
+    // 공격속도 구간별 감소량 설정
+    const val ATTACK_SPEED_DECREASE_TIER1 = 20L  // 1000ms~800ms 구간에서의 감소량 (ms)
+    const val ATTACK_SPEED_DECREASE_TIER2 = 10L  // 800ms~500ms 구간에서의 감소량 (ms)
+    const val ATTACK_SPEED_DECREASE_TIER3 = 5L   // 500ms~250ms 구간에서의 감소량 (ms)
+    const val ATTACK_SPEED_TIER1_THRESHOLD = 800L // 첫 번째 구간 임계값
+    const val ATTACK_SPEED_TIER2_THRESHOLD = 500L // 두 번째 구간 임계값
+    const val ATTACK_SPEED_TIER3_THRESHOLD = 250L // 세 번째 구간 임계값
     
     // 공격범위 업그레이드 설정
     const val ATTACK_RANGE_UPGRADE_INITIAL_COST = 10  // 초기 비용
@@ -207,12 +214,12 @@ object GameConfig {
     const val SECOND_EXTRA_CARD_COST = 2000  // 두 번째 추가 카드 비용
     
     // 카드 교체 설정
-    const val POKER_CARD_REPLACE_COUNT = 5  // 카드 교체 가능 횟수
+    const val POKER_CARD_REPLACE_COUNT = 3  // 카드 교체 가능 횟수
     
     // --------- 플러시 스킬 관련 설정 ----------
     
     // 하트 플러시 스킬: 체력 회복 관련 설정
-    const val HEART_FLUSH_HEAL_AMOUNT = 200   // -1은 전체 회복, 양수는 해당 수치만큼 회복
+    const val HEART_FLUSH_HEAL_AMOUNT = 500   // -1은 전체 회복, 양수는 해당 수치만큼 회복
     
     // 스페이드 플러시 스킬: 적 제거 관련 설정
     const val SPADE_FLUSH_DAMAGE = 1000     // 적에게 입히는 즉사 데미지 (매우 높은 값으로 설정)
@@ -221,7 +228,7 @@ object GameConfig {
     const val CLUB_FLUSH_DURATION = 5000L    // 시간 정지 지속 시간 (밀리초)
     
     // 다이아몬드 플러시 스킬: 무적 관련 설정
-    const val DIAMOND_FLUSH_DURATION = 10000L // 무적 지속 시간 (밀리초)
+    const val DIAMOND_FLUSH_DURATION = 5000L // 무적 지속 시간 (밀리초)
     
     // --------- 디펜스 유닛 문양 효과 설정 ----------
     

@@ -404,9 +404,9 @@ class GameLogic(
                         val enemyPos = enemy.getPosition()
                         if (screenRect.contains(enemyPos.x, enemyPos.y)) {
                             if (missile.checkCollision(enemy)) {
-                                // 하트 문양 효과: 적 공격 시 체력 1 회복
+                                // 하트 문양 효과: 적 공격 시 GameConfig에 정의된 양만큼 체력 회복
                                 if (defenseUnit.isHealOnDamage()) {
-                                    gameStats.healUnit(1)
+                                    gameStats.healUnit(GameConfig.HEART_HEAL_ON_DAMAGE)
                                 }
                                 
                                 // 충돌 발생
