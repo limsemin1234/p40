@@ -290,7 +290,7 @@ object GameConfig {
     const val SECOND_EXTRA_CARD_COST = 2000  // 두 번째 추가 카드 비용
     
     // 카드 교체 설정
-    const val POKER_CARD_REPLACE_COUNT = 5  // 카드 교체 가능 횟수
+    const val POKER_CARD_REPLACE_COUNT = 3  // 카드 교체 가능 횟수
     
     // --------- 플러시 스킬 관련 설정 ----------
     

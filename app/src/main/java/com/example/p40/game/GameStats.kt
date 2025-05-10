@@ -54,11 +54,11 @@ class GameStats(
     // 포커 효과
     private var activePokerHand: PokerHand? = null
     
-    // 업그레이드 레벨 및 비용
-    private var damageLevel = 1
-    private var attackSpeedLevel = 1
-    private var attackRangeLevel = 1
-    private var defenseLevel = 1
+    // 업그레이드 레벨 및 비용 (0부터 시작하도록 변경)
+    private var damageLevel = 0
+    private var attackSpeedLevel = 0
+    private var attackRangeLevel = 0
+    private var defenseLevel = 0
     private var damageCost = gameConfig.DAMAGE_UPGRADE_INITIAL_COST
     private var attackSpeedCost = gameConfig.ATTACK_SPEED_UPGRADE_INITIAL_COST
     private var attackRangeCost = gameConfig.ATTACK_RANGE_UPGRADE_INITIAL_COST
@@ -83,11 +83,11 @@ class GameStats(
         unitAttackSpeed = gameConfig.DEFENSE_UNIT_ATTACK_COOLDOWN
         unitAttackRange = gameConfig.DEFENSE_UNIT_ATTACK_RANGE
         
-        // 업그레이드 레벨 및 비용 초기화
-        damageLevel = 1
-        attackSpeedLevel = 1
-        attackRangeLevel = 1
-        defenseLevel = 1
+        // 업그레이드 레벨 및 비용 초기화 (0부터 시작하도록 변경)
+        damageLevel = 0
+        attackSpeedLevel = 0
+        attackRangeLevel = 0
+        defenseLevel = 0
         damageCost = gameConfig.DAMAGE_UPGRADE_INITIAL_COST
         attackSpeedCost = gameConfig.ATTACK_SPEED_UPGRADE_INITIAL_COST
         attackRangeCost = gameConfig.ATTACK_RANGE_UPGRADE_INITIAL_COST
