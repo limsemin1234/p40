@@ -117,7 +117,7 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="2"
-                                android:gravity="left"
+                                android:gravity="center"
                                 android:text="데미지 90% 증가"
                                 android:textColor="#FFFFFF"
                                 android:textSize="14sp" />
@@ -329,7 +329,7 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="2"
-                                android:gravity="left"
+                                android:gravity="center"
                                 android:text="데미지 80% 증가"
                                 android:textColor="#FFFFFF"
                                 android:textSize="14sp" />
@@ -541,7 +541,7 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="2"
-                                android:gravity="left"
+                                android:gravity="center"
                                 android:text="데미지 70% 증가"
                                 android:textColor="#FFFFFF"
                                 android:textSize="14sp" />
@@ -753,7 +753,7 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="2"
-                                android:gravity="left"
+                                android:gravity="center"
                                 android:text="데미지 60% 증가"
                                 android:textColor="#FFFFFF"
                                 android:textSize="14sp" />
@@ -965,7 +965,7 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="2"
-                                android:gravity="left"
+                                android:gravity="center"
                                 android:text="문양 특수 스킬 활성화\n- 하트: 체력 500 회복\n- 스페이드: 적 즉사(500 데미지)\n- 클로버: 시간 정지(5초)\n- 다이아: 무적(5초)"
                                 android:textColor="#FFFFFF"
                                 android:textSize="14sp" />
@@ -1177,7 +1177,7 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="2"
-                                android:gravity="left"
+                                android:gravity="center"
                                 android:text="데미지 40% 증가"
                                 android:textColor="#FFFFFF"
                                 android:textSize="14sp" />
@@ -1389,7 +1389,7 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="2"
-                                android:gravity="left"
+                                android:gravity="center"
                                 android:text="데미지 30% 증가"
                                 android:textColor="#FFFFFF"
                                 android:textSize="14sp" />
@@ -1601,7 +1601,7 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="2"
-                                android:gravity="left"
+                                android:gravity="center"
                                 android:text="데미지 20% 증가"
                                 android:textColor="#FFFFFF"
                                 android:textSize="14sp" />
@@ -1813,7 +1813,7 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="2"
-                                android:gravity="left"
+                                android:gravity="center"
                                 android:text="데미지 10% 증가"
                                 android:textColor="#FFFFFF"
                                 android:textSize="14sp" />
@@ -2025,7 +2025,7 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="2"
-                                android:gravity="left"
+                                android:gravity="center"
                                 android:text="효과 없음"
                                 android:textColor="#FFFFFF"
                                 android:textSize="14sp" />
