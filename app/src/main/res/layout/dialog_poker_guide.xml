@@ -122,6 +122,17 @@
                                 android:textColor="#FFFFFF"
                                 android:textSize="14sp" />
                         </LinearLayout>
+                        
+                        <!-- 족보 설명 -->
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginBottom="4dp"
+                            android:text="동일한 문양의 10, J, Q, K, A로 이루어진 가장 높은 등급의 족보"
+                            android:textColor="#CCCCCC"
+                            android:textSize="12sp"
+                            android:gravity="center" />
 
                         <!-- 카드 예시 -->
                         <LinearLayout
@@ -129,12 +140,12 @@
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
                             android:gravity="center"
-                            android:layout_marginTop="8dp">
+                            android:layout_marginTop="4dp">
 
                             <!-- 스페이드 10 -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -150,7 +161,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♠"
                                         android:textColor="#000000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -158,15 +169,15 @@
                                         android:layout_height="wrap_content"
                                         android:text="10"
                                         android:textColor="#000000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
 
                             <!-- 스페이드 J -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -182,7 +193,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♠"
                                         android:textColor="#000000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -190,15 +201,15 @@
                                         android:layout_height="wrap_content"
                                         android:text="J"
                                         android:textColor="#000000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
 
                             <!-- 스페이드 Q -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -214,7 +225,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♠"
                                         android:textColor="#000000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -222,15 +233,15 @@
                                         android:layout_height="wrap_content"
                                         android:text="Q"
                                         android:textColor="#000000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
 
                             <!-- 스페이드 K -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -246,7 +257,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♠"
                                         android:textColor="#000000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -254,15 +265,15 @@
                                         android:layout_height="wrap_content"
                                         android:text="K"
                                         android:textColor="#000000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
 
                             <!-- 스페이드 A -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -278,7 +289,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♠"
                                         android:textColor="#000000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -286,7 +297,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="A"
                                         android:textColor="#000000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
@@ -324,18 +335,29 @@
                                 android:textSize="14sp" />
                         </LinearLayout>
 
+                        <!-- 족보 설명 -->
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginBottom="4dp"
+                            android:text="동일한 문양의 연속된 숫자 5장으로 이루어진 족보"
+                            android:textColor="#CCCCCC"
+                            android:textSize="12sp"
+                            android:gravity="center" />
+
                         <!-- 카드 예시 -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
                             android:gravity="center"
-                            android:layout_marginTop="8dp">
+                            android:layout_marginTop="4dp">
 
                             <!-- 하트 4 -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -351,7 +373,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♥"
                                         android:textColor="#FF0000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -359,15 +381,15 @@
                                         android:layout_height="wrap_content"
                                         android:text="4"
                                         android:textColor="#FF0000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
 
                             <!-- 하트 5 -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -383,7 +405,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♥"
                                         android:textColor="#FF0000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -391,15 +413,15 @@
                                         android:layout_height="wrap_content"
                                         android:text="5"
                                         android:textColor="#FF0000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
 
                             <!-- 하트 6 -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -415,7 +437,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♥"
                                         android:textColor="#FF0000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -423,15 +445,15 @@
                                         android:layout_height="wrap_content"
                                         android:text="6"
                                         android:textColor="#FF0000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
 
                             <!-- 하트 7 -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -447,7 +469,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♥"
                                         android:textColor="#FF0000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -455,15 +477,15 @@
                                         android:layout_height="wrap_content"
                                         android:text="7"
                                         android:textColor="#FF0000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
 
                             <!-- 하트 8 -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -479,7 +501,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♥"
                                         android:textColor="#FF0000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -487,7 +509,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="8"
                                         android:textColor="#FF0000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
@@ -524,6 +546,17 @@
                                 android:textColor="#FFFFFF"
                                 android:textSize="14sp" />
                         </LinearLayout>
+                        
+                        <!-- 족보 설명 -->
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginBottom="4dp"
+                            android:text="동일한 숫자 4장과 다른 숫자 1장으로 이루어진 족보"
+                            android:textColor="#CCCCCC"
+                            android:textSize="12sp"
+                            android:gravity="center" />
 
                         <!-- 카드 예시 -->
                         <LinearLayout
@@ -531,12 +564,12 @@
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
                             android:gravity="center"
-                            android:layout_marginTop="8dp">
+                            android:layout_marginTop="4dp">
 
                             <!-- Q 클로버 -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -552,7 +585,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♣"
                                         android:textColor="#000000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -560,15 +593,15 @@
                                         android:layout_height="wrap_content"
                                         android:text="Q"
                                         android:textColor="#000000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
 
                             <!-- Q 다이아 -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -584,7 +617,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♦"
                                         android:textColor="#FF0000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -592,15 +625,15 @@
                                         android:layout_height="wrap_content"
                                         android:text="Q"
                                         android:textColor="#FF0000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
 
                             <!-- Q 하트 -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -616,7 +649,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♥"
                                         android:textColor="#FF0000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -624,15 +657,15 @@
                                         android:layout_height="wrap_content"
                                         android:text="Q"
                                         android:textColor="#FF0000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
 
                             <!-- Q 스페이드 -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -648,7 +681,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♠"
                                         android:textColor="#000000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -656,15 +689,15 @@
                                         android:layout_height="wrap_content"
                                         android:text="Q"
                                         android:textColor="#000000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
 
                             <!-- 8 클로버 -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -680,7 +713,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♣"
                                         android:textColor="#000000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -688,7 +721,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="8"
                                         android:textColor="#000000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
@@ -726,18 +759,29 @@
                                 android:textSize="14sp" />
                         </LinearLayout>
 
+                        <!-- 족보 설명 -->
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginBottom="4dp"
+                            android:text="동일한 숫자 3장(트리플)과 또 다른 동일한 숫자 2장(페어)으로 이루어진 족보"
+                            android:textColor="#CCCCCC"
+                            android:textSize="12sp"
+                            android:gravity="center" />
+
                         <!-- 카드 예시 -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
                             android:gravity="center"
-                            android:layout_marginTop="8dp">
+                            android:layout_marginTop="4dp">
 
                             <!-- A 하트 -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -753,7 +797,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♥"
                                         android:textColor="#FF0000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -761,15 +805,15 @@
                                         android:layout_height="wrap_content"
                                         android:text="A"
                                         android:textColor="#FF0000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
 
                             <!-- A 다이아 -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -785,7 +829,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♦"
                                         android:textColor="#FF0000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -793,15 +837,15 @@
                                         android:layout_height="wrap_content"
                                         android:text="A"
                                         android:textColor="#FF0000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
 
                             <!-- A 스페이드 -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -817,7 +861,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♠"
                                         android:textColor="#000000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -825,15 +869,15 @@
                                         android:layout_height="wrap_content"
                                         android:text="A"
                                         android:textColor="#000000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
 
                             <!-- K 다이아 -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -849,7 +893,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♦"
                                         android:textColor="#FF0000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -857,15 +901,15 @@
                                         android:layout_height="wrap_content"
                                         android:text="K"
                                         android:textColor="#FF0000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
 
                             <!-- K 클로버 -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -881,7 +925,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♣"
                                         android:textColor="#000000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -889,7 +933,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="K"
                                         android:textColor="#000000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
@@ -926,6 +970,17 @@
                                 android:textColor="#FFFFFF"
                                 android:textSize="14sp" />
                         </LinearLayout>
+                        
+                        <!-- 족보 설명 -->
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginBottom="4dp"
+                            android:text="동일한 문양 5장으로 이루어진 족보"
+                            android:textColor="#CCCCCC"
+                            android:textSize="12sp"
+                            android:gravity="center" />
 
                         <!-- 카드 예시 -->
                         <LinearLayout
@@ -933,12 +988,12 @@
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
                             android:gravity="center"
-                            android:layout_marginTop="8dp">
+                            android:layout_marginTop="4dp">
 
                             <!-- 3 다이아 -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -954,7 +1009,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♦"
                                         android:textColor="#FF0000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -962,15 +1017,15 @@
                                         android:layout_height="wrap_content"
                                         android:text="3"
                                         android:textColor="#FF0000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
 
                             <!-- 7 다이아 -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -986,7 +1041,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♦"
                                         android:textColor="#FF0000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -994,15 +1049,15 @@
                                         android:layout_height="wrap_content"
                                         android:text="7"
                                         android:textColor="#FF0000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
 
                             <!-- 9 다이아 -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -1018,7 +1073,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♦"
                                         android:textColor="#FF0000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -1026,15 +1081,15 @@
                                         android:layout_height="wrap_content"
                                         android:text="9"
                                         android:textColor="#FF0000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
 
                             <!-- J 다이아 -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -1050,7 +1105,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♦"
                                         android:textColor="#FF0000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -1058,15 +1113,15 @@
                                         android:layout_height="wrap_content"
                                         android:text="J"
                                         android:textColor="#FF0000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
 
                             <!-- K 다이아 -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -1082,7 +1137,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♦"
                                         android:textColor="#FF0000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -1090,7 +1145,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="K"
                                         android:textColor="#FF0000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
@@ -1128,18 +1183,29 @@
                                 android:textSize="14sp" />
                         </LinearLayout>
 
+                        <!-- 족보 설명 -->
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginBottom="4dp"
+                            android:text="연속된 숫자 5장으로 이루어진 족보 (문양은 관계없음)"
+                            android:textColor="#CCCCCC"
+                            android:textSize="12sp"
+                            android:gravity="center" />
+
                         <!-- 카드 예시 -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
                             android:gravity="center"
-                            android:layout_marginTop="8dp">
+                            android:layout_marginTop="4dp">
 
                             <!-- 3 클로버 -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -1155,7 +1221,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♣"
                                         android:textColor="#000000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -1163,15 +1229,15 @@
                                         android:layout_height="wrap_content"
                                         android:text="3"
                                         android:textColor="#000000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
 
                             <!-- 4 다이아 -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -1187,7 +1253,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♦"
                                         android:textColor="#FF0000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -1195,15 +1261,15 @@
                                         android:layout_height="wrap_content"
                                         android:text="4"
                                         android:textColor="#FF0000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
 
                             <!-- 5 스페이드 -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -1219,7 +1285,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♠"
                                         android:textColor="#000000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -1227,15 +1293,15 @@
                                         android:layout_height="wrap_content"
                                         android:text="5"
                                         android:textColor="#000000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
 
                             <!-- 6 하트 -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -1251,7 +1317,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♥"
                                         android:textColor="#FF0000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -1259,15 +1325,15 @@
                                         android:layout_height="wrap_content"
                                         android:text="6"
                                         android:textColor="#FF0000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
 
                             <!-- 7 스페이드 -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -1283,7 +1349,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♠"
                                         android:textColor="#000000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -1291,7 +1357,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="7"
                                         android:textColor="#000000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
@@ -1328,6 +1394,17 @@
                                 android:textColor="#FFFFFF"
                                 android:textSize="14sp" />
                         </LinearLayout>
+                        
+                        <!-- 족보 설명 -->
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginBottom="4dp"
+                            android:text="동일한 숫자 3장으로 이루어진 족보"
+                            android:textColor="#CCCCCC"
+                            android:textSize="12sp"
+                            android:gravity="center" />
 
                         <!-- 카드 예시 -->
                         <LinearLayout
@@ -1335,12 +1412,12 @@
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
                             android:gravity="center"
-                            android:layout_marginTop="8dp">
+                            android:layout_marginTop="4dp">
 
                             <!-- 8 클로버 -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -1356,7 +1433,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♣"
                                         android:textColor="#000000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -1364,15 +1441,15 @@
                                         android:layout_height="wrap_content"
                                         android:text="8"
                                         android:textColor="#000000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
 
                             <!-- 8 다이아 -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -1388,7 +1465,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♦"
                                         android:textColor="#FF0000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -1396,15 +1473,15 @@
                                         android:layout_height="wrap_content"
                                         android:text="8"
                                         android:textColor="#FF0000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
 
                             <!-- 8 하트 -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -1420,7 +1497,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♥"
                                         android:textColor="#FF0000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -1428,15 +1505,15 @@
                                         android:layout_height="wrap_content"
                                         android:text="8"
                                         android:textColor="#FF0000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
 
                             <!-- 3 스페이드 -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -1452,7 +1529,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♠"
                                         android:textColor="#000000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -1460,15 +1537,15 @@
                                         android:layout_height="wrap_content"
                                         android:text="3"
                                         android:textColor="#000000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
 
                             <!-- 5 클로버 -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -1484,7 +1561,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♣"
                                         android:textColor="#000000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -1492,7 +1569,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="5"
                                         android:textColor="#000000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
@@ -1530,18 +1607,29 @@
                                 android:textSize="14sp" />
                         </LinearLayout>
 
+                        <!-- 족보 설명 -->
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginBottom="4dp"
+                            android:text="서로 다른 두 쌍의 페어(동일한 숫자 2장)으로 이루어진 족보"
+                            android:textColor="#CCCCCC"
+                            android:textSize="12sp"
+                            android:gravity="center" />
+
                         <!-- 카드 예시 -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
                             android:gravity="center"
-                            android:layout_marginTop="8dp">
+                            android:layout_marginTop="4dp">
 
                             <!-- J 하트 -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -1557,7 +1645,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♥"
                                         android:textColor="#FF0000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -1565,15 +1653,15 @@
                                         android:layout_height="wrap_content"
                                         android:text="J"
                                         android:textColor="#FF0000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
 
                             <!-- J 클로버 -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -1589,7 +1677,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♣"
                                         android:textColor="#000000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -1597,15 +1685,15 @@
                                         android:layout_height="wrap_content"
                                         android:text="J"
                                         android:textColor="#000000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
 
                             <!-- 4 다이아 -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -1621,7 +1709,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♦"
                                         android:textColor="#FF0000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -1629,15 +1717,15 @@
                                         android:layout_height="wrap_content"
                                         android:text="4"
                                         android:textColor="#FF0000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
 
                             <!-- 4 스페이드 -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -1653,7 +1741,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♠"
                                         android:textColor="#000000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -1661,15 +1749,15 @@
                                         android:layout_height="wrap_content"
                                         android:text="4"
                                         android:textColor="#000000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
 
                             <!-- 9 하트 -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -1685,7 +1773,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♥"
                                         android:textColor="#FF0000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -1693,7 +1781,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="9"
                                         android:textColor="#FF0000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
@@ -1730,6 +1818,17 @@
                                 android:textColor="#FFFFFF"
                                 android:textSize="14sp" />
                         </LinearLayout>
+                        
+                        <!-- 족보 설명 -->
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginBottom="4dp"
+                            android:text="동일한 숫자 2장이 1쌍으로 이루어진 족보"
+                            android:textColor="#CCCCCC"
+                            android:textSize="12sp"
+                            android:gravity="center" />
 
                         <!-- 카드 예시 -->
                         <LinearLayout
@@ -1737,12 +1836,12 @@
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
                             android:gravity="center"
-                            android:layout_marginTop="8dp">
+                            android:layout_marginTop="4dp">
 
                             <!-- K 하트 -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -1758,7 +1857,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♥"
                                         android:textColor="#FF0000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -1766,15 +1865,15 @@
                                         android:layout_height="wrap_content"
                                         android:text="K"
                                         android:textColor="#FF0000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
 
                             <!-- K 다이아 -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -1790,7 +1889,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♦"
                                         android:textColor="#FF0000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -1798,15 +1897,15 @@
                                         android:layout_height="wrap_content"
                                         android:text="K"
                                         android:textColor="#FF0000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
 
                             <!-- 2 스페이드 -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -1822,7 +1921,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♠"
                                         android:textColor="#000000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -1830,15 +1929,15 @@
                                         android:layout_height="wrap_content"
                                         android:text="2"
                                         android:textColor="#000000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
 
                             <!-- 7 클로버 -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -1854,7 +1953,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♣"
                                         android:textColor="#000000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -1862,15 +1961,15 @@
                                         android:layout_height="wrap_content"
                                         android:text="7"
                                         android:textColor="#000000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
 
                             <!-- 10 다이아 -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -1886,7 +1985,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♦"
                                         android:textColor="#FF0000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -1894,7 +1993,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="10"
                                         android:textColor="#FF0000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
@@ -1932,18 +2031,29 @@
                                 android:textSize="14sp" />
                         </LinearLayout>
 
+                        <!-- 족보 설명 -->
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginBottom="4dp"
+                            android:text="어떤 족보에도 해당되지 않는 카드 조합"
+                            android:textColor="#CCCCCC"
+                            android:textSize="12sp"
+                            android:gravity="center" />
+
                         <!-- 카드 예시 -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
                             android:gravity="center"
-                            android:layout_marginTop="8dp">
+                            android:layout_marginTop="4dp">
 
                             <!-- A 스페이드 -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -1959,7 +2069,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♠"
                                         android:textColor="#000000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -1967,15 +2077,15 @@
                                         android:layout_height="wrap_content"
                                         android:text="A"
                                         android:textColor="#000000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
 
                             <!-- J 하트 -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -1991,7 +2101,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♥"
                                         android:textColor="#FF0000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -1999,15 +2109,15 @@
                                         android:layout_height="wrap_content"
                                         android:text="J"
                                         android:textColor="#FF0000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
 
                             <!-- 9 다이아 -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -2023,7 +2133,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♦"
                                         android:textColor="#FF0000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -2031,15 +2141,15 @@
                                         android:layout_height="wrap_content"
                                         android:text="9"
                                         android:textColor="#FF0000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
 
                             <!-- 7 클로버 -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -2055,7 +2165,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♣"
                                         android:textColor="#000000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -2063,15 +2173,15 @@
                                         android:layout_height="wrap_content"
                                         android:text="7"
                                         android:textColor="#000000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
 
                             <!-- 2 스페이드 -->
                             <androidx.cardview.widget.CardView
-                                android:layout_width="50dp"
-                                android:layout_height="70dp"
+                                android:layout_width="40dp"
+                                android:layout_height="55dp"
                                 android:layout_margin="2dp"
                                 app:cardCornerRadius="4dp"
                                 app:cardBackgroundColor="#FFFFFF">
@@ -2087,7 +2197,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="♠"
                                         android:textColor="#000000"
-                                        android:textSize="24sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -2095,7 +2205,7 @@
                                         android:layout_height="wrap_content"
                                         android:text="2"
                                         android:textColor="#000000"
-                                        android:textSize="16sp"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
