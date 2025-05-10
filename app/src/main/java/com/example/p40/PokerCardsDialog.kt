@@ -85,9 +85,15 @@ class PokerCardsDialog(
             confirmSelection()
         }
         
-        // 족보 가이드 버튼 이벤트
-        pokerGuideButton.setOnClickListener {
-            showPokerGuide()
+        // 족보 가이드 버튼 이벤트 및 시각적 강조
+        pokerGuideButton.apply {
+            setOnClickListener {
+                showPokerGuide()
+            }
+            // 버튼 애니메이션 효과 추가
+            animate().scaleX(1.2f).scaleY(1.2f).setDuration(300).withEndAction {
+                animate().scaleX(1f).scaleY(1f).setDuration(300).start()
+            }.start()
         }
     }
     
