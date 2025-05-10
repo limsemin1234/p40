@@ -793,13 +793,13 @@
 
                     <ImageButton
                         android:id="@+id/btnPokerGuide"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
                         android:layout_marginStart="4dp"
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:contentDescription="족보 가이드"
                         android:padding="2dp"
-                        android:src="@android:drawable/ic_dialog_info"
+                        android:src="@android:drawable/ic_menu_help"
                         android:tint="#FFD700" />
                 </LinearLayout>
             </LinearLayout>
