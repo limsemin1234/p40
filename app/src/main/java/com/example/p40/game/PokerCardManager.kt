@@ -13,6 +13,7 @@ import androidx.cardview.widget.CardView
 import com.example.p40.DeckBuilderFragment
 import com.example.p40.R
 import com.example.p40.game.MessageManager
+import com.example.p40.PokerGuideDialog
 import kotlin.random.Random
 import com.example.p40.game.HighCard
 import com.example.p40.game.OnePair
@@ -105,6 +106,11 @@ class PokerCardManager(
                     false
                 }
             }
+        }
+        
+        // 족보 가이드 버튼 이벤트 설정
+        rootView.findViewById<android.widget.ImageButton>(R.id.btnPokerGuide)?.setOnClickListener {
+            showPokerGuide()
         }
         
         // 교체 버튼 이벤트
@@ -439,5 +445,11 @@ class PokerCardManager(
             is RoyalFlush -> "데미지 ${(GameConfig.ROYAL_FLUSH_DAMAGE_INCREASE * 100).toInt()}%"
             else -> ""
         }
+    }
+
+    // 족보 가이드 다이얼로그 표시 메서드
+    private fun showPokerGuide() {
+        val guideDialog = PokerGuideDialog(context)
+        guideDialog.show()
     }
 } 

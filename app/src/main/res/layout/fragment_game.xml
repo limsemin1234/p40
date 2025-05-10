@@ -773,16 +773,35 @@
                     android:textSize="12sp"
                     android:textStyle="bold" />
 
-                <TextView
-                    android:id="@+id/tvCurrentHand"
+                <!-- 족보 텍스트와 가이드 버튼을 위한 레이아웃 -->
+                <LinearLayout
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="족보: 하이카드"
-                    android:textColor="#FFD700"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tvCurrentHand"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="족보: 하이카드"
+                        android:textColor="#FFD700"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <ImageButton
+                        android:id="@+id/btnPokerGuide"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginStart="4dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="족보 가이드"
+                        android:padding="2dp"
+                        android:src="@android:drawable/ic_dialog_info"
+                        android:tint="#FFD700" />
+                </LinearLayout>
             </LinearLayout>
 
             <HorizontalScrollView
