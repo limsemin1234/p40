@@ -443,4 +443,12 @@ object GameConfig {
         // 1웨이브: 기본값 150, 이후 매 웨이브마다 50씩 증가
         return BOSS_KILL_COIN_REWARD_BASE + (wave - 1) * BOSS_KILL_COIN_REWARD_INCREMENT
     }
+    
+    /**
+     * 기본 게임 설정을 반환하는 함수
+     * @return 이 게임 설정 객체
+     */
+    fun getDefaultConfig(): GameConfig {
+        return this
+    }
 } 

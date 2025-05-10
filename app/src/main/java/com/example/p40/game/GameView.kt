@@ -212,6 +212,14 @@ class GameView @JvmOverloads constructor(
     }
     
     /**
+     * 게임 재개 (별칭 메서드)
+     * resume 메서드와 동일한 기능을 수행합니다.
+     */
+    fun resumeGame() {
+        resume()
+    }
+    
+    /**
      * 게임 리소스 완전 정리
      * 게임 종료 또는 Fragment가 파괴될 때 호출
      */
@@ -521,6 +529,27 @@ class GameView @JvmOverloads constructor(
         if (::gameLogic.isInitialized) {
             gameLogic.getDefenseUnit().setAttackRange(range)
             gameLogic.getDefenseUnit().setAttackCooldown(attackSpeed)
+        }
+    }
+    
+    /**
+     * 게임을 초기 상태로 리셋합니다.
+     * @param config 초기화에 사용할 GameConfig 객체
+     */
+    fun resetGame(config: GameConfig) {
+        // 게임 현재 상태 초기화
+        paused = false
+        isInvincible = false
+        timeFrozen = false
+        rangeBasedTimeFrozen = false
+        
+        // GameStats 초기화
+        gameStats.reset()
+        
+        // GameLogic이 이미 초기화되어 있다면 재설정
+        if (::gameLogic.isInitialized) {
+            gameLogic = GameLogic(gameStats, config, gameOverListener, bossKillListener, levelClearListener)
+            gameLogic.initGame(width.toFloat(), height.toFloat())
         }
     }
     

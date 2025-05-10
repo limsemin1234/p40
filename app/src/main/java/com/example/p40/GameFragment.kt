@@ -49,6 +49,9 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
     private lateinit var gameView: GameView
     private var isPaused = false
     
+    // GameConfig 추가
+    private lateinit var gameConfig: GameConfig
+    
     // 현재 열려있는 패널 추적
     private var currentOpenPanel: LinearLayout? = null
     
@@ -93,6 +96,9 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // GameConfig 초기화
+        gameConfig = GameConfig.getDefaultConfig()
+        
         // UserManager 초기화
         userManager = UserManager.getInstance(requireContext())
         
@@ -1111,7 +1117,7 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
             
             tvLevelTitle.text = "1단계 난이도"
             tvClearedWaves.text = "$wave 웨이브 클리어!"
-            tvRewardCoins.text = "보상: $levelClearReward 코인"
+            tvRewardCoins.text = "$levelClearReward 코인"
             
             // 메인화면으로 버튼
             val btnToMainMenu = dialog.findViewById<Button>(R.id.btnToMainMenu)
@@ -1121,12 +1127,44 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
                 findNavController().navigate(R.id.action_gameFragment_to_mainMenuFragment)
             }
             
+            // 다시 도전 버튼
+            val btnPlayAgain = dialog.findViewById<Button>(R.id.btnPlayAgain)
+            btnPlayAgain.setOnClickListener {
+                dialog.dismiss()
+                // 게임 리셋 및 재시작
+                resetAndRestartGame()
+            }
+            
             dialog.setCancelable(false)
             dialog.show()
             
             // 통계 업데이트 - 게임 클리어 횟수 증가
             statsManager.incrementGamesCompleted()
         }
+    }
+
+    /**
+     * 게임 리셋 및 재시작
+     */
+    private fun resetAndRestartGame() {
+        // 이전 게임 자원 정리
+        cleanupGameResources()
+        
+        // 게임 상태 초기화
+        gameConfig = GameConfig.getDefaultConfig() // 기본 설정으로 리셋
+        gameView.resetGame(gameConfig)
+        
+        // 획득한 코인 초기화
+        earnedCoins = 0
+        
+        // 게임 시작
+        gameView.resumeGame()
+        
+        // 통계 업데이트 - 게임 시작 횟수 증가
+        statsManager.incrementGamesStarted()
+        
+        // 안내 메시지
+        messageManager.showInfo("새 게임이 시작되었습니다!")
     }
 
     override fun onResume() {

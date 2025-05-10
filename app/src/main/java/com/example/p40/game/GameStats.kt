@@ -98,6 +98,14 @@ class GameStats(
     }
     
     /**
+     * 게임 상태 리셋
+     * resetGame과 동일한 기능을 하는 별칭 메서드
+     */
+    fun reset() {
+        resetGame()
+    }
+    
+    /**
      * 적 처치 처리
      * @param isBoss 보스 여부
      * @return 처치된 적이 보스인 경우 true
