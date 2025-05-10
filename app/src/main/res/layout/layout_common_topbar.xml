@@ -4,11 +4,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/commonTopBar"
     android:layout_width="match_parent"
-    android:layout_height="80dp"
-    android:minHeight="80dp"
+    android:layout_height="wrap_content"
+    android:minHeight="56dp"
     android:elevation="6dp"
-    android:paddingVertical="12dp"
-    android:paddingHorizontal="8dp">
+    android:paddingVertical="6dp"
+    android:paddingHorizontal="4dp">
 
     <!-- 상단바 배경 -->
     <View
@@ -22,54 +22,72 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- 뒤로가기 버튼 -->
-    <ImageButton
-        android:id="@+id/btnBack"
-        android:layout_width="42dp"
-        android:layout_height="42dp"
-        android:src="@android:drawable/ic_menu_revert"
-        android:tint="#FFE066"
-        android:background="@drawable/back_button_ripple"
-        android:contentDescription="뒤로가기"
-        android:layout_marginStart="6dp"
-        android:padding="8dp"
+    <!-- 왼쪽 버튼 영역 -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/leftButtonsContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
-
-    <!-- 족보 가이드 버튼 -->
-    <Button
-        android:id="@+id/btnPokerGuide"
-        android:layout_width="0dp"
-        android:layout_height="42dp"
-        android:text="족보가이드"
-        android:textSize="14sp"
-        android:textColor="#FFE066"
-        android:textStyle="bold"
-        android:background="@drawable/topbar_button_ripple"
-        android:layout_marginStart="12dp"
-        app:layout_constraintStart_toEndOf="@id/btnBack"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintWidth_percent="0.23" />
+        app:layout_constraintEnd_toStartOf="@+id/coinContainer"
+        app:layout_constraintHorizontal_weight="3"
+        android:layout_marginEnd="8dp">
 
-    <!-- 업적 버튼 -->
-    <Button
-        android:id="@+id/btnAchievement"
-        android:layout_width="0dp"
-        android:layout_height="42dp"
-        android:text="업적"
-        android:textSize="14sp"
-        android:textColor="#FFE066"
-        android:textStyle="bold"
-        android:background="@drawable/topbar_button_ripple"
-        android:layout_marginStart="8dp"
-        app:layout_constraintStart_toEndOf="@id/btnPokerGuide"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintWidth_percent="0.18" />
+        <!-- 뒤로가기 버튼 -->
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@android:drawable/ic_menu_revert"
+            android:tint="#FFE066"
+            android:background="@drawable/back_button_ripple"
+            android:contentDescription="뒤로가기"
+            android:layout_marginStart="4dp"
+            android:padding="5dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
 
-    <!-- 코인 컨테이너 -->
+        <!-- 족보 가이드 버튼 - 크기 축소 -->
+        <Button
+            android:id="@+id/btnPokerGuide"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:text="족보가이드"
+            android:textSize="11sp"
+            android:textColor="#FFE066"
+            android:textStyle="bold"
+            android:background="@drawable/topbar_button_ripple"
+            android:layout_marginStart="8dp"
+            app:layout_constraintStart_toEndOf="@id/btnBack"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:paddingHorizontal="6dp"
+            app:layout_constraintEnd_toStartOf="@+id/btnAchievement"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            android:minWidth="70dp"/>
+
+        <!-- 업적 버튼 - 크기 축소 -->
+        <Button
+            android:id="@+id/btnAchievement"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:text="업적"
+            android:textSize="11sp"
+            android:textColor="#FFE066"
+            android:textStyle="bold"
+            android:background="@drawable/topbar_button_ripple"
+            android:layout_marginStart="8dp"
+            android:paddingHorizontal="6dp"
+            app:layout_constraintStart_toEndOf="@id/btnPokerGuide"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:minWidth="50dp"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- 코인 컨테이너 - 항상 우측에 고정, 크기 최적화 -->
     <LinearLayout
         android:id="@+id/coinContainer"
         android:layout_width="wrap_content"
@@ -78,31 +96,35 @@
         android:background="@drawable/coin_container_background"
         android:gravity="center_vertical"
         android:layout_marginEnd="6dp"
-        android:paddingVertical="8dp"
-        android:paddingHorizontal="20dp"
+        android:paddingVertical="4dp"
+        android:paddingHorizontal="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/leftButtonsContainer"
+        app:layout_constraintHorizontal_weight="1">
         
-        <!-- 코인 아이콘 -->
+        <!-- 코인 아이콘 - 크기 축소 -->
         <ImageView
-            android:layout_width="26dp"
-            android:layout_height="26dp"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
             android:src="@drawable/ic_coin" />
         
-        <!-- 코인 금액 텍스트 -->
+        <!-- 코인 금액 텍스트 - 크기 축소 -->
         <TextView
             android:id="@+id/tvCoinAmount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="코인: 0"
-            android:textSize="18sp"
+            android:textSize="13sp"
             android:textStyle="bold"
             android:textColor="#FFE066"
             android:shadowColor="#000000"
             android:shadowDx="1"
             android:shadowDy="1"
-            android:shadowRadius="2"
-            android:layout_marginStart="6dp" />
+            android:shadowRadius="1"
+            android:layout_marginStart="4dp"
+            android:maxLines="1"
+            android:ellipsize="end" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout> 
