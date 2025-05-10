@@ -16,19 +16,17 @@ import android.widget.NumberPicker
 import android.widget.TextView
 import android.widget.Toast
 import androidx.cardview.widget.CardView
-import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.p40.game.Card
 import com.example.p40.game.CardRank
 import com.example.p40.game.CardSuit
 import com.example.p40.game.MessageManager
 
-class MainMenuFragment : Fragment(R.layout.fragment_main_menu) {
+class MainMenuFragment : BaseFragment(R.layout.fragment_main_menu) {
     
     private val TAG = "MainMenuFragment"
 
-    // UserManager 추가
-    private lateinit var userManager: UserManager
+    // MessageManager 참조
     private lateinit var messageManager: MessageManager
     
     // 애니메이션 상태 관리
@@ -38,8 +36,7 @@ class MainMenuFragment : Fragment(R.layout.fragment_main_menu) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
-        // UserManager 초기화
-        userManager = UserManager.getInstance(requireContext())
+        // MessageManager 초기화
         messageManager = MessageManager.getInstance()
         messageManager.init(view.findViewById(android.R.id.content) ?: view as ViewGroup)
         
@@ -70,9 +67,6 @@ class MainMenuFragment : Fragment(R.layout.fragment_main_menu) {
         } catch (e: Exception) {
             Log.e(TAG, "Error disabling view clipping: ${e.message}")
         }
-        
-        // UserManager에서 코인 정보 불러오기
-        updateCoinUI(view)
         
         // 애니메이션 초기화 - 무한 반복 설정 확실히 추가
         try {
@@ -179,9 +173,9 @@ class MainMenuFragment : Fragment(R.layout.fragment_main_menu) {
     
     override fun onResume() {
         super.onResume()
-        // 화면이 다시 보일 때마다 UserManager에서 코인 정보 갱신
+        // 화면이 다시 보일 때마다 코인 정보 갱신
         view?.let { 
-            updateCoinUI(it)
+            updateCoinInfo(it)
             
             // 화면이 다시 보일 때 애니메이션 상태 확인 후 재시작
             try {
@@ -230,12 +224,6 @@ class MainMenuFragment : Fragment(R.layout.fragment_main_menu) {
                 isAnimationPlaying = false
             }
         }
-    }
-    
-    // 코인 UI 업데이트 (UserManager 사용)
-    private fun updateCoinUI(view: View) {
-        val tvCoinAmount = view.findViewById<TextView>(R.id.tvCoinAmount)
-        tvCoinAmount.text = "코인: ${userManager.getCoin()}"
     }
 
     // 모든 자식 뷰에 재귀적으로 클리핑 비활성화 적용
