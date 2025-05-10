@@ -186,7 +186,7 @@ object GameConfig {
     // --------- 자원,코인 관련 설정 ----------
 
     // 점수(자원) 설정
-    const val SCORE_PER_NORMAL_ENEMY = 1000  // 일반 적 처치 시 얻는 점수(자원)
+    const val SCORE_PER_NORMAL_ENEMY = 10  // 일반 적 처치 시 얻는 점수(자원)
     const val SCORE_PER_BOSS = 200  // 보스 처치 시 얻는 점수(자원)
     
     // 코인 보상 설정

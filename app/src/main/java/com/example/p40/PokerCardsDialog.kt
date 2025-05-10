@@ -98,18 +98,7 @@ class PokerCardsDialog(
     }
     
     private fun dealCards() {
-        // 웨이브 번호에 따라 더 좋은 카드가 나올 확률 증가
-        // 기본 확률 0.15에서 웨이브 번호에 따라 증가
-        val goodHandProbability = minOf(0.15f + (waveNumber * 0.03f), 0.5f)
-        
-        // 좋은 패가 나올 확률 계산
-        if (Random.nextFloat() < goodHandProbability) {
-            // 좋은 패 생성 (스트레이트 이상)
-            generateGoodHand()
-        } else {
-            // 일반 랜덤 패 생성
-            generateRandomHand()
-        }
+        generateRandomHand()
     }
     
     private fun generateRandomHand() {
@@ -132,110 +121,6 @@ class PokerCardsDialog(
                 cards.add(Card(suit, rank))
             }
         }
-    }
-    
-    private fun generateGoodHand() {
-        // 웨이브 번호에 따라 더 좋은 족보 가능성 증가
-        val handType = when {
-            waveNumber >= 8 && Random.nextFloat() < 0.2f -> "royal_flush"
-            waveNumber >= 6 && Random.nextFloat() < 0.3f -> "straight_flush"
-            waveNumber >= 5 && Random.nextFloat() < 0.4f -> "four_of_a_kind"
-            waveNumber >= 4 && Random.nextFloat() < 0.5f -> "full_house"
-            waveNumber >= 3 && Random.nextFloat() < 0.6f -> "flush"
-            else -> "straight"
-        }
-        
-        cards.clear()
-        
-        when (handType) {
-            "royal_flush" -> {
-                // 로얄 플러시 (스페이드 10, J, Q, K, A)
-                val suit = CardSuit.SPADE
-                cards.add(Card(suit, CardRank.TEN))
-                cards.add(Card(suit, CardRank.JACK))
-                cards.add(Card(suit, CardRank.QUEEN))
-                cards.add(Card(suit, CardRank.KING))
-                cards.add(Card(suit, CardRank.ACE))
-            }
-            "straight_flush" -> {
-                // 스트레이트 플러시 (같은 무늬의 연속된 숫자)
-                val suit = CardSuit.values().filter { it != CardSuit.JOKER }.random()
-                val startRank = Random.nextInt(1, 10) // 1(A)부터 9까지의 시작 숫자
-                
-                for (i in 0 until 5) {
-                    val rankValue = startRank + i
-                    val rank = CardRank.values().find { it.value == rankValue }
-                        ?: CardRank.values().find { it.value == (rankValue % 13) + 1 }
-                        ?: CardRank.ACE
-                    
-                    cards.add(Card(suit, rank))
-                }
-            }
-            "four_of_a_kind" -> {
-                // 포카드 (같은 숫자 4장)
-                val rank = CardRank.values().filter { it != CardRank.JOKER }.random()
-                val suits = CardSuit.values().filter { it != CardSuit.JOKER }.shuffled()
-                
-                // 같은 숫자 4장
-                for (i in 0 until 4) {
-                    cards.add(Card(suits[i], rank))
-                }
-                
-                // 다른 숫자 1장
-                var otherRank: CardRank
-                do {
-                    otherRank = CardRank.values().filter { it != CardRank.JOKER }.random()
-                } while (otherRank == rank)
-                
-                cards.add(Card(suits.random(), otherRank))
-            }
-            "full_house" -> {
-                // 풀하우스 (트리플 + 원페어)
-                val tripleRank = CardRank.values().filter { it != CardRank.JOKER }.random()
-                var pairRank: CardRank
-                do {
-                    pairRank = CardRank.values().filter { it != CardRank.JOKER }.random()
-                } while (pairRank == tripleRank)
-                
-                val suits = CardSuit.values().filter { it != CardSuit.JOKER }.shuffled()
-                
-                // 같은 숫자 3장
-                for (i in 0 until 3) {
-                    cards.add(Card(suits[i], tripleRank))
-                }
-                
-                // 다른 같은 숫자 2장
-                for (i in 0 until 2) {
-                    cards.add(Card(suits[i], pairRank))
-                }
-            }
-            "flush" -> {
-                // 플러시 (같은 무늬 5장)
-                val suit = CardSuit.values().filter { it != CardSuit.JOKER }.random()
-                val ranks = CardRank.values().filter { it != CardRank.JOKER }.shuffled().take(5)
-                
-                for (rank in ranks) {
-                    cards.add(Card(suit, rank))
-                }
-            }
-            else -> { // 스트레이트
-                // 스트레이트 (연속된 숫자 5장)
-                val startRank = Random.nextInt(1, 10) // 1(A)부터 9까지의 시작 숫자
-                val suits = CardSuit.values().filter { it != CardSuit.JOKER }
-                
-                for (i in 0 until 5) {
-                    val rankValue = startRank + i
-                    val rank = CardRank.values().find { it.value == rankValue }
-                        ?: CardRank.values().find { it.value == (rankValue % 13) + 1 }
-                        ?: CardRank.ACE
-                    
-                    cards.add(Card(suits.random(), rank))
-                }
-            }
-        }
-        
-        // 카드 순서 섞기
-        cards.shuffle()
     }
     
     private fun updateUI() {
