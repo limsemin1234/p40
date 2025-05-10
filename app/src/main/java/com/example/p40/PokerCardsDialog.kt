@@ -10,6 +10,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.ImageButton
 import androidx.cardview.widget.CardView
 import com.example.p40.game.Card
 import com.example.p40.game.CardRank
@@ -38,6 +39,7 @@ class PokerCardsDialog(
     private lateinit var confirmButton: Button
     private lateinit var replaceCountText: TextView
     private lateinit var pokerHandText: TextView
+    private lateinit var pokerGuideButton: ImageButton
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,6 +66,7 @@ class PokerCardsDialog(
         confirmButton = findViewById(R.id.btnConfirmHand)
         replaceCountText = findViewById(R.id.tvReplaceCount)
         pokerHandText = findViewById(R.id.tvCurrentHand)
+        pokerGuideButton = findViewById(R.id.btnPokerGuide)
         
         // 카드 선택 이벤트 설정
         cardViews.forEachIndexed { index, cardView ->
@@ -80,6 +83,11 @@ class PokerCardsDialog(
         // 확인 버튼 이벤트
         confirmButton.setOnClickListener {
             confirmSelection()
+        }
+        
+        // 족보 가이드 버튼 이벤트
+        pokerGuideButton.setOnClickListener {
+            showPokerGuide()
         }
     }
     
@@ -346,5 +354,11 @@ class PokerCardsDialog(
         val pokerHand = PokerHandEvaluator.evaluate(cards)
         onPokerHandSelected(pokerHand)
         dismiss()
+    }
+    
+    // 족보 가이드 다이얼로그 표시
+    private fun showPokerGuide() {
+        val pokerGuideDialog = PokerGuideDialog(context)
+        pokerGuideDialog.show()
     }
 } 
