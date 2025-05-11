@@ -44,6 +44,10 @@ import com.example.p40.game.CardSymbolType
 import com.example.p40.game.LevelClearListener
 import kotlin.random.Random
 
+/**
+ * 게임 화면을 담당하는 Fragment
+ * 리팩토링: 책임 분리를 위해 여러 매니저 클래스로 기능 위임
+ */
 class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCardManager.PokerCardListener, DefenseUnitSymbolChangeListener, LevelClearListener {
 
     private lateinit var gameView: GameView
@@ -74,7 +78,7 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
     private val handler = Handler(Looper.getMainLooper())
     private val uiUpdateRunnable = object : Runnable {
         override fun run() {
-            // GameUIHelper의 메서드 호출로 변경
+            // GameUIHelper의 메서드 호출
             gameUIHelper.updateGameInfoUI()
             gameUIHelper.updateBuffUI()
             gameUIHelper.updateUnitStatsUI()
@@ -94,8 +98,10 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
     // StatsManager 추가
     private lateinit var statsManager: StatsManager
     
-    // GameUIHelper 인스턴스 추가
+    // 리팩토링: 새로운 매니저 클래스들 추가
     private lateinit var gameUIHelper: GameUIHelper
+    private lateinit var upgradeManager: UpgradeManager
+    private lateinit var gameDialogManager: GameDialogManager
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -112,15 +118,6 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         // StatsManager 초기화
         statsManager = StatsManager.getInstance(requireContext())
         
-        // GameUIHelper 초기화
-        gameUIHelper = GameUIHelper(
-            requireContext(),
-            gameConfig,
-            userManager,
-            statsManager,
-            messageManager
-        )
-        
         // 게임 시작 시 획득 코인 초기화
         earnedCoins = 0
         
@@ -135,9 +132,6 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         
         // 게임 뷰 초기화
         gameView = view.findViewById(R.id.gameView)
-        
-        // GameUIHelper에 GameView 설정
-        gameUIHelper.setGameView(gameView)
         
         // 게임 오버 리스너 설정
         gameView.setGameOverListener(this)
@@ -171,8 +165,8 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         // 파티클 효과를 위한 애니메이션 설정
         setupDefenseUnitAnimation(view)
         
-        // UI 요소 초기화
-        gameUIHelper.initUIElements(view)
+        // 매니저 클래스 초기화
+        initializeManagers(view)
         
         // 버프 UI 초기화 (기존 코드 유지하면서 새 클래스로 점진적 이전)
         initBuffUI(view)
@@ -184,8 +178,8 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         setupGameMenu(view)
         
         // 업그레이드 버튼 설정
-        setupAttackUpgradeButtons(view)
-        setupDefenseUpgradeButtons(view)
+        upgradeManager.setupAttackUpgradeButtons()
+        upgradeManager.setupDefenseUpgradeButtons()
         
         // 카드 버튼 설정 - 패널에서 직접 포커 카드 기능 처리
         setupCardButtons(view)
@@ -194,6 +188,76 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         setupWaveCompletionListener()
         
         // 패널 초기화
+        setupPanels(view)
+
+        // UI 업데이트 시작
+        gameUIHelper.startUiUpdates()
+        
+        // 업그레이드 버튼 텍스트 초기화 (UI 업데이트 후에 실행)
+        handler.post {
+            upgradeManager.updateUpgradeButtonsText()
+        }
+        
+        // 게임 뷰에 StatsManager의 스탯 적용
+        applyStatsToGame()
+    }
+
+    /**
+     * 매니저 클래스들 초기화
+     */
+    private fun initializeManagers(view: View) {
+        // GameUIHelper 초기화
+        gameUIHelper = GameUIHelper(
+            requireContext(),
+            gameConfig,
+            userManager,
+            statsManager,
+            messageManager
+        )
+        
+        // GameView 설정
+        gameUIHelper.setGameView(gameView)
+        
+        // UpgradeManager 초기화
+        upgradeManager = UpgradeManager(
+            requireContext(),
+            gameView,
+            messageManager,
+            view
+        )
+        
+        // GameDialogManager 초기화
+        gameDialogManager = GameDialogManager(
+            requireContext(),
+            gameView,
+            messageManager,
+            userManager,
+            statsManager,
+            viewLifecycleOwner,
+            findNavController(),
+            gameConfig
+        )
+        
+        // 콜백 설정
+        gameDialogManager.setCleanupResourcesCallback {
+            cleanupGameResources()
+        }
+        
+        gameDialogManager.setPokerHandAppliedCallback { pokerHand ->
+            applyPokerHandEffect(pokerHand)
+        }
+        
+        // 획득 코인 설정
+        gameDialogManager.setEarnedCoins(earnedCoins)
+        
+        // UI 요소 초기화
+        gameUIHelper.initUIElements(view)
+    }
+    
+    /**
+     * 패널 설정
+     */
+    private fun setupPanels(view: View) {
         val attackUpgradePanel = view.findViewById<LinearLayout>(R.id.attackUpgradePanel)
         val defenseUpgradePanel = view.findViewById<LinearLayout>(R.id.defenseUpgradePanel)
         val cardPanel = view.findViewById<LinearLayout>(R.id.cardPanel)
@@ -216,14 +280,6 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
             gameUIHelper.togglePanel(cardPanel)
         }
         
-        // UI 업데이트 시작
-        gameUIHelper.startUiUpdates()
-        
-        // 업그레이드 버튼 텍스트 초기화 (UI 업데이트 후에 실행)
-        handler.post {
-            updateUpgradeButtonsText()
-        }
-
         // 플러시 스킬 매니저 초기화
         val flushSkillButtonContainer = view.findViewById<LinearLayout>(R.id.flushSkillButtonContainer)
         flushSkillManager = FlushSkillManager(
@@ -238,9 +294,6 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         
         // 플러시 스킬 버튼 컨테이너 초기 설정
         flushSkillButtonContainer.visibility = View.GONE
-
-        // 게임 뷰에 StatsManager의 스탯 적용
-        applyStatsToGame()
     }
     
     override fun onStart() {
@@ -399,20 +452,7 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         handler.removeCallbacks(uiUpdateRunnable)
         
         // 포커 카드 다이얼로그 표시
-        showPokerCardsDialog(waveNumber)
-    }
-    
-    // 포커 카드 다이얼로그 표시
-    private fun showPokerCardsDialog(waveNumber: Int) {
-        val dialog = PokerCardsDialog(requireContext(), waveNumber) { pokerHand ->
-            // 선택된 포커 족보 적용
-            applyPokerHandEffect(pokerHand)
-            
-            // 버프 정보 업데이트
-            updateBuffUI()
-        }
-        
-        dialog.show()
+        gameDialogManager.showPokerCardsDialog(waveNumber)
     }
     
     // 포커 족보 효과 적용
@@ -424,145 +464,6 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         gameUIHelper.updateBuffUI()
     }
     
-    private fun togglePanel(panel: LinearLayout) {
-        // 이미 열려있는 다른 패널이 있으면 닫기
-        if (currentOpenPanel != null && currentOpenPanel != panel) {
-            closePanel(currentOpenPanel!!)
-        }
-        
-        // 선택한 패널 토글
-        if (panel.visibility == View.VISIBLE) {
-            closePanel(panel)
-        } else {
-            // 패널을 열기 전에 최신 비용으로 업그레이드 버튼 텍스트 업데이트
-            updateUpgradeButtonsText()
-            openPanel(panel)
-        }
-    }
-    
-    private fun openPanel(panel: LinearLayout) {
-        panel.visibility = View.VISIBLE
-        
-        // 화면 높이의 일정 부분을 시작점으로 사용 (5%로 변경하여 더 위에서 시작)
-        val displayMetrics = requireContext().resources.displayMetrics
-        val screenHeight = displayMetrics.heightPixels
-        val startPosition = screenHeight * 0.05f  // 화면 높이의 5%만큼 아래에서 시작
-        
-        panel.translationY = startPosition
-        
-        val animator = ObjectAnimator.ofFloat(panel, "translationY", 0f)
-        animator.duration = 300
-        animator.interpolator = AccelerateDecelerateInterpolator()
-        animator.start()
-        
-        currentOpenPanel = panel
-    }
-    
-    private fun closePanel(panel: LinearLayout) {
-        // 화면 높이의 일정 부분을 종료점으로 사용 (5%로 변경)
-        val displayMetrics = requireContext().resources.displayMetrics
-        val screenHeight = displayMetrics.heightPixels
-        val endPosition = screenHeight * 0.05f  // 화면 높이의 5%만큼 아래로 이동
-        
-        val animator = ObjectAnimator.ofFloat(panel, "translationY", endPosition)
-        animator.duration = 300
-        animator.interpolator = AccelerateDecelerateInterpolator()
-        animator.start()
-        
-        // 애니메이션 종료 후 패널 숨기기
-        animator.addListener(object : android.animation.AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: android.animation.Animator) {
-                panel.visibility = View.GONE
-            }
-        })
-        
-        if (currentOpenPanel == panel) {
-            currentOpenPanel = null
-        }
-    }
-    
-    private fun setupAttackUpgradeButtons(view: View) {
-        val btnUpgradeDamage = view.findViewById<Button>(R.id.btnUpgradeDamage)
-        val btnUpgradeAttackSpeed = view.findViewById<Button>(R.id.btnUpgradeAttackSpeed)
-        val btnUpgradeAttackRange = view.findViewById<Button>(R.id.btnUpgradeAttackRange)
-        
-        // 데미지 업그레이드 버튼
-        btnUpgradeDamage.setOnClickListener {
-            val cost = gameView.getDamageCost()
-            if (gameView.upgradeDamage()) {
-                // 업그레이드 성공
-                messageManager.showSuccess("데미지가 강화되었습니다!")
-                updateGameInfoUI() // 자원 정보 갱신
-                updateUnitStatsUI() // 스탯 정보 갱신
-                updateUpgradeButtonsText() // 모든 버튼 텍스트 갱신
-            } else {
-                // 자원 부족
-                messageManager.showWarning("자원이 부족합니다! (필요: $cost)")
-            }
-        }
-        
-        // 공격속도 업그레이드 버튼
-        btnUpgradeAttackSpeed.setOnClickListener {
-            val cost = gameView.getAttackSpeedCost()
-            if (gameView.upgradeAttackSpeed()) {
-                // 업그레이드 성공
-                messageManager.showSuccess("공격 속도가 강화되었습니다!")
-                updateGameInfoUI() // 자원 정보 갱신
-                updateUnitStatsUI() // 스탯 정보 갱신
-                updateUpgradeButtonsText() // 모든 버튼 텍스트 갱신
-            } else {
-                // 자원 부족
-                messageManager.showWarning("자원이 부족합니다! (필요: $cost)")
-            }
-        }
-        
-        // 공격범위 업그레이드 버튼
-        btnUpgradeAttackRange.setOnClickListener {
-            val cost = gameView.getAttackRangeCost()
-            if (gameView.upgradeAttackRange()) {
-                // 업그레이드 성공
-                messageManager.showSuccess("공격 범위가 강화되었습니다!")
-                updateGameInfoUI() // 자원 정보 갱신
-                updateUnitStatsUI() // 스탯 정보 갱신
-                updateUpgradeButtonsText() // 모든 버튼 텍스트 갱신
-            } else {
-                // 자원 부족
-                messageManager.showWarning("자원이 부족합니다! (필요: $cost)")
-            }
-        }
-    }
-    
-    private fun setupDefenseUpgradeButtons(view: View) {
-        val defenseUpgrade1 = view.findViewById<Button>(R.id.defenseUpgrade1)
-        val defenseUpgrade2 = view.findViewById<Button>(R.id.defenseUpgrade2)
-        val defenseUpgrade3 = view.findViewById<Button>(R.id.defenseUpgrade3)
-        
-        defenseUpgrade1.setOnClickListener {
-            val cost = gameView.getDefenseCost()
-            if (gameView.upgradeDefense()) {
-                // 업그레이드 성공
-                messageManager.showSuccess("체력이 강화되었습니다!")
-                updateGameInfoUI() // 자원 정보 갱신
-                updateUnitStatsUI() // 스탯 정보 갱신
-                updateUpgradeButtonsText() // 모든 버튼 텍스트 갱신
-            } else {
-                // 자원 부족
-                messageManager.showWarning("자원이 부족합니다! (필요: $cost)")
-            }
-        }
-        
-        // 다른 버튼들은 아직 구현하지 않음
-        defenseUpgrade2.setOnClickListener {
-            // 준비 중인 기능
-            messageManager.showInfo("준비 중인 기능입니다.")
-        }
-        
-        defenseUpgrade3.setOnClickListener {
-            // 준비 중인 기능
-            messageManager.showInfo("준비 중인 기능입니다.")
-        }
-    }
-    
     // 카드 버튼 설정 - 패널에서 직접 포커 카드 기능 처리
     private fun setupCardButtons(view: View) {
         // 포커 카드 매니저 초기화
@@ -572,7 +473,7 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         val cardButton = view?.findViewById<Button>(R.id.cardButton)
         cardButton?.setOnClickListener {
             // 패널 토글 기능 유지
-            togglePanel(view.findViewById(R.id.cardPanel))
+            gameUIHelper.togglePanel(view.findViewById(R.id.cardPanel))
         }
     }
     
@@ -590,103 +491,6 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         gameUIHelper.updateGameInfoUI()
     }
     
-    // UI 업데이트 관련 메서드들을 GameUIHelper로 위임 (private)
-    private fun updateBuffUI() {
-        gameUIHelper.updateBuffUI()
-    }
-    
-    private fun updateUnitStatsUI() {
-        gameUIHelper.updateUnitStatsUI()
-    }
-    
-    private fun updateEnemyStatsUI() {
-        gameUIHelper.updateEnemyStatsUI()
-    }
-    
-    private fun updateBossStatsUI() {
-        gameUIHelper.updateBossStatsUI()
-    }
-    
-    private fun updateCoinUI() {
-        gameUIHelper.updateCoinUI()
-    }
-    
-    // 모든 업그레이드 버튼 텍스트 업데이트
-    private fun updateUpgradeButtonsText() {
-        if (!::gameView.isInitialized || !isAdded) return
-        
-        // 업그레이드 버튼 활성화 상태를 위한 설정 제거 (모든 문양에서 업그레이드 가능)
-        // val isSpadeSymbol = gameView.getDefenseUnit()?.getSymbolType() == CardSymbolType.SPADE
-        
-        // 데미지 업그레이드 버튼
-        val btnUpgradeDamage = view?.findViewById<Button>(R.id.btnUpgradeDamage)
-        if (btnUpgradeDamage != null) {
-            val damageLevel = gameView.getDamageLevel()
-            if (damageLevel >= GameConfig.DAMAGE_UPGRADE_MAX_LEVEL) {
-                btnUpgradeDamage.text = "데미지\n최대 레벨\n(Lv.${damageLevel}/${GameConfig.DAMAGE_UPGRADE_MAX_LEVEL})"
-                btnUpgradeDamage.isEnabled = false
-            } else {
-                btnUpgradeDamage.text = "데미지 +${GameConfig.DAMAGE_UPGRADE_VALUE}\n💰 ${gameView.getDamageCost()} 자원\n(Lv.${damageLevel}/${GameConfig.DAMAGE_UPGRADE_MAX_LEVEL})"
-                btnUpgradeDamage.isEnabled = true // 모든 문양에서 업그레이드 가능
-            }
-        }
-        
-        // 공격속도 업그레이드 버튼
-        val btnUpgradeAttackSpeed = view?.findViewById<Button>(R.id.btnUpgradeAttackSpeed)
-        if (btnUpgradeAttackSpeed != null) {
-            val attackSpeedLevel = gameView.getAttackSpeedLevel()
-            if (attackSpeedLevel >= GameConfig.ATTACK_SPEED_UPGRADE_MAX_LEVEL) {
-                btnUpgradeAttackSpeed.text = "공격속도\n최대 레벨\n(Lv.${attackSpeedLevel}/${GameConfig.ATTACK_SPEED_UPGRADE_MAX_LEVEL})"
-                btnUpgradeAttackSpeed.isEnabled = false
-            } else {
-                // 현재 공격속도에 따라 다른 감소량 표시
-                val currentAttackSpeed = gameView.getUnitAttackSpeed().toLong()
-                val decreaseAmount = when {
-                    currentAttackSpeed > GameConfig.ATTACK_SPEED_TIER1_THRESHOLD -> GameConfig.ATTACK_SPEED_DECREASE_TIER1
-                    currentAttackSpeed > GameConfig.ATTACK_SPEED_TIER2_THRESHOLD -> GameConfig.ATTACK_SPEED_DECREASE_TIER2
-                    currentAttackSpeed > GameConfig.ATTACK_SPEED_TIER3_THRESHOLD -> GameConfig.ATTACK_SPEED_DECREASE_TIER3
-                    else -> 0L
-                }
-                
-                btnUpgradeAttackSpeed.text = "공격속도 -${decreaseAmount}ms\n💰 ${gameView.getAttackSpeedCost()} 자원\n(Lv.${attackSpeedLevel}/${GameConfig.ATTACK_SPEED_UPGRADE_MAX_LEVEL})"
-                btnUpgradeAttackSpeed.isEnabled = true // 모든 문양에서 업그레이드 가능
-            }
-        }
-        
-        // 공격범위 업그레이드 버튼
-        val btnUpgradeAttackRange = view?.findViewById<Button>(R.id.btnUpgradeAttackRange)
-        if (btnUpgradeAttackRange != null) {
-            val attackRangeLevel = gameView.getAttackRangeLevel()
-            if (attackRangeLevel >= GameConfig.ATTACK_RANGE_UPGRADE_MAX_LEVEL) {
-                btnUpgradeAttackRange.text = "공격범위\n최대 레벨\n(Lv.${attackRangeLevel}/${GameConfig.ATTACK_RANGE_UPGRADE_MAX_LEVEL})"
-                btnUpgradeAttackRange.isEnabled = false
-            } else {
-                btnUpgradeAttackRange.text = "공격범위 +${GameConfig.ATTACK_RANGE_UPGRADE_VALUE.toInt()}\n💰 ${gameView.getAttackRangeCost()} 자원\n(Lv.${attackRangeLevel}/${GameConfig.ATTACK_RANGE_UPGRADE_MAX_LEVEL})"
-                btnUpgradeAttackRange.isEnabled = true // 모든 문양에서 업그레이드 가능
-            }
-        }
-        
-        // 방어력 업그레이드 버튼
-        val defenseUpgrade1 = view?.findViewById<Button>(R.id.defenseUpgrade1)
-        if (defenseUpgrade1 != null) {
-            val defenseLevel = gameView.getDefenseLevel()
-            if (defenseLevel >= GameConfig.DEFENSE_UPGRADE_MAX_LEVEL) {
-                defenseUpgrade1.text = "체력\n최대 레벨\n(Lv.${defenseLevel}/${GameConfig.DEFENSE_UPGRADE_MAX_LEVEL})"
-                defenseUpgrade1.isEnabled = false
-            } else {
-                defenseUpgrade1.text = "체력 +${GameConfig.DEFENSE_UPGRADE_VALUE}\n💰 ${gameView.getDefenseCost()} 자원\n(Lv.${defenseLevel}/${GameConfig.DEFENSE_UPGRADE_MAX_LEVEL})"
-                defenseUpgrade1.isEnabled = true // 모든 문양에서 업그레이드 가능
-            }
-        }
-        
-        // 준비 중인 기능 버튼 텍스트 업데이트
-        val defenseUpgrade2 = view?.findViewById<Button>(R.id.defenseUpgrade2)
-        defenseUpgrade2?.text = "방어력\n(v2.0 추가 예정)"
-        
-        val defenseUpgrade3 = view?.findViewById<Button>(R.id.defenseUpgrade3)
-        defenseUpgrade3?.text = "쿨타임\n(v2.0 추가 예정)"
-    }
-    
     // 게임 종료 처리
     fun exitGame() {
         // 게임 중지
@@ -701,7 +505,7 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         if (!isPaused) {
             isPaused = true
             gameView.pause()
-            showPauseDialog()
+            gameDialogManager.showPauseDialog(isPaused, uiUpdateRunnable, handler)
         }
     }
     
@@ -709,140 +513,7 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
     override fun onGameOver(resource: Int, waveCount: Int) {
         if (!isAdded || requireActivity().isFinishing) return
         
-        val dialog = Dialog(requireContext())
-        dialog.setContentView(R.layout.dialog_game_over)
-        
-        // 점수와 웨이브 표시
-        val tvGameOverScore = dialog.findViewById<TextView>(R.id.tvGameOverScore)
-        val tvGameOverWave = dialog.findViewById<TextView>(R.id.tvGameOverWave)
-        
-        tvGameOverScore.text = "최종 자원: $resource"
-        tvGameOverWave.text = "도달한 웨이브: $waveCount"
-        
-        // 코인 관련 텍스트뷰 - 획득한 코인 표시
-        val tvGameOverCoins = dialog.findViewById<TextView>(R.id.tvGameOverCoins)
-        tvGameOverCoins.text = "획득한 코인: $earnedCoins"
-        
-        // 종료 버튼 - 앱 종료
-        val btnExit = dialog.findViewById<Button>(R.id.btnExit)
-        btnExit.setOnClickListener {
-            dialog.dismiss()
-            requireActivity().finish()
-        }
-        
-        // 메인 메뉴 버튼
-        val btnMainMenu = dialog.findViewById<Button>(R.id.btnMainMenu)
-        btnMainMenu.setOnClickListener {
-            dialog.dismiss()
-            cleanupGameResources()
-            findNavController().navigate(R.id.action_gameFragment_to_mainMenuFragment)
-        }
-        
-        dialog.setCancelable(false)
-        
-        // 프래그먼트가 분리될 때 다이얼로그 닫기
-        viewLifecycleOwner.lifecycle.addObserver(object : androidx.lifecycle.LifecycleEventObserver {
-            override fun onStateChanged(source: androidx.lifecycle.LifecycleOwner, event: androidx.lifecycle.Lifecycle.Event) {
-                if (event == androidx.lifecycle.Lifecycle.Event.ON_DESTROY) {
-                    if (dialog.isShowing) {
-                        dialog.dismiss()
-                    }
-                }
-            }
-        })
-        
-        dialog.show()
-    }
-
-    // 일시정지 다이얼로그 표시
-    private fun showPauseDialog() {
-        // 다이얼로그 생성
-        val dialog = Dialog(requireContext())
-        
-        // 레이아웃 설정
-        dialog.setContentView(R.layout.dialog_pause_menu)
-        dialog.setCancelable(false)
-        
-        // 버튼 설정
-        // 1. 게임 계속하기 버튼
-        val btnResume = dialog.findViewById<Button>(R.id.btnResume)
-        btnResume.setOnClickListener {
-            dialog.dismiss()
-            
-            // 게임 재개
-            isPaused = false
-            gameView.resume()
-            handler.post(uiUpdateRunnable)
-        }
-        
-        // 2. 끝내기 버튼 (게임 오버로 처리)
-        val btnExitGame = dialog.findViewById<Button>(R.id.btnExitGame)
-        btnExitGame.setOnClickListener {
-            dialog.dismiss()
-            
-            // 게임 리소스 정리
-            cleanupGameResources()
-            
-            // 현재 웨이브와 자원 정보를 활용하여 게임 오버 처리
-            val currentResource = gameView.getResource()
-            val currentWave = gameView.getWaveCount()
-            onGameOver(currentResource, currentWave)
-        }
-        
-        // 다이얼로그 표시
-        dialog.show()
-    }
-
-    // 게임 리소스 정리 메서드
-    private fun cleanupGameResources() {
-        // 게임 일시정지
-        gameView.pause()
-        
-        // UI 업데이트 중지
-        handler.removeCallbacks(uiUpdateRunnable)
-        
-        // 포커 카드 매니저 정리
-        if (::pokerCardManager.isInitialized) {
-            pokerCardManager.cancelPendingOperations()
-        }
-        
-        // 플러시 스킬 매니저 정리
-        if (::flushSkillManager.isInitialized) {
-            flushSkillManager.resetAllSkills()
-        }
-        
-        // 메시지 매니저 정리
-        if (::messageManager.isInitialized) {
-            messageManager.clear()
-        }
-        
-        // 게임뷰 정리
-        if (::gameView.isInitialized) {
-            gameView.cleanup()
-        }
-    }
-
-    // UI 업데이트 시작하는 함수
-    private fun startUiUpdates() {
-        handler.post(uiUpdateRunnable)
-    }
-
-    // 코인 획득
-    private fun addCoins(amount: Int) {
-        userManager.addCoin(amount)
-        updateCoinUI()
-    }
-
-    // 코인 사용
-    private fun useCoins(amount: Int): Boolean {
-        return if (userManager.getCoin() >= amount) {
-            userManager.addCoin(-amount)
-            updateCoinUI()
-            true
-        } else {
-            messageManager.showWarning("코인이 부족합니다!")
-            false
-        }
+        gameDialogManager.onGameOver(resource, waveCount)
     }
 
     // setupGameMenu 함수 추가 (pauseButton과 exitButton 설정 코드)
@@ -856,7 +527,7 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
             handler.removeCallbacks(uiUpdateRunnable)
             
             // 일시정지 메뉴 보여주기
-            showPauseDialog()
+            gameDialogManager.showPauseDialog(isPaused, uiUpdateRunnable, handler)
         }
     }
 
@@ -888,10 +559,6 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         
         // 나중에 필요한 경우 여기에 추가 애니메이션 초기화 코드를 추가할 수 있습니다.
         // 예: 회전 애니메이션 속도 조절, 특수 효과 설정 등
-        
-        // GameView에 디펜스 유닛의 애니메이션 스타일 설정
-        // 실제 구현에서는 GameView에 해당 메서드를 추가해야 합니다.
-        // gameView.setDefenseUnitAnimationStyle(GameView.ANIMATION_STYLE_CARD)
     }
 
     /**
@@ -900,10 +567,10 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
      */
     override fun onSymbolChanged(symbolType: CardSymbolType) {
         // 문양 변경 후 UI 즉시 업데이트
-        updateUnitStatsUI()
+        gameUIHelper.updateUnitStatsUI()
         
         // 업그레이드 버튼 상태 업데이트
-        updateUpgradeButtonsText()
+        upgradeManager.updateUpgradeButtonsText()
         
         // 문양 타입에 따른 효과 메시지 표시
         when (symbolType) {
@@ -937,76 +604,37 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         
         // UI 스레드에서 실행하기 위해 Handler 사용
         Handler(Looper.getMainLooper()).post {
-            // 게임 일시 정지
-            gameView.pause()
-            
-            // 레벨 클리어 보상 (1단계 난이도 클리어 시 500 코인)
-            val levelClearReward = 500
-            
-            // 코인 보상 지급
-            userManager.addCoin(levelClearReward)
-            earnedCoins += levelClearReward
-            
-            // 레벨 클리어 다이얼로그 표시
-            val dialog = Dialog(requireContext())
-            dialog.setContentView(R.layout.dialog_level_clear)
-            dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
-            
-            // 텍스트 설정
-            val tvLevelTitle = dialog.findViewById<TextView>(R.id.tvLevelTitle)
-            val tvClearedWaves = dialog.findViewById<TextView>(R.id.tvClearedWaves)
-            val tvRewardCoins = dialog.findViewById<TextView>(R.id.tvRewardCoins)
-            
-            tvLevelTitle.text = "1단계 난이도"
-            tvClearedWaves.text = "$wave 웨이브 클리어!"
-            tvRewardCoins.text = "$levelClearReward 코인"
-            
-            // 메인화면으로 버튼
-            val btnToMainMenu = dialog.findViewById<Button>(R.id.btnToMainMenu)
-            btnToMainMenu.setOnClickListener {
-                dialog.dismiss()
-                cleanupGameResources()
-                findNavController().navigate(R.id.action_gameFragment_to_mainMenuFragment)
-            }
-            
-            // 다시 도전 버튼
-            val btnPlayAgain = dialog.findViewById<Button>(R.id.btnPlayAgain)
-            btnPlayAgain.setOnClickListener {
-                dialog.dismiss()
-                // 게임 리셋 및 재시작
-                resetAndRestartGame()
-            }
-            
-            dialog.setCancelable(false)
-            dialog.show()
-            
-            // 통계 업데이트 - 게임 클리어 횟수 증가
-            statsManager.incrementGamesCompleted()
+            gameDialogManager.showLevelClearedDialog(wave, score)
         }
     }
 
-    /**
-     * 게임 리셋 및 재시작
-     */
-    private fun resetAndRestartGame() {
-        // 이전 게임 자원 정리
-        cleanupGameResources()
+    // 게임 리소스 정리 메서드
+    private fun cleanupGameResources() {
+        // 게임 일시정지
+        gameView.pause()
         
-        // 게임 상태 초기화
-        gameConfig = GameConfig.getDefaultConfig() // 기본 설정으로 리셋
-        gameView.resetGame(gameConfig)
+        // UI 업데이트 중지
+        handler.removeCallbacks(uiUpdateRunnable)
         
-        // 획득한 코인 초기화
-        earnedCoins = 0
+        // 포커 카드 매니저 정리
+        if (::pokerCardManager.isInitialized) {
+            pokerCardManager.cancelPendingOperations()
+        }
         
-        // 게임 시작
-        gameView.resumeGame()
+        // 플러시 스킬 매니저 정리
+        if (::flushSkillManager.isInitialized) {
+            flushSkillManager.resetAllSkills()
+        }
         
-        // 통계 업데이트 - 게임 시작 횟수 증가
-        statsManager.incrementGamesStarted()
+        // 메시지 매니저 정리
+        if (::messageManager.isInitialized) {
+            messageManager.clear()
+        }
         
-        // 안내 메시지
-        messageManager.showInfo("새 게임이 시작되었습니다!")
+        // 게임뷰 정리
+        if (::gameView.isInitialized) {
+            gameView.cleanup()
+        }
     }
 
     override fun onResume() {
