@@ -42,56 +42,19 @@ class DefenseUnitTabFragment : Fragment() {
         // UserManager 초기화
         userManager = UserManager.getInstance(requireContext())
         
-        // 안내 텍스트 추가 - 최대 3개까지 적용 가능하다는 설명
-        val infoTextView = TextView(requireContext()).apply {
-            text = "※ 디펜스유닛은 최대 3개까지 동시에 적용 가능합니다."
-            textSize = 12f // 텍스트 크기 줄임
-            setTextColor(Color.YELLOW)
-            layoutParams = ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-            setPadding(16, 8, 16, 8) // 패딩 조정
-            gravity = Gravity.CENTER
-            id = View.generateViewId()
-            
-            // 배경색 설정
-            setBackgroundColor(Color.parseColor("#33000000")) // 반투명 검은색 배경
-        }
-        
-        // 레이아웃에 안내 텍스트 추가
-        val constraintLayout = view as ConstraintLayout
-        val recyclerView = view.findViewById<RecyclerView>(R.id.rvShopItems)
-        
-        // RecyclerView 위에 텍스트뷰 추가
-        constraintLayout.addView(infoTextView)
-        
-        // ConstraintSet을 사용하여 텍스트뷰 위치 설정
-        val constraintSet = ConstraintSet()
-        constraintSet.clone(constraintLayout)
-        
-        // 텍스트뷰를 상단에 배치
-        constraintSet.connect(infoTextView.id, ConstraintSet.TOP, constraintLayout.id, ConstraintSet.TOP, 8) // 상단 마진 추가
-        constraintSet.connect(infoTextView.id, ConstraintSet.START, constraintLayout.id, ConstraintSet.START)
-        constraintSet.connect(infoTextView.id, ConstraintSet.END, constraintLayout.id, ConstraintSet.END)
-        
-        // RecyclerView 제약 변경 - 텍스트뷰 아래에 배치
-        constraintSet.connect(recyclerView.id, ConstraintSet.TOP, infoTextView.id, ConstraintSet.BOTTOM, 8) // 간격 추가
-        constraintSet.connect(recyclerView.id, ConstraintSet.BOTTOM, constraintLayout.id, ConstraintSet.BOTTOM)
-        constraintSet.connect(recyclerView.id, ConstraintSet.START, constraintLayout.id, ConstraintSet.START)
-        constraintSet.connect(recyclerView.id, ConstraintSet.END, constraintLayout.id, ConstraintSet.END)
-        
-        // RecyclerView 패딩 설정
-        recyclerView.setPadding(8, 8, 8, 8) // RecyclerView에 패딩 추가
-        
-        // 제약 적용
-        constraintSet.applyTo(constraintLayout)
-        
         // 리사이클러뷰 설정
+        val recyclerView = view.findViewById<RecyclerView>(R.id.rvShopItems)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         
         // 빈 메시지 숨기기
         view.findViewById<TextView>(R.id.tvEmptyMessage)?.visibility = View.GONE
+        
+        // 안내 메시지 표시 (레이아웃의 기존 tvInfoMessage 사용)
+        val infoTextView = view.findViewById<TextView>(R.id.tvInfoMessage)
+        infoTextView?.apply {
+            text = "※ 디펜스유닛은 최대 3개까지 동시에 적용 가능합니다."
+            visibility = View.VISIBLE
+        }
         
         // 유닛 데이터 초기화
         initDefenseUnits()

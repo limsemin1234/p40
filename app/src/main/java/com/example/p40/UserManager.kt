@@ -196,7 +196,7 @@ class UserManager private constructor(private val context: Context) {
             return false
         }
         
-        // 적용할 유닛 추가
+        // 적용할 유닛 추가 - 새 유닛은 맨 뒤에 추가
         appliedUnits.add(symbolTypeOrdinal)
         
         // 저장
