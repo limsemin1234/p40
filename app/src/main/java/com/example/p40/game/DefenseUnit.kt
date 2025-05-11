@@ -45,6 +45,18 @@ data class ShopDefenseUnit(
         fun getDefaultDefenseUnits(): List<ShopDefenseUnit> {
             return listOf(
                 ShopDefenseUnit(
+                    id = 0,
+                    name = "스페이드 유닛",
+                    description = "기본 유닛: 밸런스가 잘 맞춰진 기본형 유닛입니다.",
+                    price = 0,
+                    damage = 10,
+                    range = 3,
+                    attackSpeed = 1.0f,
+                    symbolType = CardSymbolType.SPADE,
+                    isNew = false,
+                    isPurchased = true // 처음부터 구매된 상태
+                ),
+                ShopDefenseUnit(
                     id = 1,
                     name = "하트 유닛",
                     description = "단점: 공격력이 -50%, 장점: 타격당 1씩 체력회복",

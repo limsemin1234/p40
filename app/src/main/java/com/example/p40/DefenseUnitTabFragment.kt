@@ -79,7 +79,10 @@ class DefenseUnitTabFragment : Fragment() {
         
         // 이미 구매한 유닛 확인
         for (unit in defenseUnits) {
-            if (userManager.hasDefenseUnit(unit.id)) {
+            // 스페이드 유닛(id=0)은 항상 구매된 상태로 설정
+            if (unit.id == 0) {
+                unit.isPurchased = true
+            } else if (userManager.hasDefenseUnit(unit.id)) {
                 unit.isPurchased = true
             }
         }

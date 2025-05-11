@@ -92,7 +92,7 @@ class DefenseUnitAdapter(
             
             // 구매 버튼 상태 설정
             if (unit.isPurchased) {
-                btnBuyUnit.text = "구매완료"
+                btnBuyUnit.text = if (unit.id == 0) "기본 보유" else "구매완료"
                 btnBuyUnit.isEnabled = false
                 btnBuyUnit.alpha = 0.5f
             } else {

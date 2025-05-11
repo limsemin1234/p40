@@ -16,6 +16,18 @@ class UserManager private constructor(private val context: Context) {
     private val prefs: SharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
     private val gson = Gson()
     
+    init {
+        // 스페이드 유닛이 기본으로 구매되어 있는지 확인하고 없으면 추가
+        if (!hasDefenseUnit(0)) {
+            addPurchasedDefenseUnit(0)
+        }
+        
+        // 적용된 유닛이 없으면 스페이드 유닛을 적용
+        if (getAppliedDefenseUnits().isEmpty() || getAppliedDefenseUnits() == listOf(0)) {
+            setAppliedDefenseUnit(0) // 스페이드 적용
+        }
+    }
+    
     // 유저의 현재 코인
     fun getCoin(): Int {
         return prefs.getInt(KEY_COIN, DEFAULT_COIN)
@@ -307,8 +319,9 @@ class UserManager private constructor(private val context: Context) {
         prefs.edit()
             .putInt(KEY_COIN, DEFAULT_COIN)
             .putString(KEY_PURCHASED_CARDS, "[]")
-            .putString(KEY_PURCHASED_DEFENSE_UNITS, "[]")
+            .putString(KEY_PURCHASED_DEFENSE_UNITS, "[0]") // 스페이드 유닛은 기본 구매 상태
             .putInt(KEY_APPLIED_DEFENSE_UNIT, 0) // SPADE
+            .putString(KEY_APPLIED_DEFENSE_UNITS, "[0]") // 스페이드 유닛 적용 상태
             .putBoolean(KEY_PREMIUM, false) // 프리미엄 상태도 초기화
             .apply()
     }
