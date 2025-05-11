@@ -67,6 +67,15 @@ class GameLogic(
             attackCooldown = gameStats.getUnitAttackSpeed()
         )
         
+        // 사용자가 설정한 유닛 문양 적용 (첫 번째 적용된 유닛 기준)
+        val userManager = UserManager.getInstance(context)
+        val appliedUnits = userManager.getAppliedDefenseUnits()
+        if (appliedUnits.isNotEmpty()) {
+            val symbolTypeOrdinal = appliedUnits[0] // 첫 번째 적용된 유닛의 문양 가져오기
+            val symbolType = CardSymbolType.values()[symbolTypeOrdinal]
+            defenseUnit.setSymbolType(symbolType) // 디펜스 유닛에 문양 설정
+        }
+        
         gameStartTime = System.currentTimeMillis()
         isRunning = true
         isGameOver = false
@@ -269,6 +278,15 @@ class GameLogic(
         if (this::defenseUnit.isInitialized) {
             defenseUnit.setAttackRange(gameStats.getUnitAttackRange())
             defenseUnit.setAttackCooldown(gameStats.getUnitAttackSpeed())
+            
+            // 사용자가 설정한 유닛 문양 적용 (첫 번째 적용된 유닛 기준)
+            val userManager = UserManager.getInstance(context)
+            val appliedUnits = userManager.getAppliedDefenseUnits()
+            if (appliedUnits.isNotEmpty()) {
+                val symbolTypeOrdinal = appliedUnits[0] // 첫 번째 적용된 유닛의 문양 가져오기
+                val symbolType = CardSymbolType.values()[symbolTypeOrdinal]
+                defenseUnit.setSymbolType(symbolType) // 디펜스 유닛에 문양 설정
+            }
         }
     }
     
