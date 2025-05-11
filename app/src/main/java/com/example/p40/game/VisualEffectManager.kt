@@ -86,11 +86,14 @@ class VisualEffectManager(
         // 오버레이 제거 (기존에 있는 경우)
         clearEffects()
         
-        // 검은색 오버레이 생성 및 추가
-        createOverlay(Color.parseColor("#33000000")) // 반투명 검은색
+        // 오버레이 색상을 푸른색 계열로 변경
+        createOverlay(Color.parseColor("#334169E1")) // 반투명 로얄 블루
         
         // 스페이드 아이콘 추가
         val spadeIcon = createEffectIcon(R.drawable.spade_effect)
+        
+        // 아이콘에 밝은 색 테두리 설정
+        spadeIcon.setColorFilter(Color.parseColor("#B0E0E6")) // 파우더 블루 색상 필터 적용
         
         // 스페이드가 회전하며 확대되는 애니메이션
         val rotateAnimation = RotateAnimation(
