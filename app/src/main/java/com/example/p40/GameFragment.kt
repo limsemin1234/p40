@@ -118,6 +118,9 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         // StatsManager 초기화
         statsManager = StatsManager.getInstance(requireContext())
         
+        // 게임 시작 시 현재 코인 값 저장 (게임 중 획득한 코인 계산용)
+        statsManager.setInitialGameCoins(userManager.getCoin())
+        
         // 게임 시작 시 획득 코인 초기화
         earnedCoins = 0
         
@@ -513,6 +516,10 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
     override fun onGameOver(resource: Int, waveCount: Int) {
         if (!isAdded || requireActivity().isFinishing) return
         
+        // 게임 오버 시 획득한 코인 정보 설정
+        gameDialogManager.setEarnedCoins(earnedCoins)
+        
+        // 게임 오버 다이얼로그 표시
         gameDialogManager.onGameOver(resource, waveCount)
     }
 

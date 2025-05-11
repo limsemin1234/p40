@@ -36,6 +36,26 @@ class GameStats(
     private val gameConfig: GameConfig,
     private val context: Context
 ) {
+    // 싱글톤 구현
+    companion object {
+        @Volatile
+        private var instance: GameStats? = null
+        
+        fun initialize(gameConfig: GameConfig, context: Context) {
+            if (instance == null) {
+                synchronized(this) {
+                    if (instance == null) {
+                        instance = GameStats(gameConfig, context)
+                    }
+                }
+            }
+        }
+        
+        fun getInstance(): GameStats {
+            return instance ?: throw IllegalStateException("GameStats 클래스가 초기화되지 않았습니다. initialize()를 먼저 호출하세요.")
+        }
+    }
+    
     // 게임 상태
     private var resource = 0
     private var waveCount = 1

@@ -97,6 +97,23 @@ class GameDialogManager(
             // 현재 웨이브와 자원 정보를 활용하여 게임 오버 처리
             val currentResource = gameView.getResource()
             val currentWave = gameView.getWaveCount()
+            
+            // 현재 획득한 코인 정보를 가져오기 (GameUIHelper에서 표시하는 코인 값)
+            val tvCoinInfo = userManager.getCoin()
+            val previousCoin = try {
+                // UserManager에 저장된 이전 코인 값과의 차이를 계산
+                val gameStartTotalCoins = statsManager.getInitialGameCoins()
+                val earnedInGame = tvCoinInfo - gameStartTotalCoins
+                if (earnedInGame > 0) earnedInGame else earnedCoins
+            } catch (e: Exception) {
+                // 예외 발생 시 기존 earnedCoins 값 사용
+                earnedCoins
+            }
+            
+            // 획득한 코인 설정
+            setEarnedCoins(previousCoin)
+            
+            // 게임 오버 다이얼로그 표시
             onGameOver(currentResource, currentWave)
         }
         

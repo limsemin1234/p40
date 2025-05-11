@@ -444,17 +444,230 @@ class DefenseUnit(
     }
     
     /**
-     * 디펜스 유닛 공격 범위 그리기
+     * 디펜스 유닛 그리기
+     * @param canvas 그릴 캔버스 객체
      */
-    fun drawAttackRange(canvas: Canvas) {
-        // 공격 범위 원 그리기
-        val rangePaint = android.graphics.Paint().apply {
-            color = android.graphics.Color.argb(80, 100, 180, 255) // 반투명 파란색
-            style = android.graphics.Paint.Style.STROKE
-            strokeWidth = 2f
+    fun draw(canvas: Canvas) {
+        val unitPaint = android.graphics.Paint().apply {
+            color = when (symbolType) {
+                CardSymbolType.SPADE -> android.graphics.Color.BLUE
+                CardSymbolType.HEART -> android.graphics.Color.RED
+                CardSymbolType.DIAMOND -> android.graphics.Color.CYAN
+                CardSymbolType.CLUB -> android.graphics.Color.GREEN
+            }
+            style = android.graphics.Paint.Style.FILL
         }
         
-        // 실제 공격 범위 원
-        canvas.drawCircle(position.x, position.y, _attackRange, rangePaint)
+        // 유닛 테두리 페인트
+        val strokePaint = android.graphics.Paint().apply {
+            color = android.graphics.Color.WHITE
+            style = android.graphics.Paint.Style.STROKE
+            strokeWidth = 3f
+        }
+        
+        // 유닛을 현재 문양에 맞게 그리기
+        when (symbolType) {
+            CardSymbolType.SPADE -> {
+                // 스페이드 모양의 카드로 표현
+                val cardWidth = GameConfig.DEFENSE_UNIT_SIZE * 2.0f
+                val cardHeight = GameConfig.DEFENSE_UNIT_SIZE * 2.5f
+                
+                // 카드 배경
+                val cardBgPaint = android.graphics.Paint().apply {
+                    color = android.graphics.Color.TRANSPARENT
+                    style = android.graphics.Paint.Style.FILL
+                }
+                val cardRect = android.graphics.RectF(
+                    position.x - cardWidth / 2,
+                    position.y - cardHeight / 2,
+                    position.x + cardWidth / 2,
+                    position.y + cardHeight / 2
+                )
+                canvas.drawRoundRect(cardRect, 8f, 8f, cardBgPaint)
+                
+                // 카드 테두리
+                val cardBorderPaint = android.graphics.Paint().apply {
+                    color = android.graphics.Color.rgb(255, 215, 0) // 황금색 테두리
+                    style = android.graphics.Paint.Style.STROKE
+                    strokeWidth = 2f
+                }
+                canvas.drawRoundRect(cardRect, 8f, 8f, cardBorderPaint)
+                
+                // 스페이드 심볼
+                val spadeSymbolPaint = android.graphics.Paint().apply {
+                    color = android.graphics.Color.BLACK
+                    style = android.graphics.Paint.Style.FILL
+                    textSize = cardWidth * 0.5f
+                    textAlign = android.graphics.Paint.Align.CENTER
+                }
+                canvas.drawText("♠", position.x, position.y + cardWidth * 0.15f, spadeSymbolPaint)
+                
+                // 체력바 그리기
+                drawHealthBar(canvas, position, cardWidth, cardHeight)
+            }
+            CardSymbolType.HEART -> {
+                // 하트 모양의 카드로 표현
+                val cardWidth = GameConfig.DEFENSE_UNIT_SIZE * 2.0f
+                val cardHeight = GameConfig.DEFENSE_UNIT_SIZE * 2.5f
+                
+                // 카드 배경
+                val cardBgPaint = android.graphics.Paint().apply {
+                    color = android.graphics.Color.TRANSPARENT
+                    style = android.graphics.Paint.Style.FILL
+                }
+                val cardRect = android.graphics.RectF(
+                    position.x - cardWidth / 2,
+                    position.y - cardHeight / 2,
+                    position.x + cardWidth / 2,
+                    position.y + cardHeight / 2
+                )
+                canvas.drawRoundRect(cardRect, 8f, 8f, cardBgPaint)
+                
+                // 카드 테두리
+                val cardBorderPaint = android.graphics.Paint().apply {
+                    color = android.graphics.Color.rgb(255, 215, 0) // 황금색 테두리
+                    style = android.graphics.Paint.Style.STROKE
+                    strokeWidth = 2f
+                }
+                canvas.drawRoundRect(cardRect, 8f, 8f, cardBorderPaint)
+                
+                // 하트 심볼
+                val heartSymbolPaint = android.graphics.Paint().apply {
+                    color = android.graphics.Color.RED
+                    style = android.graphics.Paint.Style.FILL
+                    textSize = cardWidth * 0.5f
+                    textAlign = android.graphics.Paint.Align.CENTER
+                }
+                canvas.drawText("♥", position.x, position.y + cardWidth * 0.15f, heartSymbolPaint)
+                
+                // 체력바 그리기
+                drawHealthBar(canvas, position, cardWidth, cardHeight)
+            }
+            CardSymbolType.DIAMOND -> {
+                // 다이아몬드 모양의 카드로 표현
+                val cardWidth = GameConfig.DEFENSE_UNIT_SIZE * 2.0f
+                val cardHeight = GameConfig.DEFENSE_UNIT_SIZE * 2.5f
+                
+                // 카드 배경
+                val cardBgPaint = android.graphics.Paint().apply {
+                    color = android.graphics.Color.TRANSPARENT
+                    style = android.graphics.Paint.Style.FILL
+                }
+                val cardRect = android.graphics.RectF(
+                    position.x - cardWidth / 2,
+                    position.y - cardHeight / 2,
+                    position.x + cardWidth / 2,
+                    position.y + cardHeight / 2
+                )
+                canvas.drawRoundRect(cardRect, 8f, 8f, cardBgPaint)
+                
+                // 카드 테두리
+                val cardBorderPaint = android.graphics.Paint().apply {
+                    color = android.graphics.Color.rgb(255, 215, 0) // 황금색 테두리
+                    style = android.graphics.Paint.Style.STROKE
+                    strokeWidth = 2f
+                }
+                canvas.drawRoundRect(cardRect, 8f, 8f, cardBorderPaint)
+                
+                // 다이아몬드 심볼
+                val diamondSymbolPaint = android.graphics.Paint().apply {
+                    color = android.graphics.Color.RED
+                    style = android.graphics.Paint.Style.FILL
+                    textSize = cardWidth * 0.5f
+                    textAlign = android.graphics.Paint.Align.CENTER
+                }
+                canvas.drawText("♦", position.x, position.y + cardWidth * 0.15f, diamondSymbolPaint)
+                
+                // 체력바 그리기
+                drawHealthBar(canvas, position, cardWidth, cardHeight)
+            }
+            CardSymbolType.CLUB -> {
+                // 클로버 모양의 카드로 표현
+                val cardWidth = GameConfig.DEFENSE_UNIT_SIZE * 2.0f
+                val cardHeight = GameConfig.DEFENSE_UNIT_SIZE * 2.5f
+                
+                // 카드 배경
+                val cardBgPaint = android.graphics.Paint().apply {
+                    color = android.graphics.Color.TRANSPARENT
+                    style = android.graphics.Paint.Style.FILL
+                }
+                val cardRect = android.graphics.RectF(
+                    position.x - cardWidth / 2,
+                    position.y - cardHeight / 2,
+                    position.x + cardWidth / 2,
+                    position.y + cardHeight / 2
+                )
+                canvas.drawRoundRect(cardRect, 8f, 8f, cardBgPaint)
+                
+                // 카드 테두리
+                val cardBorderPaint = android.graphics.Paint().apply {
+                    color = android.graphics.Color.rgb(255, 215, 0) // 황금색 테두리
+                    style = android.graphics.Paint.Style.STROKE
+                    strokeWidth = 2f
+                }
+                canvas.drawRoundRect(cardRect, 8f, 8f, cardBorderPaint)
+                
+                // 클로버 심볼
+                val clubSymbolPaint = android.graphics.Paint().apply {
+                    color = android.graphics.Color.BLACK
+                    style = android.graphics.Paint.Style.FILL
+                    textSize = cardWidth * 0.5f
+                    textAlign = android.graphics.Paint.Align.CENTER
+                }
+                canvas.drawText("♣", position.x, position.y + cardWidth * 0.15f, clubSymbolPaint)
+                
+                // 체력바 그리기
+                drawHealthBar(canvas, position, cardWidth, cardHeight)
+            }
+        }
+    }
+    
+    /**
+     * 체력바 그리기
+     */
+    private fun drawHealthBar(canvas: Canvas, position: PointF, cardWidth: Float, cardHeight: Float) {
+        // GameStats 싱글톤에서 유닛의 현재 체력 정보를 가져옴
+        val gameStats = GameStats.getInstance()
+        val unitHealth = gameStats.getUnitHealth()
+        val unitMaxHealth = gameStats.getUnitMaxHealth()
+        val healthRatio = unitHealth.toFloat() / unitMaxHealth
+        
+        // 체력바 크기와 위치 설정
+        val healthBarWidth = cardWidth * 1.2f
+        val healthBarHeight = 8f
+        val healthBarTop = position.y + cardHeight / 2 + 15f
+        val healthBarLeft = position.x - healthBarWidth / 2
+        
+        // 체력바 배경
+        val bgPaint = android.graphics.Paint().apply { 
+            color = android.graphics.Color.DKGRAY 
+            style = android.graphics.Paint.Style.FILL
+        }
+        
+        // 체력바 
+        val healthPaint = android.graphics.Paint().apply {
+            color = if (healthRatio > 0.5f) android.graphics.Color.GREEN 
+                   else if (healthRatio > 0.25f) android.graphics.Color.YELLOW 
+                   else android.graphics.Color.RED
+            style = android.graphics.Paint.Style.FILL
+        }
+        
+        // 체력바 배경 그리기
+        canvas.drawRect(
+            healthBarLeft, 
+            healthBarTop, 
+            healthBarLeft + healthBarWidth, 
+            healthBarTop + healthBarHeight, 
+            bgPaint
+        )
+        
+        // 체력바 그리기
+        canvas.drawRect(
+            healthBarLeft, 
+            healthBarTop, 
+            healthBarLeft + healthBarWidth * healthRatio, 
+            healthBarTop + healthBarHeight, 
+            healthPaint
+        )
     }
 } 

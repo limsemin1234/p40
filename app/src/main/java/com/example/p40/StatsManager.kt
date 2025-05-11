@@ -21,6 +21,9 @@ class StatsManager private constructor(context: Context) {
         private const val KEY_ATTACK_SPEED_LEVEL = "attack_speed_level"
         private const val KEY_RANGE_LEVEL = "range_level"
         
+        // 게임 시작 시 코인 추적을 위한 키
+        private const val KEY_INITIAL_GAME_COINS = "initial_game_coins"
+        
         // 기본 스탯 값 - GameConfig에서 가져오기
         private val DEFAULT_HEALTH = GameConfig.DEFENSE_UNIT_INITIAL_HEALTH
         private val DEFAULT_ATTACK = GameConfig.MISSILE_DAMAGE
@@ -240,5 +243,21 @@ class StatsManager private constructor(context: Context) {
     
     fun broadcastStatChange(statName: String, statValue: Int) {
         // Implementation of broadcastStatChange method
+    }
+    
+    /**
+     * 게임 시작 시 초기 코인 값 설정
+     * 게임 시작 시 호출되어야 함
+     */
+    fun setInitialGameCoins(coins: Int) {
+        prefs.edit().putInt(KEY_INITIAL_GAME_COINS, coins).apply()
+    }
+    
+    /**
+     * 게임 시작 시 저장한 초기 코인 값 반환
+     * 게임 중 획득한 코인을 계산하는 데 사용됨
+     */
+    fun getInitialGameCoins(): Int {
+        return prefs.getInt(KEY_INITIAL_GAME_COINS, 0)
     }
 } 

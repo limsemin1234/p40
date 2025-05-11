@@ -32,7 +32,7 @@ class MissileManager(
     }
     
     /**
-     * 미사일 업데이트 처리
+     * 미사일 업데이트 처리 - 그리드 기반 최적화 적용
      */
     fun updateMissiles(screenRect: ScreenRect): List<Missile> {
         // 현재 미사일 상태의 스냅샷을 만들어 작업
@@ -45,6 +45,17 @@ class MissileManager(
         }
         
         val farOffScreenMargin = gameConfig.FAR_OFFSCREEN_MARGIN
+        
+        // 화면 그리드 초기화
+        screenRect.clearGrid()
+        
+        // 화면 밖 미사일 처리 최적화를 위한 영역 계산
+        val updateRect = ScreenRect(
+            left = -gameConfig.MISSILE_RENDER_MARGIN_X,
+            top = -gameConfig.MISSILE_RENDER_MARGIN_Y,
+            right = screenWidth + gameConfig.MISSILE_RENDER_MARGIN_X,
+            bottom = screenHeight + gameConfig.MISSILE_RENDER_MARGIN_Y
+        )
         
         for (missile in currentMissiles) {
             val missilePos = missile.getPosition()
@@ -63,8 +74,13 @@ class MissileManager(
                 continue
             }
             
+            // 화면 내부 또는 가까운 범위의 미사일만 그리드에 추가
+            if (updateRect.contains(missilePos.x, missilePos.y)) {
+                screenRect.addObjectToGrid(missile, missilePos, missile.getSize())
+            }
+            
             // 화면 내부 또는 가까운 범위의 미사일만 업데이트
-            if (screenRect.contains(missilePos.x, missilePos.y)) {
+            if (updateRect.contains(missilePos.x, missilePos.y)) {
                 // 항상 원래의 속도로 이동 (웨이브에 관계없이 동일한 속도)
                 missile.update(1.0f)
             }
@@ -79,13 +95,30 @@ class MissileManager(
     }
     
     /**
-     * 미사일 충돌 체크
+     * 미사일 충돌 체크 - 그리드 기반 최적화 적용
      */
-    fun checkMissileCollisions(enemies: List<Enemy>, defenseUnit: DefenseUnit): List<Missile> {
+    fun checkMissileCollisions(enemies: CopyOnWriteArrayList<Enemy>, defenseUnit: DefenseUnit): List<Missile> {
         val deadMissiles = mutableListOf<Missile>()
         
         // 현재 미사일의 스냅샷을 사용
         val currentMissiles = synchronized(missilesLock) { ArrayList(missiles) }
+        
+        // 화면 영역 구성 (충돌 감지용)
+        val collisionGrid = ScreenRect(
+            -gameConfig.FAR_OFFSCREEN_MARGIN,
+            -gameConfig.FAR_OFFSCREEN_MARGIN,
+            screenWidth + gameConfig.FAR_OFFSCREEN_MARGIN,
+            screenHeight + gameConfig.FAR_OFFSCREEN_MARGIN
+        )
+        
+        // 그리드 초기화
+        collisionGrid.clearGrid()
+        
+        // 살아있는 적들만 필터링하고 그리드에 추가
+        val aliveEnemies = enemies.filter { !it.isDead() }
+        for (enemy in aliveEnemies) {
+            collisionGrid.addObjectToGrid(enemy, enemy.getPosition(), enemy.getSize())
+        }
         
         for (missile in currentMissiles) {
             // 이미 죽은 미사일은 스킵
@@ -94,10 +127,19 @@ class MissileManager(
                 continue
             }
             
+            // 미사일 위치 가져오기
+            val missilePos = missile.getPosition()
+            
+            // 그리드 기반 충돌 가능한 적 목록 가져오기
+            val potentialCollisions = collisionGrid.findPotentialCollisions(missilePos, missile.getSize())
+            
             var hasCollided = false
             
-            // 적들과 충돌 체크
-            for (enemy in enemies) {
+            // 충돌 가능한 적들과 충돌 체크
+            for (potentialObj in potentialCollisions) {
+                if (potentialObj !is Enemy) continue
+                
+                val enemy = potentialObj
                 // 죽은 적과는 충돌 체크하지 않음
                 if (enemy.isDead()) continue
                 

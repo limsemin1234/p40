@@ -8,6 +8,7 @@ import kotlin.math.sin
 
 /**
  * 미사일 클래스
+ * 성능 최적화: 공유 페인트 객체 사용, 충돌 감지 최적화, 제곱근 연산 회피
  */
 class Missile(
     private var position: PointF,
@@ -33,6 +34,21 @@ class Missile(
         private fun nextId(): Int {
             return ++idCounter
         }
+        
+        // 미사일 크기별 페인트 캐싱 (다양한 크기의 미사일 지원)
+        private val sizePaintMap = HashMap<Float, Paint>()
+        
+        /**
+         * 크기에 맞는 페인트 객체 반환 (캐싱)
+         */
+        fun getPaintForSize(size: Float): Paint {
+            return sizePaintMap.getOrPut(size) {
+                Paint().apply {
+                    color = GameConfig.MISSILE_COLOR
+                    style = Paint.Style.FILL
+                }
+            }
+        }
     }
     
     private var isDead = false
@@ -40,6 +56,11 @@ class Missile(
     
     // 충돌 범위 제곱값을 미리 계산 (제곱근 연산 최소화)
     private var collisionRadiusSquared = size * size
+    
+    // 충돌 감지용 위치 캐싱
+    private var lastPositionX = 0f
+    private var lastPositionY = 0f
+    private var lastProcessedEnemy: Int = 0 // 마지막 처리한 적의 ID
     
     /**
      * 객체 풀링을 위한 재설정 메서드
@@ -61,6 +82,11 @@ class Missile(
         isDead = false
         deathReason = null
         
+        // 위치 캐싱 초기화
+        lastPositionX = newPosition.x
+        lastPositionY = newPosition.y
+        lastProcessedEnemy = 0
+        
         // 충돌 범위 제곱값 재계산
         collisionRadiusSquared = newSize * newSize
     }
@@ -68,7 +94,7 @@ class Missile(
     /**
      * 미사일 업데이트
      */
-    fun update(speedMultiplier: Float = 1.0f) {
+    fun update(speedMultiplier: Float) {
         // 이미 죽은 미사일이면 업데이트 하지 않음
         if (isDead) return
         
@@ -77,7 +103,9 @@ class Missile(
         position.x += cos(angle).toFloat() * adjustedSpeed
         position.y += sin(angle).toFloat() * adjustedSpeed
         
-        // 화면 밖으로 나가는 것은 GameLogic에서 처리
+        // 위치 캐싱 업데이트
+        lastPositionX = position.x
+        lastPositionY = position.y
     }
     
     /**
@@ -85,7 +113,9 @@ class Missile(
      */
     fun draw(canvas: Canvas) {
         if (!isDead) {
-            canvas.drawCircle(position.x, position.y, size, MISSILE_PAINT)
+            // 크기에 맞는 캐싱된 페인트 객체 사용
+            val paint = getPaintForSize(size)
+            canvas.drawCircle(position.x, position.y, size, paint)
         }
     }
     
@@ -95,22 +125,27 @@ class Missile(
     fun checkCollision(enemy: Enemy): Boolean {
         if (isDead || enemy.isDead()) return false
         
+        // 같은 적과의 중복 충돌 체크 방지
+        val enemyId = enemy.hashCode()
+        if (enemyId == lastProcessedEnemy) return false
+        lastProcessedEnemy = enemyId
+        
         val enemyPos = enemy.getPosition()
         val enemySize = enemy.getSize()
         
         // 거리 계산 최적화 (제곱근 연산 회피)
-        val dx = position.x - enemyPos.x
-        val dy = position.y - enemyPos.y
+        val dx = lastPositionX - enemyPos.x
+        val dy = lastPositionY - enemyPos.y
         val distanceSquared = dx * dx + dy * dy
         
-        // 충돌 범위 계산 (사전 계산된 값이 아닌 실제 충돌 범위 계산)
+        // 총 충돌 반경 제곱 (미사일 반경 + 적 반경)^2
         val totalRadius = size + enemySize
         val totalRadiusSquared = totalRadius * totalRadius
         
         if (distanceSquared < totalRadiusSquared) {
             enemy.takeDamage(damage)
             isDead = true
-            deathReason = "적과 충돌 (ID: ${enemy.hashCode()})"
+            deathReason = "적과 충돌 (ID: $enemyId)"
             return true
         }
         
@@ -128,6 +163,11 @@ class Missile(
     fun getPosition(): PointF = position
     
     /**
+     * 미사일 크기 반환
+     */
+    fun getSize(): Float = size
+    
+    /**
      * 화면 밖으로 나간 미사일 처리
      */
     fun setOutOfBounds() {
@@ -136,12 +176,7 @@ class Missile(
     }
     
     /**
-     * 타겟 정보 반환
-     */
-    fun getTarget(): Enemy? = target
-    
-    /**
-     * 미사일 ID 반환
+     * 미사일의 고유 ID 반환
      */
     fun getId(): Int = id
     

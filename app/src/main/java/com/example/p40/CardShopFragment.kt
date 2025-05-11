@@ -16,6 +16,9 @@ import com.example.p40.game.MessageManager
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import androidx.viewpager2.widget.ViewPager2
+import android.app.Dialog
+import android.view.Window
+import android.widget.Button
 
 class CardShopFragment : Fragment(R.layout.fragment_card_shop) {
 
@@ -74,15 +77,36 @@ class CardShopFragment : Fragment(R.layout.fragment_card_shop) {
             return
         }
         
-        // 구매 확인 다이얼로그
-        AlertDialog.Builder(requireContext())
-            .setTitle("카드 구매")
-            .setMessage("${card.name}을(를) ${card.price} 코인에 구매하시겠습니까?")
-            .setPositiveButton("구매") { _, _ ->
-                purchaseCard(card)
-            }
-            .setNegativeButton("취소", null)
-            .show()
+        // 작은 커스텀 다이얼로그로 구매 확인
+        val dialog = Dialog(requireContext())
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setCancelable(true)
+        dialog.setContentView(R.layout.dialog_small_purchase)
+        
+        // 배경 투명하게 설정
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        
+        // 제목과 메시지 설정
+        val tvTitle = dialog.findViewById<TextView>(R.id.tvTitle)
+        val tvMessage = dialog.findViewById<TextView>(R.id.tvMessage)
+        
+        tvTitle.text = "카드 구매"
+        tvMessage.text = "${card.name}을(를) ${card.price} 코인에 구매하시겠습니까?"
+        
+        // 취소 버튼
+        val btnCancel = dialog.findViewById<Button>(R.id.btnCancel)
+        btnCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+        
+        // 구매 버튼
+        val btnConfirm = dialog.findViewById<Button>(R.id.btnConfirm)
+        btnConfirm.setOnClickListener {
+            purchaseCard(card)
+            dialog.dismiss()
+        }
+        
+        dialog.show()
     }
     
     // 카드 구매 처리

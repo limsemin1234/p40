@@ -82,17 +82,15 @@ class EnemyManager(
     /**
      * 적이 시간 멈춤 범위 내에 있는지 확인
      */
-    fun isEnemyInTimeFrozenRange(enemy: Enemy, centerX: Float, centerY: Float, attackRange: Float): Boolean {
-        if (!rangeBasedTimeFrozen) return false
-        
-        // 적과 방어 유닛 사이의 거리 계산
+    fun isEnemyInTimeFrozenRange(enemy: Enemy, centerX: Float, centerY: Float, range: Float): Boolean {
         val enemyPos = enemy.getPosition()
         val dx = enemyPos.x - centerX
         val dy = enemyPos.y - centerY
         val distanceSquared = dx * dx + dy * dy
         
-        // 공격 범위 내에 있는지 확인
-        return distanceSquared <= (attackRange * attackRange)
+        // 제곱 값으로 비교하여 제곱근 연산 회피
+        val rangeSquared = range * range
+        return distanceSquared <= rangeSquared
     }
     
     /**
@@ -228,7 +226,7 @@ class EnemyManager(
     }
     
     /**
-     * 적 업데이트 처리
+     * 적 업데이트 처리 - 그리드 기반 최적화 적용
      */
     fun updateEnemies(screenRect: ScreenRect, centerX: Float, centerY: Float, defenseUnit: DefenseUnit, isGameOver: Boolean): List<Enemy> {
         val deadEnemies = mutableListOf<Enemy>()
@@ -237,6 +235,20 @@ class EnemyManager(
         if (timeFrozen) return deadEnemies
         
         val farOffScreenMargin = gameConfig.FAR_OFFSCREEN_MARGIN
+        
+        // 화면 그리드 초기화
+        screenRect.clearGrid()
+        
+        // 화면 밖 적 처리 최적화를 위한 영역 계산
+        val updateRect = ScreenRect(
+            left = -gameConfig.ENEMY_UPDATE_MARGIN,
+            top = -gameConfig.ENEMY_UPDATE_MARGIN,
+            right = screenWidth + gameConfig.ENEMY_UPDATE_MARGIN,
+            bottom = screenHeight + gameConfig.ENEMY_UPDATE_MARGIN
+        )
+        
+        // 방어 유닛 위치 미리 계산
+        val defenseUnitPos = defenseUnit.getPosition()
         
         for (enemy in enemies) {
             val enemyPos = enemy.getPosition()
@@ -252,13 +264,19 @@ class EnemyManager(
                 continue
             }
             
+            // 화면 그리드에 적 추가
+            if (updateRect.contains(enemyPos.x, enemyPos.y)) {
+                // 화면 근처 또는 내부의 적만 그리드에 추가
+                screenRect.addObjectToGrid(enemy, enemyPos, enemy.getSize())
+            }
+            
             // 화면 안쪽이나 가장자리에 있는 적만 업데이트
-            if (screenRect.contains(enemyPos.x, enemyPos.y)) {
+            if (updateRect.contains(enemyPos.x, enemyPos.y)) {
                 // 범위 기반 시간 멈춤 체크 - 범위 내에 있으면 이동하지 않음
                 val isFrozen = rangeBasedTimeFrozen && isEnemyInTimeFrozenRange(
                     enemy, 
-                    defenseUnit.getPosition().x, 
-                    defenseUnit.getPosition().y,
+                    defenseUnitPos.x, 
+                    defenseUnitPos.y,
                     defenseUnit.attackRange
                 )
                 
@@ -266,19 +284,20 @@ class EnemyManager(
                     // 기본 이동 속도 적용
                     enemy.update(1.0f)
                     
-                    // 적 위치가 변경되었으므로 디펜스 유닛의 캐시 업데이트
+                    // 적 위치가 변경되었으므로 디펜스 유닛의 캐시 업데이트 
                     defenseUnit.updateEnemyPosition(enemy)
                 }
                 
                 // 중앙에 도달했는지 확인
                 val dx = enemyPos.x - centerX
                 val dy = enemyPos.y - centerY
-                val distanceToCenter = kotlin.math.sqrt(dx * dx + dy * dy)
+                val distanceToCenter = dx * dx + dy * dy // 제곱근 연산 회피
+                val centerCollisionRadius = gameConfig.DEFENSE_UNIT_SIZE * gameConfig.DEFENSE_UNIT_SIZE
                 
                 try {
                     // 디펜스 유닛과의 충돌 처리
-                    if (distanceToCenter < gameConfig.DEFENSE_UNIT_SIZE) {
-                        handleEnemyCollision(enemy, dx, dy, distanceToCenter, deadEnemies, defenseUnit, isGameOver)
+                    if (distanceToCenter < centerCollisionRadius) {
+                        handleEnemyCollision(enemy, dx, dy, Math.sqrt(distanceToCenter.toDouble()).toFloat(), deadEnemies, defenseUnit, isGameOver)
                     }
                 } catch (e: Exception) {
                     // 충돌 처리 중 예외 발생 시 적 제거
@@ -455,14 +474,5 @@ class EnemyManager(
         // enemies 목록에서 보스 찾기
         val boss = enemies.find { it.isBoss() && !it.isDead() }
         return boss?.getHealth() ?: 0
-    }
-}
-
-/**
- * 화면 영역 체크를 위한 헬퍼 클래스
- */
-class ScreenRect(val left: Float, val top: Float, val right: Float, val bottom: Float) {
-    fun contains(x: Float, y: Float): Boolean {
-        return x >= left && x <= right && y >= top && y <= bottom
     }
 } 

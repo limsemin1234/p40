@@ -56,8 +56,13 @@ class GameRenderer(
         // 배경 지우기
         canvas.drawColor(Color.BLACK)
         
-        // 디펜스 유닛 공격 범위 표시
-        defenseUnit.drawAttackRange(canvas)
+        // 디펜스 유닛 공격 범위 표시 - 더 명확한 색상과 두께로 항상 표시하도록 변경
+        val rangePaint = Paint().apply {
+            color = Color.argb(100, 100, 180, 255) // 조금 더 진한 반투명 파란색
+            style = Paint.Style.STROKE
+            strokeWidth = 3f // 두께 증가
+        }
+        canvas.drawCircle(screenWidth / 2, screenHeight / 2, defenseUnit.attackRange, rangePaint)
         
         // 중앙에 방어 타워 그리기 - 카드 형태로 변경
         val centerX = screenWidth / 2
@@ -82,11 +87,6 @@ class GameRenderer(
                 pos.y >= -gameConfig.MISSILE_RENDER_MARGIN_Y && pos.y <= screenHeight + gameConfig.MISSILE_RENDER_MARGIN_Y) {
                 missile.draw(canvas)
             }
-        }
-        
-        // 웨이브 시작 메시지 표시
-        if (showWaveMessage) {
-            canvas.drawText("${gameStats.getWaveCount()} WAVE", centerX, centerY - 100, waveMessagePaint)
         }
         
         // 일시정지 상태 표시

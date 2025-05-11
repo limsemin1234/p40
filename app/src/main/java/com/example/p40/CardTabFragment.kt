@@ -77,20 +77,8 @@ class CardTabFragment : Fragment() {
             return
         }
         
-        // 조커 카드인 경우 작은 커스텀 다이얼로그 사용
-        if (card.suit == CardSuit.JOKER) {
-            showSmallPurchaseDialog(card)
-        } else {
-            // 일반 카드는 기존 방식 사용
-            AlertDialog.Builder(requireContext())
-                .setTitle("카드 구매")
-                .setMessage("${card.name}을(를) ${card.price} 코인에 구매하시겠습니까?")
-                .setPositiveButton("구매") { _, _ ->
-                    purchaseCard(card)
-                }
-                .setNegativeButton("취소", null)
-                .show()
-        }
+        // 모든 카드에 대해 작은 커스텀 다이얼로그 사용
+        showSmallPurchaseDialog(card)
     }
     
     // 작은 커스텀 구매 다이얼로그 표시
@@ -107,7 +95,9 @@ class CardTabFragment : Fragment() {
         val tvTitle = dialog.findViewById<TextView>(R.id.tvTitle)
         val tvMessage = dialog.findViewById<TextView>(R.id.tvMessage)
         
-        tvTitle.text = "별 조커 구매"
+        // 카드 종류에 따라 제목 설정
+        val titleText = if (card.suit == CardSuit.JOKER) "별 조커 구매" else "카드 구매"
+        tvTitle.text = titleText
         tvMessage.text = "${card.name}을(를) ${card.price} 코인에 구매하시겠습니까?"
         
         // 취소 버튼

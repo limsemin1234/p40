@@ -37,24 +37,35 @@ object GameConfig {
     const val DEBUG_MODE = false // 디버그 정보 표시 여부
     
     // 테스트 모드 설정
-    const val TEST_ENABLE_ALL_SKILLS = false // 웨이브 시작 시 모든 스킬 활성화 여부
+    const val TEST_ENABLE_ALL_SKILLS = true // 웨이브 시작 시 모든 스킬 활성화 여부
     
     // --------- 성능 및 제한 설정 ----------
     
     // 성능 설정
     const val FRAME_LIMIT = 60 // 최대 FPS
-    const val MAX_ENEMIES = 100 // 화면에 표시되는 최대 적 수
-    const val MAX_MISSILES = 200 // 화면에 표시되는 최대 미사일 수
+    const val MAX_ENEMIES = 150 // 화면에 표시되는 최대 적 수 (증가)
+    const val MAX_MISSILES = 300 // 화면에 표시되는 최대 미사일 수 (증가)
+    const val BACKGROUND_COLOR = Color.BLACK // 배경색
+    
+    // 공간 분할 그리드 설정
+    const val USE_SPATIAL_GRID = true // 공간 분할 그리드 사용 여부
+    const val GRID_SIZE = 4 // 그리드 분할 크기 (4x4)
+    
+    // 객체 풀 설정
+    const val ENEMY_POOL_INITIAL_SIZE = 100 // 적 객체 풀 초기 크기
+    const val ENEMY_POOL_MAX_SIZE = 300 // 적 객체 풀 최대 크기
+    const val MISSILE_POOL_INITIAL_SIZE = 200 // 미사일 객체 풀 초기 크기
+    const val MISSILE_POOL_MAX_SIZE = 500 // 미사일 객체 풀 최대 크기
     
     // 렌더링 영역 설정
-    const val ENEMY_RENDER_MARGIN_X = 300f // 적 렌더링 X축 마진 (화면 밖에서도 그리기 위함)
-    const val ENEMY_RENDER_MARGIN_Y = 300f // 적 렌더링 Y축 마진 (화면 밖에서도 그리기 위함)
+    const val ENEMY_RENDER_MARGIN_X = 500f // 적 렌더링 X축 마진 (화면 밖에서도 그리기 위함)
+    const val ENEMY_RENDER_MARGIN_Y = 500f // 적 렌더링 Y축 마진 (화면 밖에서도 그리기 위함)
     const val MISSILE_RENDER_MARGIN_X = 20f // 미사일 렌더링 X축 마진
     const val MISSILE_RENDER_MARGIN_Y = 20f // 미사일 렌더링 Y축 마진
     const val FAR_OFFSCREEN_MARGIN = 1500f // 적이 제거되는 화면 외부 거리
     const val ENEMY_SPAWN_DISTANCE_FACTOR = 0.5f // 적 생성 거리 계수
     const val BOSS_SPAWN_DISTANCE_FACTOR = 0.5f // 보스 생성 거리 계수 (화면 크기의 비율)
-    const val ENEMY_UPDATE_MARGIN = 200f // 적 생성 거리에 추가되는 여유 공간 (화면 밖 적 업데이트 범위 확장)
+    const val ENEMY_UPDATE_MARGIN = 250f // 적 생성 거리에 추가되는 여유 공간 (화면 밖 적 업데이트 범위 확장)
     
     // --------- UI 및 메시지 설정 ----------
     

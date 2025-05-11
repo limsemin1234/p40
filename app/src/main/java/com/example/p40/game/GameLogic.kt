@@ -109,7 +109,7 @@ class GameLogic(
     }
     
     /**
-     * 게임 업데이트 메인 로직
+     * 게임 로직 업데이트 - 성능 최적화 적용
      */
     fun update() {
         if (isPaused || isGameOver) return
@@ -143,7 +143,7 @@ class GameLogic(
         val maxX = screenWidth + visibleMargin
         val maxY = screenHeight + visibleMargin
         
-        // 화면 영역 객체
+        // 화면 영역 객체 - 이제 공간 분할 그리드 기능 포함
         val screenRect = ScreenRect(minX, minY, maxX, maxY)
         
         // 1. 적 업데이트
@@ -152,22 +152,26 @@ class GameLogic(
         // 2. 디펜스 유닛 공격 로직 (미사일 발사)
         updateDefenseUnitAttack(screenRect, currentTime)
         
-        // 3. 미사일 업데이트
+        // 3. 미사일 업데이트 (새 공간 분할 그리드 사용)
         val deadMissiles = missileManager.updateMissiles(screenRect)
         
-        // 4. 미사일 충돌 체크
+        // 4. 미사일 충돌 체크 (그리드 기반 충돌 감지)
         val collisionDeadMissiles = missileManager.checkMissileCollisions(
             enemyManager.getEnemies(),
             defenseUnit
         )
         
         // 5. 미사일 제거
-        missileManager.removeMissiles(deadMissiles + collisionDeadMissiles)
+        if (deadMissiles.isNotEmpty() || collisionDeadMissiles.isNotEmpty()) {
+            missileManager.removeMissiles(deadMissiles + collisionDeadMissiles)
+        }
         
         // 6. 죽은 적 처리
-        enemyManager.processDeadEnemies(deadEnemies) {
-            // 다음 웨이브로 이동 콜백
-            startNextWave()
+        if (deadEnemies.isNotEmpty()) {
+            enemyManager.processDeadEnemies(deadEnemies) {
+                // 다음 웨이브로 이동 콜백
+                startNextWave()
+            }
         }
     }
     
@@ -293,5 +297,96 @@ class GameLogic(
      */
     fun getCurrentBossHealth(): Int {
         return enemyManager.getCurrentBossHealth()
+    }
+
+    /**
+     * 게임 렌더링 - Canvas에 게임 요소 그리기
+     */
+    fun render(canvas: android.graphics.Canvas) {
+        // 화면 범위
+        val screenRect = ScreenRect(0f, 0f, screenWidth, screenHeight)
+        
+        // 배경 지우기 (검은색)
+        canvas.drawColor(android.graphics.Color.BLACK)
+        
+        // 디펜스 유닛 공격 범위 표시 (명확한 색상과 두께로 항상 표시)
+        val rangePaint = android.graphics.Paint().apply {
+            color = android.graphics.Color.argb(100, 100, 180, 255) // 반투명 파란색
+            style = android.graphics.Paint.Style.STROKE
+            strokeWidth = 3f
+        }
+        canvas.drawCircle(screenWidth / 2, screenHeight / 2, defenseUnit.attackRange, rangePaint)
+        
+        // 1. 적 그리기
+        val visibleEnemies = enemyManager.getEnemies().filter { 
+            val pos = it.getPosition()
+            // 화면 안쪽이나 약간 밖에 있는 적만 그리기 (성능 최적화)
+            pos.x >= -gameConfig.ENEMY_RENDER_MARGIN_X && 
+            pos.x <= screenWidth + gameConfig.ENEMY_RENDER_MARGIN_X &&
+            pos.y >= -gameConfig.ENEMY_RENDER_MARGIN_Y && 
+            pos.y <= screenHeight + gameConfig.ENEMY_RENDER_MARGIN_Y &&
+            !it.isDead()
+        }
+        for (enemy in visibleEnemies) {
+            enemy.draw(canvas)
+        }
+        
+        // 2. 미사일 그리기
+        val visibleMissiles = missileManager.getMissiles().filter {
+            val pos = it.getPosition()
+            // 화면 안쪽이나 약간 밖에 있는 미사일만 그리기 (성능 최적화)
+            pos.x >= -gameConfig.MISSILE_RENDER_MARGIN_X && 
+            pos.x <= screenWidth + gameConfig.MISSILE_RENDER_MARGIN_X &&
+            pos.y >= -gameConfig.MISSILE_RENDER_MARGIN_Y && 
+            pos.y <= screenHeight + gameConfig.MISSILE_RENDER_MARGIN_Y &&
+            !it.isDead()
+        }
+        for (missile in visibleMissiles) {
+            missile.draw(canvas)
+        }
+        
+        // 3. 디펜스 유닛 그리기
+        defenseUnit.draw(canvas)
+        
+        // 4. UI 그리기
+        drawGameUI(canvas)
+    }
+
+    /**
+     * 게임 UI 그리기 (점수, 상태 등)
+     */
+    private fun drawGameUI(canvas: android.graphics.Canvas) {
+        // 화면 중앙 메시지만 표시 (상단 wave, HP, resource 정보는 제거)
+        
+        // 웨이브 시작 메시지
+        if (showWaveMessage) {
+            val wavePaint = android.graphics.Paint().apply {
+                color = gameConfig.WAVE_TEXT_COLOR
+                textSize = gameConfig.TEXT_SIZE_WAVE
+                textAlign = android.graphics.Paint.Align.CENTER
+            }
+            val waveStartText = "Wave ${gameStats.getWaveCount()} Start!"
+            canvas.drawText(waveStartText, screenWidth / 2, screenHeight / 2, wavePaint)
+        }
+        
+        // 일시정지 화면
+        if (isPaused) {
+            val pausePaint = android.graphics.Paint().apply {
+                color = android.graphics.Color.WHITE
+                textSize = gameConfig.TEXT_SIZE_PAUSE
+                textAlign = android.graphics.Paint.Align.CENTER
+            }
+            canvas.drawText("PAUSED", screenWidth / 2, screenHeight / 2, pausePaint)
+        }
+        
+        // 게임 오버 화면
+        if (isGameOver) {
+            val gameOverPaint = android.graphics.Paint().apply {
+                color = android.graphics.Color.RED
+                textSize = gameConfig.TEXT_SIZE_PAUSE
+                textAlign = android.graphics.Paint.Align.CENTER
+            }
+            canvas.drawText("GAME OVER", screenWidth / 2, screenHeight / 2, gameOverPaint)
+        }
     }
 } 

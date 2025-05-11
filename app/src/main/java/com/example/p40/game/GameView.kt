@@ -2,6 +2,8 @@ package com.example.p40.game
 
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.SurfaceHolder
 import android.view.SurfaceView
@@ -51,7 +53,12 @@ class GameView @JvmOverloads constructor(
     private val gameConfig = GameConfig
     
     // 분리된 책임들
-    private val gameStats = GameStats(gameConfig, context)
+    private val gameStats by lazy {
+        // GameStats를 싱글톤으로 초기화
+        GameStats.initialize(gameConfig, context)
+        GameStats.getInstance()
+    }
+    
     private lateinit var gameRenderer: GameRenderer
     private lateinit var gameLogic: GameLogic
     
@@ -129,55 +136,132 @@ class GameView @JvmOverloads constructor(
     }
     
     /**
-     * 게임 스레드 클래스
+     * 게임 스레드 클래스 - 성능 최적화 적용
      */
     inner class GameThread : Thread() {
-        // 프레임 제한을 위한 설정
-        private val targetFPS = gameConfig.FRAME_LIMIT
-        private val targetFrameTime = 1000 / targetFPS
+        private var lastFrameTime = System.currentTimeMillis()
+        private var deltaTime = 0L
+        
+        // 성능 모니터링 변수
+        private var frameCount = 0
+        private var totalFrameTime = 0L
+        private var lastFpsUpdate = System.currentTimeMillis()
+        private var currentFps = 0
+        
+        // 프레임 제한 변수
+        private val targetFps = gameConfig.FRAME_LIMIT
+        private val targetFrameTime = 1000 / targetFps
+        
+        // 메모리 모니터링
+        private var lastMemoryCheck = System.currentTimeMillis()
+        private var memoryUsage = 0L
         
         override fun run() {
-            var lastFrameTime = System.currentTimeMillis()
-            
             while (isRunning) {
                 val startTime = System.currentTimeMillis()
                 
-                val canvas = holder.lockCanvas()
-                if (canvas != null) {
-                    try {
-                        // 게임 로직 업데이트
-                        gameLogic.update()
-                        
-                        // 게임 화면 렌더링
-                        gameRenderer.renderGame(
-                            canvas,
-                            gameLogic.getDefenseUnit(),
-                            gameLogic.getEnemies(),
-                            gameLogic.getMissiles(),
-                            gameLogic.getScreenWidth(),
-                            gameLogic.getScreenHeight(),
-                            gameLogic.isGamePaused(),
-                            gameLogic.isGameOver(),
-                            gameLogic.isShowingWaveMessage()
-                        )
-                    } finally {
-                        holder.unlockCanvasAndPost(canvas)
-                    }
-                }
+                // 로직 업데이트 및 렌더링
+                updateAndRender()
                 
-                // FPS 제한 및 CPU 사용량 최적화
+                // 프레임 시간 계산
+                val currentTime = System.currentTimeMillis()
+                deltaTime = currentTime - lastFrameTime
+                lastFrameTime = currentTime
+                
+                // 프레임 제한 (CPU 사용량 감소)
                 val frameTime = System.currentTimeMillis() - startTime
                 if (frameTime < targetFrameTime) {
                     try {
                         sleep(targetFrameTime - frameTime)
                     } catch (e: InterruptedException) {
-                        // 무시
+                        // 인터럽트 예외 무시
                     }
                 }
                 
-                // lastFrameTime 업데이트
-                val currentTime = System.currentTimeMillis()
-                lastFrameTime = currentTime
+                // 성능 모니터링
+                frameCount++
+                totalFrameTime += frameTime
+                
+                // 1초마다 FPS 업데이트
+                if (currentTime - lastFpsUpdate >= 1000) {
+                    currentFps = frameCount
+                    frameCount = 0
+                    lastFpsUpdate = currentTime
+                    totalFrameTime = 0
+                    
+                    // 메모리 사용량 업데이트 (5초마다)
+                    if (currentTime - lastMemoryCheck >= 5000) {
+                        val runtime = Runtime.getRuntime()
+                        memoryUsage = runtime.totalMemory() - runtime.freeMemory()
+                        lastMemoryCheck = currentTime
+                        
+                        if (gameConfig.DEBUG_MODE) {
+                            // 객체 풀 통계 로깅
+                            val enemyPoolStats = EnemyPool.getInstance().getPoolStats()
+                            val missilePoolStats = MissilePool.getInstance().getPoolStats()
+                            android.util.Log.d("GameView", "Enemy Pool: $enemyPoolStats")
+                            android.util.Log.d("GameView", "Missile Pool: $missilePoolStats")
+                            android.util.Log.d("GameView", "Memory Usage: ${memoryUsage / 1024 / 1024}MB")
+                        }
+                    }
+                }
+            }
+        }
+        
+        private fun updateAndRender() {
+            var canvas: Canvas? = null
+            try {
+                canvas = holder.lockCanvas()
+                if (canvas != null) {
+                    synchronized(holder) {
+                        // 게임 로직 업데이트
+                        if (::gameLogic.isInitialized) {
+                            gameLogic.update()
+                        }
+                        
+                        // 화면 그리기
+                        canvas.drawColor(gameConfig.BACKGROUND_COLOR)
+                        if (::gameLogic.isInitialized) {
+                            // GameLogic에 render 메소드가 있으면 호출, 없으면 게임 렌더러 직접 호출
+                            if (gameLogic.javaClass.declaredMethods.any { it.name == "render" }) {
+                                gameLogic.render(canvas)
+                            } else if (::gameRenderer.isInitialized) {
+                                // 게임 화면 렌더링
+                                gameRenderer.renderGame(
+                                    canvas,
+                                    gameLogic.getDefenseUnit(),
+                                    gameLogic.getEnemies(),
+                                    gameLogic.getMissiles(),
+                                    gameLogic.getScreenWidth(),
+                                    gameLogic.getScreenHeight(),
+                                    gameLogic.isGamePaused(),
+                                    gameLogic.isGameOver(),
+                                    gameLogic.isShowingWaveMessage()
+                                )
+                            }
+                        }
+                        
+                        // FPS 표시 (디버그 모드일 때만)
+                        if (gameConfig.DEBUG_MODE) {
+                            val debugPaint = Paint().apply {
+                                color = Color.YELLOW
+                                textSize = 30f
+                            }
+                            canvas.drawText("FPS: $currentFps", 20f, 40f, debugPaint)
+                            canvas.drawText("Memory: ${memoryUsage / 1024 / 1024}MB", 20f, 80f, debugPaint)
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            } finally {
+                try {
+                    if (canvas != null) {
+                        holder.unlockCanvasAndPost(canvas)
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
             }
         }
     }
