@@ -24,6 +24,13 @@ object GameConfig {
     // 게임 오버 조건
     const val CENTER_REACHED_DAMAGE = 1000  // 중앙 도달 시 입히는 데미지
     
+    // 유닛 기본 능력치 설정
+    const val BASE_DAMAGE = 10           // 기본 공격력
+    const val BASE_ATTACK_SPEED = 1000   // 기본 공격 속도 (ms)
+    const val BASE_ATTACK_RANGE = 300f   // 기본 공격 범위
+    const val BASE_HEALTH = 100          // 기본 체력
+    const val MIN_ATTACK_SPEED = 100     // 최소 공격 속도 (ms)
+    
     // --------- 디버그/테스트 설정 ----------
     
     // 디버그 모드 설정
@@ -186,7 +193,7 @@ object GameConfig {
     // --------- 자원,코인 관련 설정 ----------
 
     // 점수(자원) 설정
-    const val SCORE_PER_NORMAL_ENEMY = 10  // 일반 적 처치 시 얻는 점수(자원)
+    const val SCORE_PER_NORMAL_ENEMY = 1000  // 일반 적 처치 시 얻는 점수(자원)
     const val SCORE_PER_BOSS = 200  // 보스 처치 시 얻는 점수(자원)
     
     // 코인 보상 설정

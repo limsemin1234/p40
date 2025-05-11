@@ -90,6 +90,39 @@ class PokerDeck {
         return drawnCards
     }
     
+    /**
+     * 한 장의 카드 뽑기
+     */
+    fun drawSingleCard(): Card? {
+        if (cards.isEmpty()) {
+            // 덱이 비었으면 초기화 후 카드 뽑기
+            initializeDeck()
+            if (hasJoker) {
+                addJoker()
+            }
+        }
+        
+        return if (cards.isNotEmpty()) {
+            cards.removeAt(0)
+        } else {
+            null
+        }
+    }
+    
+    /**
+     * 덱에 남은 카드 수 반환
+     */
+    fun getCardsLeft(): Int {
+        return cards.size
+    }
+    
+    /**
+     * 덱 섞기
+     */
+    fun shuffle() {
+        cards.shuffle()
+    }
+    
     // 선택된 카드 교체
     fun replaceSelectedCards(): List<Card> {
         val indexesToReplace = mutableListOf<Int>()

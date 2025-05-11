@@ -44,6 +44,21 @@ class UserManager private constructor(private val context: Context) {
         return false
     }
     
+    /**
+     * 프리미엄 사용자 여부 확인
+     * 추후 결제 시스템 연동 시 이 메서드를 확장할 수 있음
+     */
+    fun isPremium(): Boolean {
+        return prefs.getBoolean(KEY_PREMIUM, false)
+    }
+    
+    /**
+     * 프리미엄 상태 설정 (테스트용)
+     */
+    fun setPremium(isPremium: Boolean) {
+        prefs.edit().putBoolean(KEY_PREMIUM, isPremium).apply()
+    }
+    
     // 구매한 카드 목록 가져오기
     fun getPurchasedCards(): List<Card> {
         val json = prefs.getString(KEY_PURCHASED_CARDS, "[]")
@@ -166,6 +181,7 @@ class UserManager private constructor(private val context: Context) {
             .putString(KEY_PURCHASED_CARDS, "[]")
             .putString(KEY_PURCHASED_DEFENSE_UNITS, "[]")
             .putInt(KEY_APPLIED_DEFENSE_UNIT, 0) // SPADE
+            .putBoolean(KEY_PREMIUM, false) // 프리미엄 상태도 초기화
             .apply()
     }
     
@@ -175,6 +191,7 @@ class UserManager private constructor(private val context: Context) {
         private const val KEY_PURCHASED_CARDS = "user_purchased_cards"
         private const val KEY_PURCHASED_DEFENSE_UNITS = "user_purchased_defense_units"
         private const val KEY_APPLIED_DEFENSE_UNIT = "applied_defense_unit"
+        private const val KEY_PREMIUM = "user_premium"
         private val DEFAULT_COIN = GameConfig.INITIAL_COIN // GameConfig에서 초기 코인 값 가져오기
         
         @Volatile
