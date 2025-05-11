@@ -16,7 +16,7 @@ object GameConfig {
     const val WAVE_MESSAGE_DURATION = 2000L  // 웨이브 메시지 표시 시간 (밀리초)
     
     // 유저 관련 설정
-    const val INITIAL_COIN = 500  // 게임 시작 시 주어지는 초기 코인 량
+    const val INITIAL_COIN = 2500  // 게임 시작 시 주어지는 초기 코인 량
     
     // 게임 레벨 설정
     private var currentTotalWaves: Int = 10  // 기본 총 웨이브 수

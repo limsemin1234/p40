@@ -152,13 +152,141 @@ class UserManager private constructor(private val context: Context) {
     
     // 적용된 디펜스유닛 설정
     fun setAppliedDefenseUnit(symbolTypeOrdinal: Int) {
+        // 첫 번째 단일 유닛으로 적용
+        val appliedUnits = getAppliedDefenseUnits().toMutableList()
+        
+        // 이미 포함되어 있으면 먼저 제거 (순서 재정렬을 위해)
+        if (appliedUnits.contains(symbolTypeOrdinal)) {
+            appliedUnits.remove(symbolTypeOrdinal)
+        }
+        
+        // 맨 앞에 추가
+        appliedUnits.add(0, symbolTypeOrdinal)
+        
+        // 최대 3개까지만 유지
+        while (appliedUnits.size > 3) {
+            appliedUnits.removeAt(appliedUnits.size - 1)
+        }
+        
+        // 저장
+        saveAppliedDefenseUnits(appliedUnits)
+        
+        // 이전 방식 호환성 유지
         prefs.edit().putInt(KEY_APPLIED_DEFENSE_UNIT, symbolTypeOrdinal).apply()
     }
     
-    // 적용된 디펜스유닛 가져오기
+    // 적용된 디펜스유닛 가져오기 (하위 호환성)
     fun getAppliedDefenseUnit(): Int {
         // 기본값은 SPADE(0)
+        val appliedUnits = getAppliedDefenseUnits()
+        return if (appliedUnits.isNotEmpty()) appliedUnits[0] else 0
+    }
+    
+    // 새로운 메서드: 디펜스유닛 적용 추가
+    fun addAppliedDefenseUnit(symbolTypeOrdinal: Int): Boolean {
+        val appliedUnits = getAppliedDefenseUnits().toMutableList()
+        
+        // 이미 적용된 유닛인 경우
+        if (appliedUnits.contains(symbolTypeOrdinal)) {
+            return false
+        }
+        
+        // 최대 3개까지만 적용 가능
+        if (appliedUnits.size >= 3) {
+            return false
+        }
+        
+        // 적용할 유닛 추가
+        appliedUnits.add(symbolTypeOrdinal)
+        
+        // 저장
+        saveAppliedDefenseUnits(appliedUnits)
+        
+        // 첫 번째 유닛인 경우 기존 방식 호환성 위해 추가 설정
+        if (appliedUnits.size == 1) {
+            prefs.edit().putInt(KEY_APPLIED_DEFENSE_UNIT, symbolTypeOrdinal).apply()
+        }
+        
+        return true
+    }
+    
+    // 디펜스유닛 적용 제거
+    fun removeAppliedDefenseUnit(symbolTypeOrdinal: Int): Boolean {
+        val appliedUnits = getAppliedDefenseUnits().toMutableList()
+        
+        // 적용된 유닛이 없거나 제거할 유닛이 없는 경우
+        if (appliedUnits.isEmpty() || !appliedUnits.contains(symbolTypeOrdinal)) {
+            return false
+        }
+        
+        // 유닛 제거
+        appliedUnits.remove(symbolTypeOrdinal)
+        
+        // 저장
+        saveAppliedDefenseUnits(appliedUnits)
+        
+        // 첫 번째 유닛 변경 시 기존 방식 호환성 위해 추가 설정
+        if (appliedUnits.isNotEmpty()) {
+            prefs.edit().putInt(KEY_APPLIED_DEFENSE_UNIT, appliedUnits[0]).apply()
+        } else {
+            // 적용된 유닛이 없으면 스페이드로 설정
+            prefs.edit().putInt(KEY_APPLIED_DEFENSE_UNIT, 0).apply()
+        }
+        
+        return true
+    }
+    
+    // 적용된 디펜스유닛 목록 가져오기
+    fun getAppliedDefenseUnits(): List<Int> {
+        val json = prefs.getString(KEY_APPLIED_DEFENSE_UNITS, "[]")
+        val type = object : TypeToken<List<Int>>() {}.type
+        val result: List<Int> = gson.fromJson(json, type)
+        
+        // 기존 방식과의 호환성 유지
+        if (result.isEmpty()) {
+            val legacyUnit = getAppliedDefenseUnitLegacy()
+            if (legacyUnit != 0) { // SPADE가 아닌 경우에만 추가
+                return listOf(legacyUnit)
+            }
+            // 적용된 유닛이 없을 경우 기본 스페이드(0)를 포함
+            return listOf(0)
+        }
+        
+        return result
+    }
+    
+    // 기존 방식 적용 유닛 가져오기 (내부 사용)
+    private fun getAppliedDefenseUnitLegacy(): Int {
         return prefs.getInt(KEY_APPLIED_DEFENSE_UNIT, 0)
+    }
+    
+    // 적용된 디펜스유닛 목록 저장
+    private fun saveAppliedDefenseUnits(units: List<Int>) {
+        val json = gson.toJson(units)
+        prefs.edit().putString(KEY_APPLIED_DEFENSE_UNITS, json).apply()
+    }
+    
+    // 적용된 디펜스유닛 순서 변경
+    fun reorderAppliedDefenseUnits(fromPosition: Int, toPosition: Int): Boolean {
+        val appliedUnits = getAppliedDefenseUnits().toMutableList()
+        
+        // 위치가 범위를 벗어나면 실패
+        if (fromPosition < 0 || fromPosition >= appliedUnits.size ||
+            toPosition < 0 || toPosition >= appliedUnits.size) {
+            return false
+        }
+        
+        // 순서 변경
+        val unit = appliedUnits.removeAt(fromPosition)
+        appliedUnits.add(toPosition, unit)
+        
+        // 저장
+        saveAppliedDefenseUnits(appliedUnits)
+        
+        // 첫 번째 유닛 변경 시 기존 방식 호환성 위해 추가 설정
+        prefs.edit().putInt(KEY_APPLIED_DEFENSE_UNIT, appliedUnits[0]).apply()
+        
+        return true
     }
     
     // 특정 문양 타입의 디펜스유닛 사용 가능 여부 확인
@@ -191,6 +319,7 @@ class UserManager private constructor(private val context: Context) {
         private const val KEY_PURCHASED_CARDS = "user_purchased_cards"
         private const val KEY_PURCHASED_DEFENSE_UNITS = "user_purchased_defense_units"
         private const val KEY_APPLIED_DEFENSE_UNIT = "applied_defense_unit"
+        private const val KEY_APPLIED_DEFENSE_UNITS = "applied_defense_units"
         private const val KEY_PREMIUM = "user_premium"
         private val DEFAULT_COIN = GameConfig.INITIAL_COIN // GameConfig에서 초기 코인 값 가져오기
         

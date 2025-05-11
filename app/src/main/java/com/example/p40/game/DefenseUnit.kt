@@ -37,7 +37,8 @@ data class ShopDefenseUnit(
     val symbolType: CardSymbolType, // 유닛 문양 타입
     val isNew: Boolean = false,   // 신규 유닛 여부
     var isPurchased: Boolean = false, // 구매 여부
-    var isApplied: Boolean = false   // 적용 여부
+    var isApplied: Boolean = false,   // 적용 여부
+    var appliedOrder: Int = -1    // 적용 순서 (1, 2, 3 등), -1은 미적용
 ) {
     companion object {
         // 상점에서 판매할 기본 디펜스유닛 목록 생성

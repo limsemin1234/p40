@@ -1,8 +1,10 @@
 package com.example.p40.game
 
+import android.content.Context
 import android.graphics.PointF
 import android.os.Handler
 import android.os.Looper
+import com.example.p40.UserManager
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.math.PI
 import kotlin.math.cos
@@ -19,7 +21,8 @@ class GameLogic(
     private val gameConfig: GameConfig,
     private val gameOverListener: GameOverListener? = null,
     private val bossKillListener: BossKillListener? = null,
-    private val levelClearListener: LevelClearListener? = null
+    private val levelClearListener: LevelClearListener? = null,
+    private val context: Context
 ) {
     // 게임 상태
     private var isRunning = false
@@ -30,6 +33,9 @@ class GameLogic(
     private var waveMessageDuration = gameConfig.WAVE_MESSAGE_DURATION
     private var timeFrozen = false  // 시간 멈춤 상태 변수 추가
     private var rangeBasedTimeFrozen = false  // 범위 기반 시간 멈춤 상태 변수
+    
+    // 디펜스 유닛 문양 변경 리스너
+    private var symbolChangeListener: DefenseUnitSymbolChangeListener? = null
     
     // 게임 요소
     private lateinit var defenseUnit: DefenseUnit
@@ -388,5 +394,53 @@ class GameLogic(
             }
             canvas.drawText("GAME OVER", screenWidth / 2, screenHeight / 2, gameOverPaint)
         }
+    }
+
+    /**
+     * 디펜스 유닛 문양 변경 - 클릭 시
+     * UserManager에서 적용 설정된 유닛들 사이에서 순환합니다.
+     */
+    fun changeDefenseUnitSymbol() {
+        val userManager = UserManager.getInstance(context)
+        val appliedUnits = userManager.getAppliedDefenseUnits()
+        
+        if (appliedUnits.isEmpty()) {
+            // 기본 스페이드 문양만 사용 가능한 경우
+            return
+        }
+        
+        // 현재 문양 가져오기
+        val currentSymbolType = defenseUnit.getSymbolType()
+        val currentOrdinal = currentSymbolType.ordinal
+        
+        // 현재 문양이 적용 목록에 없으면 첫 번째 적용 유닛으로 설정
+        if (!appliedUnits.contains(currentOrdinal)) {
+            val nextOrdinal = appliedUnits[0]
+            val nextSymbol = CardSymbolType.values()[nextOrdinal]
+            defenseUnit.setSymbolType(nextSymbol)
+            symbolChangeListener?.onSymbolChanged(nextSymbol)
+            return
+        }
+        
+        // 현재 문양의 인덱스 찾기
+        val currentIndex = appliedUnits.indexOf(currentOrdinal)
+        
+        // 다음 문양 계산 (순환)
+        val nextIndex = (currentIndex + 1) % appliedUnits.size
+        val nextOrdinal = appliedUnits[nextIndex]
+        
+        // 유닛 문양 변경
+        val nextSymbol = CardSymbolType.values()[nextOrdinal]
+        defenseUnit.setSymbolType(nextSymbol)
+        
+        // 변경 리스너 호출
+        symbolChangeListener?.onSymbolChanged(nextSymbol)
+    }
+
+    /**
+     * 문양 변경 리스너 설정
+     */
+    fun setSymbolChangeListener(listener: DefenseUnitSymbolChangeListener) {
+        this.symbolChangeListener = listener
     }
 } 

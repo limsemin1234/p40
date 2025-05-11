@@ -81,7 +81,7 @@
             android:id="@+id/titleText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="포커 디펜스"
+            android:text="카드 디펜스"
             android:textSize="32sp"
             android:textStyle="bold"
             android:textColor="#FFFFFF"

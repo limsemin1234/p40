@@ -2,6 +2,8 @@ package com.example.p40
 
 import android.app.AlertDialog
 import android.app.Dialog
+import android.graphics.Color
+import android.view.Gravity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +11,8 @@ import android.view.ViewGroup
 import android.view.Window
 import android.widget.Button
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -38,8 +42,52 @@ class DefenseUnitTabFragment : Fragment() {
         // UserManager 초기화
         userManager = UserManager.getInstance(requireContext())
         
-        // 리사이클러뷰 설정
+        // 안내 텍스트 추가 - 최대 3개까지 적용 가능하다는 설명
+        val infoTextView = TextView(requireContext()).apply {
+            text = "※ 디펜스유닛은 최대 3개까지 동시에 적용 가능합니다."
+            textSize = 12f // 텍스트 크기 줄임
+            setTextColor(Color.YELLOW)
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            setPadding(16, 8, 16, 8) // 패딩 조정
+            gravity = Gravity.CENTER
+            id = View.generateViewId()
+            
+            // 배경색 설정
+            setBackgroundColor(Color.parseColor("#33000000")) // 반투명 검은색 배경
+        }
+        
+        // 레이아웃에 안내 텍스트 추가
+        val constraintLayout = view as ConstraintLayout
         val recyclerView = view.findViewById<RecyclerView>(R.id.rvShopItems)
+        
+        // RecyclerView 위에 텍스트뷰 추가
+        constraintLayout.addView(infoTextView)
+        
+        // ConstraintSet을 사용하여 텍스트뷰 위치 설정
+        val constraintSet = ConstraintSet()
+        constraintSet.clone(constraintLayout)
+        
+        // 텍스트뷰를 상단에 배치
+        constraintSet.connect(infoTextView.id, ConstraintSet.TOP, constraintLayout.id, ConstraintSet.TOP, 8) // 상단 마진 추가
+        constraintSet.connect(infoTextView.id, ConstraintSet.START, constraintLayout.id, ConstraintSet.START)
+        constraintSet.connect(infoTextView.id, ConstraintSet.END, constraintLayout.id, ConstraintSet.END)
+        
+        // RecyclerView 제약 변경 - 텍스트뷰 아래에 배치
+        constraintSet.connect(recyclerView.id, ConstraintSet.TOP, infoTextView.id, ConstraintSet.BOTTOM, 8) // 간격 추가
+        constraintSet.connect(recyclerView.id, ConstraintSet.BOTTOM, constraintLayout.id, ConstraintSet.BOTTOM)
+        constraintSet.connect(recyclerView.id, ConstraintSet.START, constraintLayout.id, ConstraintSet.START)
+        constraintSet.connect(recyclerView.id, ConstraintSet.END, constraintLayout.id, ConstraintSet.END)
+        
+        // RecyclerView 패딩 설정
+        recyclerView.setPadding(8, 8, 8, 8) // RecyclerView에 패딩 추가
+        
+        // 제약 적용
+        constraintSet.applyTo(constraintLayout)
+        
+        // 리사이클러뷰 설정
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         
         // 빈 메시지 숨기기
@@ -76,11 +124,25 @@ class DefenseUnitTabFragment : Fragment() {
     
     // 적용된 유닛 상태 업데이트
     private fun updateAppliedUnitState() {
-        val appliedUnitType = userManager.getAppliedDefenseUnit()
+        // 적용된 디펜스유닛 목록 가져오기
+        val appliedUnits = userManager.getAppliedDefenseUnits()
         
+        // 모든 유닛의 적용 상태 초기화
         for (unit in defenseUnits) {
-            // 문양 타입의 ordinal과 비교하여 적용 상태 설정
-            unit.isApplied = unit.symbolType.ordinal == appliedUnitType
+            unit.isApplied = false
+            unit.appliedOrder = -1 // 적용 순서 초기화
+        }
+        
+        // 적용된 유닛 설정 및 순서 표시
+        for (i in appliedUnits.indices) {
+            val symbolTypeOrdinal = appliedUnits[i]
+            for (unit in defenseUnits) {
+                if (unit.symbolType.ordinal == symbolTypeOrdinal) {
+                    unit.isApplied = true
+                    unit.appliedOrder = i + 1 // 1부터 시작하는 순서
+                    break
+                }
+            }
         }
     }
     
@@ -134,12 +196,12 @@ class DefenseUnitTabFragment : Fragment() {
         
         // 이미 적용된 유닛인지 확인
         if (unit.isApplied) {
-            MessageManager.getInstance().showInfo(requireContext(), "이미 적용된 유닛입니다.")
-            return
+            // 이미 적용된 경우 제거
+            removeUnit(unit)
+        } else {
+            // 새로 적용
+            applyUnit(unit)
         }
-        
-        // 바로 적용 처리
-        applyUnit(unit)
     }
     
     // 유닛 구매 처리
@@ -165,20 +227,38 @@ class DefenseUnitTabFragment : Fragment() {
     
     // 유닛 적용 처리
     private fun applyUnit(unit: ShopDefenseUnit) {
-        // 기존 적용된 유닛의 상태 변경
-        for (defenseUnit in defenseUnits) {
-            defenseUnit.isApplied = false
+        // 새 방식: 유닛 추가
+        val success = userManager.addAppliedDefenseUnit(unit.symbolType.ordinal)
+        
+        if (success) {
+            // 적용된 유닛 정보 업데이트
+            updateAppliedUnitState()
+            
+            // UI 업데이트
+            defenseUnitAdapter.notifyDataSetChanged()
+            
+            // 메시지 표시 - 여러 유닛 적용 가능하므로 메시지 수정
+            MessageManager.getInstance().showSuccess(requireContext(), "${unit.name}이(가) 적용되었습니다!")
+        } else {
+            // 이미 적용된 유닛인 경우
+            MessageManager.getInstance().showInfo(requireContext(), "이미 적용 중인 유닛이거나 최대 3개까지만 적용 가능합니다.")
         }
+    }
+    
+    // 유닛 제거 처리 (새 메소드)
+    private fun removeUnit(unit: ShopDefenseUnit) {
+        // 유닛 제거
+        val success = userManager.removeAppliedDefenseUnit(unit.symbolType.ordinal)
         
-        // 새로운 유닛 적용
-        unit.isApplied = true
-        
-        // 적용된 유닛 정보 저장
-        userManager.setAppliedDefenseUnit(unit.symbolType.ordinal)
-        
-        // UI 업데이트
-        defenseUnitAdapter.notifyDataSetChanged()
-        
-        MessageManager.getInstance().showSuccess(requireContext(), "${unit.name}이(가) 적용되었습니다!")
+        if (success) {
+            // 적용된 유닛 정보 업데이트
+            updateAppliedUnitState()
+            
+            // UI 업데이트
+            defenseUnitAdapter.notifyDataSetChanged()
+            
+            // 메시지 표시
+            MessageManager.getInstance().showInfo(requireContext(), "${unit.name}이(가) 제거되었습니다.")
+        }
     }
 } 

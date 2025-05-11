@@ -83,7 +83,7 @@ class GameView @JvmOverloads constructor(
      * 필요할 때마다 호출하여 게임 로직이 초기화되도록 함
      */
     private fun initGameLogic(width: Float, height: Float) {
-        gameLogic = GameLogic(gameStats, gameConfig, gameOverListener, bossKillListener, levelClearListener)
+        gameLogic = GameLogic(gameStats, gameConfig, gameOverListener, bossKillListener, levelClearListener, context)
         gameLogic.initGame(width, height)
     }
     
@@ -472,7 +472,7 @@ class GameView @JvmOverloads constructor(
     fun setGameOverListener(listener: GameOverListener) {
         this.gameOverListener = listener
         if (initializeIfNeeded()) {
-            this.gameLogic = GameLogic(gameStats, gameConfig, listener, bossKillListener, levelClearListener)
+            this.gameLogic = GameLogic(gameStats, gameConfig, listener, bossKillListener, levelClearListener, context)
             gameLogic.initGame(width.toFloat(), height.toFloat())
         }
     }
@@ -480,7 +480,7 @@ class GameView @JvmOverloads constructor(
     fun setBossKillListener(listener: BossKillListener) {
         this.bossKillListener = listener
         if (initializeIfNeeded()) {
-            this.gameLogic = GameLogic(gameStats, gameConfig, gameOverListener, listener, levelClearListener)
+            this.gameLogic = GameLogic(gameStats, gameConfig, gameOverListener, listener, levelClearListener, context)
             gameLogic.initGame(width.toFloat(), height.toFloat())
         }
     }
@@ -491,7 +491,7 @@ class GameView @JvmOverloads constructor(
     fun setLevelClearListener(listener: LevelClearListener) {
         this.levelClearListener = listener
         if (initializeIfNeeded()) {
-            this.gameLogic = GameLogic(gameStats, gameConfig, gameOverListener, bossKillListener, listener)
+            this.gameLogic = GameLogic(gameStats, gameConfig, gameOverListener, bossKillListener, listener, context)
             gameLogic.initGame(width.toFloat(), height.toFloat())
         }
     }
@@ -632,7 +632,7 @@ class GameView @JvmOverloads constructor(
         
         // GameLogic이 이미 초기화되어 있다면 재설정
         if (::gameLogic.isInitialized) {
-            gameLogic = GameLogic(gameStats, config, gameOverListener, bossKillListener, levelClearListener)
+            gameLogic = GameLogic(gameStats, config, gameOverListener, bossKillListener, levelClearListener, context)
             gameLogic.initGame(width.toFloat(), height.toFloat())
         }
     }
@@ -642,11 +642,13 @@ class GameView @JvmOverloads constructor(
      */
     fun setSymbolChangeListener(listener: DefenseUnitSymbolChangeListener) {
         this.symbolChangeListener = listener
+        if (::gameLogic.isInitialized) {
+            gameLogic.setSymbolChangeListener(listener)
+        }
     }
     
     /**
      * 터치 이벤트 처리
-     * 디펜스 유닛을 터치하면 문양을 변경 (구매 및 적용된 유닛만 사용 가능)
      */
     override fun onTouchEvent(event: MotionEvent): Boolean {
         if (event.action == MotionEvent.ACTION_DOWN && initializeIfNeeded()) {
@@ -663,48 +665,24 @@ class GameView @JvmOverloads constructor(
             
             // 디펜스 유닛 영역을 터치했는지 확인 (크기의 1.5배 영역까지 인식)
             if (distance <= unitSize * 1.5f) {
-                // 이전 문양 저장
-                val prevSymbolType = defenseUnit.getSymbolType()
+                // 새로운 방식으로 문양 변경 - 유저가 적용한 유닛 간 순환
+                gameLogic.changeDefenseUnitSymbol()
                 
-                // UserManager에서 적용된 디펜스 유닛 타입 가져오기
-                val userManager = UserManager.getInstance(context)
-                val appliedUnitType = userManager.getAppliedDefenseUnit()
-                
-                // 현재 문양이 SPADE인 경우, 적용된 유닛 타입으로 직접 변경
-                if (prevSymbolType == CardSymbolType.SPADE) {
-                    // 적용된 유닛이 SPADE가 아닌 경우에만 변경
-                    if (appliedUnitType != 0) {
-                        // 문양 타입 직접 설정
-                        val newSymbolType = when (appliedUnitType) {
-                            1 -> CardSymbolType.HEART
-                            2 -> CardSymbolType.DIAMOND
-                            3 -> CardSymbolType.CLUB
-                            else -> CardSymbolType.SPADE
-                        }
-                        
-                        // 적용된 유닛 타입으로 설정
-                        defenseUnit.setSymbolType(newSymbolType)
-                        
-                        // 문양 변경 리스너에 알림
-                        symbolChangeListener?.onSymbolChanged(newSymbolType)
-                        
-                        // 터치 이벤트 소비
-                        return true
-                    }
-                } else {
-                    // 현재 문양이 SPADE가 아닌 경우, SPADE로 되돌림
-                    defenseUnit.setSymbolType(CardSymbolType.SPADE)
-                    
-                    // 문양 변경 리스너에 알림
-                    symbolChangeListener?.onSymbolChanged(CardSymbolType.SPADE)
-                    
-                    // 터치 이벤트 소비
-                    return true
-                }
+                // 이벤트 소비
+                return true
             }
         }
         
-        // 상위 클래스의 터치 이벤트 처리
         return super.onTouchEvent(event)
+    }
+    
+    /**
+     * 카드 터치 확인 및 처리
+     * @return 카드 영역 터치 여부
+     */
+    private fun checkAndHandleCardTouch(touchX: Float, touchY: Float): Boolean {
+        // 카드를 표시하는 UI가 있다면 여기서 처리
+        // 현재는 기본 구현으로 false 반환
+        return false
     }
 } 

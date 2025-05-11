@@ -10,7 +10,7 @@
         android:id="@+id/tvGameTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="방치형 카드 디펜스"
+        android:text="카드 디펜스"
         android:textSize="36sp"
         android:textStyle="bold"
         android:textColor="#FFFFFF"
