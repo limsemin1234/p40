@@ -92,7 +92,7 @@ class GameStats(
      */
     fun resetGame() {
         resource = 0
-        waveCount = 1
+        waveCount = gameConfig.TEST_START_WAVE // 테스트용 시작 웨이브 적용
         killCount = 0
         spawnedCount = 0
         totalEnemiesInWave = gameConfig.ENEMIES_PER_WAVE

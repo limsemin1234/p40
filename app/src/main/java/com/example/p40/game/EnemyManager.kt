@@ -395,9 +395,8 @@ class EnemyManager(
                     bossKillListener?.onBossKilled(currentWave)
                     
                     // 보스 처치 시 다음 웨이브로 이동
-                    if (currentWave < gameConfig.getTotalWaves()) {
-                        onNextWave()
-                    }
+                    // 마지막 웨이브(10)인 경우에도 다음 웨이브로 넘어가서 클리어 화면이 나타나도록 함
+                    onNextWave()
                 }
             } else {
                 enemyPool.recycle(enemy)
@@ -433,6 +432,10 @@ class EnemyManager(
             // GameConfig에 정의된 스페이드 플러시 데미지를 적용
             enemy.takeDamage(gameConfig.SPADE_FLUSH_DAMAGE)
             enemies.remove(enemy)
+            
+            // 처치 수에 포함 (공식 킬 카운트 증가)
+            gameStats.enemyKilled(false)
+            
             // 적 객체를 풀에 반환
             enemyPool.recycle(enemy)
         }

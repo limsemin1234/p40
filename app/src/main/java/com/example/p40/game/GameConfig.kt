@@ -38,6 +38,7 @@ object GameConfig {
     
     // 테스트 모드 설정
     const val TEST_ENABLE_ALL_SKILLS = true // 웨이브 시작 시 모든 스킬 활성화 여부
+    const val TEST_START_WAVE = 10 // 게임 시작 시 웨이브 번호 (10으로 변경하면 10웨이브부터 시작)
     
     // --------- 성능 및 제한 설정 ----------
     
