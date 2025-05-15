@@ -292,11 +292,16 @@ class EnemyManager(
                 val dx = enemyPos.x - centerX
                 val dy = enemyPos.y - centerY
                 val distanceToCenter = dx * dx + dy * dy // 제곱근 연산 회피
-                val centerCollisionRadius = gameConfig.DEFENSE_UNIT_SIZE * gameConfig.DEFENSE_UNIT_SIZE
+                
+                // 외곽 테두리 기반 충돌 감지로 변경
+                // 디펜스 유닛 반지름과 적 유닛 반지름의 합의 제곱
+                val defenseUnitRadius = gameConfig.DEFENSE_UNIT_SIZE
+                val enemyRadius = enemy.getSize()
+                val collisionDistanceSquared = (defenseUnitRadius + enemyRadius) * (defenseUnitRadius + enemyRadius)
                 
                 try {
-                    // 디펜스 유닛과의 충돌 처리
-                    if (distanceToCenter < centerCollisionRadius) {
+                    // 디펜스 유닛과의 충돌 처리 - 두 원의 외곽선이 겹치는 경우 충돌로 판정
+                    if (distanceToCenter < collisionDistanceSquared) {
                         handleEnemyCollision(enemy, dx, dy, Math.sqrt(distanceToCenter.toDouble()).toFloat(), deadEnemies, defenseUnit, isGameOver)
                     }
                 } catch (e: Exception) {
