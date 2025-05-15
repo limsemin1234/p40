@@ -234,7 +234,7 @@ object GameConfig {
     // 사거리 강화 관련 설정
     const val STATS_RANGE_UPGRADE_AMOUNT = 5     // 사거리 증가량
     const val STATS_RANGE_BASE_COST = 100        // 사거리 강화 기본 비용
-    const val STATS_RANGE_COST_INCREASE = 100     // 사거리 강화 비용 증가량
+    const val STATS_RANGE_COST_INCREASE = 100    // 사거리 강화 비용 증가량
 
     // --------- 포커 족보별 스탯 증가 설정 ----------
     
