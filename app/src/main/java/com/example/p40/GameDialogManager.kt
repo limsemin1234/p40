@@ -15,6 +15,7 @@ import com.example.p40.game.GameConfig
 import com.example.p40.game.GameView
 import com.example.p40.game.MessageManager
 import com.example.p40.game.PokerHand
+import com.example.p40.game.PokerCardsDialog
 
 /**
  * 게임 다이얼로그를 관리하는 클래스

@@ -13,7 +13,7 @@ import androidx.cardview.widget.CardView
 import com.example.p40.DeckBuilderFragment
 import com.example.p40.R
 import com.example.p40.game.MessageManager
-import com.example.p40.PokerGuideDialog
+import com.example.p40.game.PokerGuideDialog
 import kotlin.random.Random
 import com.example.p40.game.HighCard
 import com.example.p40.game.OnePair
