@@ -119,8 +119,8 @@ class BossEnemyBehavior : EnemyBehaviorStrategy {
     }
     
     override fun onReachCenter(enemy: Enemy) {
-        // 보스가 중앙에 도달하면 더 큰 대미지를 입힘
-        enemy.setDead(true)
+        // 보스가 중앙에 도달하면 이벤트만 발생시키고 죽지 않음
+        // enemy.setDead(true) 호출 제거
         
         // 이벤트 발생
         GameEventManager.getInstance().dispatchEvent(
