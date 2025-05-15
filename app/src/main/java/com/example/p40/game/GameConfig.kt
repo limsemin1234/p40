@@ -62,9 +62,9 @@ object GameConfig {
     const val ENEMY_RENDER_MARGIN_Y = 500f // 적 렌더링 Y축 마진 (화면 밖에서도 그리기 위함)
     const val MISSILE_RENDER_MARGIN_X = 20f // 미사일 렌더링 X축 마진
     const val MISSILE_RENDER_MARGIN_Y = 20f // 미사일 렌더링 Y축 마진
-    const val FAR_OFFSCREEN_MARGIN = 1500f // 적이 제거되는 화면 외부 거리
+    const val FAR_OFFSCREEN_MARGIN = 2000f // 적이 제거되는 화면 외부 거리
     const val ENEMY_SPAWN_DISTANCE_FACTOR = 0.5f // 적 생성 거리 계수
-    const val BOSS_SPAWN_DISTANCE_FACTOR = 0.5f // 보스 생성 거리 계수 (화면 크기의 비율)
+    const val BOSS_SPAWN_DISTANCE_FACTOR = 0.45f // 보스 생성 거리 계수 (화면 크기의 비율)
     const val ENEMY_UPDATE_MARGIN = 250f // 적 생성 거리에 추가되는 여유 공간 (화면 밖 적 업데이트 범위 확장)
     
     // --------- UI 및 메시지 설정 ----------
