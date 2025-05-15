@@ -19,7 +19,7 @@ import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
+
 import androidx.cardview.widget.CardView
 import com.example.p40.game.CardSymbolType
 import kotlin.math.abs

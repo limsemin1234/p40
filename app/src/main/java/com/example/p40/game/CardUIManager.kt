@@ -6,7 +6,6 @@ import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.cardview.widget.CardView
 import com.example.p40.R
 import com.example.p40.game.MessageManager
@@ -284,9 +283,9 @@ class CardUIManager(
     fun getConfirmButton() = confirmButton
     
     /**
-     * 토스트 메시지 표시
+     * 메시지 표시
      */
-    fun showToast(message: String, duration: Int = Toast.LENGTH_SHORT) {
+    fun showMessage(message: String) {
         // MessageManager를 사용하여 상단에 메시지 표시
         MessageManager.getInstance().showInfo(message)
     }
@@ -301,7 +300,7 @@ class CardUIManager(
         
         // 6장 이상일 경우 정확히 5장이 선택되었는지 확인
         if (selectedCardIndexes.size != 5) {
-            showToast("카드를 정확히 5장 선택해야 합니다. (현재 ${selectedCardIndexes.size}장 선택됨)")
+            showMessage("카드를 정확히 5장 선택해야 합니다. (현재 ${selectedCardIndexes.size}장 선택됨)")
             return false
         }
         

@@ -5,6 +5,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
+import android.util.Log
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.MotionEvent
@@ -199,9 +200,9 @@ class GameView @JvmOverloads constructor(
                             // 객체 풀 통계 로깅
                             val enemyPoolStats = EnemyPool.getInstance().getPoolStats()
                             val missilePoolStats = MissilePool.getInstance().getPoolStats()
-                            android.util.Log.d("GameView", "Enemy Pool: $enemyPoolStats")
-                            android.util.Log.d("GameView", "Missile Pool: $missilePoolStats")
-                            android.util.Log.d("GameView", "Memory Usage: ${memoryUsage / 1024 / 1024}MB")
+                            Log.d("GameView", "Enemy Pool: $enemyPoolStats")
+                            Log.d("GameView", "Missile Pool: $missilePoolStats")
+                            Log.d("GameView", "Memory Usage: ${memoryUsage / 1024 / 1024}MB")
                         }
                     }
                 }
