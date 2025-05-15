@@ -444,6 +444,26 @@ class EnemyManager(
     }
     
     /**
+     * 화면 내 모든 적 제거 (보스 포함) - 테스트용
+     * @return 제거된 적의 수
+     */
+    fun removeAllEnemies(): Int {
+        val count = enemies.size
+        
+        // 모든 적 제거
+        for (enemy in enemies.toList()) {
+            // 적 객체를 풀에 반환
+            enemies.remove(enemy)
+            enemyPool.recycle(enemy)
+        }
+        
+        // 적 목록 비우기
+        enemies.clear()
+        
+        return count
+    }
+    
+    /**
      * 게임 오버 알림
      */
     private fun notifyGameOver() {

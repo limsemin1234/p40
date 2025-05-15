@@ -686,4 +686,11 @@ class GameView @JvmOverloads constructor(
         // 현재는 기본 구현으로 false 반환
         return false
     }
+
+    // 테스트용: 강제로 다음 웨이브로 이동
+    fun forceNextWave() {
+        if (::gameLogic.isInitialized) {
+            gameLogic.forceNextWave()
+        }
+    }
 } 

@@ -203,6 +203,9 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         
         // 게임 뷰에 StatsManager의 스탯 적용
         applyStatsToGame()
+
+        // 테스트 버튼 설정
+        setupTestButton(view)
     }
 
     /**
@@ -516,6 +519,13 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
     override fun onGameOver(resource: Int, waveCount: Int) {
         if (!isAdded || requireActivity().isFinishing) return
         
+        // 게임 중지
+        gameView.pause()
+        isPaused = true
+        
+        // UI 업데이트 중지
+        handler.removeCallbacks(uiUpdateRunnable)
+        
         // 게임 오버 시 획득한 코인 정보 설정
         gameDialogManager.setEarnedCoins(earnedCoins)
         
@@ -661,6 +671,28 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         
         // 게임 리소스 정리
         cleanupGameResources()
+    }
+
+    private fun setupTestButton(view: View) {
+        // 테스트 버튼 찾기
+        val testButton = view.findViewById<Button>(R.id.testNextWaveButton)
+        
+        // 디버그 모드일 때만 버튼 표시
+        if (GameConfig.DEBUG_MODE) {
+            testButton.visibility = View.VISIBLE
+            
+            // 클릭 리스너 설정
+            testButton.setOnClickListener {
+                // 현재 웨이브의 모든 적 제거
+                gameView.removeAllEnemiesExceptBoss()
+                
+                // 보스도 제거하고 다음 웨이브로 진행
+                gameView.forceNextWave()
+                
+                // 메시지 표시
+                messageManager.showInfo("테스트: 다음 웨이브로 이동")
+            }
+        }
     }
 }
 

@@ -558,6 +558,20 @@
                 android:background="@drawable/main_button_selector"
                 android:backgroundTint="@null"
                 android:textColor="@android:color/white" />
+
+            <Button
+                android:id="@+id/testNextWaveButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="다음 웨이브"
+                android:textSize="12sp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginTop="8dp"
+                android:backgroundTint="#FF5722"
+                android:layout_toStartOf="@id/exitButton"
+                android:visibility="gone"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/exitButton" />
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

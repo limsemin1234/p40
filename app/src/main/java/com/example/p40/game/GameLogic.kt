@@ -461,4 +461,13 @@ class GameLogic(
     fun setSymbolChangeListener(listener: DefenseUnitSymbolChangeListener) {
         this.symbolChangeListener = listener
     }
+
+    // 테스트용: 강제로 다음 웨이브로 이동
+    fun forceNextWave() {
+        // 현재 웨이브의 모든 적 제거 (보스 포함)
+        enemyManager.removeAllEnemies()
+        
+        // 다음 웨이브 시작
+        startNextWave()
+    }
 } 
