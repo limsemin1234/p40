@@ -1,26 +1,14 @@
 package com.example.p40
 
-import android.animation.AnimatorInflater
-import android.animation.AnimatorSet
-import android.app.Dialog
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import android.view.Window
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
-import android.widget.Button
-import android.widget.NumberPicker
-import android.widget.TextView
 
 import androidx.cardview.widget.CardView
 import androidx.navigation.fragment.findNavController
-import com.example.p40.game.Card
-import com.example.p40.game.CardRank
-import com.example.p40.game.CardSuit
-import com.example.p40.game.MessageManager
 
 class MainMenuFragment : BaseFragment(R.layout.fragment_main_menu) {
     

@@ -3,10 +3,10 @@ package com.example.p40
 import android.content.Context
 import android.view.View
 import android.widget.Button
-import com.example.p40.game.CardSymbolType
-import com.example.p40.game.GameConfig
-import com.example.p40.game.GameView
-import com.example.p40.game.MessageManager
+import com.example.p40.CardSymbolType
+import com.example.p40.GameConfig
+import com.example.p40.GameView
+import com.example.p40.MessageManager
 
 /**
  * 업그레이드 관련 기능을 처리하는 매니저 클래스

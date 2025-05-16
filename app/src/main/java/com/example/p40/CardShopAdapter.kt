@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.p40.game.ShopCard
+import com.example.p40.ShopCard
 
 class CardShopAdapter(
     private val shopCards: List<ShopCard>,

@@ -16,8 +16,8 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.p40.game.ShopDefenseUnit
-import com.example.p40.game.MessageManager
+import com.example.p40.ShopDefenseUnit
+import com.example.p40.MessageManager
 
 /**
  * 상점의 디펜스유닛 탭 프래그먼트

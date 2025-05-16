@@ -7,9 +7,9 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.p40.game.Card
-import com.example.p40.game.CardSuit
-import com.example.p40.game.CardRank
+import com.example.p40.Card
+import com.example.p40.CardSuit
+import com.example.p40.CardRank
 
 /**
  * 덱 구성 화면에서 카드 리스트를 표시하기 위한 어댑터

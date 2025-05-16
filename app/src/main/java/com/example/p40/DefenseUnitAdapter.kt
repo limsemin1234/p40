@@ -8,7 +8,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.p40.game.ShopDefenseUnit
+import com.example.p40.ShopDefenseUnit
 
 class DefenseUnitAdapter(
     private val defenseUnits: List<ShopDefenseUnit>,
@@ -51,15 +51,15 @@ class DefenseUnitAdapter(
             
             // 유닛 문양 타입 표시
             when (unit.symbolType) {
-                com.example.p40.game.CardSymbolType.HEART -> {
+                com.example.p40.CardSymbolType.HEART -> {
                     tvUnitSymbol.text = "♥"
                     tvUnitSymbol.setTextColor(android.graphics.Color.RED)
                 }
-                com.example.p40.game.CardSymbolType.DIAMOND -> {
+                com.example.p40.CardSymbolType.DIAMOND -> {
                     tvUnitSymbol.text = "♦"
                     tvUnitSymbol.setTextColor(android.graphics.Color.RED)
                 }
-                com.example.p40.game.CardSymbolType.CLUB -> {
+                com.example.p40.CardSymbolType.CLUB -> {
                     tvUnitSymbol.text = "♣"
                     tvUnitSymbol.setTextColor(android.graphics.Color.BLACK)
                 }

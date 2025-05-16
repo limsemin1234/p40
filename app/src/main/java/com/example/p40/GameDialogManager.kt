@@ -2,20 +2,13 @@ package com.example.p40
 
 import android.app.Dialog
 import android.content.Context
-import android.graphics.Color
 import android.os.Handler
-import android.os.Looper
-import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavController
-import com.example.p40.game.GameConfig
-import com.example.p40.game.GameView
-import com.example.p40.game.MessageManager
-import com.example.p40.game.PokerHand
-import com.example.p40.game.PokerCardsDialog
+import com.example.p40.PokerCardsDialog
 
 /**
  * 게임 다이얼로그를 관리하는 클래스

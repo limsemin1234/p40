@@ -175,10 +175,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
         
-        <com.example.p40.game.GameView
-            android:id="@+id/gameView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+                <com.example.p40.GameView            android:id="@+id/gameView"            android:layout_width="match_parent"            android:layout_height="match_parent" />
             
         <!-- 플러시 스킬 버튼 컨테이너 -->
         <LinearLayout

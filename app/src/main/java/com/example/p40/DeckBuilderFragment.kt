@@ -1,13 +1,10 @@
 package com.example.p40
 
-import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
 import android.view.View
-import android.view.Window
 import android.widget.Button
 import android.widget.ImageButton
-import android.widget.NumberPicker
 import android.widget.TextView
 
 import androidx.activity.OnBackPressedCallback
@@ -16,12 +13,6 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.p40.game.Card
-import com.example.p40.game.CardRank
-import com.example.p40.game.CardSuit
-import com.example.p40.game.CardUtils
-import com.example.p40.game.PokerDeck
-import com.example.p40.game.MessageManager
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
@@ -305,7 +296,7 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
      * 덱 카드 정렬 함수: 무늬(스페이드, 하트, 다이아, 클로버) 순으로 정렬하고, 같은 무늬 내에서는 숫자 순으로 정렬
      */
     private fun sortDeckCards() {
-        deckCards.sortWith(compareBy<Card> { 
+        deckCards.sortWith(compareBy<Card> {
             when (it.suit) {
                 CardSuit.SPADE -> 0
                 CardSuit.HEART -> 1
@@ -320,7 +311,7 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
      * 컬렉션 카드 정렬 함수: 무늬(스페이드, 하트, 다이아, 클로버) 순으로 정렬하고, 같은 무늬 내에서는 숫자 순으로 정렬
      */
     private fun sortCollectionCards() {
-        collectionCards.sortWith(compareBy<Card> { 
+        collectionCards.sortWith(compareBy<Card> {
             when (it.suit) {
                 CardSuit.SPADE -> 0
                 CardSuit.HEART -> 1
@@ -558,11 +549,13 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
                 val removedCard = deckCards.removeAt(index)
                 
                 // 컬렉션에 카드 추가
-                collectionCards.add(Card(
+                collectionCards.add(
+                    Card(
                     removedCard.suit, 
                     removedCard.rank, 
                     isJoker = removedCard.isJoker
-                ))
+                )
+                )
                 
                 removedCount++
             }

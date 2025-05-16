@@ -17,14 +17,10 @@ import android.view.animation.AccelerateInterpolator
 import android.view.animation.Animation
 import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
-import android.widget.LinearLayout
 import android.widget.TextView
 
 import androidx.cardview.widget.CardView
-import com.example.p40.game.CardSymbolType
 import kotlin.math.abs
-import kotlin.math.max
-import kotlin.math.min
 
 /**
  * 메인 메뉴의 로고 카드 관리 클래스

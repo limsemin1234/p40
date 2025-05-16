@@ -1,54 +1,23 @@
 package com.example.p40
 
-import android.animation.ObjectAnimator
-import android.app.Dialog
-import android.content.Context
 import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.Button
-import android.widget.EditText
 import android.widget.LinearLayout
-import android.widget.NumberPicker
 import android.widget.TextView
 
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.example.p40.game.Buff
-import com.example.p40.game.GameConfig
-import com.example.p40.game.GameOverListener
-import com.example.p40.game.GameView
-import com.example.p40.game.PokerHand
-import com.example.p40.game.BossKillListener
-import com.example.p40.game.Card
-import com.example.p40.game.CardRank
-import com.example.p40.game.CardSuit
-import com.example.p40.game.PokerHandEvaluator
-import com.example.p40.game.PokerDeck
-import com.example.p40.game.CardUtils
-import com.example.p40.game.PokerCardManager
-import com.example.p40.game.BuffType
-import com.example.p40.game.MessageManager
-import com.example.p40.game.FlushSkillManager
-import com.example.p40.StatsManager
-import com.example.p40.game.DefenseUnitSymbolChangeListener
-import com.example.p40.game.CardSymbolType
-import com.example.p40.game.LevelClearListener
-import kotlin.random.Random
 
 /**
  * 게임 화면을 담당하는 Fragment
  * 리팩토링: 책임 분리를 위해 여러 매니저 클래스로 기능 위임
  */
-class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCardManager.PokerCardListener, DefenseUnitSymbolChangeListener, LevelClearListener {
+class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCardManager.PokerCardListener,
+    DefenseUnitSymbolChangeListener, LevelClearListener {
 
     private lateinit var gameView: GameView
     private var isPaused = false

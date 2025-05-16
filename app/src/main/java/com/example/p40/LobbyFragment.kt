@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.p40.game.MessageManager
+import com.example.p40.MessageManager
 
 class LobbyFragment : Fragment(R.layout.fragment_lobby) {
 

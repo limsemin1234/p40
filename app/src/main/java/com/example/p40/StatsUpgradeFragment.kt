@@ -8,8 +8,8 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.example.p40.game.GameConfig
-import com.example.p40.game.MessageManager
+import com.example.p40.GameConfig
+import com.example.p40.MessageManager
 
 class StatsUpgradeFragment : Fragment(R.layout.fragment_stats_upgrade) {
 

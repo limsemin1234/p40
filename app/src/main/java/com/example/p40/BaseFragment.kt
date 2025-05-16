@@ -7,7 +7,7 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.example.p40.game.PokerGuideDialog
+import com.example.p40.PokerGuideDialog
 
 /**
  * 모든 Fragment가 상속받는 기본 클래스

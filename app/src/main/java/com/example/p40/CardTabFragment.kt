@@ -12,10 +12,10 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.p40.game.Card
-import com.example.p40.game.CardSuit
-import com.example.p40.game.MessageManager
-import com.example.p40.game.ShopCard
+import com.example.p40.Card
+import com.example.p40.CardSuit
+import com.example.p40.MessageManager
+import com.example.p40.ShopCard
 
 /**
  * 상점의 카드 탭 프래그먼트

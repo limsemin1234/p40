@@ -2,11 +2,11 @@ package com.example.p40
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.example.p40.game.Card
-import com.example.p40.game.CardRank
-import com.example.p40.game.CardSuit
-import com.example.p40.game.GameConfig
 import com.google.gson.Gson
+import com.example.p40.Card
+import com.example.p40.CardRank
+import com.example.p40.CardSuit
+import com.example.p40.GameConfig
 import com.google.gson.reflect.TypeToken
 
 /**

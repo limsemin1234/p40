@@ -2,7 +2,6 @@ package com.example.p40
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.example.p40.game.GameConfig
 
 class StatsManager private constructor(context: Context) {
     
