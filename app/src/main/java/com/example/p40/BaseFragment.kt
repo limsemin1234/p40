@@ -30,6 +30,25 @@ abstract class BaseFragment : Fragment {
         
         // 상단바 초기화
         initTopBar(view)
+        
+        // 버튼 스타일 및 애니메이션 적용
+        applyButtonStyles(view)
+    }
+    
+    /**
+     * 버튼 스타일 및 애니메이션 적용
+     */
+    protected fun applyButtonStyles(rootView: View) {
+        try {
+            // 레이아웃 내의 모든 버튼에 애니메이션 적용
+            ButtonAnimationUtils.applyButtonAnimationToAllButtons(rootView, requireContext())
+            
+            // 여기서 개별 버튼에 특정 스타일을 적용할 수도 있습니다.
+            // 예: 특정 ID를 가진 버튼에 Primary 스타일 적용
+            // rootView.findViewById<Button>(R.id.btnSave)?.setBackgroundResource(R.drawable.btn_game_primary)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
     
     /**
@@ -53,15 +72,25 @@ abstract class BaseFragment : Fragment {
             
             // 족보가이드 버튼 설정
             val btnPokerGuide = topBarInclude.findViewById<Button>(R.id.btnPokerGuide)
-            btnPokerGuide?.setOnClickListener {
-                // 족보가이드 다이얼로그 표시
-                showPokerGuideDialog()
+            btnPokerGuide?.let {
+                it.setOnClickListener {
+                    // 족보가이드 다이얼로그 표시
+                    showPokerGuideDialog()
+                }
+                // 버튼 스타일 적용
+                it.setBackgroundResource(R.drawable.btn_game_secondary)
+                ButtonAnimationUtils.applyButtonAnimation(it, requireContext())
             }
             
             // 업적 버튼 설정 (기능은 아직 구현하지 않음)
             val btnAchievement = topBarInclude.findViewById<Button>(R.id.btnAchievement)
-            btnAchievement?.setOnClickListener {
-                // 향후 업적 기능 추가 시 구현
+            btnAchievement?.let {
+                it.setOnClickListener {
+                    // 향후 업적 기능 추가 시 구현
+                }
+                // 버튼 스타일 적용
+                it.setBackgroundResource(R.drawable.btn_game_primary)
+                ButtonAnimationUtils.applyButtonAnimation(it, requireContext())
             }
             
             // 코인 정보 업데이트

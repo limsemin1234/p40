@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 기본 게임 버튼 스타일 -->
+    <style name="ButtonGame" parent="android:Widget.Button">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:padding">12dp</item>
+        <item name="android:minWidth">120dp</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:gravity">center</item>
+    </style>
+    
+    <!-- 주요 게임 버튼 (노란색) -->
+    <style name="ButtonGame.Primary">
+        <item name="android:background">@drawable/btn_game_primary</item>
+    </style>
+    
+    <!-- 보조 게임 버튼 (파란색) -->
+    <style name="ButtonGame.Secondary">
+        <item name="android:background">@drawable/btn_game_secondary</item>
+    </style>
+    
+    <!-- 성공 버튼 (녹색) -->
+    <style name="ButtonGame.Success">
+        <item name="android:background">@drawable/btn_game_success</item>
+    </style>
+    
+    <!-- 위험 버튼 (빨간색) -->
+    <style name="ButtonGame.Danger">
+        <item name="android:background">@drawable/btn_game_danger</item>
+    </style>
+    
+    <!-- 메뉴 버튼 (작은 버튼) -->
+    <style name="ButtonGame.Menu">
+        <item name="android:background">@drawable/btn_game_primary</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:padding">8dp</item>
+        <item name="android:minWidth">100dp</item>
+        <item name="android:minHeight">36dp</item>
+    </style>
+</resources> 

@@ -33,6 +33,10 @@ class PokerGuideDialog(context: Context) {
         btnCloseGuide.setOnClickListener {
             dialog.dismiss()
         }
+        
+        // 닫기 버튼에 스타일 적용
+        btnCloseGuide.setBackgroundResource(R.drawable.btn_game_primary)
+        ButtonAnimationUtils.applyButtonAnimation(btnCloseGuide, context)
     }
     
     /**

@@ -6,6 +6,7 @@ import android.os.Handler
 import android.os.Looper
 import android.view.View
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 
@@ -175,6 +176,9 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
 
         // 테스트 버튼 설정
         setupTestButton(view)
+        
+        // 게임 화면 버튼 스타일 적용
+        applyGameButtonStyles(view)
     }
 
     /**
@@ -661,6 +665,110 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
                 // 메시지 표시
                 messageManager.showInfo("테스트: 다음 웨이브로 이동")
             }
+        }
+    }
+
+    /**
+     * 게임 화면의 버튼들에 스타일 적용
+     */
+    private fun applyGameButtonStyles(view: View) {
+        try {
+            // 업그레이드 슬라이딩 패널 버튼들 스타일 적용
+            val upgradePanelButtons = listOf(
+                view.findViewById<Button>(R.id.btnUpgradeDamage),
+                view.findViewById<Button>(R.id.btnUpgradeAttackSpeed),
+                view.findViewById<Button>(R.id.btnUpgradeAttackRange),
+                view.findViewById<Button>(R.id.defenseUpgrade1),
+                view.findViewById<Button>(R.id.defenseUpgrade2),
+                view.findViewById<Button>(R.id.defenseUpgrade3)
+            )
+            
+            upgradePanelButtons.forEach { button ->
+                button?.let {
+                    it.setBackgroundResource(R.drawable.btn_game_primary)
+                    ButtonAnimationUtils.applyButtonAnimation(it, requireContext())
+                }
+            }
+            
+            // 하단 메인 버튼들 스타일 적용
+            val mainButtons = listOf(
+                view.findViewById<Button>(R.id.attackUpButton),
+                view.findViewById<Button>(R.id.defenseUpButton),
+                view.findViewById<Button>(R.id.cardButton)
+            )
+            
+            mainButtons.forEach { button ->
+                button?.let {
+                    it.setBackgroundResource(R.drawable.btn_game_secondary)
+                    ButtonAnimationUtils.applyButtonAnimation(it, requireContext())
+                }
+            }
+            
+            // 게임 종료 버튼 스타일 적용
+            view.findViewById<Button>(R.id.exitButton)?.let {
+                it.setBackgroundResource(R.drawable.btn_game_danger)
+                ButtonAnimationUtils.applyButtonAnimation(it, requireContext())
+            }
+            
+            // 테스트 버튼 스타일 적용
+            view.findViewById<Button>(R.id.testNextWaveButton)?.let {
+                it.setBackgroundResource(R.drawable.btn_game_secondary)
+                ButtonAnimationUtils.applyButtonAnimation(it, requireContext())
+            }
+            
+            // 탭 버튼 스타일 적용
+            val tabButtons = listOf(
+                view.findViewById<Button>(R.id.myUnitTabButton),
+                view.findViewById<Button>(R.id.enemyUnitTabButton),
+                view.findViewById<Button>(R.id.bosUnitTabButton)
+            )
+            
+            tabButtons.forEach { button ->
+                button?.let {
+                    it.setBackgroundResource(R.drawable.btn_game_secondary)
+                    ButtonAnimationUtils.applyButtonAnimation(it, requireContext())
+                }
+            }
+            
+            // 카드 패널 내의 버튼에 애니메이션 적용
+            view.findViewById<ImageButton>(R.id.btnPokerGuide)?.let {
+                ButtonAnimationUtils.applyButtonAnimation(it, requireContext())
+            }
+            
+            // 포커 카드 패널 버튼들 스타일 및 애니메이션 적용
+            val pokerCardButtons = listOf(
+                view.findViewById<Button>(R.id.btnDrawPokerCards),
+                view.findViewById<Button>(R.id.btnAddCard),
+                view.findViewById<Button>(R.id.btnReplaceCards),
+                view.findViewById<Button>(R.id.btnReplaceAllCards),
+                view.findViewById<Button>(R.id.btnConfirmHand)
+            )
+            
+            pokerCardButtons.forEach { button ->
+                button?.let {
+                    it.setBackgroundResource(R.drawable.btn_game_secondary)
+                    ButtonAnimationUtils.applyButtonAnimation(it, requireContext())
+                }
+            }
+            
+            // 카드뷰들에 애니메이션 적용
+            val cardViews = listOf(
+                view.findViewById<View>(R.id.cardView1),
+                view.findViewById<View>(R.id.cardView2),
+                view.findViewById<View>(R.id.cardView3),
+                view.findViewById<View>(R.id.cardView4),
+                view.findViewById<View>(R.id.cardView5),
+                view.findViewById<View>(R.id.cardView6),
+                view.findViewById<View>(R.id.cardView7)
+            )
+            
+            cardViews.forEach { cardView ->
+                cardView?.let {
+                    ButtonAnimationUtils.applyButtonAnimation(it, requireContext())
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 }

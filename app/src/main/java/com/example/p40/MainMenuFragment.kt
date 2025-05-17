@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.ImageButton
+import android.widget.TextView
 
 import androidx.cardview.widget.CardView
 import androidx.navigation.fragment.findNavController
@@ -137,6 +138,9 @@ class MainMenuFragment : BaseFragment(R.layout.fragment_main_menu) {
         cardLobby.setOnClickListener {
             findNavController().navigate(R.id.action_mainMenu_to_game)
         }
+        
+        // 스타일 및 애니메이션 적용
+        applyMenuCardStyles(view)
 
         // 카드 구매 버튼 클릭 시
         val cardShop = view.findViewById<CardView>(R.id.cardShop)
@@ -160,6 +164,43 @@ class MainMenuFragment : BaseFragment(R.layout.fragment_main_menu) {
         val cardExit = view.findViewById<CardView>(R.id.cardExit)
         cardExit.setOnClickListener {
             activity?.finish()
+        }
+    }
+    
+    /**
+     * 메인 메뉴 카드들에 스타일 적용
+     */
+    private fun applyMenuCardStyles(view: View) {
+        // 각 메뉴 카드에 있는 버튼들에 애니메이션 효과 적용
+        val cardViews = listOf(
+            view.findViewById<CardView>(R.id.cardLobby),
+            view.findViewById<CardView>(R.id.cardShop),
+            view.findViewById<CardView>(R.id.cardStatsUpgrade),
+            view.findViewById<CardView>(R.id.cardDeckBuilder),
+            view.findViewById<CardView>(R.id.cardExit)
+        )
+        
+        // 각 카드에 애니메이션 적용
+        cardViews.forEach { cardView ->
+            cardView?.let {
+                // 카드 뷰에 클릭 애니메이션 적용
+                ButtonAnimationUtils.applyButtonAnimationProperty(it)
+                
+                // 카드뷰 내부 텍스트뷰 스타일링
+                try {
+                    // 카드뷰 내부의 첫번째 자식이 일반적으로 텍스트뷰
+                    if (it is ViewGroup && it.childCount > 0) {
+                        val childView = it.getChildAt(0)
+                        if (childView is TextView) {
+                            childView.setTextColor(android.graphics.Color.WHITE)
+                            childView.textSize = 18f
+                            childView.setTypeface(childView.typeface, android.graphics.Typeface.BOLD)
+                        }
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
         }
     }
     

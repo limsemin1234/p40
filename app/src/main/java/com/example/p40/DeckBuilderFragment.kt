@@ -94,24 +94,43 @@ class DeckBuilderFragment : BaseFragment(R.layout.fragment_deck_builder) {
             saveDeck()
         }
         
+        // 저장 버튼에 스타일 적용
+        btnSaveDeck.setBackgroundResource(R.drawable.btn_game_success)
+        ButtonAnimationUtils.applyButtonAnimation(btnSaveDeck, requireContext())
+        
         // 뒤로가기 버튼 설정
         view?.findViewById<ImageButton>(R.id.btnBack)?.setOnClickListener {
             navigateBack()
         }
         
         // 선택한 카드 추가 버튼 설정
-        view?.findViewById<Button>(R.id.btnAddSelected)?.setOnClickListener {
-            addSelectedCards()
+        view?.findViewById<Button>(R.id.btnAddSelected)?.let { button ->
+            button.setOnClickListener {
+                addSelectedCards()
+            }
+            // 버튼 스타일 적용
+            button.setBackgroundResource(R.drawable.btn_game_primary)
+            ButtonAnimationUtils.applyButtonAnimation(button, requireContext())
         }
         
         // 선택한 카드 제거 버튼 설정
-        view?.findViewById<Button>(R.id.btnRemoveSelected)?.setOnClickListener {
-            removeSelectedCards()
+        view?.findViewById<Button>(R.id.btnRemoveSelected)?.let { button ->
+            button.setOnClickListener {
+                removeSelectedCards()
+            }
+            // 버튼 스타일 적용
+            button.setBackgroundResource(R.drawable.btn_game_secondary)
+            ButtonAnimationUtils.applyButtonAnimation(button, requireContext())
         }
         
         // 카드 삭제 버튼 설정
-        view?.findViewById<Button>(R.id.btnDeleteCard)?.setOnClickListener {
-            showDeleteCardDialog()
+        view?.findViewById<Button>(R.id.btnDeleteCard)?.let { button ->
+            button.setOnClickListener {
+                showDeleteCardDialog()
+            }
+            // 버튼 스타일 적용
+            button.setBackgroundResource(R.drawable.btn_game_danger)
+            ButtonAnimationUtils.applyButtonAnimation(button, requireContext())
         }
     }
     
