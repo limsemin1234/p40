@@ -3,6 +3,7 @@ package com.example.p40
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.content.Context
+import android.graphics.drawable.GradientDrawable
 import android.media.MediaPlayer
 import android.view.MotionEvent
 import android.view.View
@@ -104,6 +105,47 @@ object ButtonAnimationUtils {
                 val child = rootView.getChildAt(i)
                 applyButtonAnimationToAllButtons(child, context)
             }
+        }
+    }
+    
+    /**
+     * 버튼에 배경색을 직접 설정하고 테마 스타일을 무시합니다.
+     * @param button 버튼 뷰
+     * @param backgroundColor 적용할 배경색 (예: "#FFC107")
+     * @param strokeColor 테두리 색상 (예: "#FFD700")
+     * @param strokeWidth 테두리 두께 (픽셀)
+     * @param cornerRadius 모서리 둥글기 (픽셀)
+     */
+    fun setButtonBackgroundDirectly(
+        button: View, 
+        backgroundColor: String, 
+        strokeColor: String? = null,
+        strokeWidth: Int = 2,
+        cornerRadius: Float = 8f
+    ) {
+        val shape = GradientDrawable()
+        shape.shape = GradientDrawable.RECTANGLE
+        
+        // 배경색 설정
+        shape.setColor(android.graphics.Color.parseColor(backgroundColor))
+        
+        // 테두리 설정 (옵션)
+        if (strokeColor != null) {
+            shape.setStroke(
+                strokeWidth, 
+                android.graphics.Color.parseColor(strokeColor)
+            )
+        }
+        
+        // 모서리 둥글기 설정
+        shape.cornerRadius = cornerRadius
+        
+        // 배경으로 설정
+        button.background = shape
+        
+        // backgroundTint 속성 초기화 (테마나 style에서 설정된 경우 재정의)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            button.backgroundTintList = null
         }
     }
 } 

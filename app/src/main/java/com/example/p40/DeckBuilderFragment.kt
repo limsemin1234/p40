@@ -102,36 +102,6 @@ class DeckBuilderFragment : BaseFragment(R.layout.fragment_deck_builder) {
         view?.findViewById<ImageButton>(R.id.btnBack)?.setOnClickListener {
             navigateBack()
         }
-        
-        // 선택한 카드 추가 버튼 설정
-        view?.findViewById<Button>(R.id.btnAddSelected)?.let { button ->
-            button.setOnClickListener {
-                addSelectedCards()
-            }
-            // 버튼 스타일 적용
-            button.setBackgroundResource(R.drawable.btn_game_primary)
-            ButtonAnimationUtils.applyButtonAnimation(button, requireContext())
-        }
-        
-        // 선택한 카드 제거 버튼 설정
-        view?.findViewById<Button>(R.id.btnRemoveSelected)?.let { button ->
-            button.setOnClickListener {
-                removeSelectedCards()
-            }
-            // 버튼 스타일 적용
-            button.setBackgroundResource(R.drawable.btn_game_secondary)
-            ButtonAnimationUtils.applyButtonAnimation(button, requireContext())
-        }
-        
-        // 카드 삭제 버튼 설정
-        view?.findViewById<Button>(R.id.btnDeleteCard)?.let { button ->
-            button.setOnClickListener {
-                showDeleteCardDialog()
-            }
-            // 버튼 스타일 적용
-            button.setBackgroundResource(R.drawable.btn_game_danger)
-            ButtonAnimationUtils.applyButtonAnimation(button, requireContext())
-        }
     }
     
     private fun navigateBack() {
@@ -173,10 +143,6 @@ class DeckBuilderFragment : BaseFragment(R.layout.fragment_deck_builder) {
             onCardClick = { card ->
                 // 덱에서 카드 제거하여 컬렉션으로 이동
                 removeCardFromDeck(card)
-            },
-            onCardLongClick = { card ->
-                // 롱클릭 기능 비활성화
-                false
             }
         )
         
@@ -188,11 +154,7 @@ class DeckBuilderFragment : BaseFragment(R.layout.fragment_deck_builder) {
                 addCardToDeck(card)
             },
             showNewLabel = true,
-            deckBuilderFragment = this,
-            onCardLongClick = { card ->
-                // 롱클릭 기능 비활성화
-                false
-            }
+            deckBuilderFragment = this
         )
         
         // RecyclerView에 어댑터 연결
@@ -475,236 +437,10 @@ class DeckBuilderFragment : BaseFragment(R.layout.fragment_deck_builder) {
     }
     
     /**
-     * 선택한 카드들을 덱에 추가
-     */
-    private fun addSelectedCards() {
-        val selectedCards = collectionAdapter.getSelectedCards()
-        
-        if (selectedCards.isEmpty()) {
-            MessageManager.getInstance().showInfo(requireContext(), "추가할 카드를 선택해주세요")
-            return
-        }
-        
-        var addedCount = 0
-        
-        // 덱 최대 크기 체크
-        if (deckCards.size + selectedCards.size > 55) {
-            MessageManager.getInstance().showInfo(requireContext(), "덱에 최대 55장까지만 넣을 수 있습니다.")
-            return
-        }
-        
-        // 선택한 카드들 처리
-        for (card in selectedCards) {
-            // 이미 덱에 있는 카드인지 확인
-            if (isCardInDeck(card)) {
-                continue
-            }
-            
-            // 덱에 카드 추가
-            deckCards.add(Card(card.suit, card.rank, isJoker = card.isJoker))
-            
-            // 컬렉션에서 해당 카드 찾기
-            val index = collectionCards.indexOfFirst { 
-                it.suit == card.suit && it.rank == card.rank && it.isJoker == card.isJoker
-            }
-            
-            // 컬렉션에서 카드 제거
-            if (index != -1) {
-                collectionCards.removeAt(index)
-                addedCount++
-            }
-        }
-        
-        // 카드 정렬
-        sortDeckCards()
-        sortCollectionCards()
-        
-        // UI 갱신
-        deckAdapter.notifyDataSetChanged()
-        collectionAdapter.notifyDataSetChanged()
-        collectionAdapter.clearSelections()
-        
-        // 카드 수량 업데이트
-        updateDeckCount()
-        
-        // 결과 안내 메시지
-        if (addedCount > 0) {
-            MessageManager.getInstance().showInfo(requireContext(), "${addedCount}장의 카드를 덱에 추가했습니다.")
-            
-            // 변경사항 자동 저장
-            autoSaveDeckAndCollection()
-        } else {
-            MessageManager.getInstance().showInfo(requireContext(), "추가할 수 있는 카드가 없습니다.")
-        }
-    }
-    
-    /**
-     * 선택한 카드들을 덱에서 제거
-     */
-    private fun removeSelectedCards() {
-        val selectedCards = deckAdapter.getSelectedCards()
-        
-        if (selectedCards.isEmpty()) {
-            MessageManager.getInstance().showInfo(requireContext(), "제거할 카드를 선택해주세요")
-            return
-        }
-        
-        var removedCount = 0
-        
-        // 선택된 카드들을 임시 리스트에 복사 (인덱스 변경 방지)
-        val cardsToRemove = selectedCards.toList()
-        
-        // 선택한 카드들 처리
-        for (card in cardsToRemove) {
-            // 덱에서 카드 찾기
-            val index = deckCards.indexOfFirst { 
-                it.suit == card.suit && it.rank == card.rank && it.isJoker == card.isJoker
-            }
-            
-            // 덱에서 카드 제거
-            if (index != -1) {
-                val removedCard = deckCards.removeAt(index)
-                
-                // 컬렉션에 카드 추가
-                collectionCards.add(
-                    Card(
-                    removedCard.suit, 
-                    removedCard.rank, 
-                    isJoker = removedCard.isJoker
-                )
-                )
-                
-                removedCount++
-            }
-        }
-        
-        // 카드 정렬
-        sortDeckCards()
-        sortCollectionCards()
-        
-        // UI 갱신
-        deckAdapter.notifyDataSetChanged()
-        collectionAdapter.notifyDataSetChanged()
-        deckAdapter.clearSelections()
-        
-        // 카드 수량 업데이트
-        updateDeckCount()
-        
-        // 결과 안내 메시지
-        if (removedCount > 0) {
-            MessageManager.getInstance().showInfo(requireContext(), "${removedCount}장의 카드를 덱에서 제거했습니다.")
-            
-            // 변경사항 자동 저장
-            autoSaveDeckAndCollection()
-        } else {
-            MessageManager.getInstance().showInfo(requireContext(), "제거할 수 있는 카드가 없습니다.")
-        }
-    }
-    
-    /**
      * 카드 삭제 다이얼로그 표시
      */
     private fun showDeleteCardDialog() {
-        // 선택된 카드 가져오기
-        val selectedDeckCards = deckAdapter.getSelectedCards()
-        val selectedCollectionCards = collectionAdapter.getSelectedCards()
-        
-        // 선택된 카드가 없는 경우
-        if (selectedDeckCards.isEmpty() && selectedCollectionCards.isEmpty()) {
-            MessageManager.getInstance().showInfo(requireContext(), "삭제할 카드를 선택해주세요")
-            return
-        }
-        
-        // 선택된 카드 총 개수
-        val totalSelectedCards = selectedDeckCards.size + selectedCollectionCards.size
-        
-        // 확인 다이얼로그 생성
-        val builder = AlertDialog.Builder(requireContext())
-        builder.setTitle("카드 삭제")
-        builder.setMessage("선택한 ${totalSelectedCards}장의 카드를 영구적으로 삭제하시겠습니까?\n삭제된 카드는 복구할 수 없습니다.")
-        
-        // 확인 버튼
-        builder.setPositiveButton("삭제") { dialog, _ ->
-            // 덱에서 선택된 카드 삭제
-            if (selectedDeckCards.isNotEmpty()) {
-                deleteCardsFromDeck(selectedDeckCards)
-            }
-            
-            // 컬렉션에서 선택된 카드 삭제
-            if (selectedCollectionCards.isNotEmpty()) {
-                deleteCardsFromCollection(selectedCollectionCards)
-            }
-            
-            // 다이얼로그 닫기
-            dialog.dismiss()
-            
-            // 변경사항 자동 저장
-            autoSaveDeckAndCollection()
-            
-            // 카드 수량 업데이트
-            updateDeckCount()
-            
-            // 결과 안내 메시지
-            MessageManager.getInstance().showInfo(requireContext(), "${totalSelectedCards}장의 카드가 삭제되었습니다.")
-        }
-        
-        // 취소 버튼
-        builder.setNegativeButton("취소") { dialog, _ ->
-            dialog.dismiss()
-        }
-        
-        // 다이얼로그 표시
-        builder.show()
-    }
-    
-    /**
-     * 덱에서 카드 삭제
-     */
-    private fun deleteCardsFromDeck(cardsToDelete: List<Card>) {
-        // 카드 하나씩 삭제
-        for (card in cardsToDelete) {
-            // 덱에서 카드 찾기
-            val index = deckCards.indexOfFirst { 
-                it.suit == card.suit && it.rank == card.rank && it.isJoker == card.isJoker
-            }
-            
-            // 덱에서 카드 제거
-            if (index != -1) {
-                deckCards.removeAt(index)
-            }
-        }
-        
-        // 덱 정렬
-        sortDeckCards()
-        
-        // UI 갱신
-        deckAdapter.notifyDataSetChanged()
-        deckAdapter.clearSelections()
-    }
-    
-    /**
-     * 컬렉션에서 카드 삭제
-     */
-    private fun deleteCardsFromCollection(cardsToDelete: List<Card>) {
-        // 카드 하나씩 삭제
-        for (card in cardsToDelete) {
-            // 컬렉션에서 카드 찾기
-            val index = collectionCards.indexOfFirst { 
-                it.suit == card.suit && it.rank == card.rank && it.isJoker == card.isJoker
-            }
-            
-            // 컬렉션에서 카드 제거
-            if (index != -1) {
-                collectionCards.removeAt(index)
-            }
-        }
-        
-        // 컬렉션 정렬
-        sortCollectionCards()
-        
-        // UI 갱신
-        collectionAdapter.notifyDataSetChanged()
-        collectionAdapter.clearSelections()
+        MessageManager.getInstance().showInfo(requireContext(), "카드 삭제 기능은 사용할 수 없습니다.")
     }
     
     // 카드 데이터 직렬화를 위한 클래스

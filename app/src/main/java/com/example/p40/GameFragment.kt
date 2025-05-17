@@ -357,13 +357,13 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
     ) {
         // 모든 탭 버튼 비활성화 스타일로 변경
         myUnitTabButton.setTextColor(Color.parseColor("#CCCCCC"))
-        myUnitTabButton.setBackgroundColor(Color.parseColor("#252525"))
+        ButtonAnimationUtils.setButtonBackgroundDirectly(myUnitTabButton, "#252525")
         
         enemyUnitTabButton.setTextColor(Color.parseColor("#CCCCCC"))
-        enemyUnitTabButton.setBackgroundColor(Color.parseColor("#252525"))
+        ButtonAnimationUtils.setButtonBackgroundDirectly(enemyUnitTabButton, "#252525")
         
         bossUnitTabButton.setTextColor(Color.parseColor("#CCCCCC"))
-        bossUnitTabButton.setBackgroundColor(Color.parseColor("#252525"))
+        ButtonAnimationUtils.setButtonBackgroundDirectly(bossUnitTabButton, "#252525")
         
         // 모든 컨테이너 숨기기
         myUnitStatsContainer.visibility = View.GONE
@@ -374,17 +374,17 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         when (selectedTab) {
             0 -> { // 내 유닛 정보
                 myUnitTabButton.setTextColor(Color.WHITE)
-                myUnitTabButton.setBackgroundColor(Color.parseColor("#333333"))
+                ButtonAnimationUtils.setButtonBackgroundDirectly(myUnitTabButton, "#333333")
                 myUnitStatsContainer.visibility = View.VISIBLE
             }
             1 -> { // 적 유닛 정보
                 enemyUnitTabButton.setTextColor(Color.WHITE)
-                enemyUnitTabButton.setBackgroundColor(Color.parseColor("#333333"))
+                ButtonAnimationUtils.setButtonBackgroundDirectly(enemyUnitTabButton, "#333333")
                 enemyStatsContainer.visibility = View.VISIBLE
             }
             2 -> { // 보스 유닛 정보
                 bossUnitTabButton.setTextColor(Color.WHITE)
-                bossUnitTabButton.setBackgroundColor(Color.parseColor("#333333"))
+                ButtonAnimationUtils.setButtonBackgroundDirectly(bossUnitTabButton, "#333333")
                 bossStatsContainer.visibility = View.VISIBLE
             }
         }
@@ -731,14 +731,41 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
      */
     private fun applyButtonStyle(view: View, buttonId: Int, backgroundResId: Int) {
         view.findViewById<Button>(buttonId)?.let { button ->
-            // 기존 클릭 리스너 저장
-            val clickListener = button.hasOnClickListeners()
-            val originalListener = if (clickListener) {
-                View.OnClickListener { button.performClick() }
-            } else null
-            
-            // 배경 리소스 설정
-            button.setBackgroundResource(backgroundResId)
+            // 배경 색상 직접 설정 (테마 스타일 우회)
+            when (backgroundResId) {
+                R.drawable.btn_game_primary -> {
+                    // 골드/황금색 버튼
+                    ButtonAnimationUtils.setButtonBackgroundDirectly(
+                        button, 
+                        "#DAA520", // 배경색 (어두운 금색)
+                        "#FFD700"  // 테두리 (밝은 금색)
+                    )
+                }
+                R.drawable.btn_game_secondary -> {
+                    // 파란색 버튼
+                    ButtonAnimationUtils.setButtonBackgroundDirectly(
+                        button, 
+                        "#1976D2", // 배경색 (어두운 파란색)
+                        "#64B5F6"  // 테두리 (밝은 파란색)
+                    )
+                }
+                R.drawable.btn_game_danger -> {
+                    // 빨간색 버튼
+                    ButtonAnimationUtils.setButtonBackgroundDirectly(
+                        button, 
+                        "#D32F2F", // 배경색 (어두운 빨간색)  
+                        "#EF5350"  // 테두리 (밝은 빨간색)
+                    )
+                }
+                else -> {
+                    // 기본 스타일 (보라색)
+                    ButtonAnimationUtils.setButtonBackgroundDirectly(
+                        button, 
+                        "#3F51B5", // 배경색 (보라색) 
+                        "#90CAF9"  // 테두리 (밝은 파란색)
+                    )
+                }
+            }
             
             // 프로퍼티 애니메이션 적용 (setOnTouchListener를 사용하므로 기존 클릭은 전파됨)
             ButtonAnimationUtils.applyButtonAnimationProperty(button)

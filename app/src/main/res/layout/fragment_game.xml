@@ -240,7 +240,8 @@
                 android:paddingVertical="8dp"
                 android:textColor="#FFFFFF"
                 android:gravity="center"
-                android:background="#333333" />
+                android:background="#333333"
+                android:backgroundTint="@null"/>
 
             <View
                 android:layout_width="1dp"
@@ -258,7 +259,8 @@
                 android:paddingVertical="8dp"
                 android:textColor="#CCCCCC"
                 android:gravity="center"
-                android:background="#252525" />
+                android:background="#252525"
+                android:backgroundTint="@null" />
 
             <View
                 android:layout_width="1dp"
@@ -276,7 +278,8 @@
                 android:paddingVertical="8dp"
                 android:textColor="#CCCCCC"
                 android:gravity="center"
-                android:background="#252525" />
+                android:background="#252525"
+                android:backgroundTint="@null" />
         </LinearLayout>
 
         <!-- 스탯 정보 컨테이너 -->
