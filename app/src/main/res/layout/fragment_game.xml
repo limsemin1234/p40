@@ -236,16 +236,16 @@
                 android:layout_weight="1"
                 android:text="내 유닛 정보"
                 android:textStyle="bold"
-                android:textSize="12sp"
-                android:paddingVertical="6dp"
+                android:textSize="13sp"
+                android:paddingVertical="8dp"
                 android:textColor="#FFFFFF"
                 android:gravity="center"
-                android:background="@android:color/transparent" />
+                android:background="#333333" />
 
             <View
                 android:layout_width="1dp"
                 android:layout_height="match_parent"
-                android:background="#444444" />
+                android:background="#555555" />
 
             <TextView
                 android:id="@+id/enemyUnitTabButton"
@@ -254,16 +254,16 @@
                 android:layout_weight="1"
                 android:text="적 유닛 정보"
                 android:textStyle="bold"
-                android:textSize="12sp"
-                android:paddingVertical="6dp"
-                android:textColor="#808080"
+                android:textSize="13sp"
+                android:paddingVertical="8dp"
+                android:textColor="#CCCCCC"
                 android:gravity="center"
-                android:background="@android:color/transparent" />
+                android:background="#252525" />
 
             <View
                 android:layout_width="1dp"
                 android:layout_height="match_parent"
-                android:background="#444444" />
+                android:background="#555555" />
 
             <TextView
                 android:id="@+id/bosUnitTabButton"
@@ -272,11 +272,11 @@
                 android:layout_weight="1"
                 android:text="적 보스 정보"
                 android:textStyle="bold"
-                android:textSize="12sp"
-                android:paddingVertical="6dp"
-                android:textColor="#808080"
+                android:textSize="13sp"
+                android:paddingVertical="8dp"
+                android:textColor="#CCCCCC"
                 android:gravity="center"
-                android:background="@android:color/transparent" />
+                android:background="#252525" />
         </LinearLayout>
 
         <!-- 스탯 정보 컨테이너 -->

@@ -338,6 +338,11 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         bosUnitTabButton.setOnClickListener {
             updateTabState(2, myUnitTabButton, enemyUnitTabButton, bosUnitTabButton, myUnitStatsContainer, enemyStatsContainer, bossStatsContainer)
         }
+        
+        // 탭 버튼에 클릭 애니메이션 적용
+        ButtonAnimationUtils.applyButtonAnimationProperty(myUnitTabButton)
+        ButtonAnimationUtils.applyButtonAnimationProperty(enemyUnitTabButton)
+        ButtonAnimationUtils.applyButtonAnimationProperty(bosUnitTabButton)
     }
     
     // 탭 상태 업데이트 (3개 탭 지원)
@@ -351,9 +356,14 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         bossStatsContainer: LinearLayout
     ) {
         // 모든 탭 버튼 비활성화 스타일로 변경
-        myUnitTabButton.setTextColor(Color.parseColor("#808080"))
-        enemyUnitTabButton.setTextColor(Color.parseColor("#808080"))
-        bossUnitTabButton.setTextColor(Color.parseColor("#808080"))
+        myUnitTabButton.setTextColor(Color.parseColor("#CCCCCC"))
+        myUnitTabButton.setBackgroundColor(Color.parseColor("#252525"))
+        
+        enemyUnitTabButton.setTextColor(Color.parseColor("#CCCCCC"))
+        enemyUnitTabButton.setBackgroundColor(Color.parseColor("#252525"))
+        
+        bossUnitTabButton.setTextColor(Color.parseColor("#CCCCCC"))
+        bossUnitTabButton.setBackgroundColor(Color.parseColor("#252525"))
         
         // 모든 컨테이너 숨기기
         myUnitStatsContainer.visibility = View.GONE
@@ -364,14 +374,17 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         when (selectedTab) {
             0 -> { // 내 유닛 정보
                 myUnitTabButton.setTextColor(Color.WHITE)
+                myUnitTabButton.setBackgroundColor(Color.parseColor("#333333"))
                 myUnitStatsContainer.visibility = View.VISIBLE
             }
             1 -> { // 적 유닛 정보
                 enemyUnitTabButton.setTextColor(Color.WHITE)
+                enemyUnitTabButton.setBackgroundColor(Color.parseColor("#333333"))
                 enemyStatsContainer.visibility = View.VISIBLE
             }
             2 -> { // 보스 유닛 정보
                 bossUnitTabButton.setTextColor(Color.WHITE)
+                bossUnitTabButton.setBackgroundColor(Color.parseColor("#333333"))
                 bossStatsContainer.visibility = View.VISIBLE
             }
         }
@@ -705,14 +718,6 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
                     R.id.cardView4, R.id.cardView5, R.id.cardView6, 
                     R.id.cardView7).forEach { cardId ->
                 view.findViewById<View>(cardId)?.let {
-                    ButtonAnimationUtils.applyButtonAnimationProperty(it)
-                }
-            }
-            
-            // 탭 버튼들
-            arrayOf(R.id.myUnitTabButton, R.id.enemyUnitTabButton, R.id.bosUnitTabButton).forEach { tabId ->
-                view.findViewById<TextView>(tabId)?.let {
-                    it.setBackgroundResource(R.drawable.btn_game_secondary)
                     ButtonAnimationUtils.applyButtonAnimationProperty(it)
                 }
             }
