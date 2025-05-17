@@ -185,7 +185,7 @@ object GameConfig {
     
     // 보스 설정
     const val BOSS_SIZE = 40f  // 보스 크기
-    const val BOSS_BASE_HEALTH = 2000  // 보스 기본 체력
+    const val BOSS_BASE_HEALTH = 200 // 보스 기본 체력
     const val BOSS_BASE_SPEED = 0.8f  // 보스 기본 이동 속도
     const val BOSS_DAMAGE = 20  // 보스 공격력
     const val BOSS_COLOR = Color.MAGENTA  // 보스 색상

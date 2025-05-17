@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import android.widget.ImageButton
 
 import androidx.cardview.widget.CardView
 import androidx.navigation.fragment.findNavController
@@ -27,6 +28,9 @@ class MainMenuFragment : BaseFragment(R.layout.fragment_main_menu) {
         // MessageManager 초기화
         messageManager = MessageManager.getInstance()
         messageManager.init(view.findViewById(android.R.id.content) ?: view as ViewGroup)
+        
+        // 상단바의 뒤로가기 버튼 숨기기
+        view.findViewById<ImageButton>(R.id.btnBack)?.visibility = View.INVISIBLE
         
         // 카드 회전 시 클리핑 문제 해결을 위해 클리핑 비활성화
         try {
