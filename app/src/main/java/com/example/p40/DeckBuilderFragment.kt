@@ -133,12 +133,12 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
     private fun autoSaveDeckAndCollection() {
         // 덱 데이터 준비
         val cardDataList = deckCards.map { card ->
-            CardData(card.suit.name, card.rank.name)
+            CardData(card.suit.name, card.rank.name, card.isJoker)
         }
         
         // 컬렉션 카드 준비
         val collectionDataList = collectionCards.map { card ->
-            CardData(card.suit.name, card.rank.name)
+            CardData(card.suit.name, card.rank.name, card.isJoker)
         }
         
         val gson = Gson()
@@ -345,7 +345,7 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
             savedCards.forEach { cardData ->
                 val suit = CardSuit.valueOf(cardData.suit)
                 val rank = CardRank.valueOf(cardData.rank)
-                deckCards.add(Card(suit, rank))
+                deckCards.add(Card(suit, rank, isJoker = cardData.isJoker))
             }
             
             // 덱 카드 정렬
@@ -361,7 +361,7 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
                 savedCollection.forEach { cardData ->
                     val suit = CardSuit.valueOf(cardData.suit)
                     val rank = CardRank.valueOf(cardData.rank)
-                    collectionCards.add(Card(suit, rank))
+                    collectionCards.add(Card(suit, rank, isJoker = cardData.isJoker))
                 }
                 
                 // 컬렉션 카드 정렬
@@ -432,7 +432,11 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
      * 카드가 이미 덱에 있는지 확인
      */
     private fun isCardInDeck(card: Card): Boolean {
-        return deckCards.any { it.suit == card.suit && it.rank == card.rank }
+        return deckCards.any { 
+            it.suit == card.suit && 
+            it.rank == card.rank && 
+            it.isJoker == card.isJoker
+        }
     }
     
     /**
@@ -691,7 +695,7 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
     }
     
     // 카드 데이터 직렬화를 위한 클래스
-    data class CardData(val suit: String, val rank: String)
+    data class CardData(val suit: String, val rank: String, val isJoker: Boolean = false)
     
     // 코인 정보 업데이트
     private fun updateCoinUI() {
