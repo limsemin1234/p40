@@ -19,7 +19,7 @@ import com.google.gson.reflect.TypeToken
 /**
  * 덱 구성 화면 프래그먼트
  */
-class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
+class DeckBuilderFragment : BaseFragment(R.layout.fragment_deck_builder) {
 
     // 리사이클러뷰 어댑터
     private lateinit var deckAdapter: CardAdapter
@@ -37,14 +37,8 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
     private lateinit var btnSaveDeck: Button
     private lateinit var tvCoinAmount: TextView
     
-    // 유저 매니저
-    private lateinit var userManager: UserManager
-    
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        
-        // 유저 매니저 초기화
-        userManager = UserManager.getInstance(requireContext())
         
         // 뷰 초기화
         initViews(view)
@@ -699,7 +693,7 @@ class DeckBuilderFragment : Fragment(R.layout.fragment_deck_builder) {
     
     // 코인 정보 업데이트
     private fun updateCoinUI() {
-        tvCoinAmount.text = "코인: ${userManager.getCoin()}"
+        updateCoinInfo(requireView())
     }
     
     override fun onResume() {

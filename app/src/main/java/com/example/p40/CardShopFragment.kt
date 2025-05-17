@@ -14,9 +14,8 @@ import android.app.Dialog
 import android.view.Window
 import android.widget.Button
 
-class CardShopFragment : Fragment(R.layout.fragment_card_shop) {
+class CardShopFragment : BaseFragment(R.layout.fragment_card_shop) {
 
-    private lateinit var userManager: UserManager
     private lateinit var cardShopAdapter: CardShopAdapter
     private lateinit var shopCards: MutableList<ShopCard>
     private lateinit var tvCoinAmount: TextView
@@ -25,9 +24,6 @@ class CardShopFragment : Fragment(R.layout.fragment_card_shop) {
     
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        
-        // UserManager 초기화
-        userManager = UserManager.getInstance(requireContext())
         
         // 뷰 초기화
         tvCoinAmount = view.findViewById(R.id.tvCoinAmount)
@@ -41,7 +37,7 @@ class CardShopFragment : Fragment(R.layout.fragment_card_shop) {
         }
         
         // 현재 코인 표시
-        updateCurrencyUI()
+        updateCoinInfo(view)
         
         // 카드 데이터 초기화
         initShopCards()
@@ -114,7 +110,7 @@ class CardShopFragment : Fragment(R.layout.fragment_card_shop) {
             // UI 업데이트
             card.isPurchased = true
             cardShopAdapter.updateCardPurchased(card.id)
-            updateCurrencyUI()
+            updateCoinInfo(requireView())
             
             MessageManager.getInstance().showSuccess(requireContext(), "${card.name} 구매 완료!")
         } else {
@@ -140,6 +136,6 @@ class CardShopFragment : Fragment(R.layout.fragment_card_shop) {
     
     // 코인 표시 UI 업데이트 - 다른 탭에서도 호출 가능하도록 public으로 변경
     fun updateCurrencyUI() {
-        tvCoinAmount.text = "코인: ${userManager.getCoin()}"
+        updateCoinInfo(requireView())
     }
 } 
