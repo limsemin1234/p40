@@ -30,7 +30,12 @@ object EnemyConfig {
     const val BASE_ENEMY_SPAWN_INTERVAL = 2000L  // 기본 적 생성 간격 (2초)
     const val MIN_ENEMY_SPAWN_INTERVAL = 500L   // 최소 적 생성 간격 (밀리초)
     const val ENEMY_SPAWN_INTERVAL_DECREASE_PER_WAVE = 0.1f // 웨이브당 생성 간격 감소율 (10%)
-    
+
+
+
+
+
+
     // --------- 일반 적 설정 ----------
     
     // 일반 적 기본 설정
@@ -77,27 +82,35 @@ object EnemyConfig {
         val increase = 1 + ((wave - 1) * ENEMY_SPEED_INCREASE_PER_WAVE)
         return BASE_ENEMY_SPEED * increase
     }
-    
+
+
+
+
+
     // --------- 공중 적 설정 ----------
     
     // 공중 적 기본 설정
     const val FLYING_ENEMY_WAVE_THRESHOLD = 6  // 공중 적이 등장하기 시작하는 웨이브
     const val FLYING_ENEMY_SPAWN_CHANCE = 0.3f  // 공중 적 등장 확률 30% (0~1)
-    const val FLYING_ENEMY_BASE_HEALTH = 60  // 공중 적의 기본 체력
+
+    const val FLYING_ENEMY_COLOR = Color.CYAN  // 공중 적 색상
+    const val FLYING_ENEMY_SIZE = 12f  // 공중 적 크기 (일반 적보다 약간 큼)
     const val FLYING_ENEMY_DAMAGE = 20  // 공중 적의 기본 공격력
-    const val FLYING_ENEMY_SIZE = ENEMY_BASE_SIZE // 공중 적 기본 크기 (일반 적과 동일)
-    const val FLYING_ENEMY_COLOR = Color.CYAN // 공중 적 색상
+    const val FLYING_ENEMY_BASE_HEALTH = 60  // 공중 적의 기본 체력
     
     // 공중 적 움직임 설정
     const val FLYING_ENEMY_SPEED_MULTIPLIER = 1.2f  // 공중 적 이동 속도 계수
+    const val FLYING_ENEMY_BASE_SPEED = BASE_ENEMY_SPEED * FLYING_ENEMY_SPEED_MULTIPLIER  // 공중 적 기본 이동 속도
     const val FLYING_ENEMY_HOVER_AMPLITUDE = 3.0  // 공중 적 호버링 진폭
     const val FLYING_ENEMY_HOVER_PERIOD = 300.0  // 공중 적 호버링 주기 (밀리초)
-    const val FLYING_ENEMY_SPEED_INCREASE_PER_WAVE = 0.5f  // 웨이브당 공중 적 속도 증가량
+    
+    // 공중 적 증가율 설정
+    const val FLYING_ENEMY_DAMAGE_INCREASE_PER_WAVE = 10  // 웨이브당 공중 적 공격력 증가량
+    const val FLYING_ENEMY_HEALTH_INCREASE_PER_WAVE = 10  // 웨이브당 공중 적 체력 증가량
+    const val FLYING_ENEMY_SPEED_INCREASE_PER_WAVE = 0.1f  // 웨이브당 공중 적 속도 증가량
     
     // 공중 적 추가 설정
     const val FLYING_ENEMY_DAMAGE_MULTIPLIER = 1.2f  // 공중 적이 받는 데미지 계수 (취약함)
-    const val FLYING_ENEMY_DAMAGE_INCREASE_PER_WAVE = 10  // 웨이브당 공중 적 공격력 증가량
-    const val FLYING_ENEMY_HEALTH_INCREASE_PER_WAVE = 10  // 웨이브당 공중 적 체력 증가량
     const val FLYING_ENEMY_RENDER_MARGIN_X = ENEMY_RENDER_MARGIN_X // 공중 적 렌더링 X축 마진
     const val FLYING_ENEMY_RENDER_MARGIN_Y = ENEMY_RENDER_MARGIN_Y // 공중 적 렌더링 Y축 마진
     const val FLYING_ENEMY_SPAWN_DISTANCE_FACTOR = ENEMY_SPAWN_DISTANCE_FACTOR // 공중 적 생성 거리 계수
@@ -133,9 +146,14 @@ object EnemyConfig {
     fun getFlyingEnemySpeedForWave(wave: Int): Float {
         val flyingWave = wave - FLYING_ENEMY_WAVE_THRESHOLD + 1
         val waveIncrease = if (flyingWave > 0) flyingWave - 1 else 0
-        return (BASE_ENEMY_SPEED * FLYING_ENEMY_SPEED_MULTIPLIER) + (waveIncrease * FLYING_ENEMY_SPEED_INCREASE_PER_WAVE)
+        return FLYING_ENEMY_BASE_SPEED + (waveIncrease * FLYING_ENEMY_SPEED_INCREASE_PER_WAVE)
     }
-    
+
+
+
+
+
+
     // --------- 보스 설정 ----------
     
     // 보스 기본 설정
