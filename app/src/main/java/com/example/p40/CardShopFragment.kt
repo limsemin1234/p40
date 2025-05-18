@@ -21,6 +21,7 @@ class CardShopFragment : BaseFragment(R.layout.fragment_card_shop) {
     private lateinit var tvCoinAmount: TextView
     private lateinit var viewPager: ViewPager2
     private lateinit var tabLayout: TabLayout
+    private var tabLayoutMediator: TabLayoutMediator? = null
     
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -46,11 +47,24 @@ class CardShopFragment : BaseFragment(R.layout.fragment_card_shop) {
         setupViewPager()
     }
     
-    // 메모리 누수 방지를 위한 onDestroy 추가
+    // 메모리 누수 방지를 위한 onDestroy 개선
     override fun onDestroy() {
         super.onDestroy()
-        // MessageManager 정리
-        MessageManager.getInstance().clear()
+        
+        try {
+            // TabLayoutMediator 해제
+            tabLayoutMediator?.detach()
+            
+            // ViewPager2 어댑터 제거
+            if (::viewPager.isInitialized) {
+                viewPager.adapter = null
+            }
+            
+            // MessageManager 정리
+            MessageManager.getInstance().clear()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
     
     // 상점 카드 초기화
@@ -133,12 +147,15 @@ class CardShopFragment : BaseFragment(R.layout.fragment_card_shop) {
         viewPager.adapter = adapter
         
         // TabLayout과 ViewPager2 연결
-        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
+        tabLayoutMediator = TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             when (position) {
                 0 -> tab.text = "카드"
                 1 -> tab.text = "디펜스유닛"
             }
-        }.attach()
+        }
+        
+        // TabLayoutMediator 연결
+        tabLayoutMediator?.attach()
     }
     
     // 코인 표시 UI 업데이트 - 다른 탭에서도 호출 가능하도록 public으로 변경

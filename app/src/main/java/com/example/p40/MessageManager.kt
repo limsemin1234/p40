@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
+import java.lang.ref.WeakReference
 import java.util.LinkedList
 import java.util.Queue
 
@@ -33,7 +34,7 @@ class MessageManager private constructor() {
     // 메시지 큐 및 현재 표시된 메시지 수 관리
     private val messageQueue: Queue<MessageInfo> = LinkedList()
     private var currentMessageCount = 0
-    private var containerView: ViewGroup? = null
+    private var containerViewRef: WeakReference<ViewGroup>? = null
     private val handler = Handler(Looper.getMainLooper())
 
     // 메시지 정보 데이터 클래스
@@ -56,10 +57,10 @@ class MessageManager private constructor() {
      */
     fun init(rootView: ViewGroup) {
         // 이미 초기화되었으면 반환
-        if (containerView != null) return
+        if (containerViewRef?.get() != null) return
 
         // 메시지 컨테이너 생성
-        containerView = LinearLayout(rootView.context).apply {
+        val newContainerView = LinearLayout(rootView.context).apply {
             orientation = LinearLayout.VERTICAL
             layoutParams = FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -71,6 +72,9 @@ class MessageManager private constructor() {
             // 컨테이너에 패딩 설정
             setPadding(dpToPx(rootView.context, 16), dpToPx(rootView.context, 8), dpToPx(rootView.context, 16), 0)
         }
+        
+        // WeakReference로 저장
+        containerViewRef = WeakReference(newContainerView)
 
         // Fragment 환경을 고려한 안전한 View 추가 방법
         try {
@@ -79,21 +83,21 @@ class MessageManager private constructor() {
             if (activity != null) {
                 val decorView = activity.window.decorView as ViewGroup
                 val contentView = decorView.findViewById<ViewGroup>(android.R.id.content)
-                contentView.addView(containerView)
+                contentView.addView(newContainerView)
             } else {
                 // 활동을 찾을 수 없는 경우 - 기본 동작으로 폴백
-                fallbackAddView(rootView)
+                fallbackAddView(rootView, newContainerView)
             }
         } catch (e: Exception) {
             // 예외 발생 시 기본 동작으로 폴백
-            fallbackAddView(rootView)
+            fallbackAddView(rootView, newContainerView)
         }
     }
 
     /**
      * 기본 View 추가 방법 (대체 방식)
      */
-    private fun fallbackAddView(rootView: ViewGroup) {
+    private fun fallbackAddView(rootView: ViewGroup, containerView: ViewGroup) {
         try {
             // FrameLayout만 직접 추가 시도
             if (rootView is FrameLayout && rootView !is androidx.fragment.app.FragmentContainerView) {
@@ -126,7 +130,7 @@ class MessageManager private constructor() {
     private fun showToast(message: String) {
         handler.post {
             android.widget.Toast.makeText(
-                containerView?.context,
+                containerViewRef?.get()?.context,
                 message,
                 android.widget.Toast.LENGTH_SHORT
             ).show()
@@ -207,7 +211,7 @@ class MessageManager private constructor() {
      * Context가 있을 때 필요하면 초기화
      */
     private fun initIfNeeded(context: Context) {
-        if (containerView == null) {
+        if (containerViewRef?.get() == null) {
             // Activity의 content view를 찾아 초기화
             val activity = getActivity(context)
             if (activity != null) {
@@ -240,7 +244,7 @@ class MessageManager private constructor() {
      * 메시지 큐 처리
      */
     private fun processMessageQueue() {
-        val container = containerView ?: return
+        val container = containerViewRef?.get() ?: return
 
         // 최대 메시지 수를 초과하지 않고, 큐에 메시지가 있는 경우에만 처리
         if (currentMessageCount < GameConfig.MESSAGE_MAX_COUNT && messageQueue.isNotEmpty()) {
@@ -399,7 +403,7 @@ class MessageManager private constructor() {
      * dp를 px로 변환
      */
     private fun dpToPx(context: Context?, dp: Int): Int {
-        val density = context?.resources?.displayMetrics?.density ?: containerView?.context?.resources?.displayMetrics?.density ?: 2.0f
+        val density = context?.resources?.displayMetrics?.density ?: containerViewRef?.get()?.context?.resources?.displayMetrics?.density ?: 2.0f
         return (dp * density).toInt()
     }
 
@@ -414,11 +418,14 @@ class MessageManager private constructor() {
         handler.removeCallbacksAndMessages(null)
         
         // 현재 표시 중인 모든 메시지 제거
-        containerView?.let { container ->
+        containerViewRef?.get()?.let { container ->
             container.removeAllViews()
         }
         
         // 카운터 초기화
         currentMessageCount = 0
+        
+        // 컨테이너 뷰 참조 해제
+        containerViewRef = null
     }
 } 

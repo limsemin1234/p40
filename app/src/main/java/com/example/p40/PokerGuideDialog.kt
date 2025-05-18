@@ -54,6 +54,13 @@ class PokerGuideDialog(context: Context) {
     }
     
     /**
+     * 다이얼로그가 현재 표시 중인지 확인
+     */
+    fun isShowing(): Boolean {
+        return dialog.isShowing
+    }
+    
+    /**
      * 백 버튼 처리를 위한 취소 가능 여부 설정
      */
     fun setCancelable(cancelable: Boolean) {

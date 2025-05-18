@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.p40.PokerGuideDialog
+import java.lang.ref.WeakReference
 
 /**
  * 모든 Fragment가 상속받는 기본 클래스
@@ -21,6 +22,9 @@ abstract class BaseFragment : Fragment {
 
     // UserManager 공통 참조
     protected lateinit var userManager: UserManager
+    
+    // 다이얼로그 참조 관리
+    private var pokerGuideDialogRef: WeakReference<PokerGuideDialog>? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -33,6 +37,20 @@ abstract class BaseFragment : Fragment {
         
         // 버튼 스타일 및 애니메이션 적용
         applyButtonStyles(view)
+    }
+    
+    override fun onDestroyView() {
+        super.onDestroyView()
+        
+        // 열려있는 다이얼로그 닫기
+        dismissPokerGuideDialog()
+    }
+    
+    override fun onDestroy() {
+        super.onDestroy()
+        
+        // 열려있는 다이얼로그 참조 해제
+        pokerGuideDialogRef = null
     }
     
     /**
@@ -119,12 +137,34 @@ abstract class BaseFragment : Fragment {
      */
     private fun showPokerGuideDialog() {
         try {
+            // 기존 다이얼로그가 있으면 닫기
+            dismissPokerGuideDialog()
+            
+            // 새 다이얼로그 생성 및 표시
             val dialog = PokerGuideDialog(requireContext())
             dialog.setCancelable(true)
             dialog.show()
+            
+            // 약한 참조로 저장
+            pokerGuideDialogRef = WeakReference(dialog)
         } catch (e: Exception) {
             // 예외 처리
             e.printStackTrace()
+        }
+    }
+    
+    /**
+     * 포커 족보 가이드 다이얼로그 닫기
+     */
+    private fun dismissPokerGuideDialog() {
+        pokerGuideDialogRef?.get()?.let { dialog ->
+            try {
+                if (dialog.isShowing()) {
+                    dialog.dismiss()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 } 

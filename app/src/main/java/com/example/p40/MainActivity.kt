@@ -15,4 +15,15 @@ class MainActivity : AppCompatActivity() {
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         val navController = navHostFragment.navController
     }
+    
+    override fun onDestroy() {
+        super.onDestroy()
+        
+        // 애플리케이션 종료 시 MessageManager 리소스 정리
+        try {
+            MessageManager.getInstance().clear()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 }
