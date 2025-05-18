@@ -469,7 +469,7 @@ class GameView @JvmOverloads constructor(
     fun getDefenseLevel(): Int = gameStats.getDefenseLevel()
     
     // 리스너 설정
-    fun setGameOverListener(listener: GameOverListener) {
+    fun setGameOverListener(listener: GameOverListener?) {
         this.gameOverListener = listener
         if (initializeIfNeeded()) {
             this.gameLogic = GameLogic(gameStats, gameConfig, listener, bossKillListener, levelClearListener, context)
@@ -477,7 +477,7 @@ class GameView @JvmOverloads constructor(
         }
     }
     
-    fun setBossKillListener(listener: BossKillListener) {
+    fun setBossKillListener(listener: BossKillListener?) {
         this.bossKillListener = listener
         if (initializeIfNeeded()) {
             this.gameLogic = GameLogic(gameStats, gameConfig, gameOverListener, listener, levelClearListener, context)
@@ -488,7 +488,7 @@ class GameView @JvmOverloads constructor(
     /**
      * 레벨 클리어 리스너 설정
      */
-    fun setLevelClearListener(listener: LevelClearListener) {
+    fun setLevelClearListener(listener: LevelClearListener?) {
         this.levelClearListener = listener
         if (initializeIfNeeded()) {
             this.gameLogic = GameLogic(gameStats, gameConfig, gameOverListener, bossKillListener, listener, context)
@@ -640,7 +640,7 @@ class GameView @JvmOverloads constructor(
     /**
      * 문양 변경 리스너 설정
      */
-    fun setSymbolChangeListener(listener: DefenseUnitSymbolChangeListener) {
+    fun setSymbolChangeListener(listener: DefenseUnitSymbolChangeListener?) {
         this.symbolChangeListener = listener
         if (::gameLogic.isInitialized) {
             gameLogic.setSymbolChangeListener(listener)

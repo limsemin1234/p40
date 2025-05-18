@@ -45,6 +45,17 @@ class CardSelectionManager private constructor() {
     }
     
     /**
+     * 모든 참조 해제 (메모리 누수 방지)
+     */
+    fun clear() {
+        // 컨텍스트 참조 해제
+        context = null
+        
+        // 선택 상태 초기화
+        clearSelections()
+    }
+    
+    /**
      * 선택된 카드 교체
      */
     fun replaceSelectedCards(

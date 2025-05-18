@@ -304,4 +304,26 @@ class CardUIManager(
         
         return true
     }
+    
+    /**
+     * 모든 카드 뷰와 버튼을 숨기는 메서드
+     * 게임이 종료되거나 미완료 작업 취소 시 호출됨
+     */
+    fun hideAllCardViewsAndButtons() {
+        // 모든 카드 뷰 숨기기
+        for (cardView in cardViews) {
+            cardView.visibility = View.GONE
+        }
+        
+        // 카드 정보 레이아웃 숨기기
+        cardInfoLayout.visibility = View.GONE
+        
+        // 버튼 레이아웃 숨기기
+        cardButtonsLayout.visibility = View.GONE
+        
+        // 텍스트 초기화
+        currentHandText.text = "현재 족보: 없음"
+        handDescriptionText.text = "효과: 없음"
+        replaceCountText.text = "교체 가능 횟수: 0"
+    }
 } 

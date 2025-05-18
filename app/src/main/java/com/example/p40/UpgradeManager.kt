@@ -165,4 +165,31 @@ class UpgradeManager(
         val defenseUpgrade3 = rootView.findViewById<Button>(R.id.defenseUpgrade3)
         defenseUpgrade3?.text = "쿨타임\n(v2.0 추가 예정)"
     }
+    
+    /**
+     * 메모리 누수 방지를 위한 참조 정리
+     * Fragment의 onDestroyView에서 호출해야 함
+     */
+    fun clearReferences() {
+        // 버튼 클릭 리스너 제거
+        try {
+            val btnUpgradeDamage = rootView.findViewById<Button>(R.id.btnUpgradeDamage)
+            val btnUpgradeAttackSpeed = rootView.findViewById<Button>(R.id.btnUpgradeAttackSpeed)
+            val btnUpgradeAttackRange = rootView.findViewById<Button>(R.id.btnUpgradeAttackRange)
+            val defenseUpgrade1 = rootView.findViewById<Button>(R.id.defenseUpgrade1)
+            val defenseUpgrade2 = rootView.findViewById<Button>(R.id.defenseUpgrade2)
+            val defenseUpgrade3 = rootView.findViewById<Button>(R.id.defenseUpgrade3)
+            
+            // 모든 버튼의 클릭 리스너 제거
+            btnUpgradeDamage?.setOnClickListener(null)
+            btnUpgradeAttackSpeed?.setOnClickListener(null)
+            btnUpgradeAttackRange?.setOnClickListener(null)
+            defenseUpgrade1?.setOnClickListener(null)
+            defenseUpgrade2?.setOnClickListener(null)
+            defenseUpgrade3?.setOnClickListener(null)
+        } catch (e: Exception) {
+            // 예외 처리 - 이미 버튼이 제거되었을 수 있음
+            e.printStackTrace()
+        }
+    }
 } 

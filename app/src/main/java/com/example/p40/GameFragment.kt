@@ -309,6 +309,53 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         }
     }
     
+    override fun onDestroyView() {
+        super.onDestroyView()
+        
+        // 열려 있는 패널 정리
+        currentOpenPanel = null
+        
+        // 게임 관련 리스너 정리 작업
+        try {
+            // 리스너 정리를 위한 순차적 정리 작업
+            if (::gameView.isInitialized) {
+                // 명시적으로 null 설정은 안 되지만 리스너 참조를 해제하기 위한 방법
+                gameView.setGameOverListener(null)
+                gameView.setBossKillListener(null)
+                gameView.setLevelClearListener(null)
+                gameView.setSymbolChangeListener(null)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        
+        // 핸들러 콜백 제거
+        handler.removeCallbacks(uiUpdateRunnable)
+        waveCompletionRunnable?.let {
+            handler.removeCallbacks(it)
+        }
+        
+        // 매니저 클래스들의 뷰 참조 정리
+        if (::gameUIHelper.isInitialized) {
+            gameUIHelper.stopUiUpdates()
+            gameUIHelper.clear()
+        }
+        
+        if (::upgradeManager.isInitialized) {
+            upgradeManager.clearReferences()
+        }
+        
+        if (::pokerCardManager.isInitialized) {
+            pokerCardManager.cancelPendingOperations()
+            pokerCardManager.clearReferences()
+        }
+        
+        if (::flushSkillManager.isInitialized) {
+            flushSkillManager.resetAllSkills()
+            flushSkillManager.clearReferences()
+        }
+    }
+    
     // 버프 UI 초기화 (후에 GameUIHelper.initBuffUI 메서드로 점진적 이전)
     private fun initBuffUI(view: View) {
         // 버프 컨테이너 찾기

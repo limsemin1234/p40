@@ -299,4 +299,27 @@ class FlushSkillManager(
         visualEffectManager?.cleanup()
         visualEffectManager = null
     }
+    
+    /**
+     * 메모리 누수 방지를 위한 참조 정리
+     * Fragment의 onDestroyView에서 호출해야 함
+     */
+    fun clearReferences() {
+        // 모든 지연 작업 취소
+        handler.removeCallbacksAndMessages(null)
+        
+        // 시각적 효과 제거
+        visualEffectManager?.clearEffects()
+        
+        // 모든 스킬 버튼 클릭 리스너 제거
+        skillButtons.values.forEach { button ->
+            button.setOnClickListener(null)
+        }
+        
+        // 버튼 참조 정리
+        skillButtons.clear()
+        
+        // 활성화 상태 초기화
+        activeSkills.clear()
+    }
 } 

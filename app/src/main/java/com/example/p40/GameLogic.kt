@@ -452,7 +452,7 @@ class GameLogic(
     /**
      * 문양 변경 리스너 설정
      */
-    fun setSymbolChangeListener(listener: DefenseUnitSymbolChangeListener) {
+    fun setSymbolChangeListener(listener: DefenseUnitSymbolChangeListener?) {
         this.symbolChangeListener = listener
     }
 

@@ -228,19 +228,49 @@ class PokerCardManager(
     }
     
     /**
-     * 진행 중인 카드 작업 취소 (게임 종료 시 사용)
+     * 미완료 작업 취소 (게임 종료 시 호출)
      */
     fun cancelPendingOperations() {
-        // 카드 관련 상태 초기화
-        cards.clear()
-        selectedCardIndexes.clear()
+        // 게임 활성 상태 해제
         isGameActive = false
         
-        // UI 초기화
-        cardUIManager.resetUI()
+        // 카드 정리
+        cards.clear()
+        selectedCardIndexes.clear()
         
-        // CardSelectionManager 상태 초기화
-        cardSelectionManager.clearSelections()
+        // UI 업데이트
+        cardUIManager.hideAllCardViewsAndButtons()
+    }
+    
+    /**
+     * 메모리 누수 방지를 위한 참조 정리
+     * Fragment의 onDestroyView에서 호출해야 함
+     */
+    fun clearReferences() {
+        // 카드 UI 리스너 제거
+        cardUIManager.cardViews.forEachIndexed { index, cardView ->
+            cardView.setOnClickListener(null)
+            cardView.setOnLongClickListener(null)
+        }
+        
+        // 버튼 리스너 제거
+        try {
+            // 족보 가이드 버튼
+            rootView.findViewById<android.widget.ImageButton>(R.id.btnPokerGuide)?.setOnClickListener(null)
+            
+            // 기능 버튼들
+            cardUIManager.getReplaceButton().setOnClickListener(null)
+            cardUIManager.getReplaceAllButton().setOnClickListener(null)
+            cardUIManager.getConfirmButton().setOnClickListener(null)
+            cardUIManager.getAddCardButton().setOnClickListener(null)
+            cardUIManager.getDrawPokerCardsButton().setOnClickListener(null)
+        } catch (e: Exception) {
+            // 예외 발생 시 무시 (이미 뷰가 분리되었을 수 있음)
+            e.printStackTrace()
+        }
+        
+        // CardSelectionManager 참조 정리
+        cardSelectionManager.clear()
     }
     
     // 카드 선택 토글
