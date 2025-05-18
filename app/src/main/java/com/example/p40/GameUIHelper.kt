@@ -57,6 +57,9 @@ class GameUIHelper(
         }
     }
     
+    // 업데이트 상태 추적
+    private var isUpdating = false
+    
     // 현재 웨이브 정보
     private var currentWave = 1
     
@@ -372,14 +375,53 @@ class GameUIHelper(
      * UI 업데이트 시작
      */
     fun startUiUpdates() {
-        handler.post(uiUpdateRunnable)
+        if (!isUpdating) {
+            isUpdating = true
+            handler.post(uiUpdateRunnable)
+        }
     }
     
     /**
      * UI 업데이트 중지
      */
     fun stopUiUpdates() {
+        isUpdating = false
         handler.removeCallbacks(uiUpdateRunnable)
+    }
+    
+    /**
+     * 리소스 정리 메서드 - 메모리 누수 방지
+     */
+    fun clear() {
+        // 모든 핸들러 콜백 제거
+        handler.removeCallbacksAndMessages(null)
+        isUpdating = false
+        
+        // 뷰 참조 제거
+        rootView = null
+        tvWaveInfo = null
+        tvBuffList = null
+        tvResourceInfo = null
+        tvKillInfo = null
+        unitHealthText = null
+        unitAttackText = null
+        unitAttackSpeedText = null
+        unitRangeText = null
+        enemyHealthText = null
+        enemyAttackText = null
+        enemySpeedText = null
+        bossHealthText = null
+        bossAttackText = null
+        bossSpeedText = null
+        
+        // 게임 뷰 참조 해제
+        gameView = null
+        
+        // 플러시 스킬 매니저 참조 해제
+        flushSkillManager = null
+        
+        // 패널 참조 해제
+        currentOpenPanel = null
     }
     
     /**

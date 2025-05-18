@@ -73,6 +73,9 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
     private lateinit var upgradeManager: UpgradeManager
     private lateinit var gameDialogManager: GameDialogManager
 
+    // 웨이브 변경을 감지하기 위한 Runnable
+    private var waveCompletionRunnable: Runnable? = null
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -299,6 +302,11 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         
         // UI 업데이트 중지 (핸들러 콜백 제거)
         handler.removeCallbacks(uiUpdateRunnable)
+        
+        // 웨이브 완료 리스너 임시 중지
+        waveCompletionRunnable?.let {
+            handler.removeCallbacks(it)
+        }
     }
     
     // 버프 UI 초기화 (후에 GameUIHelper.initBuffUI 메서드로 점진적 이전)
@@ -395,8 +403,13 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         // 이전 웨이브 정보 저장 변수
         var previousWave = 0
         
-        // 주기적으로 웨이브 변경 감지
-        handler.postDelayed(object : Runnable {
+        // 기존 Runnable이 있으면 제거
+        waveCompletionRunnable?.let {
+            handler.removeCallbacks(it)
+        }
+        
+        // 새로운 Runnable 생성
+        waveCompletionRunnable = object : Runnable {
             override fun run() {
                 if (!isAdded) return
                 
@@ -422,7 +435,10 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
                     handler.postDelayed(this, 500)
                 }
             }
-        }, 500)
+        }
+        
+        // 웨이브 체크 시작
+        handler.post(waveCompletionRunnable!!)
     }
     
     // 테스트를 위해 모든 스킬 활성화
@@ -629,6 +645,12 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
             flushSkillManager.resetAllSkills()
         }
         
+        // GameUIHelper 정리
+        if (::gameUIHelper.isInitialized) {
+            gameUIHelper.stopUiUpdates()
+            gameUIHelper.clear()
+        }
+        
         // 메시지 매니저 정리
         if (::messageManager.isInitialized) {
             messageManager.clear()
@@ -642,7 +664,16 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
 
     override fun onResume() {
         super.onResume()
-        gameView.resume()
+        
+        // 게임 재개
+        if (::gameView.isInitialized) {
+            gameView.resume()
+        }
+        
+        // 웨이브 완료 리스너 재개
+        if (::gameView.isInitialized && waveCompletionRunnable != null) {
+            handler.post(waveCompletionRunnable!!)
+        }
     }
     
     override fun onPause() {
@@ -654,6 +685,9 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         super.onDestroy()
         // 모든 핸들러 콜백 제거
         handler.removeCallbacksAndMessages(null)
+        
+        // 웨이브 완료 리스너 정리
+        waveCompletionRunnable = null
         
         // 게임 리소스 정리
         cleanupGameResources()
