@@ -69,6 +69,13 @@ class DeckBuilderFragment : BaseFragment(R.layout.fragment_deck_builder) {
         })
     }
     
+    // 메모리 누수 방지를 위한 onDestroy 추가
+    override fun onDestroy() {
+        super.onDestroy()
+        // MessageManager 정리
+        MessageManager.getInstance().clear()
+    }
+    
     private fun initViews(view: View) {
         // 덱 카드 리사이클러뷰 설정
         val rvDeck = view.findViewById<RecyclerView>(R.id.rvDeck)

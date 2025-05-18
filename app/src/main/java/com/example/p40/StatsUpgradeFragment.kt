@@ -63,6 +63,13 @@ class StatsUpgradeFragment : Fragment(R.layout.fragment_stats_upgrade) {
         setupUpgradeButtons(view)
     }
     
+    // 메모리 누수 방지를 위한 onDestroy 추가
+    override fun onDestroy() {
+        super.onDestroy()
+        // MessageManager 정리
+        messageManager.clear()
+    }
+    
     // UI 요소 초기화
     private fun initViews(view: View) {
         // 코인 정보 텍스트뷰

@@ -46,6 +46,13 @@ class CardShopFragment : BaseFragment(R.layout.fragment_card_shop) {
         setupViewPager()
     }
     
+    // 메모리 누수 방지를 위한 onDestroy 추가
+    override fun onDestroy() {
+        super.onDestroy()
+        // MessageManager 정리
+        MessageManager.getInstance().clear()
+    }
+    
     // 상점 카드 초기화
     private fun initShopCards() {
         // 기본 상점 카드 가져오기
