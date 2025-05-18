@@ -27,15 +27,15 @@ class Enemy(
     
     // 페인트 객체 (색상)
     private val paint = Paint().apply {
-        color = if (isBoss) GameConfig.BOSS_COLOR else GameConfig.ENEMY_COLOR
+        color = if (isBoss) EnemyConfig.BOSS_COLOR else EnemyConfig.ENEMY_COLOR
         style = Paint.Style.FILL
     }
     
     // 외곽선용 페인트 객체
     private val strokePaint = Paint().apply {
-        color = if (isBoss) GameConfig.BOSS_BORDER_COLOR else Color.WHITE
+        color = if (isBoss) EnemyConfig.BOSS_BORDER_COLOR else Color.WHITE
         style = Paint.Style.STROKE
-        strokeWidth = if (isBoss) GameConfig.BOSS_BORDER_WIDTH else 2f
+        strokeWidth = if (isBoss) EnemyConfig.BOSS_BORDER_WIDTH else 2f
     }
     
     // 행동 전략 설정 (전략 패턴)
@@ -85,20 +85,20 @@ class Enemy(
         // 적 타입에 따른 체력 설정
         val isFlying = behaviorStrategy is FlyingEnemyBehavior
         health = if (isBoss) {
-            GameConfig.getEnemyHealthForWave(wave, true)
+            EnemyConfig.getEnemyHealthForWave(wave, true)
         } else if (isFlying) {
-            GameConfig.getEnemyHealthForWave(wave, false, true)
+            EnemyConfig.getEnemyHealthForWave(wave, false, true)
         } else {
             newHealth // 일반 적은 기존 파라미터 사용
         }
         maxHealth = health
         
         // 페인트 색상 재설정
-        paint.color = if (isBoss) GameConfig.BOSS_COLOR else GameConfig.ENEMY_COLOR
+        paint.color = if (isBoss) EnemyConfig.BOSS_COLOR else EnemyConfig.ENEMY_COLOR
         
         // 외곽선 페인트 재설정
-        strokePaint.color = if (isBoss) GameConfig.BOSS_BORDER_COLOR else Color.WHITE
-        strokePaint.strokeWidth = if (isBoss) GameConfig.BOSS_BORDER_WIDTH else 2f
+        strokePaint.color = if (isBoss) EnemyConfig.BOSS_BORDER_COLOR else Color.WHITE
+        strokePaint.strokeWidth = if (isBoss) EnemyConfig.BOSS_BORDER_WIDTH else 2f
     }
     
     /**
@@ -157,7 +157,7 @@ class Enemy(
     fun getDamage(): Int {
         return if (isBoss) {
             // 보스 공격력: 기본 보스 공격력 + (웨이브 - 1) * 웨이브당 보스 공격력 증가량
-            GameConfig.BOSS_DAMAGE + ((wave - 1) * GameConfig.BOSS_DAMAGE_INCREASE_PER_WAVE)
+            EnemyConfig.BOSS_DAMAGE + ((wave - 1) * EnemyConfig.BOSS_DAMAGE_INCREASE_PER_WAVE)
         } else {
             // 공중적인지 확인
             val isFlying = behaviorStrategy is FlyingEnemyBehavior
@@ -167,10 +167,10 @@ class Enemy(
                 // 웨이브 6부터 등장하므로, 웨이브 6에서는 증가량이 0이 되어 기본 공격력만 적용됨
                 val flyingWave = wave - GameConfig.FLYING_ENEMY_WAVE_THRESHOLD + 1
                 val waveIncrease = if (flyingWave > 0) flyingWave - 1 else 0
-                GameConfig.FLYING_ENEMY_DAMAGE + (waveIncrease * GameConfig.FLYING_ENEMY_DAMAGE_INCREASE_PER_WAVE)
+                EnemyConfig.FLYING_ENEMY_DAMAGE + (waveIncrease * EnemyConfig.FLYING_ENEMY_DAMAGE_INCREASE_PER_WAVE)
             } else {
                 // 일반 적 공격력: 기본 적 공격력 + (웨이브 - 1) * 웨이브당 적 공격력 증가량
-                GameConfig.NORMAL_ENEMY_DAMAGE + ((wave - 1) * GameConfig.ENEMY_DAMAGE_PER_WAVE)
+                EnemyConfig.NORMAL_ENEMY_DAMAGE + ((wave - 1) * EnemyConfig.ENEMY_DAMAGE_PER_WAVE)
             }
         }
     }

@@ -289,20 +289,20 @@ class GameUIHelper(
         val wave = gameView?.getWaveCount() ?: currentWave
         
         // GameConfig를 통해 웨이브별 적 스탯 정보 계산
-        val normalHealth = gameConfig.getEnemyHealthForWave(wave)
-        val normalDamage = gameConfig.getEnemyDamageForWave(wave, false)
-        val normalSpeed = gameConfig.getEnemySpeedForWave(wave)
+        val normalHealth = EnemyConfig.getEnemyHealthForWave(wave)
+        val normalDamage = EnemyConfig.getEnemyDamageForWave(wave, false)
+        val normalSpeed = EnemyConfig.getEnemySpeedForWave(wave)
         
         // 공중적 정보 (6웨이브부터 등장하는 경우만)
         val showFlyingInfo = wave >= gameConfig.FLYING_ENEMY_WAVE_THRESHOLD
         val flyingHealth = if (showFlyingInfo) {
-            gameConfig.getEnemyHealthForWave(wave, false, true)
+            EnemyConfig.getEnemyHealthForWave(wave, false, true)
         } else 0
         val flyingDamage = if (showFlyingInfo) {
-            gameConfig.getEnemyDamageForWave(wave, false, true)
+            EnemyConfig.getEnemyDamageForWave(wave, false, true)
         } else 0
         val flyingSpeed = if (showFlyingInfo) {
-            gameConfig.getEnemySpeedForWave(wave, false, true)
+            EnemyConfig.getEnemySpeedForWave(wave, false, true)
         } else 0f
         
         // 체력 정보 업데이트
@@ -340,9 +340,9 @@ class GameUIHelper(
         val wave = gameView?.getWaveCount() ?: currentWave
         
         // GameConfig를 통해 웨이브별 보스 스탯 정보 계산
-        val maxHealth = gameConfig.getEnemyHealthForWave(wave, true)
-        val damage = gameConfig.getEnemyDamageForWave(wave, true)
-        val speed = gameConfig.getEnemySpeedForWave(wave, true)
+        val maxHealth = EnemyConfig.getEnemyHealthForWave(wave, true)
+        val damage = EnemyConfig.getEnemyDamageForWave(wave, true)
+        val speed = EnemyConfig.getEnemySpeedForWave(wave, true)
         
         // 현재 보스 체력 정보 가져오기
         val currentBossHealth = gameView?.getCurrentBossHealth() ?: 0
@@ -493,17 +493,17 @@ class GameUIHelper(
      */
     private fun getWaveHealthMultiplier(wave: Int): Float {
         return when (wave) {
-            1 -> gameConfig.WAVE_1_HEALTH_MULTIPLIER
-            2 -> gameConfig.WAVE_2_HEALTH_MULTIPLIER
-            3 -> gameConfig.WAVE_3_HEALTH_MULTIPLIER
-            4 -> gameConfig.WAVE_4_HEALTH_MULTIPLIER
-            5 -> gameConfig.WAVE_5_HEALTH_MULTIPLIER
-            6 -> gameConfig.WAVE_6_HEALTH_MULTIPLIER
-            7 -> gameConfig.WAVE_7_HEALTH_MULTIPLIER
-            8 -> gameConfig.WAVE_8_HEALTH_MULTIPLIER
-            9 -> gameConfig.WAVE_9_HEALTH_MULTIPLIER
-            10 -> gameConfig.WAVE_10_HEALTH_MULTIPLIER
-            else -> gameConfig.WAVE_10_HEALTH_MULTIPLIER
+            1 -> EnemyConfig.WAVE_1_HEALTH_MULTIPLIER
+            2 -> EnemyConfig.WAVE_2_HEALTH_MULTIPLIER
+            3 -> EnemyConfig.WAVE_3_HEALTH_MULTIPLIER
+            4 -> EnemyConfig.WAVE_4_HEALTH_MULTIPLIER
+            5 -> EnemyConfig.WAVE_5_HEALTH_MULTIPLIER
+            6 -> EnemyConfig.WAVE_6_HEALTH_MULTIPLIER
+            7 -> EnemyConfig.WAVE_7_HEALTH_MULTIPLIER
+            8 -> EnemyConfig.WAVE_8_HEALTH_MULTIPLIER
+            9 -> EnemyConfig.WAVE_9_HEALTH_MULTIPLIER
+            10 -> EnemyConfig.WAVE_10_HEALTH_MULTIPLIER
+            else -> EnemyConfig.WAVE_10_HEALTH_MULTIPLIER
         }
     }
     

@@ -11,8 +11,8 @@ import java.util.concurrent.atomic.AtomicInteger
  */
 class EnemyPool {
     companion object {
-        private const val INITIAL_POOL_SIZE = 100 // 기본 풀 사이즈 증가
-        private const val MAX_POOL_SIZE = 300 // 최대 풀 사이즈 제한
+        private val INITIAL_POOL_SIZE = EnemyConfig.ENEMY_POOL_INITIAL_SIZE // 기본 풀 사이즈 증가
+        private val MAX_POOL_SIZE = EnemyConfig.ENEMY_POOL_MAX_SIZE // 최대 풀 사이즈 제한
         private const val AUTO_EXPAND_SIZE = 20 // 자동 확장 시 추가되는 객체 수
         private val instance = EnemyPool()
         
@@ -47,8 +47,8 @@ class EnemyPool {
         position: PointF,
         target: PointF,
         speed: Float,
-        size: Float = GameConfig.ENEMY_BASE_SIZE,
-        health: Int = GameConfig.ENEMY_BASE_HEALTH,
+        size: Float = EnemyConfig.ENEMY_BASE_SIZE,
+        health: Int = EnemyConfig.ENEMY_BASE_HEALTH,
         isBoss: Boolean = false,
         wave: Int = 1
     ): Enemy {

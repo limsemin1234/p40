@@ -106,7 +106,7 @@ class EnemyManager(
             // 웨이브당 정확히 적 수만큼만 생성
             if (spawnedCount < totalEnemiesInWave && !isBossSpawned && !isGameOver) {
                 // 웨이브에 맞는 적 생성 간격으로 적 생성
-                val spawnCooldown = GameConfig.getEnemySpawnIntervalForWave(waveCount)
+                val spawnCooldown = EnemyConfig.getEnemySpawnIntervalForWave(waveCount)
                 
                 if (currentTime - lastEnemySpawnTime > spawnCooldown) {
                     spawnEnemy(currentTime)
@@ -133,15 +133,15 @@ class EnemyManager(
             
             // 화면 가장자리에서 적 스폰
             val angle = Random.nextDouble(0.0, 2 * PI)
-            val spawnDistance = screenWidth.coerceAtLeast(screenHeight) * GameConfig.ENEMY_SPAWN_DISTANCE_FACTOR
+            val spawnDistance = screenWidth.coerceAtLeast(screenHeight) * EnemyConfig.ENEMY_SPAWN_DISTANCE_FACTOR
             
             val spawnX = centerX + cos(angle).toFloat() * spawnDistance
             val spawnY = centerY + sin(angle).toFloat() * spawnDistance
             
             val waveCount = gameStats.getWaveCount()
             // 현재 웨이브에 맞는 적 능력치 설정
-            val speed = GameConfig.getEnemySpeedForWave(waveCount)
-            val health = GameConfig.getEnemyHealthForWave(waveCount)
+            val speed = EnemyConfig.getEnemySpeedForWave(waveCount)
+            val health = EnemyConfig.getEnemyHealthForWave(waveCount)
             
             // 객체 풀에서 적 가져오기
             val enemy = enemyPool.obtain(
@@ -169,16 +169,16 @@ class EnemyManager(
         
         // 보스는 랜덤한 방향에서 생성
         val angle = Random.nextDouble(0.0, 2 * PI)
-        val spawnDistance = screenWidth.coerceAtLeast(screenHeight) * GameConfig.BOSS_SPAWN_DISTANCE_FACTOR
+        val spawnDistance = screenWidth.coerceAtLeast(screenHeight) * EnemyConfig.BOSS_SPAWN_DISTANCE_FACTOR
         
         val spawnX = centerX + cos(angle).toFloat() * spawnDistance
         val spawnY = centerY + sin(angle).toFloat() * spawnDistance
         
         val waveCount = gameStats.getWaveCount()
         // 현재 웨이브에 맞는 보스 능력치 설정
-        val speed = GameConfig.getEnemySpeedForWave(waveCount, true)
-        val health = GameConfig.getEnemyHealthForWave(waveCount, true)
-        val bossSize = GameConfig.BOSS_SIZE
+        val speed = EnemyConfig.getEnemySpeedForWave(waveCount, true)
+        val health = EnemyConfig.getEnemyHealthForWave(waveCount, true)
+        val bossSize = EnemyConfig.BOSS_SIZE
         
         // 객체 풀에서 보스 가져오기
         val boss = enemyPool.obtain(
@@ -234,17 +234,17 @@ class EnemyManager(
         // 시간 멈춤 상태면 처리 중단
         if (timeFrozen) return deadEnemies
         
-        val farOffScreenMargin = GameConfig.FAR_OFFSCREEN_MARGIN
+        val farOffScreenMargin = EnemyConfig.FAR_OFFSCREEN_MARGIN
         
         // 화면 그리드 초기화
         screenRect.clearGrid()
         
         // 화면 밖 적 처리 최적화를 위한 영역 계산
         val updateRect = ScreenRect(
-            left = -GameConfig.ENEMY_UPDATE_MARGIN,
-            top = -GameConfig.ENEMY_UPDATE_MARGIN,
-            right = screenWidth + GameConfig.ENEMY_UPDATE_MARGIN,
-            bottom = screenHeight + GameConfig.ENEMY_UPDATE_MARGIN
+            left = -EnemyConfig.ENEMY_UPDATE_MARGIN,
+            top = -EnemyConfig.ENEMY_UPDATE_MARGIN,
+            right = screenWidth + EnemyConfig.ENEMY_UPDATE_MARGIN,
+            bottom = screenHeight + EnemyConfig.ENEMY_UPDATE_MARGIN
         )
         
         // 방어 유닛 위치 미리 계산

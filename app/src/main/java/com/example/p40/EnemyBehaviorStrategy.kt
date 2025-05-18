@@ -68,7 +68,7 @@ class BossEnemyBehavior : EnemyBehaviorStrategy {
         val position = enemy.getPosition()
         val target = enemy.getTarget()
         // 보스는 일반 적보다 약간 느리게 설정 (GameConfig 값 사용)
-        val speed = enemy.getSpeed() * speedMultiplier * GameConfig.BOSS_SPEED_MULTIPLIER
+        val speed = enemy.getSpeed() * speedMultiplier * EnemyConfig.BOSS_SPEED_MULTIPLIER
         
         // 목표 방향으로 이동 (지그재그 패턴)
         val dx = target.x - position.x
@@ -77,8 +77,8 @@ class BossEnemyBehavior : EnemyBehaviorStrategy {
         
         if (distance > 0) {
             // 지그재그 움직임 구현 (시간에 따른 사인파) (GameConfig 값 사용)
-            val time = System.currentTimeMillis() / GameConfig.BOSS_ZIGZAG_PERIOD // 지그재그 주기 단위로 변화
-            val offsetX = Math.sin(time) * GameConfig.BOSS_ZIGZAG_AMPLITUDE // 좌우 진폭
+            val time = System.currentTimeMillis() / EnemyConfig.BOSS_ZIGZAG_PERIOD // 지그재그 주기 단위로 변화
+            val offsetX = Math.sin(time) * EnemyConfig.BOSS_ZIGZAG_AMPLITUDE // 좌우 진폭
             
             position.x += (dx / distance * speed) + offsetX.toFloat()
             position.y += dy / distance * speed
@@ -100,12 +100,12 @@ class BossEnemyBehavior : EnemyBehaviorStrategy {
     
     override fun onDamage(enemy: Enemy, damage: Int): Boolean {
         // 보스는 데미지 저항이 있음 (데미지 감소율은 GameConfig에서 설정)
-        val actualDamage = (damage * GameConfig.BOSS_DAMAGE_REDUCTION).toInt()
+        val actualDamage = (damage * EnemyConfig.BOSS_DAMAGE_REDUCTION).toInt()
         val health = enemy.getHealth() - actualDamage
         enemy.setHealth(health)
         
         // 특수 효과: 체력이 설정된 비율 이하로 떨어지면 분노 모드 (빨간색으로 변경)
-        if (health <= enemy.getMaxHealth() * GameConfig.BOSS_ENRAGE_HEALTH_RATIO) {
+        if (health <= enemy.getMaxHealth() * EnemyConfig.BOSS_ENRAGE_HEALTH_RATIO) {
             enemy.setEnraged(true)
         }
         
@@ -139,12 +139,12 @@ class FlyingEnemyBehavior : EnemyBehaviorStrategy {
         val wave = enemy.getWave()
         
         // GameConfig에서 웨이브에 따른 공중적 속도 가져오기
-        val baseSpeed = GameConfig.getEnemySpeedForWave(wave, false, true)
+        val baseSpeed = EnemyConfig.getEnemySpeedForWave(wave, false, true)
         val speed = baseSpeed * speedMultiplier
         
         // 호버링 효과 (상하로 움직임 추가) (GameConfig 값 사용)
-        val time = System.currentTimeMillis() / GameConfig.FLYING_ENEMY_HOVER_PERIOD // 호버링 주기 단위로 변화
-        val offsetY = Math.sin(time) * GameConfig.FLYING_ENEMY_HOVER_AMPLITUDE // 상하 진폭
+        val time = System.currentTimeMillis() / EnemyConfig.FLYING_ENEMY_HOVER_PERIOD // 호버링 주기 단위로 변화
+        val offsetY = Math.sin(time) * EnemyConfig.FLYING_ENEMY_HOVER_AMPLITUDE // 상하 진폭
         
         val dx = target.x - position.x
         val dy = target.y - position.y
@@ -179,7 +179,7 @@ class FlyingEnemyBehavior : EnemyBehaviorStrategy {
     
     override fun onDamage(enemy: Enemy, damage: Int): Boolean {
         // 날아다니는 적은 데미지를 더 많이 받음 (GameConfig 값 사용)
-        val actualDamage = (damage * GameConfig.FLYING_ENEMY_DAMAGE_MULTIPLIER).toInt()
+        val actualDamage = (damage * EnemyConfig.FLYING_ENEMY_DAMAGE_MULTIPLIER).toInt()
         val health = enemy.getHealth() - actualDamage
         enemy.setHealth(health)
         
