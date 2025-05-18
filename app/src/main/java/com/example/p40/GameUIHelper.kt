@@ -487,25 +487,7 @@ class GameUIHelper(
             else -> "알 수 없음"
         }
     }
-    
-    /**
-     * 웨이브별 체력 배율 반환
-     */
-    private fun getWaveHealthMultiplier(wave: Int): Float {
-        return when (wave) {
-            1 -> EnemyConfig.WAVE_1_HEALTH_MULTIPLIER
-            2 -> EnemyConfig.WAVE_2_HEALTH_MULTIPLIER
-            3 -> EnemyConfig.WAVE_3_HEALTH_MULTIPLIER
-            4 -> EnemyConfig.WAVE_4_HEALTH_MULTIPLIER
-            5 -> EnemyConfig.WAVE_5_HEALTH_MULTIPLIER
-            6 -> EnemyConfig.WAVE_6_HEALTH_MULTIPLIER
-            7 -> EnemyConfig.WAVE_7_HEALTH_MULTIPLIER
-            8 -> EnemyConfig.WAVE_8_HEALTH_MULTIPLIER
-            9 -> EnemyConfig.WAVE_9_HEALTH_MULTIPLIER
-            10 -> EnemyConfig.WAVE_10_HEALTH_MULTIPLIER
-            else -> EnemyConfig.WAVE_10_HEALTH_MULTIPLIER
-        }
-    }
+
     
     /**
      * 플러시 스킬 감지 및 활성화
