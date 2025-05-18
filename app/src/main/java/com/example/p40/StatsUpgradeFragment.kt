@@ -11,12 +11,10 @@ import androidx.navigation.fragment.findNavController
 import com.example.p40.GameConfig
 import com.example.p40.MessageManager
 
-class StatsUpgradeFragment : Fragment(R.layout.fragment_stats_upgrade) {
+class StatsUpgradeFragment : BaseFragment(R.layout.fragment_stats_upgrade) {
 
-    private lateinit var userManager: UserManager
     private lateinit var statsManager: StatsManager
     private lateinit var messageManager: MessageManager
-    private lateinit var tvCoinAmount: TextView
     
     // 현재 스탯 표시 텍스트뷰
     private lateinit var tvCurrentHealth: TextView
@@ -39,8 +37,7 @@ class StatsUpgradeFragment : Fragment(R.layout.fragment_stats_upgrade) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
-        // UserManager와 StatsManager 초기화
-        userManager = UserManager.getInstance(requireContext())
+        // StatsManager 초기화
         statsManager = StatsManager.getInstance(requireContext())
         messageManager = MessageManager.getInstance()
         messageManager.init(view.findViewById(android.R.id.content) ?: view as ViewGroup)
@@ -50,14 +47,6 @@ class StatsUpgradeFragment : Fragment(R.layout.fragment_stats_upgrade) {
         
         // 현재 스탯 정보 표시
         updateStatsUI()
-        
-        // 코인 정보 업데이트
-        updateCoinUI()
-        
-        // 뒤로가기 버튼 설정
-        view.findViewById<ImageButton>(R.id.btnBack).setOnClickListener {
-            findNavController().popBackStack()
-        }
         
         // 강화 버튼 이벤트 설정
         setupUpgradeButtons(view)
@@ -72,9 +61,6 @@ class StatsUpgradeFragment : Fragment(R.layout.fragment_stats_upgrade) {
     
     // UI 요소 초기화
     private fun initViews(view: View) {
-        // 코인 정보 텍스트뷰
-        tvCoinAmount = view.findViewById(R.id.tvCoinAmount)
-        
         // 현재 스탯 텍스트뷰
         tvCurrentHealth = view.findViewById(R.id.tvCurrentHealth)
         tvCurrentAttack = view.findViewById(R.id.tvCurrentAttack)
@@ -151,11 +137,9 @@ class StatsUpgradeFragment : Fragment(R.layout.fragment_stats_upgrade) {
         tvAttackUpgradeCost.text = "코인: $attackCost"
         tvAttackSpeedUpgradeCost.text = "코인: $attackSpeedCost"
         tvRangeUpgradeCost.text = "코인: $rangeCost"
-    }
-    
-    // 코인 정보 업데이트
-    private fun updateCoinUI() {
-        tvCoinAmount.text = "코인: ${userManager.getCoin()}"
+        
+        // 코인 정보 업데이트 (BaseFragment의 메서드 활용)
+        updateCoinInfo(requireView())
     }
     
     // 체력 강화
@@ -177,7 +161,6 @@ class StatsUpgradeFragment : Fragment(R.layout.fragment_stats_upgrade) {
             
             // UI 업데이트
             updateStatsUI()
-            updateCoinUI()
             
             if (success) {
                 messageManager.showSuccess("체력이 강화되었습니다!")
@@ -208,7 +191,6 @@ class StatsUpgradeFragment : Fragment(R.layout.fragment_stats_upgrade) {
             
             // UI 업데이트
             updateStatsUI()
-            updateCoinUI()
             
             if (success) {
                 messageManager.showSuccess("공격력이 강화되었습니다!")
@@ -239,7 +221,6 @@ class StatsUpgradeFragment : Fragment(R.layout.fragment_stats_upgrade) {
             
             // UI 업데이트
             updateStatsUI()
-            updateCoinUI()
             
             if (success) {
                 messageManager.showSuccess("공격 속도가 강화되었습니다!")
@@ -270,7 +251,6 @@ class StatsUpgradeFragment : Fragment(R.layout.fragment_stats_upgrade) {
             
             // UI 업데이트
             updateStatsUI()
-            updateCoinUI()
             
             if (success) {
                 messageManager.showSuccess("사거리가 강화되었습니다!")
@@ -284,7 +264,7 @@ class StatsUpgradeFragment : Fragment(R.layout.fragment_stats_upgrade) {
     
     override fun onResume() {
         super.onResume()
-        // 화면이 다시 보일 때마다 코인 정보 갱신
-        updateCoinUI()
+        // 화면이 다시 보일 때마다 스탯 정보 갱신
+        updateStatsUI()
     }
 } 

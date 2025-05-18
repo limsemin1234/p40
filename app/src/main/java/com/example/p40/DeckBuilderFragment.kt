@@ -2,6 +2,7 @@ package com.example.p40
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
@@ -113,8 +114,33 @@ class DeckBuilderFragment : BaseFragment(R.layout.fragment_deck_builder) {
     
     private fun navigateBack() {
         // 뒤로 가기 전에 현재 덱과 컬렉션 상태 저장
-        autoSaveDeckAndCollection()
-        findNavController().popBackStack()
+        try {
+            // 덱과 컬렉션 상태 저장
+            autoSaveDeckAndCollection()
+            
+            // 뒤로 가기 실행
+            findNavController().popBackStack()
+        } catch (e: Exception) {
+            // 예외 발생 시 로그 출력 및 사용자에게 알림
+            Log.e("DeckBuilderFragment", "Error during navigateBack: ${e.message}")
+            e.printStackTrace()
+            
+            // 저장 실패 메시지 표시
+            MessageManager.getInstance().showWarning(requireContext(), "덱 저장 중 문제가 발생했습니다. 다시 시도해주세요.")
+            
+            // 저장에 실패하더라도 뒤로 가기는 시도
+            try {
+                findNavController().popBackStack()
+            } catch (e2: Exception) {
+                // 뒤로 가기도 실패할 경우 메인 메뉴로 직접 이동 시도
+                try {
+                    findNavController().navigate(R.id.action_deckBuilder_to_mainMenu)
+                } catch (e3: Exception) {
+                    // 최후의 방법으로 액티비티 종료
+                    activity?.onBackPressed()
+                }
+            }
+        }
     }
     
     /**

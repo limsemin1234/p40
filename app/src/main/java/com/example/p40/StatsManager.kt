@@ -30,6 +30,7 @@ class StatsManager private constructor(context: Context) {
         private val DEFAULT_RANGE = GameConfig.DEFENSE_UNIT_ATTACK_RANGE.toInt()
         
         // 싱글톤 인스턴스
+        @Volatile
         private var instance: StatsManager? = null
         
         // 플레이 통계 키
@@ -48,13 +49,14 @@ class StatsManager private constructor(context: Context) {
         const val STAT_GAMES_OVER = "games_over"
         
         /**
-         * 싱글톤 인스턴스 가져오기
+         * 싱글톤 인스턴스 가져오기 - thread-safe 구현
          */
         fun getInstance(context: Context): StatsManager {
-            if (instance == null) {
-                instance = StatsManager(context.applicationContext)
+            return instance ?: synchronized(this) {
+                instance ?: StatsManager(context.applicationContext).also {
+                    instance = it
+                }
             }
-            return instance!!
         }
     }
     

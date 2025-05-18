@@ -273,4 +273,33 @@ class MainMenuFragment : BaseFragment(R.layout.fragment_main_menu) {
             }
         }
     }
+    
+    // 메모리 누수 방지를 위한 onDestroy 메서드 추가
+    override fun onDestroy() {
+        super.onDestroy()
+        
+        try {
+            // 애니메이션 정리
+            view?.let {
+                val gameLogo = it.findViewById<MainMenuLogoCard>(R.id.gameLogo)
+                gameLogo?.let { logo ->
+                    // 애니메이션 중지
+                    logo.clearAnimation()
+                    logo.setAnimationActive(false)
+                    
+                    // 클릭 리스너 제거
+                    logo.setOnClickListener(null)
+                    
+                    Log.d(TAG, "Animation resources cleaned up in onDestroy")
+                }
+            }
+            
+            // MessageManager 정리
+            if(::messageManager.isInitialized) {
+                messageManager.clear()
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error cleaning up resources in onDestroy: ${e.message}")
+        }
+    }
 }
