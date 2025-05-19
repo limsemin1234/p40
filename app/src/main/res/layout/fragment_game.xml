@@ -645,7 +645,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="#80333333"
+        android:background="#B3222244"
         android:visibility="gone"
         android:elevation="15dp"
         app:layout_constraintBottom_toTopOf="@id/bottomBar">
@@ -684,7 +684,7 @@
                 android:lineSpacingExtra="2sp"
                 android:layout_marginHorizontal="4dp"
                 android:background="@drawable/main_button_selector"
-                android:backgroundTint="@null"
+                android:backgroundTint="#661A237E"
                 android:textColor="@android:color/white" />
 
             <Button
@@ -698,7 +698,7 @@
                 android:lineSpacingExtra="2sp"
                 android:layout_marginHorizontal="4dp"
                 android:background="@drawable/main_button_selector"
-                android:backgroundTint="@null"
+                android:backgroundTint="#661A237E"
                 android:textColor="@android:color/white" />
 
             <Button
@@ -712,7 +712,7 @@
                 android:lineSpacingExtra="2sp"
                 android:layout_marginHorizontal="4dp"
                 android:background="@drawable/main_button_selector"
-                android:backgroundTint="@null"
+                android:backgroundTint="#661A237E"
                 android:textColor="@android:color/white" />
         </LinearLayout>
     </LinearLayout>
@@ -723,7 +723,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="#80333333"
+        android:background="#B3224422"
         android:visibility="gone"
         android:elevation="15dp"
         app:layout_constraintBottom_toTopOf="@id/bottomBar">
@@ -762,7 +762,7 @@
                 android:lineSpacingExtra="2sp"
                 android:layout_marginHorizontal="4dp"
                 android:background="@drawable/main_button_selector"
-                android:backgroundTint="@null"
+                android:backgroundTint="#661A4518"
                 android:textColor="@android:color/white" />
 
             <Button
@@ -776,7 +776,7 @@
                 android:lineSpacingExtra="2sp"
                 android:layout_marginHorizontal="4dp"
                 android:background="@drawable/main_button_selector"
-                android:backgroundTint="@null"
+                android:backgroundTint="#661A4518"
                 android:textColor="@android:color/white" />
 
             <Button
@@ -790,7 +790,7 @@
                 android:lineSpacingExtra="2sp"
                 android:layout_marginHorizontal="4dp"
                 android:background="@drawable/main_button_selector"
-                android:backgroundTint="@null"
+                android:backgroundTint="#661A4518"
                 android:textColor="@android:color/white" />
         </LinearLayout>
     </LinearLayout>
