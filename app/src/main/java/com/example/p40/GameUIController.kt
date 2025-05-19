@@ -526,14 +526,6 @@ class GameUIController(
             onMainMenuRequested?.invoke()
         }
         
-        // 다시 도전 버튼
-        val btnPlayAgain = dialog.findViewById<Button>(R.id.btnPlayAgain)
-        btnPlayAgain.setOnClickListener {
-            dialog.dismiss()
-            // 게임 리셋 및 재시작
-            onRestartGameRequested?.invoke()
-        }
-        
         dialog.setCancelable(false)
         dialog.show()
         

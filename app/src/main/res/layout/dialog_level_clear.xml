@@ -70,22 +70,9 @@
 
             <Button
                 android:id="@+id/btnToMainMenu"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:text="메인 화면으로"
-                android:textStyle="bold"
-                android:layout_marginHorizontal="8dp"
-                android:background="@drawable/main_button_selector"
-                android:backgroundTint="@null"
-                android:textColor="@android:color/white"/>
-
-            <Button
-                android:id="@+id/btnPlayAgain"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="다시 도전"
                 android:textStyle="bold"
                 android:layout_marginHorizontal="8dp"
                 android:background="@drawable/main_button_selector"

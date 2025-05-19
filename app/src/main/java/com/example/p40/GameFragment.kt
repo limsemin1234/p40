@@ -770,13 +770,61 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
      */
     private fun applyGameButtonStyles(view: View) {
         try {
-            // 패널 및 주요 UI 버튼들의 스타일과 애니메이션 적용
-            applyButtonStyle(view, R.id.btnUpgradeDamage, R.drawable.btn_game_primary)
-            applyButtonStyle(view, R.id.btnUpgradeAttackSpeed, R.drawable.btn_game_primary)
-            applyButtonStyle(view, R.id.btnUpgradeAttackRange, R.drawable.btn_game_primary)
-            applyButtonStyle(view, R.id.defenseUpgrade1, R.drawable.btn_game_primary)
-            applyButtonStyle(view, R.id.defenseUpgrade2, R.drawable.btn_game_primary)
-            applyButtonStyle(view, R.id.defenseUpgrade3, R.drawable.btn_game_primary)
+            // 공격력 업그레이드 버튼 (파란색)
+            view.findViewById<Button>(R.id.btnUpgradeDamage)?.let { button ->
+                ButtonAnimationUtils.setButtonBackgroundDirectly(
+                    button, 
+                    "#1A237E", // 배경색 (짙은 파란색)
+                    "#64B5F6"  // 테두리 (밝은 파란색)
+                )
+                ButtonAnimationUtils.applyButtonAnimationProperty(button)
+            }
+            
+            view.findViewById<Button>(R.id.btnUpgradeAttackSpeed)?.let { button ->
+                ButtonAnimationUtils.setButtonBackgroundDirectly(
+                    button, 
+                    "#1A237E", // 배경색 (짙은 파란색)
+                    "#64B5F6"  // 테두리 (밝은 파란색)
+                )
+                ButtonAnimationUtils.applyButtonAnimationProperty(button)
+            }
+            
+            view.findViewById<Button>(R.id.btnUpgradeAttackRange)?.let { button ->
+                ButtonAnimationUtils.setButtonBackgroundDirectly(
+                    button, 
+                    "#1A237E", // 배경색 (짙은 파란색)
+                    "#64B5F6"  // 테두리 (밝은 파란색)
+                )
+                ButtonAnimationUtils.applyButtonAnimationProperty(button)
+            }
+            
+            // 방어력 업그레이드 버튼 (녹색)
+            view.findViewById<Button>(R.id.defenseUpgrade1)?.let { button ->
+                ButtonAnimationUtils.setButtonBackgroundDirectly(
+                    button, 
+                    "#103C10", // 배경색 (짙은 녹색)
+                    "#4CAF50"  // 테두리 (밝은 녹색)
+                )
+                ButtonAnimationUtils.applyButtonAnimationProperty(button)
+            }
+            
+            view.findViewById<Button>(R.id.defenseUpgrade2)?.let { button ->
+                ButtonAnimationUtils.setButtonBackgroundDirectly(
+                    button, 
+                    "#103C10", // 배경색 (짙은 녹색)
+                    "#4CAF50"  // 테두리 (밝은 녹색)
+                )
+                ButtonAnimationUtils.applyButtonAnimationProperty(button)
+            }
+            
+            view.findViewById<Button>(R.id.defenseUpgrade3)?.let { button ->
+                ButtonAnimationUtils.setButtonBackgroundDirectly(
+                    button, 
+                    "#103C10", // 배경색 (짙은 녹색)
+                    "#4CAF50"  // 테두리 (밝은 녹색)
+                )
+                ButtonAnimationUtils.applyButtonAnimationProperty(button)
+            }
             
             // 하단 메인 버튼들
             applyButtonStyle(view, R.id.attackUpButton, R.drawable.btn_game_secondary)

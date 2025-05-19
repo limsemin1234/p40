@@ -240,39 +240,10 @@ class GameDialogManager(
             navController?.navigate(R.id.action_gameFragment_to_mainMenuFragment)
         }
         
-        // 다시 도전 버튼
-        val btnPlayAgain = dialog.findViewById<Button>(R.id.btnPlayAgain)
-        btnPlayAgain.setOnClickListener {
-            dialog.dismiss()
-            // 게임 리셋 및 재시작
-            resetAndRestartGame()
-        }
-        
         dialog.setCancelable(false)
         dialog.show()
         
         // 통계 업데이트 - 게임 클리어 횟수 증가
         statsManager.incrementGamesCompleted()
-    }
-    
-    /**
-     * 게임 리셋 및 재시작
-     */
-    private fun resetAndRestartGame() {
-        // 이전 게임 자원 정리
-        cleanupResourcesCallback?.invoke()
-        
-        // 획득한 코인 초기화
-        earnedCoins = 0
-        
-        // 게임 재시작 - config 파라미터 전달
-        gameView.resetGame(gameConfig)
-        gameView.resumeGame()
-        
-        // 통계 업데이트 - 게임 시작 횟수 증가
-        statsManager.incrementGamesStarted()
-        
-        // 안내 메시지
-        messageManager.showInfo("새 게임이 시작되었습니다!")
     }
 } 
