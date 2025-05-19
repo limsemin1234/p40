@@ -277,15 +277,20 @@ class FlushSkillManager(
         // 진행 중인 모든 지연 작업 취소
         handler.removeCallbacksAndMessages(null)
         
-        // 클로버 플러시 효과(시간 멈춤) 해제
-        gameView.freezeAllEnemies(false)
-        gameView.freezeEnemiesInRange(false) // 범위 기반 시간 멈춤도 해제
-        
-        // 다이아몬드 플러시 효과(무적) 해제
-        gameView.setInvincible(false)
-        
-        // 모든 시각적 효과 제거
-        visualEffectManager?.clearEffects()
+        try {
+            // 클로버 플러시 효과(시간 멈춤) 해제
+            gameView.freezeAllEnemies(false)
+            gameView.freezeEnemiesInRange(false) // 범위 기반 시간 멈춤도 해제
+            
+            // 다이아몬드 플러시 효과(무적) 해제
+            gameView.setInvincible(false)
+            
+            // 모든 시각적 효과 제거
+            visualEffectManager?.clearEffects()
+        } catch (e: Exception) {
+            // 예외 발생 시 로그만 출력하고 계속 진행
+            e.printStackTrace()
+        }
         
         // 모든 스킬 비활성화
         deactivateAllSkills()

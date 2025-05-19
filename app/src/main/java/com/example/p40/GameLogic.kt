@@ -71,6 +71,13 @@ class GameLogic(
             attackCooldown = gameStats.getUnitAttackSpeed()
         )
         
+        // gameView 초기화 여부 확인 (안전장치 추가)
+        if (!::gameView.isInitialized) {
+            // 로그 출력 또는 예외 처리 대신 조용히 리턴
+            // 나중에 setGameView가 호출되면 필요한 설정을 할 수 있도록 게임 상태는 유지
+            return
+        }
+        
         // 사용자가 설정한 유닛 문양 적용 (첫 번째 적용된 유닛 기준)
         val userManager = UserManager.getInstance(context)
         val appliedUnits = userManager.getAppliedDefenseUnits()
@@ -102,6 +109,12 @@ class GameLogic(
      */
     fun setTimeFrozen(frozen: Boolean) {
         this.timeFrozen = frozen
+        
+        // enemyManager 초기화 여부 확인
+        if (!::enemyManager.isInitialized) {
+            return
+        }
+        
         enemyManager.setTimeFrozen(frozen)
         
         // 범위 기반 시간 멈춤이 설정될 때 기존 전체 시간 멈춤은 비활성화
@@ -115,6 +128,12 @@ class GameLogic(
      */
     fun setRangeBasedTimeFrozen(frozen: Boolean) {
         this.rangeBasedTimeFrozen = frozen
+        
+        // enemyManager 초기화 여부 확인
+        if (!::enemyManager.isInitialized) {
+            return
+        }
+        
         enemyManager.setRangeBasedTimeFrozen(frozen)
         
         // 범위 기반 시간 멈춤이 켜지면 전체 시간 멈춤은 끄기
@@ -127,6 +146,11 @@ class GameLogic(
      * 무적 상태 설정 (다이아몬드 플러시 스킬용)
      */
     fun setInvincible(invincible: Boolean) {
+        // enemyManager 초기화 여부 확인
+        if (!::enemyManager.isInitialized) {
+            return
+        }
+        
         enemyManager.setInvincible(invincible)
     }
     
@@ -302,6 +326,10 @@ class GameLogic(
      * @return 제거된 적의 수
      */
     fun removeAllEnemiesExceptBoss(): Int {
+        if (!::enemyManager.isInitialized) {
+            return 0 // enemyManager가 초기화되지 않은 경우 0 반환
+        }
+        
         val centerX = defenseUnit.getPosition().x
         val centerY = defenseUnit.getPosition().y
         val attackRange = defenseUnit.attackRange
@@ -316,8 +344,10 @@ class GameLogic(
     
     // 게임 요소 접근자 메서드들
     fun getDefenseUnit(): DefenseUnit = defenseUnit
-    fun getEnemies(): CopyOnWriteArrayList<Enemy> = enemyManager.getEnemies()
-    fun getMissiles(): CopyOnWriteArrayList<Missile> = missileManager.getMissiles()
+    fun getEnemies(): CopyOnWriteArrayList<Enemy> = 
+        if (::enemyManager.isInitialized) enemyManager.getEnemies() else CopyOnWriteArrayList()
+    fun getMissiles(): CopyOnWriteArrayList<Missile> = 
+        if (::missileManager.isInitialized) missileManager.getMissiles() else CopyOnWriteArrayList()
     
     // 화면 정보 접근자 메서드들
     fun getScreenWidth(): Float = screenWidth
@@ -327,7 +357,11 @@ class GameLogic(
      * 현재 보스 체력 반환
      */
     fun getCurrentBossHealth(): Int {
-        return enemyManager.getCurrentBossHealth()
+        return if (::enemyManager.isInitialized) {
+            enemyManager.getCurrentBossHealth()
+        } else {
+            0 // enemyManager가 초기화되지 않은 경우 기본값 0 반환
+        }
     }
 
     /**

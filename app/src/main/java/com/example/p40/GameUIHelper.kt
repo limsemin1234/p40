@@ -125,11 +125,19 @@ class GameUIHelper(
             e.printStackTrace()
         }
         
-        // 초기 업데이트
-        updateCoinUI()
-        updateUnitStatsUI()
-        updateEnemyStatsUI()
-        updateBossStatsUI()
+        // 초기 업데이트 - 예외 처리 추가
+        try {
+            updateCoinUI()
+            updateUnitStatsUI()
+            updateEnemyStatsUI()
+            // updateBossStatsUI()는 GameView가 초기화된 후에 호출하도록 변경
+            // 대신 기본 텍스트만 설정
+            bossHealthText?.text = "체력: -"
+            bossAttackText?.text = "공격력: -"
+            bossSpeedText?.text = "이동속도: -"
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
     
     /**
@@ -287,7 +295,7 @@ class GameUIHelper(
         
         // 밀치기 정보 업데이트
         val pushDistance = gameView?.getCurrentPushDistance() ?: GameConfig.DEFENSE_UNIT_PUSH_DISTANCE
-        rootView.findViewById<TextView>(R.id.unitPushDistanceText)?.text = "밀치기: $pushDistance"
+        rootView.findViewById<TextView>(R.id.unitPushDistanceText)?.text = "밀치기: ${String.format("%.1f", pushDistance)}"
     }
     
     /**
@@ -357,7 +365,13 @@ class GameUIHelper(
         val speed = EnemyConfig.getEnemySpeedForWave(wave, true)
         
         // 현재 보스 체력 정보 가져오기
-        val currentBossHealth = gameView?.getCurrentBossHealth() ?: 0
+        // null 체크와 예외 처리 추가
+        val currentBossHealth = try {
+            gameView?.getCurrentBossHealth() ?: 0
+        } catch (e: Exception) {
+            // 예외 발생 시 0으로 처리
+            0
+        }
         
         // 체력 정보 업데이트 - 현재/최대 체력 표시 형식으로 변경
         val healthText = if (currentBossHealth > 0) {

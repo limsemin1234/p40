@@ -302,9 +302,21 @@
                 android:gravity="center_vertical"
                 android:visibility="visible">
                 
+                <!-- 왼쪽 화살표 -->
+                <ImageView
+                    android:id="@+id/leftArrow"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@android:drawable/ic_media_previous"
+                    android:tint="#FFFFFF"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginEnd="4dp"
+                    android:alpha="0.7" />
+                
                 <HorizontalScrollView
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
+                    android:layout_weight="1"
                     android:scrollbars="none"
                     android:fillViewport="true">
                     
@@ -400,6 +412,17 @@
                             
                     </LinearLayout>
                 </HorizontalScrollView>
+                
+                <!-- 오른쪽 화살표 -->
+                <ImageView
+                    android:id="@+id/rightArrow"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@android:drawable/ic_media_next"
+                    android:tint="#FFFFFF"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginEnd="4dp"
+                    android:alpha="0.7" />
             </LinearLayout>
 
             <!-- 적 유닛 스탯 정보 -->

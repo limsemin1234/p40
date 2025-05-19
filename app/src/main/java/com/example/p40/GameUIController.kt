@@ -599,6 +599,6 @@ class GameUIController(
         
         // 밀치기 업데이트
         val pushDistance = gameView.getCurrentPushDistance()
-        unitPushDistanceText?.text = "밀치기: $pushDistance"
+        unitPushDistanceText?.text = "밀치기: ${String.format("%.1f", pushDistance)}"
     }
 } 

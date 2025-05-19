@@ -531,9 +531,14 @@ class GameView @JvmOverloads constructor(
     fun freezeAllEnemies(freeze: Boolean) {
         timeFrozen = freeze
         
-        // GameLogic에 시간 정지 상태 전달
-        if (initializeIfNeeded()) {
-            gameLogic.setTimeFrozen(freeze)
+        // GameLogic에 시간 정지 상태 전달 - 초기화 여부 확인
+        if (::gameLogic.isInitialized) {
+            try {
+                gameLogic.setTimeFrozen(freeze)
+            } catch (e: Exception) {
+                // 예외 발생 시 로그만 출력하고 계속 진행
+                e.printStackTrace()
+            }
         }
     }
     
@@ -541,9 +546,14 @@ class GameView @JvmOverloads constructor(
     fun freezeEnemiesInRange(freeze: Boolean) {
         rangeBasedTimeFrozen = freeze
         
-        // GameLogic에 범위 기반 시간 정지 상태 전달
-        if (initializeIfNeeded()) {
-            gameLogic.setRangeBasedTimeFrozen(freeze)
+        // GameLogic에 범위 기반 시간 정지 상태 전달 - 초기화 여부 확인
+        if (::gameLogic.isInitialized) {
+            try {
+                gameLogic.setRangeBasedTimeFrozen(freeze)
+            } catch (e: Exception) {
+                // 예외 발생 시 로그만 출력하고 계속 진행
+                e.printStackTrace()
+            }
         }
     }
     
@@ -553,9 +563,14 @@ class GameView @JvmOverloads constructor(
     fun setInvincible(invincible: Boolean) {
         isInvincible = invincible
         
-        // GameLogic에도 무적 상태 전달
-        if (initializeIfNeeded()) {
-            gameLogic.setInvincible(invincible)
+        // GameLogic에도 무적 상태 전달 - 초기화 여부 확인
+        if (::gameLogic.isInitialized) {
+            try {
+                gameLogic.setInvincible(invincible)
+            } catch (e: Exception) {
+                // 예외 발생 시 로그만 출력하고 계속 진행
+                e.printStackTrace()
+            }
         }
     }
     
@@ -639,11 +654,14 @@ class GameView @JvmOverloads constructor(
         // GameStats 초기화
         gameStats.reset()
         
-        // GameLogic이 이미 초기화되어 있다면 재설정
-        if (::gameLogic.isInitialized) {
-            gameLogic = GameLogic(gameStats, config, gameOverListener, bossKillListener, levelClearListener, context)
-            gameLogic.initGame(width.toFloat(), height.toFloat())
-        }
+        // GameLogic 새로 생성 및 초기화
+        gameLogic = GameLogic(gameStats, config, gameOverListener, bossKillListener, levelClearListener, context)
+        
+        // GameLogic에 GameView 참조 설정 (중요: 순서 변경)
+        gameLogic.setGameView(this)
+        
+        // 이제 GameView 참조가 설정된 후 initGame 호출
+        gameLogic.initGame(width.toFloat(), height.toFloat())
     }
     
     /**
