@@ -121,7 +121,7 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
                 // UI 스레드에서 실행하기 위해 Handler 사용
                 Handler(Looper.getMainLooper()).post {
                     // 인자로 받은 웨이브에 따른 보스 처치 코인 보상 설정
-                    val coinReward = GameConfig.getBossKillCoinReward(wave)
+                    val coinReward = EnemyConfig.getBossKillCoinReward(wave)
                     
                     // 웨이브에 맞는 코인 획득
                     userManager.addCoin(coinReward)

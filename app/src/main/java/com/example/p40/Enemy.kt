@@ -41,7 +41,7 @@ class Enemy(
     // 행동 전략 설정 (전략 패턴)
     private var behaviorStrategy: EnemyBehaviorStrategy = when {
         isBoss -> BossEnemyBehavior()
-        wave >= GameConfig.FLYING_ENEMY_WAVE_THRESHOLD && Math.random() < GameConfig.FLYING_ENEMY_SPAWN_CHANCE -> FlyingEnemyBehavior() // GameConfig에서 설정한 웨이브와 확률로 공중 적 생성
+        wave >= EnemyConfig.FLYING_ENEMY_WAVE_THRESHOLD && Math.random() < EnemyConfig.FLYING_ENEMY_SPAWN_CHANCE -> FlyingEnemyBehavior() // EnemyConfig에서 설정한 웨이브와 확률로 공중 적 생성
         else -> BasicEnemyBehavior()
     }
     
@@ -78,7 +78,7 @@ class Enemy(
         // 행동 전략 재설정
         behaviorStrategy = when {
             isBoss -> BossEnemyBehavior()
-            newWave >= GameConfig.FLYING_ENEMY_WAVE_THRESHOLD && Math.random() < GameConfig.FLYING_ENEMY_SPAWN_CHANCE -> FlyingEnemyBehavior()
+            newWave >= EnemyConfig.FLYING_ENEMY_WAVE_THRESHOLD && Math.random() < EnemyConfig.FLYING_ENEMY_SPAWN_CHANCE -> FlyingEnemyBehavior()
             else -> BasicEnemyBehavior()
         }
         
@@ -165,7 +165,7 @@ class Enemy(
             if (isFlying) {
                 // 공중적 공격력: 기본 공중적 공격력 + (웨이브에서 첫 등장 웨이브를 뺀 값) * 웨이브당 공중적 공격력 증가량
                 // 웨이브 6부터 등장하므로, 웨이브 6에서는 증가량이 0이 되어 기본 공격력만 적용됨
-                val flyingWave = wave - GameConfig.FLYING_ENEMY_WAVE_THRESHOLD + 1
+                val flyingWave = wave - EnemyConfig.FLYING_ENEMY_WAVE_THRESHOLD + 1
                 val waveIncrease = if (flyingWave > 0) flyingWave - 1 else 0
                 EnemyConfig.FLYING_ENEMY_DAMAGE + (waveIncrease * EnemyConfig.FLYING_ENEMY_DAMAGE_INCREASE_PER_WAVE)
             } else {
@@ -185,7 +185,7 @@ class Enemy(
         // 웨이브 변경에 따른 행동 전략 재평가
         behaviorStrategy = when {
             isBoss -> BossEnemyBehavior()
-            newWave >= GameConfig.FLYING_ENEMY_WAVE_THRESHOLD && Math.random() < GameConfig.FLYING_ENEMY_SPAWN_CHANCE -> FlyingEnemyBehavior()
+            newWave >= EnemyConfig.FLYING_ENEMY_WAVE_THRESHOLD && Math.random() < EnemyConfig.FLYING_ENEMY_SPAWN_CHANCE -> FlyingEnemyBehavior()
             else -> BasicEnemyBehavior()
         }
     }

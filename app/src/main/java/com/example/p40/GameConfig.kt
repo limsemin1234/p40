@@ -15,9 +15,9 @@ object GameConfig {
     const val ENEMIES_PER_WAVE = 50  // 웨이브 당 적 수
     const val WAVE_MESSAGE_DURATION = 2000L  // 웨이브 메시지 표시 시간 (밀리초)
     
-    // 적 관련 기본 설정
-    const val FLYING_ENEMY_WAVE_THRESHOLD = 6 // 공중 적이 등장하기 시작하는 웨이브
-    const val FLYING_ENEMY_SPAWN_CHANCE = 0.3f // 공중 적 등장 확률 30% (0~1)
+    // 적 생성 관련 설정
+    const val ENEMY_SPAWN_DISTANCE_FACTOR = 1.2f  // 적 생성 거리 계수 (화면 크기 대비)
+    const val ENEMY_UPDATE_MARGIN = 200f  // 적 업데이트 마진 (적 생성 거리 외 여유 공간)
     
     // 유저 관련 설정
     const val INITIAL_COIN = 5000  // 게임 시작 시 주어지는 초기 코인 량
@@ -28,12 +28,19 @@ object GameConfig {
     // 게임 오버 조건
     const val CENTER_REACHED_DAMAGE: Int = 1000 // 중앙 도달 시 입히는 데미지
     
+    // 점수 관련 설정
+    const val SCORE_PER_NORMAL_ENEMY = 5 // 일반 적 처치 시 획득 점수
+    const val SCORE_PER_BOSS = 50 // 보스 처치 시 획득 점수
+    
     // 유닛 기본 능력치 설정
     const val BASE_DAMAGE = 10           // 기본 공격력
     const val BASE_ATTACK_SPEED = 1000   // 기본 공격 속도 (ms)
     const val BASE_ATTACK_RANGE = 300f   // 기본 공격 범위
     const val BASE_HEALTH = 100          // 기본 체력
     const val MIN_ATTACK_SPEED = 100     // 최소 공격 속도 (ms)
+    
+    // 적 유닛 등장 설정
+    const val FLYING_ENEMY_WAVE_THRESHOLD = 6 // 날아다니는 적이 등장하기 시작하는 웨이브
     
     // --------- 디버그/테스트 설정 ----------
     
@@ -56,20 +63,15 @@ object GameConfig {
     const val GRID_SIZE = 4 // 그리드 분할 크기 (4x4)
     
     // 객체 풀 설정
-    const val ENEMY_POOL_INITIAL_SIZE = 100 // 적 객체 풀 초기 크기
-    const val ENEMY_POOL_MAX_SIZE = 300 // 적 객체 풀 최대 크기
     const val MISSILE_POOL_INITIAL_SIZE = 200 // 미사일 객체 풀 초기 크기
     const val MISSILE_POOL_MAX_SIZE = 500 // 미사일 객체 풀 최대 크기
     
     // 렌더링 영역 설정
-    const val ENEMY_RENDER_MARGIN_X = 500f // 적 렌더링 X축 마진
-    const val ENEMY_RENDER_MARGIN_Y = 500f // 적 렌더링 Y축 마진
     const val MISSILE_RENDER_MARGIN_X = 20f // 미사일 렌더링 X축 마진
     const val MISSILE_RENDER_MARGIN_Y = 20f // 미사일 렌더링 Y축 마진
-    const val FAR_OFFSCREEN_MARGIN = 2000f // 적이 제거되는 화면 외부 거리
-    const val ENEMY_SPAWN_DISTANCE_FACTOR = 0.5f // 적 생성 거리 계수
-    const val BOSS_SPAWN_DISTANCE_FACTOR = 0.45f // 보스 생성 거리 계수
-    const val ENEMY_UPDATE_MARGIN = 250f // 적 생성 거리에 추가되는 여유 공간
+    const val ENEMY_RENDER_MARGIN_X = 30f // 적 렌더링 X축 마진
+    const val ENEMY_RENDER_MARGIN_Y = 30f // 적 렌더링 Y축 마진
+    const val FAR_OFFSCREEN_MARGIN = 2000f // 게임 오브젝트가 제거되는 화면 외부 거리
     
     // --------- UI 및 메시지 설정 ----------
     
@@ -141,10 +143,6 @@ object GameConfig {
     const val MISSILE_SPEED = 10f  // 미사일 속도
     const val MISSILE_DAMAGE = 50  // 미사일 기본 데미지
     const val MISSILE_COLOR = Color.YELLOW  // 미사일 색상
-
-    // 점수(자원) 설정
-    const val SCORE_PER_NORMAL_ENEMY = 1000 // 일반 적 처치 시 얻는 점수(자원)
-    const val SCORE_PER_BOSS = 200 // 보스 처치 시 얻는 점수(자원)
     
     // --------- 스탯 강화 관련 설정 ----------
     
@@ -283,84 +281,6 @@ object GameConfig {
     const val CLUB_RANGE_MULTIPLIER = 1.5f    // 공격범위 50% 증가
     
     /**
-     * 웨이브별 적 체력 계산
-     */
-    fun getEnemyHealthForWave(wave: Int, isBoss: Boolean = false, isFlying: Boolean = false): Int {
-        if (isBoss) {
-            // 보스는 기본 체력 + 웨이브당 증가량
-            return 200 + ((wave - 1) * 100)
-        } else if (isFlying) {
-            // 공중적은 기본 체력 + 웨이브당 증가량
-            val flyingWave = wave - 6 + 1 // 6웨이브부터 등장
-            val waveIncrease = if (flyingWave > 0) flyingWave - 1 else 0
-            return 60 + (waveIncrease * 10)
-        } else {
-            // 일반 적은 웨이브에 따라 체력 증가
-            val healthMultiplier = when(wave) {
-                1 -> 1.0f
-                2 -> 1.1f
-                3 -> 1.2f
-                4 -> 1.3f
-                5 -> 1.4f
-                6 -> 1.5f
-                7 -> 1.6f
-                8 -> 1.7f
-                9 -> 1.8f
-                10 -> 2.0f
-                else -> 2.0f
-            }
-            return (50 * healthMultiplier).toInt()
-        }
-    }
-    
-    /**
-     * 웨이브별 적 데미지 계산
-     */
-    fun getEnemyDamageForWave(wave: Int, isBoss: Boolean, isFlying: Boolean = false): Int {
-        if (isBoss) {
-            // 보스는 기본 데미지 + 웨이브당 증가량
-            return 20 + ((wave - 1) * 10)
-        } else if (isFlying) {
-            // 공중적 공격력 계산
-            val flyingWave = wave - 6 + 1 // 6웨이브부터 등장
-            val waveIncrease = if (flyingWave > 0) flyingWave - 1 else 0
-            return 20 + (waveIncrease * 10)
-        } else {
-            // 일반 적은 기본 공격력 + 웨이브당 증가량
-            return 5 + ((wave - 1) * 5)
-        }
-    }
-    
-    /**
-     * 웨이브에 따른 적 생성 간격 계산
-     */
-    fun getEnemySpawnIntervalForWave(wave: Int): Long {
-        // 웨이브가 증가할수록 적 생성 간격 감소
-        val decreaseFactor = 1 - ((wave - 1) * 0.1f)
-        val interval = (2000 * decreaseFactor).toLong() // 기본 생성 간격 2초
-        return maxOf(interval, 500L) // 최소 0.5초 간격 유지
-    }
-    
-    /**
-     * 웨이브에 따른 적 이동 속도 계산
-     */
-    fun getEnemySpeedForWave(wave: Int, isBoss: Boolean = false, isFlying: Boolean = false): Float {
-        if (isBoss) {
-            // 보스는 기본 속도 + 웨이브당 증가량
-            return 0.8f + ((wave - 1) * 0.05f)
-        } else if (isFlying) {
-            // 공중적은 기본 속도에 계수를 곱하고 웨이브당 증가량 적용
-            val flyingWave = wave - 6 + 1 // 6웨이브부터 등장
-            val waveIncrease = if (flyingWave > 0) flyingWave - 1 else 0
-            return (1.0f * 1.2f) + (waveIncrease * 0.5f)
-        } else {
-            // 일반 적은 웨이브에 따라 속도 증가
-            val increase = 1 + ((wave - 1) * 0.05f)
-            return 1.0f * increase
-        }
-    }
-    
-    /**
      * 현재 설정된 총 웨이브 수 반환
      */
     fun getTotalWaves(): Int = currentTotalWaves
@@ -373,18 +293,52 @@ object GameConfig {
     }
     
     /**
-     * 웨이브에 따른 보스 처치 코인 보상 계산
-     */
-    fun getBossKillCoinReward(wave: Int): Int {
-        // 1웨이브: 기본값 100, 이후 매 웨이브마다 50씩 증가
-        return 100 + (wave - 1) * 50
-    }
-    
-    /**
      * 기본 게임 설정을 반환하는 함수
      * @return 이 게임 설정 객체
      */
     fun getDefaultConfig(): GameConfig {
         return this
+    }
+    
+    /**
+     * 웨이브별 적 체력 계산
+     * @param wave 현재 웨이브
+     * @param isBoss 보스 여부
+     * @param isFlying 공중적 여부
+     * @return 적 체력
+     */
+    fun getEnemyHealthForWave(wave: Int, isBoss: Boolean = false, isFlying: Boolean = false): Int {
+        return EnemyConfig.getEnemyHealthForWave(wave, isBoss, isFlying)
+    }
+    
+    /**
+     * 웨이브별 적 데미지 계산
+     * @param wave 현재 웨이브
+     * @param isBoss 보스 여부
+     * @param isFlying 공중적 여부
+     * @return 적 데미지
+     */
+    fun getEnemyDamageForWave(wave: Int, isBoss: Boolean = false, isFlying: Boolean = false): Int {
+        return EnemyConfig.getEnemyDamageForWave(wave, isBoss, isFlying)
+    }
+    
+    /**
+     * 웨이브별 적 이동 속도 계산
+     * @param wave 현재 웨이브
+     * @param isBoss 보스 여부
+     * @param isFlying 공중적 여부
+     * @return 적 이동 속도
+     */
+    fun getEnemySpeedForWave(wave: Int, isBoss: Boolean = false, isFlying: Boolean = false): Float {
+        return EnemyConfig.getEnemySpeedForWave(wave, isBoss, isFlying)
+    }
+    
+    /**
+     * 웨이브에 따른 보스 처치 코인 보상 계산
+     * @param wave 현재 웨이브
+     * @return 보스 처치 시 획득하는 코인
+     */
+    fun getBossKillCoinReward(wave: Int): Int {
+        return EnemyConfig.getBossKillCoinReward(wave)
     }
 } 

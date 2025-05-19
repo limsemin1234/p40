@@ -11,7 +11,7 @@ object EnemyConfig {
     
     // 기타 설정
     const val CENTER_REACHED_DAMAGE = 1000  // 중앙 도달 시 입히는 데미지
-    const val SCORE_PER_NORMAL_ENEMY = 10  // 일반 적 처치 시 얻는 점수(자원)
+    const val SCORE_PER_NORMAL_ENEMY = 1000  // 일반 적 처치 시 얻는 점수(자원)
     const val SCORE_PER_BOSS = 200  // 보스 처치 시 얻는 점수(자원)
     
     // 렌더링 및 업데이트 설정
@@ -30,11 +30,6 @@ object EnemyConfig {
     const val BASE_ENEMY_SPAWN_INTERVAL = 2000L  // 기본 적 생성 간격 (2초)
     const val MIN_ENEMY_SPAWN_INTERVAL = 500L   // 최소 적 생성 간격 (밀리초)
     const val ENEMY_SPAWN_INTERVAL_DECREASE_PER_WAVE = 0.1f // 웨이브당 생성 간격 감소율 (10%)
-
-
-
-
-
 
     // --------- 일반 적 설정 ----------
     
@@ -82,10 +77,6 @@ object EnemyConfig {
         val increase = 1 + ((wave - 1) * ENEMY_SPEED_INCREASE_PER_WAVE)
         return BASE_ENEMY_SPEED * increase
     }
-
-
-
-
 
     // --------- 공중 적 설정 ----------
     
@@ -148,11 +139,6 @@ object EnemyConfig {
         val waveIncrease = if (flyingWave > 0) flyingWave - 1 else 0
         return FLYING_ENEMY_BASE_SPEED + (waveIncrease * FLYING_ENEMY_SPEED_INCREASE_PER_WAVE)
     }
-
-
-
-
-
 
     // --------- 보스 설정 ----------
     
@@ -251,7 +237,7 @@ object EnemyConfig {
     
     /**
      * 웨이브별 적 데미지 계산 (하위 호환성 유지)
-     * @param wave 웨이브 번호
+     * @param wave 현재 웨이브
      * @param isBoss 보스 여부
      * @param isFlying 공중적 여부
      * @return 적 데미지
@@ -265,7 +251,7 @@ object EnemyConfig {
     }
     
     /**
-     * 웨이브에 따른 적 이동 속도 계산 (하위 호환성 유지)
+     * 웨이브별 적 이동 속도 계산 (하위 호환성 유지)
      * @param wave 현재 웨이브
      * @param isBoss 보스 여부
      * @param isFlying 공중적 여부
