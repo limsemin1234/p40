@@ -27,6 +27,8 @@ class GameUIHelper(
     private var unitAttackText: TextView? = null
     private var unitAttackSpeedText: TextView? = null
     private var unitRangeText: TextView? = null
+    private var unitThornDamageText: TextView? = null
+    private var unitPushDistanceText: TextView? = null
     private var enemyHealthText: TextView? = null
     private var enemyAttackText: TextView? = null
     private var enemySpeedText: TextView? = null
@@ -102,6 +104,8 @@ class GameUIHelper(
             unitAttackText = view.findViewById(R.id.unitAttackText)
             unitAttackSpeedText = view.findViewById(R.id.unitAttackSpeedText)
             unitRangeText = view.findViewById(R.id.unitRangeText)
+            unitThornDamageText = view.findViewById(R.id.unitThornDamageText)
+            unitPushDistanceText = view.findViewById(R.id.unitPushDistanceText)
             
             // 일반 적 스탯 요소
             enemyHealthText = view.findViewById(R.id.enemyHealthText)
@@ -276,6 +280,14 @@ class GameUIHelper(
         // 사거리 정보 업데이트
         val attackRange = gameView?.getUnitAttackRange() ?: 0f
         rootView.findViewById<TextView>(R.id.unitRangeText)?.text = "사거리: ${attackRange.toInt()}"
+        
+        // 가시데미지 정보 업데이트
+        val thornDamage = gameView?.getCurrentThornDamage() ?: GameConfig.DEFENSE_UNIT_THORN_DAMAGE
+        rootView.findViewById<TextView>(R.id.unitThornDamageText)?.text = "가시데미지: $thornDamage"
+        
+        // 밀치기 정보 업데이트
+        val pushDistance = gameView?.getCurrentPushDistance() ?: GameConfig.DEFENSE_UNIT_PUSH_DISTANCE
+        rootView.findViewById<TextView>(R.id.unitPushDistanceText)?.text = "밀치기: $pushDistance"
     }
     
     /**
@@ -407,6 +419,8 @@ class GameUIHelper(
         unitAttackText = null
         unitAttackSpeedText = null
         unitRangeText = null
+        unitThornDamageText = null
+        unitPushDistanceText = null
         enemyHealthText = null
         enemyAttackText = null
         enemySpeedText = null

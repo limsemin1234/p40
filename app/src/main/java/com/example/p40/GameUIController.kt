@@ -562,4 +562,43 @@ class GameUIController(
             flushSkillManager.resetAllSkills()
         }
     }
+    
+    /**
+     * 유닛 스탯 업데이트
+     */
+    fun updateUnitStats() {
+        val unitHealthText = rootView.findViewById<TextView>(R.id.unitHealthText)
+        val unitAttackText = rootView.findViewById<TextView>(R.id.unitAttackText)
+        val unitAttackSpeedText = rootView.findViewById<TextView>(R.id.unitAttackSpeedText)
+        val unitRangeText = rootView.findViewById<TextView>(R.id.unitRangeText)
+        val unitThornDamageText = rootView.findViewById<TextView>(R.id.unitThornDamageText)
+        val unitPushDistanceText = rootView.findViewById<TextView>(R.id.unitPushDistanceText)
+        
+        // 체력 업데이트
+        val unitHealth = gameView.getUnitHealth()
+        val unitMaxHealth = gameView.getUnitMaxHealth()
+        unitHealthText?.text = "체력: $unitHealth/$unitMaxHealth"
+        
+        // 공격력 업데이트
+        val unitAttack = gameView.getUnitAttack()
+        unitAttackText?.text = "공격력: $unitAttack"
+        
+        // 공격속도 업데이트
+        val unitAttackSpeed = gameView.getUnitAttackSpeed()
+        val attacksPerSecond = 1000f / unitAttackSpeed
+        val formattedAttacksPerSecond = String.format("%.2f", attacksPerSecond)
+        unitAttackSpeedText?.text = "공속: ${formattedAttacksPerSecond}회/초\n(${unitAttackSpeed.toInt()}ms)"
+        
+        // 사거리 업데이트
+        val unitRange = gameView.getUnitAttackRange()
+        unitRangeText?.text = "사거리: ${unitRange.toInt()}"
+        
+        // 가시데미지 업데이트
+        val thornDamage = gameView.getCurrentThornDamage()
+        unitThornDamageText?.text = "가시데미지: $thornDamage"
+        
+        // 밀치기 업데이트
+        val pushDistance = gameView.getCurrentPushDistance()
+        unitPushDistanceText?.text = "밀치기: $pushDistance"
+    }
 } 
