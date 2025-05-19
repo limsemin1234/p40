@@ -19,7 +19,8 @@ class GameUIController(
     private val gameViewModel: GameViewModel,
     private val messageManager: MessageManager,
     private val gameView: GameView,
-    private val rootView: View
+    private val rootView: View,
+    private val gameConfig: GameConfig = GameConfig.getDefaultConfig()
 ) {
     // 현재 열려있는 패널 추적
     private var currentOpenPanel: LinearLayout? = null
@@ -477,6 +478,10 @@ class GameUIController(
         val btnMainMenu = dialog.findViewById<Button>(R.id.btnMainMenu)
         btnMainMenu.setOnClickListener {
             dialog.dismiss()
+            
+            // 게임 완전 초기화 (1웨이브부터 시작하도록)
+            gameView.resetGame(gameConfig)
+            
             // 게임 프래그먼트에서 네비게이션 처리를 하도록 콜백 필요
             onMainMenuRequested?.invoke()
         }
@@ -513,6 +518,11 @@ class GameUIController(
         val btnToMainMenu = dialog.findViewById<Button>(R.id.btnToMainMenu)
         btnToMainMenu.setOnClickListener {
             dialog.dismiss()
+            
+            // 게임 완전 초기화 (1웨이브부터 시작하도록)
+            gameView.resetGame(gameConfig)
+            
+            // 메인 메뉴로 이동
             onMainMenuRequested?.invoke()
         }
         

@@ -147,7 +147,14 @@ class GameDialogManager(
         val btnMainMenu = dialog.findViewById<Button>(R.id.btnMainMenu)
         btnMainMenu.setOnClickListener {
             dialog.dismiss()
+            
+            // 게임 리소스 정리
             cleanupResourcesCallback?.invoke()
+            
+            // 게임 완전 초기화 (1웨이브부터 시작하도록)
+            gameView.resetGame(gameConfig)
+            
+            // 메인 메뉴로 이동
             navController?.navigate(R.id.action_gameFragment_to_mainMenuFragment)
         }
         
@@ -222,7 +229,14 @@ class GameDialogManager(
         val btnToMainMenu = dialog.findViewById<Button>(R.id.btnToMainMenu)
         btnToMainMenu.setOnClickListener {
             dialog.dismiss()
+            
+            // 게임 리소스 정리
             cleanupResourcesCallback?.invoke()
+            
+            // 게임 완전 초기화 (1웨이브부터 시작하도록)
+            gameView.resetGame(gameConfig)
+            
+            // 메인 메뉴로 이동
             navController?.navigate(R.id.action_gameFragment_to_mainMenuFragment)
         }
         

@@ -109,6 +109,9 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
         // 게임 뷰 초기화
         gameView = view.findViewById(R.id.gameView)
         
+        // 게임을 항상 1웨이브부터 시작하도록 초기화
+        gameView.resetGame(gameConfig)
+        
         // 게임 오버 리스너 설정
         gameView.setGameOverListener(this)
         
