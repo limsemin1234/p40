@@ -21,9 +21,12 @@ object EnemyConfig {
     const val ENEMY_RENDER_MARGIN_X = 500f // 적 렌더링 X축 마진 (화면 밖에서도 그리기 위함)
     const val ENEMY_RENDER_MARGIN_Y = 500f // 적 렌더링 Y축 마진 (화면 밖에서도 그리기 위함)
     const val FAR_OFFSCREEN_MARGIN = 2000f // 적이 제거되는 화면 외부 거리
-    const val ENEMY_SPAWN_DISTANCE_FACTOR = 0.5f // 적 생성 거리 계수
-    const val BOSS_SPAWN_DISTANCE_FACTOR = 0.45f // 보스 생성 거리 계수 (화면 크기의 비율)
     const val ENEMY_UPDATE_MARGIN = 250f // 적 생성 거리에 추가되는 여유 공간 (화면 밖 적 업데이트 범위 확장)
+    
+    // 적 생성 거리 계수
+    const val ENEMY_SPAWN_DISTANCE_FACTOR = 0.5f // 기본 적 생성 거리 계수
+    const val BOSS_SPAWN_DISTANCE_FACTOR = 0.45f // 보스 생성 거리 계수 (화면 크기의 비율)
+    const val FLYING_ENEMY_SPAWN_DISTANCE_FACTOR = 0.55f // 공중 적 생성 거리 계수 (일반 적보다 멀리서 생성)
     
     // 객체 풀 설정
     const val ENEMY_POOL_INITIAL_SIZE = 100 // 적 객체 풀 초기 크기
@@ -48,9 +51,6 @@ object EnemyConfig {
     
     // 일반 적 추가 설정
     const val NORMAL_ENEMY_DAMAGE_REDUCTION = 1.0f // 일반 적 데미지 감소율 (감소 없음)
-    const val NORMAL_ENEMY_RENDER_MARGIN_X = ENEMY_RENDER_MARGIN_X // 일반 적 렌더링 X축 마진
-    const val NORMAL_ENEMY_RENDER_MARGIN_Y = ENEMY_RENDER_MARGIN_Y // 일반 적 렌더링 Y축 마진
-    const val NORMAL_ENEMY_SPAWN_DISTANCE_FACTOR = ENEMY_SPAWN_DISTANCE_FACTOR // 일반 적 생성 거리 계수
     
     /**
      * 일반 적 웨이브별 체력 계산
@@ -105,9 +105,6 @@ object EnemyConfig {
     
     // 공중 적 추가 설정
     const val FLYING_ENEMY_DAMAGE_MULTIPLIER = 1.2f  // 공중 적이 받는 데미지 계수 (취약함)
-    const val FLYING_ENEMY_RENDER_MARGIN_X = ENEMY_RENDER_MARGIN_X // 공중 적 렌더링 X축 마진
-    const val FLYING_ENEMY_RENDER_MARGIN_Y = ENEMY_RENDER_MARGIN_Y // 공중 적 렌더링 Y축 마진
-    const val FLYING_ENEMY_SPAWN_DISTANCE_FACTOR = ENEMY_SPAWN_DISTANCE_FACTOR // 공중 적 생성 거리 계수
     
     /**
      * 공중 적 웨이브별 체력 계산
@@ -168,8 +165,6 @@ object EnemyConfig {
     const val BOSS_DAMAGE_INCREASE_PER_WAVE = 10   // 웨이브당 보스 공격력 증가량
     
     // 보스 추가 설정
-    const val BOSS_RENDER_MARGIN_X = ENEMY_RENDER_MARGIN_X // 보스 렌더링 X축 마진
-    const val BOSS_RENDER_MARGIN_Y = ENEMY_RENDER_MARGIN_Y // 보스 렌더링 Y축 마진
     const val BOSS_KILL_COIN_REWARD_BASE = 100  // 1웨이브 보스 처치 시 획득 기본 코인 보상
     const val BOSS_KILL_COIN_REWARD_INCREMENT = 50  // 웨이브당 증가하는 코인 보상량
     
