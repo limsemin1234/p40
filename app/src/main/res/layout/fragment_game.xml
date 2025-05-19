@@ -682,9 +682,8 @@
                 android:textSize="11sp"
                 android:textStyle="bold"
                 android:lineSpacingExtra="2sp"
-                android:layout_marginHorizontal="4dp"
-                android:background="@drawable/main_button_selector"
-                android:backgroundTint="#661A237E"
+                android:layout_marginHorizontal="5dp"
+                android:background="@drawable/attack_button_selector"
                 android:textColor="@android:color/white" />
 
             <Button
@@ -696,9 +695,8 @@
                 android:textSize="11sp"
                 android:textStyle="bold"
                 android:lineSpacingExtra="2sp"
-                android:layout_marginHorizontal="4dp"
-                android:background="@drawable/main_button_selector"
-                android:backgroundTint="#661A237E"
+                android:layout_marginHorizontal="5dp"
+                android:background="@drawable/attack_button_selector"
                 android:textColor="@android:color/white" />
 
             <Button
@@ -710,9 +708,8 @@
                 android:textSize="11sp"
                 android:textStyle="bold"
                 android:lineSpacingExtra="2sp"
-                android:layout_marginHorizontal="4dp"
-                android:background="@drawable/main_button_selector"
-                android:backgroundTint="#661A237E"
+                android:layout_marginHorizontal="5dp"
+                android:background="@drawable/attack_button_selector"
                 android:textColor="@android:color/white" />
         </LinearLayout>
     </LinearLayout>
@@ -760,9 +757,8 @@
                 android:textSize="11sp"
                 android:textStyle="bold"
                 android:lineSpacingExtra="2sp"
-                android:layout_marginHorizontal="4dp"
-                android:background="@drawable/main_button_selector"
-                android:backgroundTint="#661A4518"
+                android:layout_marginHorizontal="5dp"
+                android:background="@drawable/defense_button_selector"
                 android:textColor="@android:color/white" />
 
             <Button
@@ -774,9 +770,8 @@
                 android:textSize="11sp"
                 android:textStyle="bold"
                 android:lineSpacingExtra="2sp"
-                android:layout_marginHorizontal="4dp"
-                android:background="@drawable/main_button_selector"
-                android:backgroundTint="#661A4518"
+                android:layout_marginHorizontal="5dp"
+                android:background="@drawable/defense_button_selector"
                 android:textColor="@android:color/white" />
 
             <Button
@@ -788,9 +783,8 @@
                 android:textSize="11sp"
                 android:textStyle="bold"
                 android:lineSpacingExtra="2sp"
-                android:layout_marginHorizontal="4dp"
-                android:background="@drawable/main_button_selector"
-                android:backgroundTint="#661A4518"
+                android:layout_marginHorizontal="5dp"
+                android:background="@drawable/defense_button_selector"
                 android:textColor="@android:color/white" />
         </LinearLayout>
     </LinearLayout>
