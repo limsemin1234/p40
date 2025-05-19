@@ -13,7 +13,7 @@ object EnemyConfig {
     // const val CENTER_REACHED_DAMAGE = 1000  // 중앙 도달 시 입히는 데미지 (삭제됨)
 
     // 처치 시 자원 획득
-    const val SCORE_PER_NORMAL_ENEMY = 1000  // 일반 적 처치 시 얻는 점수(자원)
+    const val SCORE_PER_NORMAL_ENEMY = 10  // 일반 적 처치 시 얻는 점수(자원)
     const val SCORE_PER_BOSS = 200  // 보스 처치 시 얻는 점수(자원)
     const val FLYING_ENEMY_SCORE = 20 // 공중 적 처치 시 획득 점수(자원)
     
@@ -24,9 +24,9 @@ object EnemyConfig {
     const val ENEMY_UPDATE_MARGIN = 250f // 적 생성 거리에 추가되는 여유 공간 (화면 밖 적 업데이트 범위 확장)
     
     // 적 생성 거리 계수
-    const val ENEMY_SPAWN_DISTANCE_FACTOR = 0.5f // 기본 적 생성 거리 계수
+    const val ENEMY_SPAWN_DISTANCE_FACTOR = 0.45f // 기본 적 생성 거리 계수
     const val BOSS_SPAWN_DISTANCE_FACTOR = 0.45f // 보스 생성 거리 계수 (화면 크기의 비율)
-    const val FLYING_ENEMY_SPAWN_DISTANCE_FACTOR = 0.55f // 공중 적 생성 거리 계수 (일반 적보다 멀리서 생성)
+    const val FLYING_ENEMY_SPAWN_DISTANCE_FACTOR = 0.45f // 공중 적 생성 거리 계수 (일반 적보다 멀리서 생성)
     
     // 객체 풀 설정
     const val ENEMY_POOL_INITIAL_SIZE = 100 // 적 객체 풀 초기 크기
