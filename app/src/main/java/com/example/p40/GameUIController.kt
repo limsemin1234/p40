@@ -543,7 +543,6 @@ class GameUIController(
     
     // 콜백 정의
     var onMainMenuRequested: (() -> Unit)? = null
-    var onRestartGameRequested: (() -> Unit)? = null
     
     /**
      * 게임 리소스 정리
