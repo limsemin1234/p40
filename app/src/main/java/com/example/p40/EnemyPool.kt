@@ -55,11 +55,20 @@ class EnemyPool {
         // 풀에서 객체 가져오기 또는 새로 생성
         val enemy = pool.poll()
         
+        // 적 크기 계산 (보스/공중적에 따라 다르게 설정)
+        val enemySize = when {
+            isBoss -> EnemyConfig.BOSS_SIZE
+            wave >= EnemyConfig.FLYING_ENEMY_WAVE_THRESHOLD && 
+                    Math.random() < EnemyConfig.FLYING_ENEMY_SPAWN_CHANCE -> 
+                EnemyConfig.FLYING_ENEMY_SIZE
+            else -> size
+        }
+        
         if (enemy != null) {
             // 풀 히트 증가
             poolHits.incrementAndGet()
             // 객체 재설정
-            enemy.reset(position, target, speed, size, health, isBoss, wave)
+            enemy.reset(position, target, speed, enemySize, health, isBoss, wave)
             currentPoolSize--
             return enemy
         } else {
@@ -73,7 +82,7 @@ class EnemyPool {
             
             // 새 객체 생성
             val newEnemy = createEnemy()
-            newEnemy.reset(position, target, speed, size, health, isBoss, wave)
+            newEnemy.reset(position, target, speed, enemySize, health, isBoss, wave)
             return newEnemy
         }
     }

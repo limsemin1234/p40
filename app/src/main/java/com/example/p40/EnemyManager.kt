@@ -131,17 +131,27 @@ class EnemyManager(
             val centerX = screenWidth / 2
             val centerY = screenHeight / 2
             
+            val waveCount = gameStats.getWaveCount()
+            
+            // 현재 웨이브에서 공중적이 등장할 수 있는지 확인
+            val canSpawnFlyingEnemy = waveCount >= EnemyConfig.FLYING_ENEMY_WAVE_THRESHOLD
+            val isSpawningFlyingEnemy = canSpawnFlyingEnemy && Math.random() < EnemyConfig.FLYING_ENEMY_SPAWN_CHANCE
+            
             // 화면 가장자리에서 적 스폰
             val angle = Random.nextDouble(0.0, 2 * PI)
-            val spawnDistance = screenWidth.coerceAtLeast(screenHeight) * EnemyConfig.ENEMY_SPAWN_DISTANCE_FACTOR
+            
+            // 적 타입에 따라 다른 생성 거리 사용
+            val spawnDistance = when {
+                isSpawningFlyingEnemy -> screenWidth.coerceAtLeast(screenHeight) * EnemyConfig.FLYING_ENEMY_SPAWN_DISTANCE_FACTOR
+                else -> screenWidth.coerceAtLeast(screenHeight) * EnemyConfig.ENEMY_SPAWN_DISTANCE_FACTOR
+            }
             
             val spawnX = centerX + cos(angle).toFloat() * spawnDistance
             val spawnY = centerY + sin(angle).toFloat() * spawnDistance
             
-            val waveCount = gameStats.getWaveCount()
             // 현재 웨이브에 맞는 적 능력치 설정
-            val speed = EnemyConfig.getEnemySpeedForWave(waveCount)
-            val health = EnemyConfig.getEnemyHealthForWave(waveCount)
+            val speed = EnemyConfig.getEnemySpeedForWave(waveCount, false, isSpawningFlyingEnemy)
+            val health = EnemyConfig.getEnemyHealthForWave(waveCount, false, isSpawningFlyingEnemy)
             
             // 객체 풀에서 적 가져오기
             val enemy = enemyPool.obtain(
@@ -253,7 +263,7 @@ class EnemyManager(
         for (enemy in enemies) {
             val enemyPos = enemy.getPosition()
             
-            // 화면 범위에서 멀리 벗어난 적은 자동 제거 (최적화)
+            // 화면 범위에서 뀌리 벗어난 적은 자동 제거 (최적화)
             if (enemyPos.x < -farOffScreenMargin || enemyPos.x > screenWidth + farOffScreenMargin ||
                 enemyPos.y < -farOffScreenMargin || enemyPos.y > screenHeight + farOffScreenMargin) {
                 deadEnemies.add(enemy)
