@@ -73,6 +73,14 @@ class GameView @JvmOverloads constructor(
     private var symbolChangeListener: DefenseUnitSymbolChangeListener? = null
     private var levelClearListener: LevelClearListener? = null
     
+    // 가시 데미지 업그레이드 레벨 및 비용
+    private var thornDamageLevel = 0
+    private var thornDamageCost = GameConfig.THORN_DAMAGE_UPGRADE_INITIAL_COST
+    
+    // 밀치기 업그레이드 레벨 및 비용
+    private var pushDistanceLevel = 0
+    private var pushDistanceCost = GameConfig.PUSH_DISTANCE_UPGRADE_INITIAL_COST
+    
     init {
         holder.addCallback(this)
         gameRenderer = GameRenderer(gameStats, gameConfig)
@@ -84,6 +92,7 @@ class GameView @JvmOverloads constructor(
      */
     private fun initGameLogic(width: Float, height: Float) {
         gameLogic = GameLogic(gameStats, gameConfig, gameOverListener, bossKillListener, levelClearListener, context)
+        gameLogic.setGameView(this)
         gameLogic.initGame(width, height)
     }
     
@@ -691,5 +700,95 @@ class GameView @JvmOverloads constructor(
         if (::gameLogic.isInitialized) {
             gameLogic.forceNextWave()
         }
+    }
+
+    /**
+     * 가시 데미지 레벨 가져오기
+     */
+    fun getThornDamageLevel(): Int = thornDamageLevel
+    
+    /**
+     * 밀치기 레벨 가져오기
+     */
+    fun getPushDistanceLevel(): Int = pushDistanceLevel
+    
+    /**
+     * 가시 데미지 비용 가져오기
+     */
+    fun getThornDamageCost(): Int = thornDamageCost
+    
+    /**
+     * 밀치기 비용 가져오기
+     */
+    fun getPushDistanceCost(): Int = pushDistanceCost
+    
+    /**
+     * 현재 가시 데미지 계산
+     */
+    fun getCurrentThornDamage(): Int {
+        return GameConfig.DEFENSE_UNIT_THORN_DAMAGE + thornDamageLevel * GameConfig.THORN_DAMAGE_UPGRADE_VALUE
+    }
+    
+    /**
+     * 현재 밀치기 거리 계산 (유닛 크기 배수로)
+     */
+    fun getCurrentPushDistance(): Float {
+        return GameConfig.DEFENSE_UNIT_PUSH_DISTANCE + pushDistanceLevel * GameConfig.PUSH_DISTANCE_UPGRADE_VALUE
+    }
+    
+    /**
+     * 가시 데미지 업그레이드
+     * @return 업그레이드 성공 여부
+     */
+    fun upgradeThornDamage(): Boolean {
+        // 최대 레벨 체크
+        if (thornDamageLevel >= GameConfig.THORN_DAMAGE_UPGRADE_MAX_LEVEL) {
+            return false
+        }
+        
+        // 자원 부족 체크
+        if (gameStats.getResource() < thornDamageCost) {
+            return false
+        }
+        
+        // 자원 차감
+        gameStats.useResource(thornDamageCost)
+        
+        // 레벨 증가
+        thornDamageLevel++
+        
+        // 비용 증가
+        thornDamageCost = GameConfig.THORN_DAMAGE_UPGRADE_INITIAL_COST + 
+                          thornDamageLevel * GameConfig.THORN_DAMAGE_UPGRADE_COST_INCREASE
+        
+        return true
+    }
+    
+    /**
+     * 밀치기 업그레이드
+     * @return 업그레이드 성공 여부
+     */
+    fun upgradePushDistance(): Boolean {
+        // 최대 레벨 체크
+        if (pushDistanceLevel >= GameConfig.PUSH_DISTANCE_UPGRADE_MAX_LEVEL) {
+            return false
+        }
+        
+        // 자원 부족 체크
+        if (gameStats.getResource() < pushDistanceCost) {
+            return false
+        }
+        
+        // 자원 차감
+        gameStats.useResource(pushDistanceCost)
+        
+        // 레벨 증가
+        pushDistanceLevel++
+        
+        // 비용 증가
+        pushDistanceCost = GameConfig.PUSH_DISTANCE_UPGRADE_INITIAL_COST + 
+                           pushDistanceLevel * GameConfig.PUSH_DISTANCE_UPGRADE_COST_INCREASE
+        
+        return true
     }
 } 

@@ -66,11 +66,11 @@ class GameRenderer(
         
         // 가시 효과 외곽선 표시 - 적과 충돌 시 데미지를 주는 영역
         val thornPaint = Paint().apply {
-            color = Color.argb(180, 255, 80, 80) // 선명한 반투명 빨간색
+            color = Color.argb(100, 255, 100, 100) // 반투명 붉은색
             style = Paint.Style.STROKE
-            strokeWidth = 5f // 두꺼운 외곽선
+            strokeWidth = 2f
         }
-        canvas.drawCircle(screenWidth / 2, screenHeight / 2, gameConfig.DEFENSE_UNIT_SIZE, thornPaint)
+        canvas.drawCircle(screenWidth / 2, screenHeight / 2, GameConfig.DEFENSE_UNIT_SIZE, thornPaint)
         
         // 중앙에 방어 타워 그리기 - 카드 형태로 변경
         val centerX = screenWidth / 2

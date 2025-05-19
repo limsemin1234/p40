@@ -1,5 +1,6 @@
 package com.example.p40
 
+import android.content.Context
 import android.graphics.PointF
 import android.os.Handler
 import android.os.Looper
@@ -14,8 +15,10 @@ import java.util.concurrent.CopyOnWriteArrayList
  * 적 생성, 처리, 업데이트 등 적 관련 모든 기능을 관리
  */
 class EnemyManager(
+    private val context: Context,
     private val gameStats: GameStats,
     private val gameConfig: GameConfig,
+    private val gameView: GameView,
     private val gameOverListener: GameOverListener? = null,
     private val bossKillListener: BossKillListener? = null
 ) {
@@ -135,7 +138,7 @@ class EnemyManager(
             
             // 현재 웨이브에서 공중적이 등장할 수 있는지 확인
             val canSpawnFlyingEnemy = waveCount >= EnemyConfig.FLYING_ENEMY_WAVE_THRESHOLD
-            val isSpawningFlyingEnemy = canSpawnFlyingEnemy && Math.random() < EnemyConfig.FLYING_ENEMY_SPAWN_CHANCE
+            val isSpawningFlyingEnemy = canSpawnFlyingEnemy && Random.nextDouble() < EnemyConfig.FLYING_ENEMY_SPAWN_CHANCE
             
             // 화면 가장자리에서 적 스폰
             val angle = Random.nextDouble(0.0, 2 * PI)
@@ -334,14 +337,14 @@ class EnemyManager(
      */
     private fun handleEnemyCollision(enemy: Enemy, dx: Float, dy: Float, distanceToCenter: Float,
                                      deadEnemies: MutableList<Enemy>, defenseUnit: DefenseUnit, isGameOver: Boolean) {
-        // 가시 데미지 설정 - 모든 적에게 GameConfig에 정의된 데미지 적용
-        val thornDamage = GameConfig.DEFENSE_UNIT_THORN_DAMAGE
+        // 가시 데미지 설정 - 현재 업그레이드 레벨에 따른 데미지 적용
+        val thornDamage = gameView.getCurrentThornDamage()
         
         // 적에게 가시 데미지 적용
         enemy.takeDamage(thornDamage)
         
-        // 튕겨내기 계산 - 모든 적에게 적용
-        val pushDistance = GameConfig.DEFENSE_UNIT_SIZE * 1.5f
+        // 튕겨내기 계산 - 현재 업그레이드 레벨에 따른 밀치기 거리 적용
+        val pushDistance = GameConfig.DEFENSE_UNIT_SIZE * gameView.getCurrentPushDistance()
         val pushDirX = if (dx != 0f) dx / distanceToCenter else 0f
         val pushDirY = if (dy != 0f) dy / distanceToCenter else 0f
         

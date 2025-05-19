@@ -42,8 +42,18 @@ class GameLogic(
     private var gameStartTime = 0L
     
     // 매니저 클래스 인스턴스
-    private val enemyManager = EnemyManager(gameStats, gameConfig, gameOverListener, bossKillListener)
-    private val missileManager = MissileManager(gameStats, gameConfig)
+    private lateinit var enemyManager: EnemyManager
+    private lateinit var missileManager: MissileManager
+    
+    // GameView 참조
+    private lateinit var gameView: GameView
+    
+    /**
+     * GameView 참조 설정
+     */
+    fun setGameView(gameView: GameView) {
+        this.gameView = gameView
+    }
     
     /**
      * 게임 초기화
@@ -76,6 +86,9 @@ class GameLogic(
         isPaused = false
         
         // 매니저 초기화
+        enemyManager = EnemyManager(context, gameStats, gameConfig, gameView, gameOverListener, bossKillListener)
+        missileManager = MissileManager(gameStats, gameConfig)
+        
         enemyManager.init(width, height, gameStartTime)
         missileManager.init(width, height)
         

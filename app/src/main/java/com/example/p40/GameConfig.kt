@@ -132,6 +132,7 @@ object GameConfig {
     const val DEFENSE_UNIT_INITIAL_HEALTH = 100 // 초기 체력
     const val DEFENSE_UNIT_INITIAL_MAX_HEALTH = 100 // 초기 최대 체력
     const val DEFENSE_UNIT_THORN_DAMAGE = 10 // 디펜스 유닛 가시 데미지 (충돌 시 적에게 입히는 데미지)
+    const val DEFENSE_UNIT_PUSH_DISTANCE = 1.5f // 디펜스 유닛과 충돌 시 적이 밀려나는 거리 (유닛 크기 배수)
     
     // 미사일 설정
     const val MISSILE_SIZE = 5f  // 미사일 크기
@@ -274,6 +275,18 @@ object GameConfig {
     const val CLUB_DAMAGE_MULTIPLIER = 1.0f   // 공격력 영향 없음
     const val CLUB_SPEED_MULTIPLIER = 0.5f    // 공격속도 50% 감소
     const val CLUB_RANGE_MULTIPLIER = 1.5f    // 공격범위 50% 증가
+    
+    // 가시 데미지 업그레이드 설정
+    const val THORN_DAMAGE_UPGRADE_INITIAL_COST = 10  // 초기 비용
+    const val THORN_DAMAGE_UPGRADE_COST_INCREASE = 5  // 레벨당 비용 증가량
+    const val THORN_DAMAGE_UPGRADE_VALUE = 1  // 업그레이드당 가시 데미지 증가량
+    const val THORN_DAMAGE_UPGRADE_MAX_LEVEL = 100  // 최대 업그레이드 레벨
+    
+    // 밀치기 업그레이드 설정
+    const val PUSH_DISTANCE_UPGRADE_INITIAL_COST = 10  // 초기 비용
+    const val PUSH_DISTANCE_UPGRADE_COST_INCREASE = 5  // 레벨당 비용 증가량
+    const val PUSH_DISTANCE_UPGRADE_VALUE = 0.1f  // 업그레이드당 밀치기 거리 증가량 (유닛 크기 배수)
+    const val PUSH_DISTANCE_UPGRADE_MAX_LEVEL = 100  // 최대 업그레이드 레벨
     
     /**
      * 현재 설정된 총 웨이브 수 반환

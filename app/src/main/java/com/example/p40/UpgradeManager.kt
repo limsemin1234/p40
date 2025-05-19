@@ -86,15 +86,38 @@ class UpgradeManager(
             }
         }
         
-        // 다른 버튼들은 아직 구현하지 않음
+        // 가시 데미지 업그레이드 버튼
         defenseUpgrade2.setOnClickListener {
-            // 준비 중인 기능
-            messageManager.showInfo("준비 중인 기능입니다.")
+            val cost = gameView.getThornDamageCost()
+            if (gameView.upgradeThornDamage()) {
+                // 업그레이드 성공
+                messageManager.showSuccess("가시 데미지가 강화되었습니다!")
+                updateUpgradeButtonsText() // 모든 버튼 텍스트 갱신
+            } else {
+                // 자원 부족 또는 최대 레벨
+                if (gameView.getThornDamageLevel() >= GameConfig.THORN_DAMAGE_UPGRADE_MAX_LEVEL) {
+                    messageManager.showInfo("이미 최대 레벨입니다.")
+                } else {
+                    messageManager.showWarning("자원이 부족합니다! (필요: $cost)")
+                }
+            }
         }
         
+        // 밀치기 업그레이드 버튼
         defenseUpgrade3.setOnClickListener {
-            // 준비 중인 기능
-            messageManager.showInfo("준비 중인 기능입니다.")
+            val cost = gameView.getPushDistanceCost()
+            if (gameView.upgradePushDistance()) {
+                // 업그레이드 성공
+                messageManager.showSuccess("밀치기 거리가 강화되었습니다!")
+                updateUpgradeButtonsText() // 모든 버튼 텍스트 갱신
+            } else {
+                // 자원 부족 또는 최대 레벨
+                if (gameView.getPushDistanceLevel() >= GameConfig.PUSH_DISTANCE_UPGRADE_MAX_LEVEL) {
+                    messageManager.showInfo("이미 최대 레벨입니다.")
+                } else {
+                    messageManager.showWarning("자원이 부족합니다! (필요: $cost)")
+                }
+            }
         }
     }
     
@@ -160,10 +183,24 @@ class UpgradeManager(
         
         // 준비 중인 기능 버튼 텍스트 업데이트
         val defenseUpgrade2 = rootView.findViewById<Button>(R.id.defenseUpgrade2)
-        defenseUpgrade2?.text = "방어력\n(v2.0 추가 예정)"
+        val thornDamageLevel = gameView.getThornDamageLevel()
+        if (thornDamageLevel >= GameConfig.THORN_DAMAGE_UPGRADE_MAX_LEVEL) {
+            defenseUpgrade2.text = "가시데미지\n최대 레벨\n(Lv.${thornDamageLevel}/${GameConfig.THORN_DAMAGE_UPGRADE_MAX_LEVEL})"
+            defenseUpgrade2.isEnabled = false
+        } else {
+            defenseUpgrade2.text = "가시데미지 +${GameConfig.THORN_DAMAGE_UPGRADE_VALUE}\n💰 ${gameView.getThornDamageCost()} 자원\n(Lv.${thornDamageLevel}/${GameConfig.THORN_DAMAGE_UPGRADE_MAX_LEVEL})"
+            defenseUpgrade2.isEnabled = true
+        }
         
         val defenseUpgrade3 = rootView.findViewById<Button>(R.id.defenseUpgrade3)
-        defenseUpgrade3?.text = "쿨타임\n(v2.0 추가 예정)"
+        val pushDistanceLevel = gameView.getPushDistanceLevel()
+        if (pushDistanceLevel >= GameConfig.PUSH_DISTANCE_UPGRADE_MAX_LEVEL) {
+            defenseUpgrade3.text = "밀치기\n최대 레벨\n(Lv.${pushDistanceLevel}/${GameConfig.PUSH_DISTANCE_UPGRADE_MAX_LEVEL})"
+            defenseUpgrade3.isEnabled = false
+        } else {
+            defenseUpgrade3.text = "밀치기 +${GameConfig.PUSH_DISTANCE_UPGRADE_VALUE}\n💰 ${gameView.getPushDistanceCost()} 자원\n(Lv.${pushDistanceLevel}/${GameConfig.PUSH_DISTANCE_UPGRADE_MAX_LEVEL})"
+            defenseUpgrade3.isEnabled = true
+        }
     }
     
     /**
