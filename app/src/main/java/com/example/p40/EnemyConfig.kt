@@ -11,8 +11,11 @@ object EnemyConfig {
     
     // 기타 설정
     const val CENTER_REACHED_DAMAGE = 1000  // 중앙 도달 시 입히는 데미지
+
+    // 처치 시 자원 획득
     const val SCORE_PER_NORMAL_ENEMY = 1000  // 일반 적 처치 시 얻는 점수(자원)
     const val SCORE_PER_BOSS = 200  // 보스 처치 시 얻는 점수(자원)
+    const val FLYING_ENEMY_SCORE = 20 // 공중 적 처치 시 획득 점수(자원)
     
     // 렌더링 및 업데이트 설정
     const val ENEMY_RENDER_MARGIN_X = 500f // 적 렌더링 X축 마진 (화면 밖에서도 그리기 위함)
@@ -105,7 +108,6 @@ object EnemyConfig {
     const val FLYING_ENEMY_RENDER_MARGIN_X = ENEMY_RENDER_MARGIN_X // 공중 적 렌더링 X축 마진
     const val FLYING_ENEMY_RENDER_MARGIN_Y = ENEMY_RENDER_MARGIN_Y // 공중 적 렌더링 Y축 마진
     const val FLYING_ENEMY_SPAWN_DISTANCE_FACTOR = ENEMY_SPAWN_DISTANCE_FACTOR // 공중 적 생성 거리 계수
-    const val FLYING_ENEMY_SCORE = 20 // 공중 적 처치 시 획득 점수(자원)
     
     /**
      * 공중 적 웨이브별 체력 계산
@@ -170,7 +172,6 @@ object EnemyConfig {
     const val BOSS_RENDER_MARGIN_Y = ENEMY_RENDER_MARGIN_Y // 보스 렌더링 Y축 마진
     const val BOSS_KILL_COIN_REWARD_BASE = 100  // 1웨이브 보스 처치 시 획득 기본 코인 보상
     const val BOSS_KILL_COIN_REWARD_INCREMENT = 50  // 웨이브당 증가하는 코인 보상량
-    const val BOSS_SCORE = SCORE_PER_BOSS // 보스 처치 시 얻는 점수
     
     /**
      * 보스 웨이브별 체력 계산
