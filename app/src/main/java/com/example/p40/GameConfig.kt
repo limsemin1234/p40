@@ -16,8 +16,8 @@ object GameConfig {
     const val WAVE_MESSAGE_DURATION = 2000L  // 웨이브 메시지 표시 시간 (밀리초)
     
     // 적 생성 관련 설정
-    const val ENEMY_SPAWN_DISTANCE_FACTOR = 1.2f  // 적 생성 거리 계수 (화면 크기 대비)
-    const val ENEMY_UPDATE_MARGIN = 200f  // 적 업데이트 마진 (적 생성 거리 외 여유 공간)
+    const val ENEMY_SPAWN_DISTANCE_FACTOR = EnemyConfig.ENEMY_SPAWN_DISTANCE_FACTOR  // 적 생성 거리 계수 (화면 크기 대비)
+    const val ENEMY_UPDATE_MARGIN = EnemyConfig.ENEMY_UPDATE_MARGIN  // 적 업데이트 마진 (적 생성 거리 외 여유 공간)
     
     // 유저 관련 설정
     const val INITIAL_COIN = 5000  // 게임 시작 시 주어지는 초기 코인 량
@@ -26,11 +26,8 @@ object GameConfig {
     private var currentTotalWaves: Int = 10  // 기본 총 웨이브 수
     
     // 게임 오버 조건
-    const val CENTER_REACHED_DAMAGE: Int = 1000 // 중앙 도달 시 입히는 데미지
-    
-    // 점수 관련 설정 (EnemyConfig와 동일하게 유지)
-    const val SCORE_PER_NORMAL_ENEMY = EnemyConfig.SCORE_PER_NORMAL_ENEMY // 일반 적 처치 시 획득 점수
-    const val SCORE_PER_BOSS = EnemyConfig.SCORE_PER_BOSS // 보스 처치 시 획득 점수
+    const val CENTER_REACHED_DAMAGE: Int = EnemyConfig.CENTER_REACHED_DAMAGE // 중앙 도달 시 입히는 데미지
+
     
     // 유닛 기본 능력치 설정
     const val BASE_DAMAGE = 10           // 기본 공격력
@@ -40,7 +37,7 @@ object GameConfig {
     const val MIN_ATTACK_SPEED = 100     // 최소 공격 속도 (ms)
     
     // 적 유닛 등장 설정
-    const val FLYING_ENEMY_WAVE_THRESHOLD = 6 // 날아다니는 적이 등장하기 시작하는 웨이브
+    const val FLYING_ENEMY_WAVE_THRESHOLD = EnemyConfig.FLYING_ENEMY_WAVE_THRESHOLD // 날아다니는 적이 등장하기 시작하는 웨이브
     
     // --------- 디버그/테스트 설정 ----------
     
@@ -69,9 +66,9 @@ object GameConfig {
     // 렌더링 영역 설정
     const val MISSILE_RENDER_MARGIN_X = 20f // 미사일 렌더링 X축 마진
     const val MISSILE_RENDER_MARGIN_Y = 20f // 미사일 렌더링 Y축 마진
-    const val ENEMY_RENDER_MARGIN_X = 30f // 적 렌더링 X축 마진
-    const val ENEMY_RENDER_MARGIN_Y = 30f // 적 렌더링 Y축 마진
-    const val FAR_OFFSCREEN_MARGIN = 2000f // 게임 오브젝트가 제거되는 화면 외부 거리
+    const val ENEMY_RENDER_MARGIN_X = EnemyConfig.ENEMY_RENDER_MARGIN_X // 적 렌더링 X축 마진
+    const val ENEMY_RENDER_MARGIN_Y = EnemyConfig.ENEMY_RENDER_MARGIN_Y // 적 렌더링 Y축 마진
+    const val FAR_OFFSCREEN_MARGIN = EnemyConfig.FAR_OFFSCREEN_MARGIN // 게임 오브젝트가 제거되는 화면 외부 거리
     
     // --------- UI 및 메시지 설정 ----------
     
@@ -298,47 +295,5 @@ object GameConfig {
      */
     fun getDefaultConfig(): GameConfig {
         return this
-    }
-    
-    /**
-     * 웨이브별 적 체력 계산
-     * @param wave 현재 웨이브
-     * @param isBoss 보스 여부
-     * @param isFlying 공중적 여부
-     * @return 적 체력
-     */
-    fun getEnemyHealthForWave(wave: Int, isBoss: Boolean = false, isFlying: Boolean = false): Int {
-        return EnemyConfig.getEnemyHealthForWave(wave, isBoss, isFlying)
-    }
-    
-    /**
-     * 웨이브별 적 데미지 계산
-     * @param wave 현재 웨이브
-     * @param isBoss 보스 여부
-     * @param isFlying 공중적 여부
-     * @return 적 데미지
-     */
-    fun getEnemyDamageForWave(wave: Int, isBoss: Boolean = false, isFlying: Boolean = false): Int {
-        return EnemyConfig.getEnemyDamageForWave(wave, isBoss, isFlying)
-    }
-    
-    /**
-     * 웨이브별 적 이동 속도 계산
-     * @param wave 현재 웨이브
-     * @param isBoss 보스 여부
-     * @param isFlying 공중적 여부
-     * @return 적 이동 속도
-     */
-    fun getEnemySpeedForWave(wave: Int, isBoss: Boolean = false, isFlying: Boolean = false): Float {
-        return EnemyConfig.getEnemySpeedForWave(wave, isBoss, isFlying)
-    }
-    
-    /**
-     * 웨이브에 따른 보스 처치 코인 보상 계산
-     * @param wave 현재 웨이브
-     * @return 보스 처치 시 획득하는 코인
-     */
-    fun getBossKillCoinReward(wave: Int): Int {
-        return EnemyConfig.getBossKillCoinReward(wave)
     }
 } 

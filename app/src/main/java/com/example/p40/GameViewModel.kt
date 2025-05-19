@@ -129,28 +129,28 @@ class GameViewModel : ViewModel() {
      * 웨이브별 적 체력 계산
      */
     fun getEnemyHealthForWave(wave: Int, isBoss: Boolean = false, isFlying: Boolean = false): Int {
-        return gameConfig?.getEnemyHealthForWave(wave, isBoss, isFlying) ?: 0
+        return EnemyConfig.getEnemyHealthForWave(wave, isBoss, isFlying)
     }
     
     /**
      * 웨이브별 적 데미지 계산
      */
     fun getEnemyDamageForWave(wave: Int, isBoss: Boolean = false, isFlying: Boolean = false): Int {
-        return gameConfig?.getEnemyDamageForWave(wave, isBoss, isFlying) ?: 0
+        return EnemyConfig.getEnemyDamageForWave(wave, isBoss, isFlying)
     }
     
     /**
      * 웨이브별 적 속도 계산
      */
     fun getEnemySpeedForWave(wave: Int, isBoss: Boolean = false, isFlying: Boolean = false): Float {
-        return gameConfig?.getEnemySpeedForWave(wave, isBoss, isFlying) ?: 0f
+        return EnemyConfig.getEnemySpeedForWave(wave, isBoss, isFlying)
     }
     
     /**
      * 보스 처치 보상 코인량 계산
      */
     fun getBossKillCoinReward(wave: Int): Int {
-        return gameConfig?.getBossKillCoinReward(wave) ?: 0
+        return EnemyConfig.getBossKillCoinReward(wave)
     }
     
     /**
