@@ -28,9 +28,9 @@ object GameConfig {
     // 게임 오버 조건
     const val CENTER_REACHED_DAMAGE: Int = 1000 // 중앙 도달 시 입히는 데미지
     
-    // 점수 관련 설정
-    const val SCORE_PER_NORMAL_ENEMY = 5 // 일반 적 처치 시 획득 점수
-    const val SCORE_PER_BOSS = 50 // 보스 처치 시 획득 점수
+    // 점수 관련 설정 (EnemyConfig와 동일하게 유지)
+    const val SCORE_PER_NORMAL_ENEMY = EnemyConfig.SCORE_PER_NORMAL_ENEMY // 일반 적 처치 시 획득 점수
+    const val SCORE_PER_BOSS = EnemyConfig.SCORE_PER_BOSS // 보스 처치 시 획득 점수
     
     // 유닛 기본 능력치 설정
     const val BASE_DAMAGE = 10           // 기본 공격력

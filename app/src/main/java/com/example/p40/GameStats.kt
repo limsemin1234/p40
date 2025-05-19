@@ -128,14 +128,17 @@ class GameStats(
     /**
      * 적 처치 처리
      * @param isBoss 보스 여부
+     * @param isFlying 공중적 여부 (기본값: false)
      * @return 처치된 적이 보스인 경우 true
      */
-    fun enemyKilled(isBoss: Boolean): Boolean {
-        resource += if (isBoss) {
-            gameConfig.SCORE_PER_BOSS
-        } else {
-            killCount++
-            gameConfig.SCORE_PER_NORMAL_ENEMY
+    fun enemyKilled(isBoss: Boolean, isFlying: Boolean = false): Boolean {
+        resource += when {
+            isBoss -> EnemyConfig.SCORE_PER_BOSS
+            isFlying -> EnemyConfig.FLYING_ENEMY_SCORE
+            else -> {
+                killCount++
+                EnemyConfig.SCORE_PER_NORMAL_ENEMY
+            }
         }
         
         return isBoss

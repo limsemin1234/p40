@@ -387,7 +387,11 @@ class EnemyManager(
             }
             
             if (enemy.isDead()) { // 실제로 죽은 경우만 점수 처리
-                val isBossKilled = gameStats.enemyKilled(enemy.isBoss())
+                val isBoss = enemy.isBoss()
+                val isFlying = enemy.isFlying()
+                
+                // 적 타입에 따라 다른 점수 적용
+                val isBossKilled = gameStats.enemyKilled(isBoss, isFlying)
                 
                 // 객체 풀에 적 반환 (재사용)
                 enemyPool.recycle(enemy)
@@ -438,8 +442,11 @@ class EnemyManager(
             enemy.takeDamage(GameConfig.SPADE_FLUSH_DAMAGE)
             enemies.remove(enemy)
             
+            // 적 유형 확인
+            val isFlying = enemy.isFlying()
+            
             // 처치 수에 포함 (공식 킬 카운트 증가)
-            gameStats.enemyKilled(false)
+            gameStats.enemyKilled(false, isFlying)
             
             // 적 객체를 풀에 반환
             enemyPool.recycle(enemy)
