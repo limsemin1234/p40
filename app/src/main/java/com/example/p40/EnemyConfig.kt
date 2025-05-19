@@ -9,8 +9,8 @@ import android.graphics.Color
 object EnemyConfig {
     // --------- 공통 설정 ----------
     
-    // 기타 설정
-    const val CENTER_REACHED_DAMAGE = 1000  // 중앙 도달 시 입히는 데미지
+    // 기타 설정 - 중앙 도달 데미지 삭제
+    // const val CENTER_REACHED_DAMAGE = 1000  // 중앙 도달 시 입히는 데미지 (삭제됨)
 
     // 처치 시 자원 획득
     const val SCORE_PER_NORMAL_ENEMY = 1000  // 일반 적 처치 시 얻는 점수(자원)

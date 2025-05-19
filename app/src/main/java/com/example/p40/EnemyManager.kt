@@ -334,52 +334,44 @@ class EnemyManager(
      */
     private fun handleEnemyCollision(enemy: Enemy, dx: Float, dy: Float, distanceToCenter: Float,
                                      deadEnemies: MutableList<Enemy>, defenseUnit: DefenseUnit, isGameOver: Boolean) {
-        if (enemy.isBoss()) {
-            // 보스의 경우 다르게 처리 (죽이지는 않음)
-            // 플레이어에게 데미지를 주고 약간 밀어내기
+        // 가시 데미지 설정 - 모든 적에게 GameConfig에 정의된 데미지 적용
+        val thornDamage = GameConfig.DEFENSE_UNIT_THORN_DAMAGE
+        
+        // 적에게 가시 데미지 적용
+        enemy.takeDamage(thornDamage)
+        
+        // 튕겨내기 계산 - 모든 적에게 적용
+        val pushDistance = GameConfig.DEFENSE_UNIT_SIZE * 1.5f
+        val pushDirX = if (dx != 0f) dx / distanceToCenter else 0f
+        val pushDirY = if (dy != 0f) dy / distanceToCenter else 0f
+        
+        // NaN이나 무한대 값 검사
+        val newX = if (pushDirX.isNaN() || pushDirX.isInfinite()) enemy.getPosition().x 
+                  else enemy.getPosition().x + pushDirX * pushDistance
+        val newY = if (pushDirY.isNaN() || pushDirY.isInfinite()) enemy.getPosition().y 
+                  else enemy.getPosition().y + pushDirY * pushDistance
+        
+        // 유효한 위치 값인지 확인 (화면 내부로 제한)
+        val safeX = newX.coerceIn(0f, screenWidth)
+        val safeY = newY.coerceIn(0f, screenHeight)
+        
+        // 적 위치 변경 (튕겨내기)
+        enemy.setPosition(safeX, safeY)
+        
+        // 만약 적이 죽었다면 deadEnemies에 추가
+        if (enemy.isDead()) {
+            deadEnemies.add(enemy)
+            return
+        }
+        
+        // 적의 공격력에 따라 디펜스 유닛 체력 감소 (무적 상태가 아닐 때만)
+        if (!isInvincible) {
             val enemyDamage = enemy.getDamage()
-            
-            // 무적 상태가 아닐 때만 데미지 적용
-            val isUnitDead = if (!isInvincible) {
-                gameStats.applyDamageToUnit(enemyDamage)
-            } else {
-                false // 무적 상태일 때는 데미지를 입지 않음
-            }
-            
-            // 보스를 약간 밀어내기 (중앙에서 같은 방향으로 조금 더 멀어지게)
-            val pushDistance = GameConfig.DEFENSE_UNIT_SIZE * 1.5f
-            val pushDirX = if (dx != 0f) dx / distanceToCenter else 0f
-            val pushDirY = if (dy != 0f) dy / distanceToCenter else 0f
-            
-            // NaN이나 무한대 값 검사
-            val newX = if (pushDirX.isNaN() || pushDirX.isInfinite()) enemy.getPosition().x 
-                      else enemy.getPosition().x + pushDirX * pushDistance
-            val newY = if (pushDirY.isNaN() || pushDirY.isInfinite()) enemy.getPosition().y 
-                      else enemy.getPosition().y + pushDirY * pushDistance
-            
-            // 유효한 위치 값인지 확인 (화면 내부로 제한)
-            val safeX = newX.coerceIn(0f, screenWidth)
-            val safeY = newY.coerceIn(0f, screenHeight)
-            
-            enemy.setPosition(safeX, safeY)
+            val isUnitDead = gameStats.applyDamageToUnit(enemyDamage)
             
             // 체력이 0 이하일 때만 게임오버 처리
             if (isUnitDead && !isGameOver) {
                 notifyGameOver()
-            }
-        } else {
-            // 공중적과 일반 적은 기존 방식대로 처리
-            enemy.takeDamage(GameConfig.CENTER_REACHED_DAMAGE) // 중앙에 도달하면 죽음
-            
-            // 적의 공격력에 따라 디펜스 유닛 체력 감소 (무적 상태가 아닐 때만)
-            if (!isInvincible) {
-                val enemyDamage = enemy.getDamage()
-                val isUnitDead = gameStats.applyDamageToUnit(enemyDamage)
-                
-                // 체력이 0 이하일 때만 게임오버 처리
-                if (isUnitDead && !isGameOver) {
-                    notifyGameOver()
-                }
             }
         }
     }

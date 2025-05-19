@@ -110,6 +110,7 @@ class Enemy(
         // 전략 패턴: 이동 로직을 전략에 위임
         behaviorStrategy.move(this, speedMultiplier)
         
+        /* 중앙 도달 체크 비활성화 - 이제 EnemyManager에서 외곽 충돌로 처리
         // 중앙에 도달했는지 확인 (거리 계산 최적화)
         val dx = position.x - target.x
         val dy = position.y - target.y
@@ -122,6 +123,7 @@ class Enemy(
             // 전략 패턴: 중앙 도달 로직을 전략에 위임
             behaviorStrategy.onReachCenter(this)
         }
+        */
     }
     
     /**
