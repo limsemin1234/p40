@@ -76,18 +76,30 @@ class PokerCardManager(
                 toggleCardSelection(index)
             }
             
-            // 조커 카드 롱클릭 이벤트 설정
+            // 조커 카드 롱클릭 이벤트 설정 (개선)
             cardView.setOnLongClickListener {
-                if (index < cards.size && CardUtils.isJokerCard(cards[index])) {
-                    cardSelectionManager.showJokerSelectionDialog(context, cards[index], index) { newCard, cardIndex ->
-                        cards[cardIndex] = newCard
-                        updateUI()
+                android.util.Log.d("PokerCardManager", "카드 롱클릭 감지: index=$index")
+                
+                // 카드 객체가 유효하고 인덱스가 범위 내인지 확인
+                if (index < cards.size) {
+                    val card = cards[index]
+                    
+                    // 조커 여부 확인 및 로그 출력
+                    val isJoker = CardUtils.isJokerCard(card)
+                    android.util.Log.d("PokerCardManager", "카드[$index] 조커여부: $isJoker, 카드정보: ${card.suit}:${card.rank}")
+                    
+                    // 조커 카드인지 확인
+                    if (isJoker) {
+                        // 조커 카드 변환 다이얼로그 직접 호출
+                        showJokerTransformDialog(card, index)
+                        return@setOnLongClickListener true
                     }
-                    true
-                } else {
-                    false
                 }
+                false
             }
+            
+            // 롱클릭 활성화를 위한 추가 설정
+            cardView.isLongClickable = true
         }
         
         // 족보 가이드 버튼 이벤트 설정
@@ -474,5 +486,98 @@ class PokerCardManager(
      */
     fun setPokerHandCallback(callback: (PokerHand) -> Unit) {
         this.externalPokerHandCallback = callback
+    }
+
+    /**
+     * 조커 카드 변환 다이얼로그를 표시
+     */
+    private fun showJokerTransformDialog(card: Card, index: Int) {
+        android.util.Log.d("PokerCardManager", "조커 변환 다이얼로그 시작: index=$index, card=$card")
+        
+        try {
+            // 커스텀 다이얼로그 생성
+            val dialog = android.app.Dialog(context)
+            dialog.setContentView(R.layout.dialog_joker_number_picker)
+            dialog.setCancelable(true)
+            
+            // 다이얼로그 창 배경을 투명하게 설정
+            dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+            
+            // 다이얼로그 제목 설정
+            val titleTextView = dialog.findViewById<android.widget.TextView>(R.id.tvTitle)
+            titleTextView.text = "조커 카드 변환"
+            
+            // 무늬 선택기 설정
+            val suitPicker = dialog.findViewById<android.widget.NumberPicker>(R.id.suitPicker)
+            val suits = arrayOf(CardSuit.HEART, CardSuit.DIAMOND, CardSuit.CLUB, CardSuit.SPADE)
+            val suitSymbols = arrayOf("♥", "♦", "♣", "♠")
+            
+            suitPicker.minValue = 0
+            suitPicker.maxValue = suits.size - 1
+            suitPicker.displayedValues = suitSymbols
+            
+            // 숫자 선택기 설정
+            val rankPicker = dialog.findViewById<android.widget.NumberPicker>(R.id.rankPicker)
+            val rankValues = arrayOf("A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K")
+            val ranks = arrayOf(
+                CardRank.ACE, CardRank.TWO, CardRank.THREE, CardRank.FOUR, CardRank.FIVE,
+                CardRank.SIX, CardRank.SEVEN, CardRank.EIGHT, CardRank.NINE, CardRank.TEN,
+                CardRank.JACK, CardRank.QUEEN, CardRank.KING
+            )
+            
+            rankPicker.minValue = 0
+            rankPicker.maxValue = ranks.size - 1
+            rankPicker.displayedValues = rankValues
+            
+            // 확인 버튼 설정
+            val confirmButton = dialog.findViewById<android.widget.Button>(R.id.btnConfirm)
+            confirmButton.setOnClickListener {
+                // 선택된 카드로 조커 카드 교체
+                val selectedSuit = suits[suitPicker.value]
+                val selectedRank = ranks[rankPicker.value]
+                
+                // 새 카드 생성 (isJoker 속성 유지)
+                val newCard = Card(
+                    suit = selectedSuit,
+                    rank = selectedRank,
+                    isSelected = false,
+                    isJoker = true  // 여전히 조커지만 보이는 모양과 숫자만 변경
+                )
+                
+                android.util.Log.d("PokerCardManager", "조커 변환 완료: ${card.suit}:${card.rank} -> ${newCard.suit}:${newCard.rank}")
+                
+                // 카드 교체 및 UI 업데이트
+                cards[index] = newCard
+                updateUI()
+                
+                // 토스트 메시지 표시
+                android.widget.Toast.makeText(
+                    context,
+                    "조커가 ${selectedSuit.getName()} ${selectedRank.getName()}(으)로 변환되었습니다.",
+                    android.widget.Toast.LENGTH_SHORT
+                ).show()
+                
+                dialog.dismiss()
+            }
+            
+            // 취소 버튼 설정
+            val cancelButton = dialog.findViewById<android.widget.Button>(R.id.btnCancel)
+            cancelButton.setOnClickListener {
+                dialog.dismiss()
+            }
+            
+            // 다이얼로그 표시
+            dialog.show()
+            android.util.Log.d("PokerCardManager", "조커 변환 다이얼로그 표시됨")
+        } catch (e: Exception) {
+            android.util.Log.e("PokerCardManager", "조커 변환 다이얼로그 표시 중 오류: ${e.message}")
+            e.printStackTrace()
+            
+            // 오류 시 CardSelectionManager를 통해 변환 시도
+            cardSelectionManager.showJokerSelectionDialog(context, card, index) { newCard, cardIndex ->
+                cards[cardIndex] = newCard
+                updateUI()
+            }
+        }
     }
 } 

@@ -39,11 +39,20 @@ class CardGenerationManager(
     fun generateRandomHand(): List<Card> {
         val cards = mutableListOf<Card>()
         
+        // 첫 번째 카드는 항상 조커 카드로 설정
+        val jokerCard = Card.createJoker()
+        cards.add(jokerCard)
+        
+        // 나머지 카드는 일반적인 방식으로 생성
+        val cardCount = baseCardCount - 1 // 조커 카드 1장을 뺀 나머지 수
+        
         // 저장된 덱 불러오기
         val savedDeck = if (context != null) DeckBuilderFragment.loadDeckFromPrefs(context) else null
         
         // 중복 없는 카드 생성
         val usedCards = mutableSetOf<Pair<CardSuit, CardRank>>()
+        // 조커 카드는 이미 사용함으로 표시
+        usedCards.add(Pair(CardSuit.JOKER, CardRank.JOKER))
         
         // 저장된 덱이 있는 경우, 저장된 덱에서만 카드 선택
         if (savedDeck != null && savedDeck.isNotEmpty()) {
@@ -51,8 +60,12 @@ class CardGenerationManager(
             val shuffledDeck = savedDeck.toMutableList().shuffled()
             
             // 모든 카드가 동일한 확률로 선택되게 함
-            for (i in 0 until minOf(baseCardCount, shuffledDeck.size)) {
+            for (i in 0 until minOf(cardCount, shuffledDeck.size)) {
                 val card = shuffledDeck[i]
+                // 조커 카드 제외
+                if (card.isJoker || (card.suit == CardSuit.JOKER && card.rank == CardRank.JOKER)) {
+                    continue
+                }
                 cards.add(Card(card.suit, card.rank, isJoker = card.isJoker))
                 usedCards.add(Pair(card.suit, card.rank))
             }
@@ -60,7 +73,7 @@ class CardGenerationManager(
             // 부족한 카드가 있는 경우 덱에서 추가로 채우기
             if (cards.size < baseCardCount && shuffledDeck.size > baseCardCount) {
                 val remainingCards = shuffledDeck.filter { 
-                    Pair(it.suit, it.rank) !in usedCards 
+                    Pair(it.suit, it.rank) !in usedCards && !it.isJoker && !(it.suit == CardSuit.JOKER && it.rank == CardRank.JOKER)
                 }.shuffled()
                 
                 val needMoreCards = baseCardCount - cards.size
@@ -73,10 +86,13 @@ class CardGenerationManager(
             
             // 카드가 여전히 부족한 경우 사용한 카드를 중복해서 사용
             if (cards.size < baseCardCount) {
-                // 이미 사용된 카드를 포함해 덱에서 다시 선택
-                val allAvailableCards = savedDeck.shuffled()
+                // 이미 사용된 카드를 포함해 덱에서 다시 선택 (조커 제외)
+                val allAvailableCards = savedDeck.filter {
+                    !it.isJoker && !(it.suit == CardSuit.JOKER && it.rank == CardRank.JOKER)
+                }.shuffled()
+                
                 while (cards.size < baseCardCount && allAvailableCards.isNotEmpty()) {
-                    val card = allAvailableCards[cards.size % allAvailableCards.size]
+                    val card = allAvailableCards[(cards.size - 1) % allAvailableCards.size]
                     cards.add(Card(card.suit, card.rank, isJoker = card.isJoker))
                 }
             }
@@ -85,12 +101,15 @@ class CardGenerationManager(
             val basicDeck = createBasicDeck()
             val shuffledBasicDeck = basicDeck.shuffled()
             
-            for (i in 0 until minOf(baseCardCount, shuffledBasicDeck.size)) {
+            for (i in 0 until minOf(cardCount, shuffledBasicDeck.size)) {
                 val card = shuffledBasicDeck[i]
                 cards.add(Card(card.suit, card.rank))
                 usedCards.add(Pair(card.suit, card.rank))
             }
         }
+        
+        // 카드 수 확인 로그 추가
+        android.util.Log.d("CardGenerationManager", "생성된 카드 수: ${cards.size}, 첫 번째 카드가 조커인지: ${CardUtils.isJokerCard(cards[0])}")
         
         return cards
     }
