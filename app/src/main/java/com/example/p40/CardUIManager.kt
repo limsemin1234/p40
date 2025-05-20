@@ -179,26 +179,30 @@ class CardUIManager(
         
         // 6장 이상인 경우의 처리
         if (activeCardCount > 5) {
-            // 확정 버튼은 5장 선택했을 때만 활성화
-            confirmButton.isEnabled = selectedCardIndexes.size == 5
+            // 확정 버튼은 항상 활성화 (선택된 5장 또는 자동 선택된 최적의 5장 사용)
+            confirmButton.isEnabled = true
             
             // 교체 횟수 표시 (교체 가능 여부 함께 표시)
             if (replacesLeft > 0) {
                 if (selectedCardIndexes.isEmpty()) {
                     replaceCountText.text = "교체 가능 횟수: $replacesLeft\n6장 이상 카드 중 최적의 5장으로 판정됩니다. 원하는 카드 5장을 직접 선택할 수도 있습니다."
+                } else if (selectedCardIndexes.size != 5) {
+                    replaceCountText.text = "교체 가능 횟수: $replacesLeft\n정확히 5장을 선택하거나, 선택하지 않고 확정하기를 눌러 최적의 5장을 사용하세요."
                 } else {
                     replaceCountText.text = "교체 가능 횟수: $replacesLeft"
                 }
             } else {
                 if (selectedCardIndexes.isEmpty()) {
                     replaceCountText.text = "교체 불가능\n6장 이상 카드 중 최적의 5장으로 판정됩니다. 원하는 카드 5장을 직접 선택할 수도 있습니다."
+                } else if (selectedCardIndexes.size != 5) {
+                    replaceCountText.text = "교체 불가능\n정확히 5장을 선택하거나, 선택하지 않고 확정하기를 눌러 최적의 5장을 사용하세요."
                 } else {
                     replaceCountText.text = "교체 불가능"
                 }
             }
             
-            if (selectedCardIndexes.size != 5) {
-                // 선택된 카드가 5장이 아닌 경우 안내 메시지
+            if (selectedCardIndexes.size != 0 && selectedCardIndexes.size != 5) {
+                // 선택된 카드가 0장도 아니고 5장도 아닌 경우 안내 메시지
                 handDescriptionText.text = "5장의 카드를 선택하세요 (현재 ${selectedCardIndexes.size}장 선택됨)"
             }
         } else {
@@ -324,9 +328,9 @@ class CardUIManager(
         // 카드가 5장 이하인 경우는 항상 유효
         if (cards.size <= 5) return true
         
-        // 6장 이상일 경우 정확히 5장이 선택되었는지 확인
-        if (selectedCardIndexes.size != 5) {
-            showMessage("카드를 정확히 5장 선택해야 합니다. (현재 ${selectedCardIndexes.size}장 선택됨)")
+        // 6장 이상일 경우 정확히 5장이 선택되었는지 또는 아예 선택이 없는지 확인
+        if (selectedCardIndexes.size != 5 && selectedCardIndexes.size != 0) {
+            showMessage("카드를 정확히 5장 선택하거나, 선택하지 않고 최적의 5장을 자동으로 사용하세요. (현재 ${selectedCardIndexes.size}장 선택됨)")
             return false
         }
         

@@ -417,24 +417,48 @@ class PokerCardManager(
         val pokerDeck = PokerDeck()
         var pokerHand: PokerHand
         
-        // 6장 이상인 경우 5장 선택 여부 확인
+        // 6장 이상인 경우 선택 처리
         if (cards.size > 5) {
-            // 5장 선택 검증
-            if (!cardUIManager.validateCardSelection(cards, selectedCardIndexes)) {
-                return // 검증 실패시 함수 종료
+            if (selectedCardIndexes.isEmpty()) {
+                // 카드가 선택되지 않은 경우 최적의 5장 카드 조합 사용
+                val bestFiveCards = cardSelectionManager.findBestFiveCards(cards)
+                
+                // 선택된 카드를 CardSelectionManager 싱글톤에 저장
+                CardSelectionManager.instance.setSelectedCards(bestFiveCards)
+                
+                // 로그 출력
+                android.util.Log.d("PokerCardManager", "선택 없이 확정: 최적의 5장 조합 사용 - ${bestFiveCards.map { "${it.suit}:${it.rank}" }}")
+                
+                // 현재 패 평가
+                pokerDeck.playerHand = bestFiveCards.toMutableList()
+                
+                // 현재 패 평가 결과 전달
+                pokerHand = pokerDeck.evaluateHand()
+            } else if (selectedCardIndexes.size == 5) {
+                // 정확히 5장 선택된 경우
+                val selectedFiveCards = selectedCardIndexes.map { cards[it] }
+                
+                // 선택된 카드를 CardSelectionManager 싱글톤에 저장
+                CardSelectionManager.instance.setSelectedCards(selectedFiveCards)
+                
+                // 현재 패 평가
+                pokerDeck.playerHand = selectedFiveCards.toMutableList()
+                
+                // 현재 패 평가 결과 전달
+                pokerHand = pokerDeck.evaluateHand()
+            } else {
+                // 선택된 카드가 5장이 아닌 경우 선택 검증 수행
+                if (!cardUIManager.validateCardSelection(cards, selectedCardIndexes)) {
+                    return // 검증 실패시 함수 종료
+                }
+                
+                // 이 코드는 실행되지 않아야 함 (검증에서 실패했을 것임)
+                // 안전장치로 남겨둠
+                val selectedFiveCards = selectedCardIndexes.map { cards[it] }
+                CardSelectionManager.instance.setSelectedCards(selectedFiveCards)
+                pokerDeck.playerHand = selectedFiveCards.toMutableList()
+                pokerHand = pokerDeck.evaluateHand()
             }
-            
-            // 선택된 5장의 카드를 사용
-            val selectedFiveCards = selectedCardIndexes.map { cards[it] }
-            
-            // 선택된 카드를 CardSelectionManager 싱글톤에 저장
-            CardSelectionManager.instance.setSelectedCards(selectedFiveCards)
-            
-            // 현재 패 평가
-            pokerDeck.playerHand = selectedFiveCards.toMutableList()
-            
-            // 현재 패 평가 결과 전달
-            pokerHand = pokerDeck.evaluateHand()
         } else {
             // 5장 이하인 경우 모든 카드 사용
             CardSelectionManager.instance.setSelectedCards(cards)
