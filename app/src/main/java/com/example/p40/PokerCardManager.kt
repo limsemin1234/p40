@@ -307,6 +307,12 @@ class PokerCardManager(
             if (index < cards.size) {
                 val card = cards[index]
                 if (CardUtils.isJokerCard(card)) {
+                    // 이미 변환된 조커 카드인지 확인
+                    if (card.isJoker && card.suit != CardSuit.JOKER) {
+                        MessageManager.getInstance().showWarning("이미 변환된 조커 카드는 다시 변환할 수 없습니다.")
+                        return
+                    }
+                    
                     // 조커 카드인 경우 변환 다이얼로그 표시
                     showJokerTransformDialog(card, index)
                     return
@@ -328,19 +334,19 @@ class PokerCardManager(
         }
     }
     
-    // 전체 카드 교체 (조커 카드 제외)
+    // 전체 카드 교체 (조커 카드 포함)
     private fun replaceAllNonJokerCards() {
         if (replacesLeft <= 0) {
             MessageManager.getInstance().showWarning("교체 횟수를 모두 사용했습니다.")
             return
         }
         
-        // 전체 교체 요청
-        val result = cardSelectionManager.replaceAllNonJokerCards(cards)
+        // 전체 교체 요청 (조커 카드 포함)
+        val result = cardSelectionManager.replaceAllCards(cards)
         
         if (!result.first) {
             // 교체할 카드가 없는 경우
-            MessageManager.getInstance().showInfo("교체할 일반 카드가 없습니다.")
+            MessageManager.getInstance().showInfo("교체할 카드가 없습니다.")
             return
         }
         
@@ -537,10 +543,14 @@ class PokerCardManager(
                     isJoker = true  // 여전히 조커지만 보이는 모양과 숫자만 변경
                 )
                 
+                // 조커 카드 변환 상태 설정
+                newCard.transformJoker(selectedSuit)
+                
                 android.util.Log.d("PokerCardManager", "조커 변환 완료: ${card.suit}:${card.rank} -> ${newCard.suit}:${newCard.rank}")
                 
                 // 카드 교체 및 UI 업데이트
                 cards[index] = newCard
+                selectedCardIndexes.clear()
                 updateUI()
                 
                 // 토스트 메시지 표시
@@ -568,7 +578,10 @@ class PokerCardManager(
             
             // 오류 시 CardSelectionManager를 통해 변환 시도
             cardSelectionManager.showJokerSelectionDialog(context, card, index) { newCard, cardIndex ->
+                // 조커 카드 변환 상태 설정
+                newCard.transformJoker(newCard.suit)
                 cards[cardIndex] = newCard
+                selectedCardIndexes.clear()
                 updateUI()
             }
         }

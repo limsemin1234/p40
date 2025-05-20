@@ -281,6 +281,29 @@ class CardSelectionManager private constructor() {
             isJoker = true  // 여전히 조커지만 보이는 모양과 숫자만 변경
         )
     }
+    
+    /**
+     * 모든 카드 교체 (조커 카드 포함)
+     */
+    fun replaceAllCards(cards: MutableList<Card>): Pair<Boolean, Int> {
+        if (cards.isEmpty()) {
+            return Pair(false, 0)
+        }
+        
+        // 모든 카드 인덱스
+        val allCardIndices = cards.indices.toMutableSet()
+        
+        // 현재 사용 중인 카드 초기화 (모든 카드 교체)
+        val usedCards = mutableSetOf<Pair<CardSuit, CardRank>>()
+        
+        // 모든 카드 교체
+        for (index in allCardIndices) {
+            // 저장된 덱에서만 카드 생성
+            cards[index] = cardGenManager.createRandomCard(usedCards)
+        }
+        
+        return Pair(true, allCardIndices.size)
+    }
 
     companion object {
         // 싱글톤 인스턴스
