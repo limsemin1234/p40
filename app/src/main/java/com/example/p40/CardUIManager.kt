@@ -122,7 +122,8 @@ class CardUIManager(
         
         // 카드가 5장을 초과하는 경우 최적의 5장 조합 찾기
         if (cards.size > 5 && bestFiveCards != null) {
-            // 초록색 강조 표시 기능 제거 (모든 카드는 선택 여부에 따라 노란색 또는 흰색으로만 표시)
+            // 최적의 조합 카드 로그 출력 (디버깅용)
+            android.util.Log.d("CardUIManager", "최적 조합 카드 목록: ${bestFiveCards.map { "${it.suit}:${it.rank}" }}")
             
             // 최적의 조합으로 족보 업데이트
             val tempDeck = PokerDeck()
@@ -173,9 +174,17 @@ class CardUIManager(
             
             // 교체 횟수 표시 (교체 가능 여부 함께 표시)
             if (replacesLeft > 0) {
-                replaceCountText.text = "교체 가능 횟수: $replacesLeft"
+                if (selectedCardIndexes.isEmpty()) {
+                    replaceCountText.text = "교체 가능 횟수: $replacesLeft\n6장 이상 카드 중 최적의 5장으로 판정됩니다. 원하는 카드 5장을 직접 선택할 수도 있습니다."
+                } else {
+                    replaceCountText.text = "교체 가능 횟수: $replacesLeft"
+                }
             } else {
-                replaceCountText.text = "교체 불가능"
+                if (selectedCardIndexes.isEmpty()) {
+                    replaceCountText.text = "교체 불가능\n6장 이상 카드 중 최적의 5장으로 판정됩니다. 원하는 카드 5장을 직접 선택할 수도 있습니다."
+                } else {
+                    replaceCountText.text = "교체 불가능"
+                }
             }
             
             if (selectedCardIndexes.size != 5) {

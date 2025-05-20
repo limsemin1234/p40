@@ -112,20 +112,35 @@ class CardSelectionManager private constructor() {
      * 최적의 5장 카드 조합 찾기
      */
     fun findBestFiveCards(allCards: List<Card>): List<Card> {
+        // 카드 목록 로그 출력
+        android.util.Log.d("CardSelectionManager", "모든 카드 목록: ${allCards.map { "${it.suit}:${it.rank}" }}")
+        
         // 모든 가능한 5장 조합 생성
         val cardCombinations = generateCombinations(allCards, 5)
+        
+        // 조합 개수 로그 출력
+        android.util.Log.d("CardSelectionManager", "생성된 조합 개수: ${cardCombinations.size}")
         
         // 각 조합에 대한 족보 평가 결과와 함께 저장
         val rankedCombinations = cardCombinations.map { combo ->
             // 조커 카드가 있는 경우 처리
             val tempDeck = PokerDeck()
             tempDeck.playerHand = combo.toMutableList()
-            val handRank = getHandRank(tempDeck.evaluateHand())
+            val hand = tempDeck.evaluateHand()
+            val handRank = getHandRank(hand)
+            
+            // 각 조합의 카드 및 족보 결과 로그 출력
+            android.util.Log.d("CardSelectionManager", "조합: ${combo.map { "${it.suit}:${it.rank}" }} -> 족보: ${hand.handName}, 순위: $handRank")
+            
             Pair(combo, handRank)
         }
         
-        // 가장 높은 족보의 조합 반환
+        // 가장 높은 족보의 조합 찾기
         val bestCombo = rankedCombinations.maxByOrNull { it.second }?.first ?: allCards.take(5)
+        
+        // 최적의 5장 조합 로그 출력
+        android.util.Log.d("CardSelectionManager", "최적 조합: ${bestCombo.map { "${it.suit}:${it.rank}" }}")
+        
         return bestCombo
     }
     
