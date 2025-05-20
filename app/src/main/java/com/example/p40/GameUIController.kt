@@ -537,8 +537,22 @@ class GameUIController(
      * 포커 카드 다이얼로그 표시
      */
     fun showPokerCardsDialog(waveNumber: Int, onPokerHandSelected: (PokerHand) -> Unit) {
-        val dialog = PokerCardsDialog(context, waveNumber, onPokerHandSelected)
-        dialog.show()
+        // 다이얼로그 대신 게임 프래그먼트를 통해 카드 패널 표시
+        val gameFragment = context as? GameFragment
+        if (gameFragment != null) {
+            // 콜백 설정 (선택된 포커 핸드를 처리하기 위한 콜백)
+            val pokerCardManager = gameFragment.getPokerCardManager()
+            pokerCardManager.setPokerHandCallback(onPokerHandSelected)
+            
+            // 카드 게임 시작
+            pokerCardManager.startPokerCards(waveNumber)
+            
+            // 카드 패널 표시
+            gameFragment.showCardPanel()
+        } else {
+            // 오류 메시지
+            MessageManager.getInstance().showError("카드 패널을 표시할 수 없습니다.")
+        }
     }
     
     // 콜백 정의

@@ -13,7 +13,7 @@ object EnemyConfig {
     // const val CENTER_REACHED_DAMAGE = 1000  // 중앙 도달 시 입히는 데미지 (삭제됨)
 
     // 처치 시 자원 획득
-    const val SCORE_PER_NORMAL_ENEMY = 10  // 일반 적 처치 시 얻는 점수(자원)
+    const val SCORE_PER_NORMAL_ENEMY = 1000  // 일반 적 처치 시 얻는 점수(자원)
     const val SCORE_PER_BOSS = 200  // 보스 처치 시 얻는 점수(자원)
     const val FLYING_ENEMY_SCORE = 20 // 공중 적 처치 시 획득 점수(자원)
     

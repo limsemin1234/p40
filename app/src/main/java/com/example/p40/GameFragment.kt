@@ -903,5 +903,30 @@ class GameFragment : Fragment(R.layout.fragment_game), GameOverListener, PokerCa
             ButtonAnimationUtils.applyButtonAnimationProperty(button)
         }
     }
+
+    /**
+     * 포커 카드 매니저 접근 메서드
+     * GameDialogManager에서 호출하기 위한 공개 메서드
+     */
+    fun getPokerCardManager(): PokerCardManager {
+        return pokerCardManager
+    }
+    
+    /**
+     * 카드 패널 표시 메서드
+     * GameDialogManager에서 호출하기 위한 공개 메서드
+     */
+    fun showCardPanel() {
+        // 카드 패널 보이기
+        val cardPanel = view?.findViewById<LinearLayout>(R.id.cardPanel)
+        cardPanel?.visibility = View.VISIBLE
+        
+        // 다른 패널 숨기기
+        view?.findViewById<LinearLayout>(R.id.attackUpgradePanel)?.visibility = View.GONE
+        view?.findViewById<LinearLayout>(R.id.defenseUpgradePanel)?.visibility = View.GONE
+        
+        // 현재 열린 패널 업데이트
+        currentOpenPanel = cardPanel
+    }
 }
 

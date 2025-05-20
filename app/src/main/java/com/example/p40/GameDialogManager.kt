@@ -8,7 +8,6 @@ import android.widget.TextView
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavController
-import com.example.p40.PokerCardsDialog
 
 /**
  * 게임 다이얼로그를 관리하는 클래스
@@ -178,12 +177,21 @@ class GameDialogManager(
      * 포커 카드 다이얼로그 표시
      */
     fun showPokerCardsDialog(waveNumber: Int) {
-        val dialog = PokerCardsDialog(context, waveNumber) { pokerHand ->
-            // 선택된 포커 족보 적용
-            applyPokerHandEffect(pokerHand)
+        // 다이얼로그 대신 카드 패널 활성화
+        val gameFragment = context as? GameFragment
+        if (gameFragment != null) {
+            // 포커 카드 매니저 접근
+            val pokerCardManager = gameFragment.getPokerCardManager()
+            
+            // 카드 게임 시작
+            pokerCardManager.startPokerCards(waveNumber)
+            
+            // 카드 패널 표시
+            gameFragment.showCardPanel()
+        } else {
+            // 오류 메시지
+            MessageManager.getInstance().showError("카드 패널을 표시할 수 없습니다.")
         }
-        
-        dialog.show()
     }
     
     /**

@@ -45,6 +45,9 @@ class PokerCardManager(
     
     // 현재 카드 게임이 진행 중인지 여부
     private var isGameActive = false
+    
+    // 외부 포커 핸드 콜백 (PokerCardsDialog 대체용)
+    private var externalPokerHandCallback: ((PokerHand) -> Unit)? = null
 
     // 포커 카드 매니저 인터페이스
     interface PokerCardListener {
@@ -408,6 +411,9 @@ class PokerCardManager(
         // 포커 패 효과 적용
         listener.applyPokerHandEffect(pokerHand)
         
+        // 외부 콜백 호출 (PokerCardsDialog 대체)
+        externalPokerHandCallback?.invoke(pokerHand)
+        
         // 성공 메시지 표시
         if (pokerHand is HighCard) {
             // 하이카드(족보 없음)일 경우
@@ -460,5 +466,13 @@ class PokerCardManager(
     private fun showPokerGuide() {
         val guideDialog = PokerGuideDialog(context)
         guideDialog.show()
+    }
+
+    /**
+     * 외부에서 포커 핸드 콜백을 설정하기 위한 메서드
+     * GameUIController에서 호출
+     */
+    fun setPokerHandCallback(callback: (PokerHand) -> Unit) {
+        this.externalPokerHandCallback = callback
     }
 } 

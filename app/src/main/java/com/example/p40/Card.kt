@@ -30,9 +30,8 @@ enum class CardSuit {
     
     fun getColor(): Int {
         return when (this) {
-            HEART, DIAMOND -> Color.RED
+            HEART, DIAMOND, JOKER -> Color.RED
             CLUB, SPADE -> Color.BLACK
-            JOKER -> Color.BLUE
         }
     }
 }
