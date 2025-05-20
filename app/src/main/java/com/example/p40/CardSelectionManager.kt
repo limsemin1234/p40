@@ -115,6 +115,10 @@ class CardSelectionManager private constructor() {
         // 카드 목록 로그 출력
         android.util.Log.d("CardSelectionManager", "모든 카드 목록: ${allCards.map { "${it.suit}:${it.rank}" }}")
         
+        // 원페어 확인을 위한 랭크 그룹화
+        val rankGroups = allCards.groupBy { it.rank }
+        android.util.Log.d("CardSelectionManager", "카드 랭크 그룹: ${rankGroups.map { "${it.key}: ${it.value.size}장" }}")
+        
         // 모든 가능한 5장 조합 생성
         val cardCombinations = generateCombinations(allCards, 5)
         
@@ -140,6 +144,12 @@ class CardSelectionManager private constructor() {
         
         // 최적의 5장 조합 로그 출력
         android.util.Log.d("CardSelectionManager", "최적 조합: ${bestCombo.map { "${it.suit}:${it.rank}" }}")
+        
+        // 최적 조합 평가 결과
+        val finalDeck = PokerDeck()
+        finalDeck.playerHand = bestCombo.toMutableList()
+        val finalHand = finalDeck.evaluateHand()
+        android.util.Log.d("CardSelectionManager", "최종 족보 판정: ${finalHand.handName}")
         
         return bestCombo
     }

@@ -125,10 +125,17 @@ class CardUIManager(
             // 최적의 조합 카드 로그 출력 (디버깅용)
             android.util.Log.d("CardUIManager", "최적 조합 카드 목록: ${bestFiveCards.map { "${it.suit}:${it.rank}" }}")
             
+            // 사용자에게 보여줄 카드 조합을 출력 (랭크별로 그룹화)
+            val rankGroups = bestFiveCards.groupBy { it.rank }
+            android.util.Log.d("CardUIManager", "최적 조합 랭크 그룹: ${rankGroups.map { "${it.key}: ${it.value.size}장" }}")
+            
             // 최적의 조합으로 족보 업데이트
             val tempDeck = PokerDeck()
             tempDeck.playerHand = bestFiveCards.toMutableList()
             val pokerHand = tempDeck.evaluateHand()
+            
+            // 족보 평가 결과 출력
+            android.util.Log.d("CardUIManager", "최종 족보 평가 결과: ${pokerHand.handName}")
             
             // 족보 텍스트 업데이트
             if (pokerHand is HighCard) {
@@ -143,6 +150,9 @@ class CardUIManager(
             val pokerDeck = PokerDeck()
             pokerDeck.playerHand = cards.toMutableList()
             val pokerHand = pokerDeck.evaluateHand()
+            
+            // 족보 평가 결과 출력
+            android.util.Log.d("CardUIManager", "일반(5장) 족보 평가 결과: ${pokerHand.handName}")
             
             // 족보 텍스트 업데이트
             if (pokerHand is HighCard) {

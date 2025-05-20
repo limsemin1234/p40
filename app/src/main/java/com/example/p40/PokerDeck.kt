@@ -226,9 +226,16 @@ class PokerDeck {
             }
         }
         
+        // 디버그 로깅 추가
+        android.util.Log.d("PokerDeck", "평가할 카드: ${tempHand.map { "${it.suit}:${it.rank}" }}")
+        
         // 효율성을 위해 필요한 카드 정보를 한 번만 계산
         val suits = tempHand.groupBy { it.suit }
         val ranks = tempHand.groupBy { it.rank }
+        
+        // 디버그 로깅 추가
+        android.util.Log.d("PokerDeck", "랭크 그룹: ${ranks.map { "${it.key}: ${it.value.size}장" }}")
+        
         val rankValues = tempHand.map { it.rank.value }.sorted()
         val isAllSameSuit = suits.size == 1
         
@@ -281,7 +288,10 @@ class PokerDeck {
         
         // 원페어 체크
         if (pairs.size == 1) {
-            return OnePair()
+            // 원페어의 랭크 정보 찾기
+            val pairRank = pairs.keys.first()
+            android.util.Log.d("PokerDeck", "원페어 발견: ${pairRank}")
+            return OnePair(tempHand, pairRank)
         }
         
         // 하이카드
