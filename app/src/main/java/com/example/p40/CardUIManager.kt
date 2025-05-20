@@ -153,8 +153,17 @@ class CardUIManager(
             }
         }
         
-        // 교체 버튼 활성화/비활성화 (교체 횟수가 0이면 항상 비활성화)
-        replaceButton.isEnabled = replacesLeft > 0 && selectedCardIndexes.isNotEmpty()
+        // 선택된 카드 중 조커 카드가 있는지 확인
+        val hasSelectedJoker = selectedCardIndexes.any { index ->
+            index < cards.size && CardUtils.isJokerCard(cards[index])
+        }
+        
+        // 교체 버튼 활성화/비활성화
+        // 조커 카드가 선택되어 있으면 교체 횟수와 상관없이 활성화
+        replaceButton.isEnabled = (replacesLeft > 0 && selectedCardIndexes.isNotEmpty()) || 
+                                 (hasSelectedJoker && selectedCardIndexes.isNotEmpty())
+        
+        // 전체 교체 버튼은 교체 횟수에 따라 활성화/비활성화
         replaceAllButton.isEnabled = replacesLeft > 0
         
         // 6장 이상인 경우의 처리

@@ -270,6 +270,12 @@ class PokerCardManager(
     
     // 카드 선택 토글
     private fun toggleCardSelection(index: Int) {
+        // 인덱스가 유효한지 확인
+        if (index >= cards.size) return
+        
+        // 현재 카드가 조커인지 확인
+        val isJoker = if (index < cards.size) CardUtils.isJokerCard(cards[index]) else false
+        
         // 6장 이상인 경우 교체 횟수와 관계없이 선택 가능
         if (cards.size > 5) {
             if (index in selectedCardIndexes) {
@@ -286,21 +292,42 @@ class PokerCardManager(
             return
         }
         
-        // 5장 이하인 경우는 교체 모드일 때만 선택 가능
-        if (replacesLeft <= 0) return
-        
+        // 5장 이하인 경우:
+        // 1. 이미 선택된 카드는 항상 선택 해제 가능
         if (index in selectedCardIndexes) {
             selectedCardIndexes.remove(index)
-        } else {
-            selectedCardIndexes.add(index)
+            updateUI()
+            return
         }
         
+        // 2. 조커 카드는 교체 횟수와 관계없이 선택 가능
+        if (isJoker) {
+            selectedCardIndexes.add(index)
+            updateUI()
+            return
+        }
+        
+        // 3. 일반 카드는 교체 모드일 때만 선택 가능
+        if (replacesLeft <= 0) return
+        
+        selectedCardIndexes.add(index)
         updateUI()
     }
     
     // 선택된 카드 교체
     private fun replaceSelectedCards() {
-        if (selectedCardIndexes.isEmpty() || replacesLeft <= 0) return
+        if (selectedCardIndexes.isEmpty()) return
+        
+        // 조커 카드 변환은 교체 횟수와 상관없이 가능
+        // 일반 카드 교체는 교체 횟수가 남아있어야 가능
+        val hasNormalCards = selectedCardIndexes.any { index ->
+            index < cards.size && !CardUtils.isJokerCard(cards[index])
+        }
+        
+        if (hasNormalCards && replacesLeft <= 0) {
+            MessageManager.getInstance().showWarning("교체 횟수를 모두 사용했습니다.")
+            return
+        }
         
         // 선택된 카드가 조커 카드인지 확인
         for (index in selectedCardIndexes) {
