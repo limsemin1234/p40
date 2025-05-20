@@ -76,30 +76,11 @@ class PokerCardManager(
                 toggleCardSelection(index)
             }
             
-            // 조커 카드 롱클릭 이벤트 설정 (개선)
-            cardView.setOnLongClickListener {
-                android.util.Log.d("PokerCardManager", "카드 롱클릭 감지: index=$index")
-                
-                // 카드 객체가 유효하고 인덱스가 범위 내인지 확인
-                if (index < cards.size) {
-                    val card = cards[index]
-                    
-                    // 조커 여부 확인 및 로그 출력
-                    val isJoker = CardUtils.isJokerCard(card)
-                    android.util.Log.d("PokerCardManager", "카드[$index] 조커여부: $isJoker, 카드정보: ${card.suit}:${card.rank}")
-                    
-                    // 조커 카드인지 확인
-                    if (isJoker) {
-                        // 조커 카드 변환 다이얼로그 직접 호출
-                        showJokerTransformDialog(card, index)
-                        return@setOnLongClickListener true
-                    }
-                }
-                false
-            }
+            // 롱클릭 이벤트 제거
+            cardView.setOnLongClickListener(null)
             
-            // 롱클릭 활성화를 위한 추가 설정
-            cardView.isLongClickable = true
+            // 롱클릭 비활성화
+            cardView.isLongClickable = false
         }
         
         // 족보 가이드 버튼 이벤트 설정
@@ -265,7 +246,6 @@ class PokerCardManager(
         // 카드 UI 리스너 제거
         cardUIManager.cardViews.forEachIndexed { index, cardView ->
             cardView.setOnClickListener(null)
-            cardView.setOnLongClickListener(null)
         }
         
         // 버튼 리스너 제거
@@ -322,6 +302,19 @@ class PokerCardManager(
     private fun replaceSelectedCards() {
         if (selectedCardIndexes.isEmpty() || replacesLeft <= 0) return
         
+        // 선택된 카드가 조커 카드인지 확인
+        for (index in selectedCardIndexes) {
+            if (index < cards.size) {
+                val card = cards[index]
+                if (CardUtils.isJokerCard(card)) {
+                    // 조커 카드인 경우 변환 다이얼로그 표시
+                    showJokerTransformDialog(card, index)
+                    return
+                }
+            }
+        }
+        
+        // 조커 카드가 아닌 경우 기존 교체 로직 실행
         // 카드 교체 요청
         if (cardSelectionManager.replaceSelectedCards(cards, selectedCardIndexes)) {
             // 교체 횟수 감소

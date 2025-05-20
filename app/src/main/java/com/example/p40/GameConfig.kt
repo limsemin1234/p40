@@ -42,7 +42,7 @@ object GameConfig {
     const val DEBUG_MODE = false // 디버그 정보 표시 여부
     
     // 테스트 모드 설정
-    const val TEST_ENABLE_ALL_SKILLS = false // 웨이브 시작 시 모든 스킬 활성화 여부
+    const val TEST_ENABLE_ALL_SKILLS = true // 웨이브 시작 시 모든 스킬 활성화 여부
     
     // --------- 성능 및 제한 설정 ----------
     
