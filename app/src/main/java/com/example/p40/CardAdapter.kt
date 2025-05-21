@@ -75,10 +75,10 @@ class CardAdapter(
             }
 
             // 카드 색상 설정
-            val cardColor = if (card.suit == CardSuit.HEART || card.suit == CardSuit.DIAMOND || card.suit == CardSuit.JOKER) {
-                Color.RED
-            } else {
-                Color.BLACK
+            val cardColor = when {
+                card.suit == CardSuit.JOKER -> Color.parseColor("#FFD700") // 황금색(#FFD700)
+                card.suit == CardSuit.HEART || card.suit == CardSuit.DIAMOND -> Color.RED
+                else -> Color.BLACK
             }
             tvCardSuit.setTextColor(cardColor)
             tvCardRank.setTextColor(cardColor)

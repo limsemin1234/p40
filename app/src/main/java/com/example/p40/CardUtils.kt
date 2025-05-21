@@ -36,8 +36,9 @@ object CardUtils {
      */
     fun getSuitColor(suit: CardSuit): Int {
         return when (suit) {
-            CardSuit.HEART, CardSuit.DIAMOND, CardSuit.JOKER -> Color.RED
+            CardSuit.HEART, CardSuit.DIAMOND -> Color.RED
             CardSuit.CLUB, CardSuit.SPADE -> Color.BLACK
+            CardSuit.JOKER -> Color.parseColor("#FFD700") // 황금색(#FFD700)으로 변경
         }
     }
     

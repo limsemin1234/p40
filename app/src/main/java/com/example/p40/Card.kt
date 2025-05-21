@@ -30,8 +30,9 @@ enum class CardSuit {
     
     fun getColor(): Int {
         return when (this) {
-            HEART, DIAMOND, JOKER -> Color.RED
+            HEART, DIAMOND -> Color.RED
             CLUB, SPADE -> Color.BLACK
+            JOKER -> Color.parseColor("#FFD700") // 황금색(#FFD700)으로 변경
         }
     }
 }
