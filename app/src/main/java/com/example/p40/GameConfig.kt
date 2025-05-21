@@ -176,6 +176,16 @@ object GameConfig {
     const val STATS_RANGE_UPGRADE_AMOUNT = 5     // 사거리 증가량
     const val STATS_RANGE_BASE_COST = 100        // 사거리 강화 기본 비용
     const val STATS_RANGE_COST_INCREASE = 100    // 사거리 강화 비용 증가량
+    
+    // 가시 데미지 강화 관련 설정
+    const val STATS_THORN_DAMAGE_UPGRADE_AMOUNT = 2     // 가시 데미지 증가량
+    const val STATS_THORN_DAMAGE_BASE_COST = 100        // 가시 데미지 강화 기본 비용
+    const val STATS_THORN_DAMAGE_COST_INCREASE = 100    // 가시 데미지 강화 비용 증가량
+    
+    // 밀치기 강화 관련 설정
+    const val STATS_PUSH_DISTANCE_UPGRADE_AMOUNT = 0.2f  // 밀치기 거리 증가량 (유닛 크기 배수)
+    const val STATS_PUSH_DISTANCE_BASE_COST = 100        // 밀치기 강화 기본 비용
+    const val STATS_PUSH_DISTANCE_COST_INCREASE = 100    // 밀치기 강화 비용 증가량
 
     // --------- 포커 족보별 스탯 증가 설정 ----------
     
