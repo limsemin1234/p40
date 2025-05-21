@@ -158,17 +158,17 @@ object GameConfig {
     const val STATS_MAX_LEVEL = 50  // 모든 스탯의 최대 강화 레벨
     
     // 체력 강화 관련 설정
-    const val STATS_HEALTH_UPGRADE_AMOUNT = 10    // 체력 증가량
+    const val STATS_HEALTH_UPGRADE_AMOUNT = 5    // 체력 증가량
     const val STATS_HEALTH_BASE_COST = 100        // 체력 강화 기본 비용
     const val STATS_HEALTH_COST_INCREASE = 100    // 체력 강화 비용 증가량
     
     // 공격력 강화 관련 설정
-    const val STATS_ATTACK_UPGRADE_AMOUNT = 5     // 공격력 증가량
+    const val STATS_ATTACK_UPGRADE_AMOUNT = 2     // 공격력 증가량
     const val STATS_ATTACK_BASE_COST = 100        // 공격력 강화 기본 비용
     const val STATS_ATTACK_COST_INCREASE = 100    // 공격력 강화 비용 증가량
     
     // 공격 속도 강화 관련 설정
-    const val STATS_ATTACK_SPEED_UPGRADE_AMOUNT = 10  // 공격 속도 감소량 (ms)
+    const val STATS_ATTACK_SPEED_UPGRADE_AMOUNT = 5  // 공격 속도 감소량 (ms)
     const val STATS_ATTACK_SPEED_BASE_COST = 100        // 공격 속도 강화 기본 비용
     const val STATS_ATTACK_SPEED_COST_INCREASE = 100    // 공격 속도 강화 비용 증가량
     
@@ -183,7 +183,7 @@ object GameConfig {
     const val STATS_THORN_DAMAGE_COST_INCREASE = 100    // 가시 데미지 강화 비용 증가량
     
     // 밀치기 강화 관련 설정
-    const val STATS_PUSH_DISTANCE_UPGRADE_AMOUNT = 0.2f  // 밀치기 거리 증가량 (유닛 크기 배수)
+    const val STATS_PUSH_DISTANCE_UPGRADE_AMOUNT = 0.1f  // 밀치기 거리 증가량 (유닛 크기 배수)
     const val STATS_PUSH_DISTANCE_BASE_COST = 100        // 밀치기 강화 기본 비용
     const val STATS_PUSH_DISTANCE_COST_INCREASE = 100    // 밀치기 강화 비용 증가량
 
