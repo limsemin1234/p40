@@ -121,6 +121,18 @@ object GameConfig {
     const val DEFENSE_UPGRADE_VALUE = 10  // 업그레이드당 최대 체력 증가량
     const val DEFENSE_UPGRADE_MAX_LEVEL = 100  // 최대 업그레이드 레벨
 
+    // 가시 데미지 업그레이드 설정
+    const val THORN_DAMAGE_UPGRADE_INITIAL_COST = 10  // 초기 비용
+    const val THORN_DAMAGE_UPGRADE_COST_INCREASE = 5  // 레벨당 비용 증가량
+    const val THORN_DAMAGE_UPGRADE_VALUE = 1  // 업그레이드당 가시 데미지 증가량
+    const val THORN_DAMAGE_UPGRADE_MAX_LEVEL = 100  // 최대 업그레이드 레벨
+
+    // 밀치기 업그레이드 설정
+    const val PUSH_DISTANCE_UPGRADE_INITIAL_COST = 10  // 초기 비용
+    const val PUSH_DISTANCE_UPGRADE_COST_INCREASE = 5  // 레벨당 비용 증가량
+    const val PUSH_DISTANCE_UPGRADE_VALUE = 0.1f  // 업그레이드당 밀치기 거리 증가량 (유닛 크기 배수)
+    const val PUSH_DISTANCE_UPGRADE_MAX_LEVEL = 100  // 최대 업그레이드 레벨
+
     
     // --------- 렌더링 관련 설정 ----------
     
@@ -275,18 +287,7 @@ object GameConfig {
     const val CLUB_DAMAGE_MULTIPLIER = 1.0f   // 공격력 영향 없음
     const val CLUB_SPEED_MULTIPLIER = 0.5f    // 공격속도 50% 감소
     const val CLUB_RANGE_MULTIPLIER = 1.5f    // 공격범위 50% 증가
-    
-    // 가시 데미지 업그레이드 설정
-    const val THORN_DAMAGE_UPGRADE_INITIAL_COST = 10  // 초기 비용
-    const val THORN_DAMAGE_UPGRADE_COST_INCREASE = 5  // 레벨당 비용 증가량
-    const val THORN_DAMAGE_UPGRADE_VALUE = 1  // 업그레이드당 가시 데미지 증가량
-    const val THORN_DAMAGE_UPGRADE_MAX_LEVEL = 100  // 최대 업그레이드 레벨
-    
-    // 밀치기 업그레이드 설정
-    const val PUSH_DISTANCE_UPGRADE_INITIAL_COST = 10  // 초기 비용
-    const val PUSH_DISTANCE_UPGRADE_COST_INCREASE = 5  // 레벨당 비용 증가량
-    const val PUSH_DISTANCE_UPGRADE_VALUE = 0.1f  // 업그레이드당 밀치기 거리 증가량 (유닛 크기 배수)
-    const val PUSH_DISTANCE_UPGRADE_MAX_LEVEL = 100  // 최대 업그레이드 레벨
+
     
     /**
      * 현재 설정된 총 웨이브 수 반환
