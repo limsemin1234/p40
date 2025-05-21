@@ -152,8 +152,8 @@ class StatsUpgradeFragment : BaseFragment(R.layout.fragment_stats_upgrade) {
         tvAttackUpgradeInfo.text = "공격력 +${GameConfig.STATS_ATTACK_UPGRADE_AMOUNT} (Lv.${attackLevel}/${GameConfig.STATS_MAX_LEVEL})"
         tvAttackSpeedUpgradeInfo.text = "공격 속도 -${GameConfig.STATS_ATTACK_SPEED_UPGRADE_AMOUNT}ms (Lv.${attackSpeedLevel}/${GameConfig.STATS_MAX_LEVEL})"
         tvRangeUpgradeInfo.text = "사거리 +${GameConfig.STATS_RANGE_UPGRADE_AMOUNT} (Lv.${rangeLevel}/${GameConfig.STATS_MAX_LEVEL})"
-        tvThornDamageUpgradeInfo.text = "가시데미지 +1 (Lv.${thornDamageLevel}/${GameConfig.STATS_MAX_LEVEL})"
-        tvPushDistanceUpgradeInfo.text = "밀치기 +0.1 (Lv.${pushDistanceLevel}/${GameConfig.STATS_MAX_LEVEL})"
+        tvThornDamageUpgradeInfo.text = "가시데미지 +${GameConfig.STATS_THORN_DAMAGE_UPGRADE_AMOUNT} (Lv.${thornDamageLevel}/${GameConfig.STATS_MAX_LEVEL})"
+        tvPushDistanceUpgradeInfo.text = "밀치기 +${GameConfig.STATS_PUSH_DISTANCE_UPGRADE_AMOUNT} (Lv.${pushDistanceLevel}/${GameConfig.STATS_MAX_LEVEL})"
         
         // 강화 비용 표시
         val healthCost = statsManager.getHealthUpgradeCost()

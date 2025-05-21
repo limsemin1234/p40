@@ -200,7 +200,7 @@ class StatsManager private constructor(context: Context) {
         return prefs.getInt(KEY_THORN_DAMAGE_LEVEL, 0)
     }
     
-    fun upgradeThornDamage(amount: Int = 1): Boolean {
+    fun upgradeThornDamage(amount: Int = GameConfig.STATS_THORN_DAMAGE_UPGRADE_AMOUNT): Boolean {
         val currentLevel = getThornDamageLevel()
         
         // 최대 레벨 체크
@@ -227,7 +227,7 @@ class StatsManager private constructor(context: Context) {
         return prefs.getInt(KEY_PUSH_DISTANCE_LEVEL, 0)
     }
     
-    fun upgradePushDistance(amount: Float = 0.1f): Boolean {
+    fun upgradePushDistance(amount: Float = GameConfig.STATS_PUSH_DISTANCE_UPGRADE_AMOUNT): Boolean {
         val currentLevel = getPushDistanceLevel()
         
         // 최대 레벨 체크
@@ -243,12 +243,12 @@ class StatsManager private constructor(context: Context) {
     
     // 가시데미지 강화 비용 계산
     fun getThornDamageUpgradeCost(): Int {
-        return 100 + (getThornDamageLevel() * 100)
+        return GameConfig.STATS_THORN_DAMAGE_BASE_COST + (getThornDamageLevel() * GameConfig.STATS_THORN_DAMAGE_COST_INCREASE)
     }
     
     // 밀치기 강화 비용 계산
     fun getPushDistanceUpgradeCost(): Int {
-        return 100 + (getPushDistanceLevel() * 100)
+        return GameConfig.STATS_PUSH_DISTANCE_BASE_COST + (getPushDistanceLevel() * GameConfig.STATS_PUSH_DISTANCE_COST_INCREASE)
     }
     
     // 강화 비용 계산 메서드를 스탯별로 개별화
