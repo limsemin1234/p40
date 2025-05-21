@@ -13,12 +13,16 @@ class StatsManager private constructor(context: Context) {
         private const val KEY_ATTACK = "attack"
         private const val KEY_ATTACK_SPEED = "attack_speed"
         private const val KEY_RANGE = "range"
+        private const val KEY_THORN_DAMAGE = "thorn_damage"
+        private const val KEY_PUSH_DISTANCE = "push_distance"
         
         // 스탯 레벨 키 정의
         private const val KEY_HEALTH_LEVEL = "health_level"
         private const val KEY_ATTACK_LEVEL = "attack_level"
         private const val KEY_ATTACK_SPEED_LEVEL = "attack_speed_level"
         private const val KEY_RANGE_LEVEL = "range_level"
+        private const val KEY_THORN_DAMAGE_LEVEL = "thorn_damage_level"
+        private const val KEY_PUSH_DISTANCE_LEVEL = "push_distance_level"
         
         // 게임 시작 시 코인 추적을 위한 키
         private const val KEY_INITIAL_GAME_COINS = "initial_game_coins"
@@ -28,6 +32,8 @@ class StatsManager private constructor(context: Context) {
         private val DEFAULT_ATTACK = GameConfig.MISSILE_DAMAGE
         private val DEFAULT_ATTACK_SPEED = 1.0f
         private val DEFAULT_RANGE = GameConfig.DEFENSE_UNIT_ATTACK_RANGE.toInt()
+        private val DEFAULT_THORN_DAMAGE = GameConfig.DEFENSE_UNIT_THORN_DAMAGE
+        private val DEFAULT_PUSH_DISTANCE = GameConfig.DEFENSE_UNIT_PUSH_DISTANCE
         
         // 싱글톤 인스턴스
         @Volatile
@@ -181,6 +187,70 @@ class StatsManager private constructor(context: Context) {
         return true
     }
     
+    // 가시데미지 관련
+    fun getThornDamage(): Int {
+        return prefs.getInt(KEY_THORN_DAMAGE, DEFAULT_THORN_DAMAGE)
+    }
+    
+    fun setThornDamage(thornDamage: Int) {
+        prefs.edit().putInt(KEY_THORN_DAMAGE, thornDamage).apply()
+    }
+    
+    fun getThornDamageLevel(): Int {
+        return prefs.getInt(KEY_THORN_DAMAGE_LEVEL, 0)
+    }
+    
+    fun upgradeThornDamage(amount: Int = 1): Boolean {
+        val currentLevel = getThornDamageLevel()
+        
+        // 최대 레벨 체크
+        if (currentLevel >= GameConfig.STATS_MAX_LEVEL) {
+            return false
+        }
+        
+        val currentThornDamage = getThornDamage()
+        setThornDamage(currentThornDamage + amount)
+        prefs.edit().putInt(KEY_THORN_DAMAGE_LEVEL, currentLevel + 1).apply()
+        return true
+    }
+    
+    // 밀치기 관련
+    fun getPushDistance(): Float {
+        return prefs.getFloat(KEY_PUSH_DISTANCE, DEFAULT_PUSH_DISTANCE)
+    }
+    
+    fun setPushDistance(pushDistance: Float) {
+        prefs.edit().putFloat(KEY_PUSH_DISTANCE, pushDistance).apply()
+    }
+    
+    fun getPushDistanceLevel(): Int {
+        return prefs.getInt(KEY_PUSH_DISTANCE_LEVEL, 0)
+    }
+    
+    fun upgradePushDistance(amount: Float = 0.1f): Boolean {
+        val currentLevel = getPushDistanceLevel()
+        
+        // 최대 레벨 체크
+        if (currentLevel >= GameConfig.STATS_MAX_LEVEL) {
+            return false
+        }
+        
+        val currentPushDistance = getPushDistance()
+        setPushDistance(currentPushDistance + amount)
+        prefs.edit().putInt(KEY_PUSH_DISTANCE_LEVEL, currentLevel + 1).apply()
+        return true
+    }
+    
+    // 가시데미지 강화 비용 계산
+    fun getThornDamageUpgradeCost(): Int {
+        return 100 + (getThornDamageLevel() * 100)
+    }
+    
+    // 밀치기 강화 비용 계산
+    fun getPushDistanceUpgradeCost(): Int {
+        return 100 + (getPushDistanceLevel() * 100)
+    }
+    
     // 강화 비용 계산 메서드를 스탯별로 개별화
     
     // 체력 강화 비용 계산 - 선형 증가 방식으로 변경
@@ -203,18 +273,22 @@ class StatsManager private constructor(context: Context) {
         return GameConfig.STATS_RANGE_BASE_COST + (getRangeLevel() * GameConfig.STATS_RANGE_COST_INCREASE)
     }
     
-    // 모든 스탯 초기화 (개발 테스트용)
+    // 모든 스탯 초기화 수정 (개발 테스트용)
     fun resetAllStats() {
         prefs.edit().apply {
             putInt(KEY_HEALTH, DEFAULT_HEALTH)
             putInt(KEY_ATTACK, DEFAULT_ATTACK)
             putFloat(KEY_ATTACK_SPEED, DEFAULT_ATTACK_SPEED)
             putInt(KEY_RANGE, DEFAULT_RANGE)
+            putInt(KEY_THORN_DAMAGE, DEFAULT_THORN_DAMAGE)
+            putFloat(KEY_PUSH_DISTANCE, DEFAULT_PUSH_DISTANCE)
             
             putInt(KEY_HEALTH_LEVEL, 0)
             putInt(KEY_ATTACK_LEVEL, 0)
             putInt(KEY_ATTACK_SPEED_LEVEL, 0)
             putInt(KEY_RANGE_LEVEL, 0)
+            putInt(KEY_THORN_DAMAGE_LEVEL, 0)
+            putInt(KEY_PUSH_DISTANCE_LEVEL, 0)
         }.apply()
     }
     

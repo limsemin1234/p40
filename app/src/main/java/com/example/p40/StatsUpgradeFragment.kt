@@ -21,18 +21,24 @@ class StatsUpgradeFragment : BaseFragment(R.layout.fragment_stats_upgrade) {
     private lateinit var tvCurrentAttack: TextView
     private lateinit var tvCurrentAttackSpeed: TextView
     private lateinit var tvCurrentRange: TextView
+    private lateinit var tvCurrentThornDamage: TextView
+    private lateinit var tvCurrentPushDistance: TextView
     
     // 스탯 강화 정보 텍스트뷰
     private lateinit var tvHealthUpgradeInfo: TextView
     private lateinit var tvAttackUpgradeInfo: TextView
     private lateinit var tvAttackSpeedUpgradeInfo: TextView
     private lateinit var tvRangeUpgradeInfo: TextView
+    private lateinit var tvThornDamageUpgradeInfo: TextView
+    private lateinit var tvPushDistanceUpgradeInfo: TextView
     
     // 스탯 강화 비용 텍스트뷰
     private lateinit var tvHealthUpgradeCost: TextView
     private lateinit var tvAttackUpgradeCost: TextView
     private lateinit var tvAttackSpeedUpgradeCost: TextView
     private lateinit var tvRangeUpgradeCost: TextView
+    private lateinit var tvThornDamageUpgradeCost: TextView
+    private lateinit var tvPushDistanceUpgradeCost: TextView
     
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -66,18 +72,24 @@ class StatsUpgradeFragment : BaseFragment(R.layout.fragment_stats_upgrade) {
         tvCurrentAttack = view.findViewById(R.id.tvCurrentAttack)
         tvCurrentAttackSpeed = view.findViewById(R.id.tvCurrentAttackSpeed)
         tvCurrentRange = view.findViewById(R.id.tvCurrentRange)
+        tvCurrentThornDamage = view.findViewById(R.id.tvCurrentThornDamage)
+        tvCurrentPushDistance = view.findViewById(R.id.tvCurrentPushDistance)
         
         // 스탯 강화 정보 텍스트뷰
         tvHealthUpgradeInfo = view.findViewById(R.id.tvHealthUpgradeInfo)
         tvAttackUpgradeInfo = view.findViewById(R.id.tvAttackUpgradeInfo)
         tvAttackSpeedUpgradeInfo = view.findViewById(R.id.tvAttackSpeedUpgradeInfo)
         tvRangeUpgradeInfo = view.findViewById(R.id.tvRangeUpgradeInfo)
+        tvThornDamageUpgradeInfo = view.findViewById(R.id.tvThornDamageUpgradeInfo)
+        tvPushDistanceUpgradeInfo = view.findViewById(R.id.tvPushDistanceUpgradeInfo)
         
         // 스탯 강화 비용 텍스트뷰
         tvHealthUpgradeCost = view.findViewById(R.id.tvHealthUpgradeCost)
         tvAttackUpgradeCost = view.findViewById(R.id.tvAttackUpgradeCost)
         tvAttackSpeedUpgradeCost = view.findViewById(R.id.tvAttackSpeedUpgradeCost)
         tvRangeUpgradeCost = view.findViewById(R.id.tvRangeUpgradeCost)
+        tvThornDamageUpgradeCost = view.findViewById(R.id.tvThornDamageUpgradeCost)
+        tvPushDistanceUpgradeCost = view.findViewById(R.id.tvPushDistanceUpgradeCost)
     }
     
     // 강화 버튼 설정
@@ -101,6 +113,16 @@ class StatsUpgradeFragment : BaseFragment(R.layout.fragment_stats_upgrade) {
         view.findViewById<Button>(R.id.btnUpgradeRange).setOnClickListener {
             upgradeRange()
         }
+        
+        // 가시데미지 강화 버튼 추가
+        view.findViewById<Button>(R.id.btnUpgradeThornDamage).setOnClickListener {
+            upgradeThornDamage()
+        }
+        
+        // 밀치기 강화 버튼 추가
+        view.findViewById<Button>(R.id.btnUpgradePushDistance).setOnClickListener {
+            upgradePushDistance()
+        }
     }
     
     // 현재 스탯 정보 업데이트
@@ -114,29 +136,39 @@ class StatsUpgradeFragment : BaseFragment(R.layout.fragment_stats_upgrade) {
         tvCurrentAttackSpeed.text = "${attackSpeedInMs}ms"
         
         tvCurrentRange.text = statsManager.getRange().toString()
+        tvCurrentThornDamage.text = statsManager.getThornDamage().toString()
+        tvCurrentPushDistance.text = statsManager.getPushDistance().toString()
         
         // 현재 레벨 정보
         val healthLevel = statsManager.getHealthLevel()
         val attackLevel = statsManager.getAttackLevel()
         val attackSpeedLevel = statsManager.getAttackSpeedLevel()
         val rangeLevel = statsManager.getRangeLevel()
+        val thornDamageLevel = statsManager.getThornDamageLevel()
+        val pushDistanceLevel = statsManager.getPushDistanceLevel()
         
         // 강화 정보 표시 (현재 레벨/최대 레벨 표시 추가)
         tvHealthUpgradeInfo.text = "체력 +${GameConfig.STATS_HEALTH_UPGRADE_AMOUNT} (Lv.${healthLevel}/${GameConfig.STATS_MAX_LEVEL})"
         tvAttackUpgradeInfo.text = "공격력 +${GameConfig.STATS_ATTACK_UPGRADE_AMOUNT} (Lv.${attackLevel}/${GameConfig.STATS_MAX_LEVEL})"
         tvAttackSpeedUpgradeInfo.text = "공격 속도 -${GameConfig.STATS_ATTACK_SPEED_UPGRADE_AMOUNT}ms (Lv.${attackSpeedLevel}/${GameConfig.STATS_MAX_LEVEL})"
         tvRangeUpgradeInfo.text = "사거리 +${GameConfig.STATS_RANGE_UPGRADE_AMOUNT} (Lv.${rangeLevel}/${GameConfig.STATS_MAX_LEVEL})"
+        tvThornDamageUpgradeInfo.text = "가시데미지 +1 (Lv.${thornDamageLevel}/${GameConfig.STATS_MAX_LEVEL})"
+        tvPushDistanceUpgradeInfo.text = "밀치기 +0.1 (Lv.${pushDistanceLevel}/${GameConfig.STATS_MAX_LEVEL})"
         
         // 강화 비용 표시
         val healthCost = statsManager.getHealthUpgradeCost()
         val attackCost = statsManager.getAttackUpgradeCost()
         val attackSpeedCost = statsManager.getAttackSpeedUpgradeCost()
         val rangeCost = statsManager.getRangeUpgradeCost()
+        val thornDamageCost = statsManager.getThornDamageUpgradeCost()
+        val pushDistanceCost = statsManager.getPushDistanceUpgradeCost()
         
         tvHealthUpgradeCost.text = "코인: $healthCost"
         tvAttackUpgradeCost.text = "코인: $attackCost"
         tvAttackSpeedUpgradeCost.text = "코인: $attackSpeedCost"
         tvRangeUpgradeCost.text = "코인: $rangeCost"
+        tvThornDamageUpgradeCost.text = "코인: $thornDamageCost"
+        tvPushDistanceUpgradeCost.text = "코인: $pushDistanceCost"
         
         // 코인 정보 업데이트 (BaseFragment의 메서드 활용)
         updateCoinInfo(requireView())
@@ -254,6 +286,66 @@ class StatsUpgradeFragment : BaseFragment(R.layout.fragment_stats_upgrade) {
             
             if (success) {
                 messageManager.showSuccess("사거리가 강화되었습니다!")
+            } else {
+                messageManager.showWarning("최대 레벨에 도달했습니다!")
+            }
+        } else {
+            messageManager.showWarning("코인이 부족합니다!")
+        }
+    }
+    
+    // 가시데미지 강화
+    private fun upgradeThornDamage() {
+        val cost = statsManager.getThornDamageUpgradeCost()
+        
+        // 최대 레벨 체크
+        if (statsManager.getThornDamageLevel() >= GameConfig.STATS_MAX_LEVEL) {
+            messageManager.showWarning("이미 최대 레벨에 도달했습니다!")
+            return
+        }
+        
+        if (userManager.getCoin() >= cost) {
+            // 코인 차감
+            userManager.decreaseCoin(cost)
+            
+            // 가시데미지 증가
+            val success = statsManager.upgradeThornDamage()
+            
+            // UI 업데이트
+            updateStatsUI()
+            
+            if (success) {
+                messageManager.showSuccess("가시데미지가 강화되었습니다!")
+            } else {
+                messageManager.showWarning("최대 레벨에 도달했습니다!")
+            }
+        } else {
+            messageManager.showWarning("코인이 부족합니다!")
+        }
+    }
+    
+    // 밀치기 강화
+    private fun upgradePushDistance() {
+        val cost = statsManager.getPushDistanceUpgradeCost()
+        
+        // 최대 레벨 체크
+        if (statsManager.getPushDistanceLevel() >= GameConfig.STATS_MAX_LEVEL) {
+            messageManager.showWarning("이미 최대 레벨에 도달했습니다!")
+            return
+        }
+        
+        if (userManager.getCoin() >= cost) {
+            // 코인 차감
+            userManager.decreaseCoin(cost)
+            
+            // 밀치기 증가
+            val success = statsManager.upgradePushDistance()
+            
+            // UI 업데이트
+            updateStatsUI()
+            
+            if (success) {
+                messageManager.showSuccess("밀치기가 강화되었습니다!")
             } else {
                 messageManager.showWarning("최대 레벨에 도달했습니다!")
             }
